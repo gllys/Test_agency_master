@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+echo "Tag list:"
+git tag
+echo ""
+echo "Please choose a tag to publish :"
+read git_tag_val
+
+echo ""
+echo "Server list:"
+web1="deploy@web-yv1:/data/web/openapi_ticket"
+web2="deploy@web-yv2:/data/web/openapi_ticket"
+web3="deploy@web-yv3:/data/web/openapi_ticket"
+echo "web1"
+echo "web2"
+echo "web3"
+echo ""
+echo "Please choose a server to publish :"
+read target_server
+
+echo ""
+echo "================!!!CONFIRM!!!==============="
+echo ""
+read -p "Publish $git_tag_val to $target_server ? (y/n) "
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+
+	mkdir /tmp/__master/
+
+	git archive $git_tag_val | tar -x -C /tmp/__master/
+
+	rsync -avzP \
+		--exclude 'log/*' \
+		--delete \
+	/tmp/__master/ ${!target_server}
+
+	rm -rf /tmp/__master/
+fi

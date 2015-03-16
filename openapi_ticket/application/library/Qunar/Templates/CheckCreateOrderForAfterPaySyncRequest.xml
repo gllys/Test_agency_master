@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<request xsi:schemaLocation="http://piao.qunar.com/2013/QMenpiaoRequestSchema QMRequestDataSchema-2.0.1.xsd" xmlns="http://piao.qunar.com/2013/QMenpiaoRequestSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<header>
+		<application>Qunar.Menpiao.Agent</application>
+		<processor>SupplierDataExchangeProcessor</processor>
+		<version>v2.0.1</version>
+		<bodyType>CheckCreateOrderForAfterPaySyncRequestBody</bodyType>
+		<createUser>SupplierSystemName</createUser>
+		<createTime>yyyy-MM-dd HH:mm:ss</createTime>
+		<supplierIdentity>supplierIdentity</supplierIdentity>
+	</header>
+	<body xsi:type="CheckCreateOrderForAfterPaySyncRequestBody">
+		<orderInfo>
+			<orderId></orderId>
+			<product>
+				<resourceId></resourceId>
+				<productName></productName>
+				<visitDate></visitDate>
+				<sellPrice></sellPrice>
+				<cashBackMoney></cashBackMoney>
+			</product>
+			<contactPerson>
+				<name></name>
+				<namePinyin></namePinyin>
+				<mobile></mobile>
+				<email></email>
+				<address></address>
+				<zipCode></zipCode>
+			</contactPerson>
+			<visitPerson>
+					<person>
+						<name></name>
+						<namePinyin></namePinyin>
+						<credentials></credentials>
+						<credentialsType></credentialsType>
+						<defined1Value></defined1Value>
+						<defined2Value></defined2Value>
+					</person>
+			</visitPerson>
+			<orderQuantity></orderQuantity>
+			<orderPrice></orderPrice>
+			<orderCashBackMoney></orderCashBackMoney>
+			<orderStatus></orderStatus>
+			<orderRemark></orderRemark>
+			<orderSource></orderSource>
+		</orderInfo>
+	</body>
+</request>

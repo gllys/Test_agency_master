@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<request xsi:schemaLocation="http://piao.qunar.com/2013/QMenpiaoRequestSchema QMRequestDataSchema-2.0.1.xsd" xmlns="http://piao.qunar.com/2013/QMenpiaoRequestSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<header>
+		<application>Qunar.Menpiao.Agent</application>
+		<processor>SupplierDataExchangeProcessor</processor>
+		<version>v2.0.1</version>
+		<bodyType>NoticeProductChangedRequestBody</bodyType>
+		<createUser>SupplierSystemName</createUser>
+		<createTime>yyyy-MM-dd HH:mm:ss</createTime>
+		<supplierIdentity>supplierIdentity</supplierIdentity>
+	</header>
+	<body xsi:type="NoticeProductChangedRequestBody">
+		<resourceId></resourceId>
+	</body>
+</request>

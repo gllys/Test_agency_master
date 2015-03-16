@@ -1,0 +1,9 @@
+body{ font-size:14px;}
+pre{ border:1px solid #cccccc; padding:10px 5px;}
+table{ border:0; background: #cccccc;}
+th, td{ background: #ffffff; line-height: 30px; padding:0 10px;}
+#toc-menu{ border: 1px solid #cccccc;}
+#toc-menu h3{ margin: 0; text-indent: 5px; font-size: 14px; line-height: 30px; background: #fcfcfc; border-bottom: 1px solid #cccccc;}
+#toc-list{ list-style:none; margin:0; padding:10px 5px;}
+#toc-list a{ text-decoration: none; color:#003399; font-size: 14px; line-height: 25px;}
+#toc-list a:hover{ color:#e0d75a;}

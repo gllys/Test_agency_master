@@ -1,0 +1,1 @@
+ALTER TABLE `ticket_template` CHANGE `state` `state` TINYINT(1) NOT NULL DEFAULT '0' COMMENT '上下架状态 1：上架，0仓库中，2待上架';

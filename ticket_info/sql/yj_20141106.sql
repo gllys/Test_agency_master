@@ -1,0 +1,2 @@
+ALTER TABLE `ticket_template` ADD `expire_start` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '起始日';
+ALTER TABLE `ticket_template` ADD `expire_end` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '结束日';

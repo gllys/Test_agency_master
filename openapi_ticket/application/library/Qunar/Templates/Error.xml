@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response xsi:schemaLocation="http://piao.qunar.com/2013/QMenpiaoResponseSchema QMResponseDataSchema-2.0.1.xsd" xmlns="http://piao.qunar.com/2013/QMenpiaoResponseSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	{include file="ResponseHeader.xml" name="header"} 
+	<body xsi:type="APIErrorResponseBody">
+		<code>{{$code}}</code>
+		<message>{{$message}}</message>
+	</body>
+</response>

@@ -1,0 +1,9 @@
+<header>
+    <application>{{$request_application}}</application>
+    <processor>{{$request_processor}}</processor>
+    <version>{{$request_version}}</version>
+    <bodyType>{{$request_type}}</bodyType>
+    <createUser>{{$request_create_user}}</createUser>
+    <createTime>{{$request_time}}</createTime>
+    <supplierIdentity>{{$request_supplier_identity}}</supplierIdentity>
+</header>

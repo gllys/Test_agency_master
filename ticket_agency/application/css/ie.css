@@ -1,0 +1,16 @@
+.headerwrapper .header-right .btn-group > .btn {
+	background-color:#4182b9;
+    color:#fff;
+	}
+.ckbox label:before,.rdio label:before{
+	border:0
+	}
+	
+.modal-body > .form-group{
+	overflow:hidden
+	}
+
+.ui-datepicker td.ui-datepicker-today a {
+	background: rgba(66,139,202,1) !important;
+	background:#4182b9;
+}

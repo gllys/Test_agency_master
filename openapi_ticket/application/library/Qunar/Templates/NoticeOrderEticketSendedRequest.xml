@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<request xsi:schemaLocation="http://piao.qunar.com/2013/QMenpiaoRequestSchema QMRequestDataSchema-2.0.1.xsd" xmlns="http://piao.qunar.com/2013/QMenpiaoRequestSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	{include file="RequestHeader.xml" name="header"}
+	<body xsi:type="NoticeOrderEticketSendedRequestBody">
+		<orderInfo>
+			<partnerorderId>{{$partnerorderId}}</partnerorderId>
+			<eticketNo>{{$eticketNo}}</eticketNo>
+			<eticketSended>{{$eticketSended}}</eticketSended>
+		</orderInfo>
+	</body>
+</request>

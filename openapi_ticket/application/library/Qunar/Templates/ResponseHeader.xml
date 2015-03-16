@@ -1,0 +1,10 @@
+<header>
+		<application>{{$response_application}}</application>
+		<processor>{{$response_processor}}</processor>
+		<version>{{$response_version}}</version>
+		<bodyType>{{$response_type}}</bodyType>
+		<createUser>{{$response_create_user}}</createUser>
+		<createTime>{{$response_time}}</createTime>
+		<code>{{$response_code}}</code>
+		<describe>{{$response_desc}}</describe>
+</header>

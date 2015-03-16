@@ -1,0 +1,42 @@
+CREATE TABLE `ticket_template_base` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) COLLATE utf8_unicode_ci NOT NULL DEFAULT '' COMMENT '门票名称',
+  `fat_price` decimal(20,2) NOT NULL DEFAULT '0.00' COMMENT '散客价',
+  `group_price` decimal(20,2) NOT NULL DEFAULT '0.00' COMMENT '团体价',
+  `sale_price` decimal(20,2) NOT NULL DEFAULT '0.00' COMMENT '销售价',
+  `listed_price` decimal(20,2) NOT NULL DEFAULT '0.00' COMMENT '挂牌价',
+  `valid` int(11) NOT NULL DEFAULT '0' COMMENT '门票有效期，预定后多少天内有效',
+  `max_buy` int(11) NOT NULL DEFAULT '100' COMMENT '购买上限',
+  `mini_buy` int(11) NOT NULL DEFAULT '1' COMMENT '购买下限',
+  `payment` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '1,2,3,4' COMMENT '支付方式： 1：支线支付，2：信用支付，3：储值支付，4：平台储值支付',
+  `scenic_id` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '0' COMMENT '景区ID，逗号分隔',
+  `view_point` text COLLATE utf8_unicode_ci NOT NULL COMMENT '景点ID',
+  `state` tinyint(1) NOT NULL DEFAULT '2' COMMENT '上下架状态 1：上架，0仓库中，2待上架',
+  `scheduled_time` int(11) NOT NULL DEFAULT '0' COMMENT '需提前X天/X小时预定',
+  `week_time` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '' COMMENT '周几使用只能',
+  `is_del` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否删除 0：未删除，1：已删除',
+  `remark` text COLLATE utf8_unicode_ci NOT NULL COMMENT '名票说明',
+  `type` tinyint(2) NOT NULL DEFAULT '0' COMMENT '票类型 ；0 =>电子票 1=>任务单',
+  `date_available` varchar(30) COLLATE utf8_unicode_ci NOT NULL DEFAULT '0' COMMENT '可玩日期  int(11),int(11) 表示一个时间段 ，逗号分隔',
+  `created_by` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '创建人',
+  `created_at` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `updated_at` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '修改时间',
+  `province_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '所在省',
+  `city_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '所在市',
+  `district_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '所在地',
+  `is_fit` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '是否散客票0否1是',
+  `is_full` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '是否团客票0否1是',
+  `rule_id` int(11) unsigned DEFAULT NULL COMMENT '价格规则ID',
+  `namelist_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '限制清单ID',
+  `discount_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '优惠规则ID',
+  `ota_type` varchar(20) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'system',
+  `is_union` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT '是否联票',
+  `expire_start` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '起始日',
+  `expire_end` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '结束日',
+  PRIMARY KEY (`id`),
+  KEY `scenic_id` (`scenic_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '基础票';
+
+ALTER TABLE `ticket_template` ADD `real_expire_end` int(11) NOT NULL DEFAULT '0' COMMENT '真结束日';
+UPDATE `ticket_template` SET `real_expire_end`=cast(`expire_end` as signed)-cast(`scheduled_time` as signed);
+ALTER TABLE `ticket_template_base` ADD `real_expire_end` int(11) NOT NULL DEFAULT '0' COMMENT '真结束日';

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response xsi:schemaLocation="http://piao.qunar.com/2013/QMenpiaoResponseSchema QMResponseDataSchema-2.0.1.xsd" xmlns="http://piao.qunar.com/2013/QMenpiaoResponseSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<header>
+		<application>Qunar.Menpiao.Agent</application>
+		<processor>PayOrderForBeforePaySyncResponseBody</processor>
+		<version>v2.0.1</version>
+		<bodyType>SendOrderEticketResponseBody</bodyType>
+		<createUser>SupplierSystemName</createUser>
+		<createTime>yyyy-MM-dd HH:mm:ss</createTime>
+		<code>String</code>
+		<describe>String</describe>
+	</header>
+	<body xsi:type="PayOrderForBeforePaySyncResponseBody">
+		<orderInfo>
+			<partnerorderId></partnerorderId>
+			<orderStatus></orderStatus>
+		</orderInfo>
+	</body>
+</response>

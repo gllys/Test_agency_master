@@ -1,0 +1,184 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Name>info</Name>
+    <ProjectGuid>{fb7e64a5-37fe-48f3-a6bb-d1330cf4c279}</ProjectGuid>
+    <RootNamespace>info</RootNamespace>
+    <OutputType>Library</OutputType>
+    <ProjectTypeGuids>{A0786B88-2ADB-4C21-ABE8-AA2D79766269}</ProjectTypeGuids>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <IncludeDebugInformation>true</IncludeDebugInformation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <IncludeDebugInformation>false</IncludeDebugInformation>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="application\controllers\Error.php" />
+    <Compile Include="application\controllers\Index.php" />
+    <Compile Include="application\library\Base\Controller\Abstract.php" />
+    <Compile Include="application\library\Base\Controller\Api.php" />
+    <Compile Include="application\library\Base\Model\Abstract.php" />
+    <Compile Include="application\library\Base\Model\Api.php" />
+    <Compile Include="application\library\Cache\Memcache.php" />
+    <Compile Include="application\library\Cache\Redis.php" />
+    <Compile Include="application\library\Db\Mysql.php" />
+    <Compile Include="application\library\Lang\Msg.php" />
+    <Compile Include="application\library\Log\Base.php" />
+    <Compile Include="application\library\Log\Debug.php" />
+    <Compile Include="application\library\Log\Import.php" />
+    <Compile Include="application\library\Log\Test.php" />
+    <Compile Include="application\library\Pack\Json.php" />
+    <Compile Include="application\library\Pack\Msgpack.php" />
+    <Compile Include="application\library\Process\Base.php" />
+    <Compile Include="application\library\Process\Control.php" />
+    <Compile Include="application\library\Process\Manager.php" />
+    <Compile Include="application\library\Process\System.php" />
+    <Compile Include="application\library\Session\Writer\Redis.php" />
+    <Compile Include="application\library\Session\Proxy.php" />
+    <Compile Include="application\library\Util\Common.php" />
+    <Compile Include="application\library\Util\Curl.php" />
+    <Compile Include="application\library\Util\Gencache.php" />
+    <Compile Include="application\library\Util\Lock.php" />
+    <Compile Include="application\library\Util\Queue.php" />
+    <Compile Include="application\library\Util\Test.php" />
+    <Compile Include="application\library\View\Abstract.php" />
+    <Compile Include="application\library\Carbon.php" />
+    <Compile Include="application\library\Hash.php" />
+    <Compile Include="application\library\Password.php" />
+    <Compile Include="application\library\Sms.php" />
+    <Compile Include="application\library\Tools.php" />
+    <Compile Include="application\library\Validate.php" />
+    <Compile Include="application\models\AgencyProduct.php" />
+    <Compile Include="application\models\ApiOrganization.php" />
+    <Compile Include="application\models\District.php" />
+    <Compile Include="application\models\Favorites.php" />
+    <Compile Include="application\models\Language.php" />
+    <Compile Include="application\models\Organization.php" />
+    <Compile Include="application\models\Process.php" />
+    <Compile Include="application\models\Scenic.php" />
+    <Compile Include="application\models\Sendmsg.php" />
+    <Compile Include="application\models\Sms.php" />
+    <Compile Include="application\models\Subscribes.php" />
+    <Compile Include="application\models\Testapi.php" />
+    <Compile Include="application\models\TicketAgencyPrice.php" />
+    <Compile Include="application\models\TicketDayPrice.php" />
+    <Compile Include="application\models\TicketDayReserve.php" />
+    <Compile Include="application\models\TicketDiscountRule.php" />
+    <Compile Include="application\models\TicketOrgNamelist.php" />
+    <Compile Include="application\models\TicketPolicy.php" />
+    <Compile Include="application\models\TicketPolicyItem.php" />
+    <Compile Include="application\models\TicketRule.php" />
+    <Compile Include="application\models\TicketRuleItem.php" />
+    <Compile Include="application\models\TicketTemplate.php" />
+    <Compile Include="application\models\TicketTemplateBase.php" />
+    <Compile Include="application\models\TicketTemplateItem.php" />
+    <Compile Include="application\models\TicketType.php" />
+    <Compile Include="application\modules\Test\controllers\Test.php" />
+    <Compile Include="application\modules\V1\controllers\Agencyproduct.php" />
+    <Compile Include="application\modules\V1\controllers\Favorites.php" />
+    <Compile Include="application\modules\V1\controllers\Subscribes.php" />
+    <Compile Include="application\modules\V1\controllers\Ticketdiscountrule.php" />
+    <Compile Include="application\modules\V1\controllers\Ticketdprice.php" />
+    <Compile Include="application\modules\V1\controllers\Ticketdreserve.php" />
+    <Compile Include="application\modules\V1\controllers\Ticketorgnamelist.php" />
+    <Compile Include="application\modules\V1\controllers\Ticketpolicy.php" />
+    <Compile Include="application\modules\V1\controllers\Ticketrule.php" />
+    <Compile Include="application\modules\V1\controllers\Tickettemplate.php" />
+    <Compile Include="application\modules\V1\controllers\Tickettemplatebase.php" />
+    <Compile Include="application\modules\Agencyproduct.php" />
+    <Compile Include="application\modules\Favorites.php" />
+    <Compile Include="application\modules\Subscribes.php" />
+    <Compile Include="application\modules\Ticketdiscountrule.php" />
+    <Compile Include="application\modules\Ticketdprice.php" />
+    <Compile Include="application\modules\Ticketdreserve.php" />
+    <Compile Include="application\modules\Ticketorgnamelist.php" />
+    <Compile Include="application\modules\Ticketpolicy.php" />
+    <Compile Include="application\modules\Ticketrule.php" />
+    <Compile Include="application\modules\Tickettemplate.php" />
+    <Compile Include="application\modules\Tickettemplatebase.php" />
+    <Compile Include="application\plugins\Acl.php" />
+    <Compile Include="application\views\error\error.phtml" />
+    <Compile Include="application\views\index\index.phtml" />
+    <Compile Include="application\Bootstrap.php" />
+    <Compile Include="conf\base.ini" />
+    <Compile Include="conf\cache.ini" />
+    <Compile Include="conf\rewrite.conf" />
+    <Compile Include="crontab\Base.php" />
+    <Compile Include="crontab\Gencache.php" />
+    <Compile Include="crontab\GenTicketCode.php" />
+    <Compile Include="crontab\Manager.php" />
+    <Compile Include="crontab\MergeData.php" />
+    <Compile Include="crontab\Process.php" />
+    <Compile Include="crontab\Queue.php" />
+    <Compile Include="crontab\Share.php" />
+    <Compile Include="crontab\UpdateTicket.php" />
+    <Compile Include="crontab\Worker1.php" />
+    <Compile Include="log\error_20141011.sql" />
+    <Compile Include="public\.htaccess" />
+    <Compile Include="public\index.php" />
+    <Compile Include="sql\ct20141125.sql" />
+    <Compile Include="sql\joe20150116.sql" />
+    <Compile Include="sql\update_20141127.sql" />
+    <Compile Include="sql\xpf_20141014.sql" />
+    <Compile Include="sql\yj_20141104.sql" />
+    <Compile Include="sql\yj_20141106.sql" />
+    <Compile Include="sql\yj_20141110.sql" />
+    <Compile Include="sql\yj_20141218.sql" />
+    <Compile Include="sql\yj_20141227.sql" />
+    <Compile Include="sql\zqf20141110.sql" />
+    <Compile Include="sql\zqf20141111.sql" />
+    <Compile Include="sql\zqf20141111_lang.sql" />
+    <Compile Include="sql\zqf20141117_infoLang.sql" />
+    <Compile Include="sql\zqf20141119.sql" />
+    <Compile Include="sql\zqf20150116.sql" />
+    <Compile Include="sql\zqf_20141021.sql" />
+    <Compile Include="sql\zqf_20141103.sql" />
+    <Compile Include="sql\zqf_20141110.sql" />
+    <Compile Include="sql\zqf_20141112.sql" />
+    <Compile Include="sql\zqf_20141219.sql" />
+    <Compile Include="sql\zqf_20141229.sql" />
+    <Compile Include="sql\zqf_20150205v1.5.1.sql" />
+    <Compile Include="sql\zqf_20150310.sql" />
+    <Compile Include="test\Base.php" />
+    <Compile Include="test\Exp1.php" />
+    <Compile Include=".gitattributes" />
+    <Compile Include=".gitignore" />
+    <Compile Include="version" />
+    <Compile Include="xhprof.php" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="application\controllers" />
+    <Folder Include="application\library\Base\Controller" />
+    <Folder Include="application\library\Base\Model" />
+    <Folder Include="application\library\Base" />
+    <Folder Include="application\library\Cache" />
+    <Folder Include="application\library\Db" />
+    <Folder Include="application\library\Lang" />
+    <Folder Include="application\library\Log" />
+    <Folder Include="application\library\Pack" />
+    <Folder Include="application\library\Process" />
+    <Folder Include="application\library\Session\Writer" />
+    <Folder Include="application\library\Session" />
+    <Folder Include="application\library\Util" />
+    <Folder Include="application\library\View" />
+    <Folder Include="application\library" />
+    <Folder Include="application\models" />
+    <Folder Include="application\modules\Test\controllers" />
+    <Folder Include="application\modules\Test" />
+    <Folder Include="application\modules\V1\controllers" />
+    <Folder Include="application\modules\V1" />
+    <Folder Include="application\modules" />
+    <Folder Include="application\plugins" />
+    <Folder Include="application\views\error" />
+    <Folder Include="application\views\index" />
+    <Folder Include="application\views" />
+    <Folder Include="application" />
+    <Folder Include="conf" />
+    <Folder Include="crontab" />
+    <Folder Include="log" />
+    <Folder Include="public" />
+    <Folder Include="sql" />
+    <Folder Include="test" />
+  </ItemGroup>
+</Project>
