@@ -13,7 +13,7 @@ class V1Controller extends Base_Controller_ApiDispatch{
     public function init(){
         parent::init(false);
 
-//        self::echoLog('body', var_export($this->body, true), 'qunar_bee.log');
+        self::echoLog('body', var_export($this->body, true), 'common_bee.log');
     }
 
 }

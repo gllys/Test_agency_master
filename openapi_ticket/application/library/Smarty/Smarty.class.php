@@ -100,6 +100,11 @@ include_once SMARTY_SYSPLUGINS_DIR.'smarty_internal_resource_file.php';
 include_once SMARTY_SYSPLUGINS_DIR.'smarty_cacheresource.php';
 include_once SMARTY_SYSPLUGINS_DIR.'smarty_internal_cacheresource_file.php';
 
+include_once SMARTY_SYSPLUGINS_DIR.'smarty_internal_templatecompilerbase.php';
+include_once SMARTY_SYSPLUGINS_DIR.'smarty_internal_templatelexer.php';
+include_once SMARTY_SYSPLUGINS_DIR.'smarty_internal_templateparser.php';
+include_once SMARTY_SYSPLUGINS_DIR.'smarty_internal_compilebase.php';
+include_once SMARTY_SYSPLUGINS_DIR.'smarty_internal_write_file.php';
 /**
  * This is the main Smarty class
  * @package Smarty

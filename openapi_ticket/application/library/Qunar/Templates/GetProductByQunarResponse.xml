@@ -101,7 +101,7 @@
 								<saleEndTime></saleEndTime>
 							</salePeriod>
 						</salePeriods>
-						<smsTemplet></smsTemplet>
+						<smsTemplet>{{$product.smsTemplet}}</smsTemplet>
 						<eticketType></eticketType>
 					</otherConfig>
 				</productInfo>

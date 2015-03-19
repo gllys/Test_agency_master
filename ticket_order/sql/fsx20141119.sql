@@ -1,0 +1,1 @@
+ALTER TABLE `ticket_record` ADD `cancel_status` TINYINT NOT NULL DEFAULT '0' COMMENT '是否撤销 0未撤销 1已撤销' AFTER `http_status`;

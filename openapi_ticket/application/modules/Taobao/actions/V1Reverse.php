@@ -15,6 +15,7 @@ class ReverseAction extends Yaf_Action_Abstract{
     public function execute(){
         //获取本动作对应的控制器实例
         $ctrl = $this->getController();
+        $taobao = Taobao_TopClientFactory::create();
         //var_dump($ctrl->topc);
 
         $req = new Taobao_Request_VmarketEticketReverseRequest;
@@ -25,14 +26,14 @@ class ReverseAction extends Yaf_Action_Abstract{
 //        $req->setVerifyCodes($verifyCodes);
 //        $req->setQrImages($qrImages);
         $req->setToken($ctrl->body['token']);
-        $req->setCodemerchantId($ctrl->merchantId);
+        $req->setCodemerchantId($taobao->merchantId);
         $req->setPosid($ctrl->body['posid']);
 
         //日志输出
         $ctrl->echoLog('body', json_encode($ctrl->body), 'reverse_bee.log');
 
         for($i=0; $i<self::REVERSE_TIME; $i++){
-            $resp = $ctrl->topc->execute($req, $ctrl->sessionKey);
+            $resp = $taobao->topc->execute($req, $taobao->sessionKey);
 
             //日志输出
             $ctrl->echoLog('resp'.$i, json_encode($resp), 'reverse_bee.log');

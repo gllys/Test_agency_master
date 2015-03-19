@@ -1,0 +1,2 @@
+ALTER TABLE `transaction_flow` ADD `order_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '订单号';
+ALTER TABLE `transaction_flow` ADD `bill_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '结算单号';

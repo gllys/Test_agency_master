@@ -1,0 +1,1 @@
+<?phpclass CartModel extends Base_Model_Abstract{	protected $dbname = 'itourism';    protected $tblname = 'cart';    protected $pkKey = 'id';    protected $preCacheKey = 'cache|cartModel|';    	 public function getTable() 	 {	      return $this->tblname;	 }}

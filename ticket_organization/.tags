@@ -1,0 +1,1114 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+APPLICATION_PATH	crontab/Base.php	/^define('APPLICATION_PATH', realpath(dirname(__FILE__).'\/..\/'));$/;"	d
+APPLICATION_PATH	public/index.php	/^define('APPLICATION_PATH', realpath('..\/'));$/;"	d
+APPLICATION_PATH	test/Base.php	/^define('APPLICATION_PATH', realpath(dirname(__FILE__).'\/..\/'));$/;"	d
+BACKEND	crontab/Base.php	/^define('BACKEND', 1);$/;"	d
+Base_Controller_Abstract	application/library/Base/Controller/Abstract.php	/^class Base_Controller_Abstract extends Yaf_Controller_Abstract$/;"	c
+Base_Controller_Api	application/library/Base/Controller/Api.php	/^class Base_Controller_Api extends Base_Controller_Abstract$/;"	c
+Base_Model_Abstract	application/library/Base/Model/Abstract.php	/^abstract class Base_Model_Abstract$/;"	c
+Bootstrap	application/Bootstrap.php	/^class Bootstrap extends Yaf_Bootstrap_Abstract{$/;"	c
+Cache_Memcache	application/library/Cache/Memcache.php	/^class Cache_Memcache implements Countable$/;"	c
+Cache_Redis	application/library/Cache/Redis.php	/^class Cache_Redis implements Countable$/;"	c
+Carbon	application/library/Carbon.php	/^class Carbon extends DateTime$/;"	c
+Crontab_Queue	crontab/Queue.php	/^class Crontab_Queue extends Process_Base $/;"	c
+Crontab_Worker1	crontab/Worker1.php	/^class Crontab_Worker1 extends Process_Base $/;"	c
+Db_Mysql	application/library/Db/Mysql.php	/^class Db_Mysql$/;"	c
+ErrorController	application/controllers/Error.php	/^class ErrorController extends Yaf_Controller_Abstract {$/;"	c
+IndexController	application/controllers/Index.php	/^class IndexController extends Base_Controller_Abstract$/;"	c
+LOG_PATH	test/Base.php	/^define('LOG_PATH', APPLICATION_PATH.'\/log\/');$/;"	d
+Lang_Msg	application/library/Lang/Msg.php	/^class Lang_Msg $/;"	c
+LanguageModel	application/models/Language.php	/^class LanguageModel extends Base_Model_Abstract$/;"	c
+Log_Base	application/library/Log/Base.php	/^class Log_Base$/;"	c
+Log_Debug	application/library/Log/Debug.php	/^class Log_Debug$/;"	c
+Log_Import	application/library/Log/Import.php	/^class Log_Import$/;"	c
+Log_Test	application/library/Log/Test.php	/^class Log_Test extends Log_Base$/;"	c
+MemcacheConfig	application/library/Cache/Memcache.php	/^class MemcacheConfig$/;"	c
+MysqlConfig	application/library/Db/Mysql.php	/^class MysqlConfig$/;"	c
+OrganizationModel	application/models/Organization.php	/^class OrganizationModel extends Base_Model_Abstract$/;"	c
+PASSWORD_BCRYPT	application/library/Password.php	/^define('PASSWORD_BCRYPT', 1);$/;"	d
+PASSWORD_DEFAULT	application/library/Password.php	/^define('PASSWORD_DEFAULT', PASSWORD_BCRYPT);$/;"	d
+Pack_Json	application/library/Pack/Json.php	/^class Pack_Json$/;"	c
+Pack_Msgpack	application/library/Pack/Msgpack.php	/^class Pack_Msgpack$/;"	c
+Password	application/library/Password.php	/^class Password$/;"	c
+ProcessModel	application/models/Process.php	/^class ProcessModel extends Base_Model_Abstract$/;"	c
+Process_Base	application/library/Process/Base.php	/^abstract class Process_Base $/;"	c
+Process_Control	application/library/Process/Control.php	/^class Process_Control extends Process_Base$/;"	c
+Process_Manager	application/library/Process/Manager.php	/^class Process_Manager extends Process_Base$/;"	c
+Process_System	application/library/Process/System.php	/^class Process_System $/;"	c
+RedisConfig	application/library/Cache/Redis.php	/^class RedisConfig$/;"	c
+SamplePlugin	application/plugins/Sample.php	/^class SamplePlugin extends Yaf_Plugin_Abstract {$/;"	c
+SessionWriterRedisConfig	application/library/Session/Writer/Redis.php	/^class SessionWriterRedisConfig$/;"	c
+Session_Proxy	application/library/Session/Proxy.php	/^class Session_Proxy $/;"	c
+Session_Writer_Redis	application/library/Session/Writer/Redis.php	/^class Session_Writer_Redis extends Base_Model_Abstract$/;"	c
+Sms	application/library/Sms.php	/^class Sms$/;"	c
+SmsModel	application/models/Sms.php	/^class SmsModel extends Db_Base$/;"	c
+TEST_PATH	test/Base.php	/^define('TEST_PATH', APPLICATION_PATH.'\/test\/');$/;"	d
+TestController	application/Modules/V1/controllers/Test.php	/^class TestController extends Base_Controller_Api$/;"	c
+Test_Base	test/Base.php	/^abstract class Test_Base $/;"	c
+Test_Exp1	test/Exp1.php	/^class Test_Exp1 extends Test_Base $/;"	c
+Tools	application/library/Tools.php	/^class Tools {$/;"	c
+Util_Common	application/library/Util/Common.php	/^class Util_Common$/;"	c
+Util_Curl	application/library/Util/Curl.php	/^class Util_Curl $/;"	c
+Util_Filecache	application/library/Util/Filecache.php	/^class Util_Filecache extends Base_Model_Abstract$/;"	c
+Util_Lock	application/library/Util/Lock.php	/^class Util_Lock$/;"	c
+Util_Queue	application/library/Util/Queue.php	/^class Util_Queue$/;"	c
+Validate	application/library/Validate.php	/^class Validate {$/;"	c
+ZipExtract	application/library/Tools.php	/^	public static function ZipExtract($from_file, $to_dir) {$/;"	f
+ZipTest	application/library/Tools.php	/^	public static function ZipTest($from_file) {$/;"	f
+_POST	application/library/Tools.php	/^		$_POST = array_map(array('Tools', 'htmlentitiesUTF8'), $_POST);$/;"	v
+__call	application/library/Base/Controller/Abstract.php	/^    public function __call($name, $arguments) {$/;"	f
+__call	application/library/Base/Model/Abstract.php	/^    public function __call($name, $arguments) {$/;"	f
+__call	application/library/Cache/Redis.php	/^    public function __call($command, $params = array()) {$/;"	f
+__call	application/library/Db/Mysql.php	/^    public function __call($command, $params = array()) {$/;"	f
+__construct	application/library/Cache/Memcache.php	/^    public function __construct($config) {$/;"	f
+__construct	application/library/Cache/Memcache.php	/^    public function __construct($options) {$/;"	f
+__construct	application/library/Cache/Redis.php	/^    public function __construct($config) {$/;"	f
+__construct	application/library/Cache/Redis.php	/^    public function __construct($options) {$/;"	f
+__construct	application/library/Carbon.php	/^    public function __construct($time = null, $tz = null)$/;"	f
+__construct	application/library/Db/Mysql.php	/^    public function __construct($config) {$/;"	f
+__construct	application/library/Db/Mysql.php	/^    public function __construct($options) {$/;"	f
+__construct	application/library/Process/Base.php	/^    public function __construct() {$/;"	f
+__construct	application/library/Session/Proxy.php	/^	public function __construct() {$/;"	f
+__construct	application/library/Session/Writer/Redis.php	/^	public function __construct($options) {$/;"	f
+__construct	application/library/Session/Writer/Redis.php	/^    public function __construct($config) {$/;"	f
+__construct	application/models/Sms.php	/^    public function __construct()$/;"	f
+__construct	test/Base.php	/^    public function __construct() {$/;"	f
+__destruct	application/library/Cache/Redis.php	/^    public function __destruct() {$/;"	f
+__get	application/library/Base/Controller/Abstract.php	/^    public function __get($name) {$/;"	f
+__get	application/library/Base/Model/Abstract.php	/^    public function __get($name) {$/;"	f
+__get	application/library/Carbon.php	/^    public function __get($name)$/;"	f
+__isset	application/library/Base/Controller/Abstract.php	/^    public function __isset($name) {$/;"	f
+__isset	application/library/Base/Model/Abstract.php	/^    public function __isset($name) {$/;"	f
+__isset	application/library/Carbon.php	/^    public function __isset($name)$/;"	f
+__set	application/library/Base/Controller/Abstract.php	/^    public function __set($name, $value) {$/;"	f
+__set	application/library/Base/Model/Abstract.php	/^    public function __set($name, $value) {$/;"	f
+__set	application/library/Carbon.php	/^    public function __set($name, $value)$/;"	f
+__toString	application/library/Carbon.php	/^    public function __toString()$/;"	f
+__unset	application/library/Base/Controller/Abstract.php	/^    public function __unset($name) {$/;"	f
+__unset	application/library/Base/Model/Abstract.php	/^    public function __unset($name) {$/;"	f
+_appendValue	application/library/Db/Mysql.php	/^    protected function _appendValue($key, &$row, &$data) {$/;"	f
+_body	application/library/Lang/Msg.php	/^    protected static $_body = array();$/;"	v
+_code	application/library/Lang/Msg.php	/^    protected static $_code = 'succ';$/;"	v
+_connect	application/library/Cache/Memcache.php	/^	private function _connect() {$/;"	f
+_connect	application/library/Cache/Redis.php	/^    private function _connect() {$/;"	f
+_connect	application/library/Db/Mysql.php	/^    private function _connect() {$/;"	f
+_initConfig	application/Bootstrap.php	/^    public function _initConfig() {$/;"	f
+_initLoader	application/Bootstrap.php	/^	public function _initLoader(Yaf_Dispatcher $dispatcher) {$/;"	f
+_initPlugin	application/Bootstrap.php	/^	public function _initPlugin(Yaf_Dispatcher $dispatcher) {$/;"	f
+_initRoute	application/Bootstrap.php	/^	public function _initRoute(Yaf_Dispatcher $dispatcher) {$/;"	f
+_initSession	application/Bootstrap.php	/^	public function _initSession(Yaf_Dispatcher $dispatcher) {$/;"	f
+_initView	application/Bootstrap.php	/^	public function _initView(Yaf_Dispatcher $dispatcher){$/;"	f
+_languages	application/library/Lang/Msg.php	/^    protected static $_languages = array();$/;"	v
+_message	application/library/Lang/Msg.php	/^    protected static $_message = '';$/;"	v
+_where	application/library/Db/Mysql.php	/^    private function _where($column, $cond, &$params) {$/;"	f
+action	test/Base.php	/^	protected $action = 'index';$/;"	v
+action	test/Exp1.php	/^    protected $action = 'index';$/;"	v
+add	application/library/Base/Model/Abstract.php	/^    public function add($data) {$/;"	f
+add	application/library/Cache/Memcache.php	/^	public function add($key, $data, $expire=0, $compression=true) {$/;"	f
+add	application/library/Log/Test.php	/^    public function add($data) {$/;"	f
+addCache	application/library/Base/Model/Abstract.php	/^    public function addCache($cacheKey, $data, $cd, $preCacheKey = null) {$/;"	f
+addDay	application/library/Carbon.php	/^    public function addDay()$/;"	f
+addDays	application/library/Carbon.php	/^    public function addDays($value)$/;"	f
+addHour	application/library/Carbon.php	/^    public function addHour()$/;"	f
+addHours	application/library/Carbon.php	/^    public function addHours($value)$/;"	f
+addList	application/library/Log/Test.php	/^    public function addList($data) {$/;"	f
+addMinute	application/library/Carbon.php	/^    public function addMinute()$/;"	f
+addMinutes	application/library/Carbon.php	/^    public function addMinutes($value)$/;"	f
+addMonth	application/library/Carbon.php	/^    public function addMonth()$/;"	f
+addMonths	application/library/Carbon.php	/^    public function addMonths($value)$/;"	f
+addSecond	application/library/Carbon.php	/^    public function addSecond()$/;"	f
+addSeconds	application/library/Carbon.php	/^    public function addSeconds($value)$/;"	f
+addWeek	application/library/Carbon.php	/^    public function addWeek()$/;"	f
+addWeekday	application/library/Carbon.php	/^    public function addWeekday()$/;"	f
+addWeekdays	application/library/Carbon.php	/^    public function addWeekdays($value)$/;"	f
+addWeeks	application/library/Carbon.php	/^    public function addWeeks($value)$/;"	f
+addYear	application/library/Carbon.php	/^    public function addYear()$/;"	f
+addYears	application/library/Carbon.php	/^    public function addYears($value)$/;"	f
+app	crontab/Base.php	/^$app = new Yaf_Application( APPLICATION_PATH . "\/conf\/base.ini");$/;"	v
+app	public/index.php	/^    $app = new Yaf_Application(APPLICATION_PATH . "\/conf\/base.ini");$/;"	v
+app	test/Base.php	/^	protected $app;$/;"	v
+app	test/Base.php	/^    	$this->app = new Yaf_Application( APPLICATION_PATH . "\/conf\/base.ini");$/;"	v
+appSecret	application/library/Base/Controller/Api.php	/^        $appSecret = $this->config['api']['appSecret'];$/;"	v
+appendValue	application/library/Db/Mysql.php	/^    protected function appendValue($row, &$data) {$/;"	f
+arr	application/Bootstrap.php	/^		$arr = Yaf_Application::app()->getConfig()->toArray();$/;"	v
+arr	application/library/Util/Common.php	/^        $arr = array_reverse(str_split($num));$/;"	v
+arr	application/library/Util/Common.php	/^        $arr = self::toBase($num, strlen(self::$code));$/;"	v
+arrayUnique	application/library/Tools.php	/^	public static function arrayUnique($array) {$/;"	f
+arrayUnique2d	application/library/Tools.php	/^	public static function arrayUnique2d($array, $keepkeys = true) {$/;"	f
+ary	application/library/Validate.php	/^		$ary = explode('.', $data);$/;"	v
+asc	application/library/Db/Mysql.php	/^                $asc = strtoupper($val) == 'ASC' ? 'ASC' : 'DESC';$/;"	v
+average	application/library/Carbon.php	/^    public function average(Carbon $dt = null)$/;"	f
+basePath	application/library/Process/Base.php	/^        $this->basePath = APPLICATION_PATH . '\/crontab\/';$/;"	v
+basePath	application/library/Process/Base.php	/^    protected $basePath;$/;"	v
+begin	application/library/Base/Model/Abstract.php	/^    public function begin() {$/;"	f
+begin	application/library/Db/Mysql.php	/^    public function begin() {$/;"	f
+between	application/library/Carbon.php	/^    public function between(Carbon $dt1, Carbon $dt2, $equal = true)$/;"	f
+bin	application/library/Process/Base.php	/^        $this->bin = $conf['crontab']['bin'];$/;"	v
+bin	application/library/Process/Base.php	/^    protected $bin;$/;"	v
+bl	application/library/Password.php	/^                $bl = strlen($buffer);$/;"	v
+body	application/library/Base/Controller/Abstract.php	/^            $body = trim(file_get_contents('php:\/\/input'));$/;"	v
+body	application/library/Base/Controller/Api.php	/^        $this->body = json_decode(urldecode($this->getPost('body')), true);$/;"	v
+br2nl	application/library/Tools.php	/^	public static function br2nl($str) {$/;"	f
+buffer	application/library/Password.php	/^                $buffer = mcrypt_create_iv($raw_salt_len, MCRYPT_DEV_URANDOM);$/;"	v
+buffer	application/library/Password.php	/^                $buffer = openssl_random_pseudo_bytes($raw_salt_len);$/;"	v
+buffer	application/library/Password.php	/^            $buffer = '';$/;"	v
+buffer_valid	application/library/Password.php	/^                    $buffer_valid = true;$/;"	v
+buffer_valid	application/library/Password.php	/^            $buffer_valid = false;$/;"	v
+cacheData	application/library/Base/Model/Abstract.php	/^            $cacheData = $this->getCacheList($cacheKeys);$/;"	v
+cacheKey	application/library/Base/Model/Abstract.php	/^            $this->cacheKey = null;$/;"	v
+cacheKey	application/library/Base/Model/Abstract.php	/^        $this->cacheKey = $key;$/;"	v
+cacheKey	application/library/Base/Model/Abstract.php	/^        $this->cacheKey = null;$/;"	v
+cacheKey	application/library/Base/Model/Abstract.php	/^    protected $cacheKey;$/;"	v
+cacheKeys	application/library/Base/Model/Abstract.php	/^            $cacheKeys = array();$/;"	v
+callBacks	application/library/Util/Queue.php	/^	protected static $callBacks = array();$/;"	v
+cd	application/library/Base/Model/Abstract.php	/^    protected $cd = 3600;$/;"	v
+ceilf	application/library/Tools.php	/^	public static function ceilf($value, $precision = 0) {$/;"	f
+ch	application/library/Tools.php	/^		$ch = curl_init();$/;"	v
+channel	application/library/Util/Common.php	/^        $channel = self::to60($channel);$/;"	v
+charset	application/library/Db/Mysql.php	/^    public $charset = 'utf8';$/;"	v
+check	application/library/Db/Mysql.php	/^            $check = strtoupper($key);$/;"	v
+check	application/library/Process/Manager.php	/^    public function check() {$/;"	f
+className	application/library/Base/Model/Abstract.php	/^        $className = get_called_class();$/;"	v
+className	application/library/Log/Base.php	/^        $className = get_called_class();$/;"	v
+className	application/library/Util/Filecache.php	/^		$className = ucfirst($class). 'Model';$/;"	v
+cleanAll	application/library/Cache/Redis.php	/^    public function cleanAll() {$/;"	f
+cleanNonUnicodeSupport	application/library/Tools.php	/^	public static function cleanNonUnicodeSupport($pattern) {$/;"	f
+cleanUrl	application/library/Tools.php	/^	public static function cleanUrl($url, $cleanall = true) {$/;"	f
+close	application/library/Cache/Redis.php	/^    public function close() {$/;"	f
+close	application/library/Session/Proxy.php	/^	public function close() {$/;"	f
+cls	application/library/Cache/Memcache.php	/^			$cls = $this->getExtClass();	$/;"	v
+cls	application/library/Cache/Memcache.php	/^        	$cls = __CLASS__;$/;"	v
+cls	application/library/Cache/Redis.php	/^            $cls = __CLASS__;$/;"	v
+cls	application/library/Db/Mysql.php	/^            $cls = __CLASS__;$/;"	v
+cls	application/library/Session/Proxy.php	/^			$cls = $session['proxy'] ? $session['proxy'] : 'Session_Writer_Redis';$/;"	v
+cmpWord	application/library/Tools.php	/^	public static function cmpWord($a, $b) {$/;"	f
+code	application/library/Tools.php	/^        $code = $code ? 'succ':'fail';$/;"	v
+code	application/library/Util/Common.php	/^	protected static $code = '0123456789bcdefghijklmnopqrstuvwxyzBCDEFGHIJKLMNOPQRSTUVWXYZ';$/;"	v
+code	application/library/Util/Common.php	/^        $code = array_flip(str_split(self::$code));$/;"	v
+code	application/library/Util/Filecache.php	/^			$code = $this->parseClass($class, $funs);$/;"	v
+code	application/library/Util/Filecache.php	/^		$code = array();$/;"	v
+code	application/library/Util/Filecache.php	/^		$code = preg_replace($s, $r, var_export($rows, true));$/;"	v
+column	application/library/Base/Model/Abstract.php	/^                $column = reset(array_keys($where));$/;"	v
+command	application/library/Cache/Redis.php	/^            $command = $this->config->pconnect ? "pconnect" : "connect";$/;"	v
+command	application/library/Process/System.php	/^            $command = "{$sudo} {$bin} {$script} >> $log &";$/;"	v
+commit	application/library/Base/Model/Abstract.php	/^    public function commit() {$/;"	f
+commit	application/library/Cache/Memcache.php	/^	public function commit() {$/;"	f
+commit	application/library/Cache/Redis.php	/^    public function commit() {$/;"	f
+commit	application/library/Db/Mysql.php	/^    public function commit() {$/;"	f
+conf	application/library/Process/Base.php	/^        $conf = Yaf_Registry::get("config");$/;"	v
+config	application/library/Base/Controller/Api.php	/^        $this->config = Yaf_Registry::get("config");$/;"	v
+config	application/library/Cache/Memcache.php	/^	private $config = array();$/;"	v
+config	application/library/Cache/Memcache.php	/^        $config = Yaf_Registry::get("config");$/;"	v
+config	application/library/Cache/Redis.php	/^        $config = Yaf_Registry::get("config");$/;"	v
+config	application/library/Cache/Redis.php	/^        $this->config = new RedisConfig($options);$/;"	v
+config	application/library/Cache/Redis.php	/^    protected $config;$/;"	v
+config	application/library/Db/Mysql.php	/^        $config = Yaf_Registry::get("config");$/;"	v
+config	application/library/Db/Mysql.php	/^        $this->config = new MysqlConfig($options);$/;"	v
+config	application/library/Db/Mysql.php	/^    protected $config;$/;"	v
+config	application/library/Log/Base.php	/^	private static $config;$/;"	v
+config	application/library/Log/Base.php	/^        	$config = Yaf_Registry::get("config");$/;"	v
+config	application/library/Log/Debug.php	/^			$config = Yaf_Registry::get("config");$/;"	v
+config	application/library/Log/Debug.php	/^	protected static $config = array();$/;"	v
+config	application/library/Session/Proxy.php	/^			$config = Yaf_Registry::get("config");$/;"	v
+config	application/library/Session/Writer/Redis.php	/^		$this->config = new SessionWriterRedisConfig($options);$/;"	v
+config	application/library/Session/Writer/Redis.php	/^	protected $config;$/;"	v
+config	application/library/Util/Filecache.php	/^		$config = Yaf_Registry::get("config");$/;"	v
+config	application/library/Util/Filecache.php	/^		$config = new Yaf_Config_Ini($filecache['list']);$/;"	v
+connect	application/library/Cache/Memcache.php	/^	public function connect() {$/;"	f
+connect	application/library/Cache/Redis.php	/^    public function connect() {$/;"	f
+connect	application/library/Db/Mysql.php	/^    public function connect() {$/;"	f
+connected	application/library/Cache/Memcache.php	/^					$this->connected = $this->memcache->addServer($server->host,$server->port,$server->persistent,$server->weight,$server->timeout,$server->retryInterval,$server->status);$/;"	v
+connected	application/library/Cache/Memcache.php	/^					$this->connected = $this->memcache->addServer($server->host,$server->port,$server->weight);$/;"	v
+connected	application/library/Cache/Memcache.php	/^	private $connected = false;$/;"	v
+connected	application/library/Cache/Redis.php	/^        $this->connected = false;$/;"	v
+connected	application/library/Cache/Redis.php	/^    protected $connected = false;$/;"	v
+connected	application/library/Db/Mysql.php	/^                $this->connected = false;$/;"	v
+connected	application/library/Db/Mysql.php	/^                $this->connected = true;$/;"	v
+connected	application/library/Db/Mysql.php	/^    protected $connected = false;$/;"	v
+content	application/library/Tools.php	/^			$content = curl_exec($curl);$/;"	v
+control	crontab/Process.php	/^$control = new Process_Control();/;"	v
+controller	test/Base.php	/^	protected $controller = 'index';$/;"	v
+controller	test/Exp1.php	/^    protected $controller = 'index';$/;"	v
+convertBytes	application/library/Tools.php	/^	public static function convertBytes($value) {$/;"	f
+cookieFile	application/library/Util/Curl.php	/^		$this->cookieFile = $val;$/;"	v
+cookieFile	application/library/Util/Curl.php	/^	protected $cookieFile = '';$/;"	v
+copy	application/library/Carbon.php	/^    public function copy()$/;"	f
+copyFile	application/library/Tools.php	/^	public static function copyFile($source, $dest) {$/;"	f
+cost	application/library/Password.php	/^                    $cost = $options['cost'];$/;"	v
+cost	application/library/Password.php	/^                $cost = 10;$/;"	v
+cost	application/library/Password.php	/^                $cost = isset($options['cost']) ? $options['cost'] : 10;$/;"	v
+cost	application/library/Util/Queue.php	/^					$cost = $now - $st;$/;"	v
+count	application/library/Cache/Memcache.php	/^	public function count() {$/;"	f
+count	application/library/Cache/Redis.php	/^    public function count() {$/;"	f
+cpu	application/library/Process/Base.php	/^        $this->cpu = Process_System::getCpu();$/;"	v
+cpu	application/library/Process/Base.php	/^    protected $cpu = 1;$/;"	v
+create	application/library/Carbon.php	/^    public static function create($year = null, $month = null, $day = null, $hour = null, $minute = null, $second = null, $tz = null)$/;"	f
+create	application/library/Util/Filecache.php	/^	public function create($key = null) {$/;"	f
+createFromDate	application/library/Carbon.php	/^    public static function createFromDate($year = null, $month = null, $day = null, $tz = null)$/;"	f
+createFromFormat	application/library/Carbon.php	/^    public static function createFromFormat($format, $time, $tz = null)$/;"	f
+createFromTime	application/library/Carbon.php	/^    public static function createFromTime($hour = null, $minute = null, $second = null, $tz = null)$/;"	f
+createFromTimestamp	application/library/Carbon.php	/^    public static function createFromTimestamp($timestamp, $tz = null)$/;"	f
+createFromTimestampUTC	application/library/Carbon.php	/^    public static function createFromTimestampUTC($timestamp)$/;"	f
+curl	application/library/Tools.php	/^			$curl = curl_init();$/;"	v
+curl	application/library/Tools.php	/^	public static function curl($url, $method = 'GET', $postFields = null, $header = null) {$/;"	f
+current	application/library/Process/Manager.php	/^                $current = Process_System::getProcessNum($worker);$/;"	v
+current	application/library/Process/System.php	/^        $current = self::getProcessNum($script);$/;"	v
+data	application/Modules/V1/controllers/Test.php	/^        $data = array("result"=>1);$/;"	v
+data	application/library/Base/Model/Abstract.php	/^            $data = $this->db->get($this->getTable(), $where, $fields);$/;"	v
+data	application/library/Base/Model/Abstract.php	/^            $data = $this->db->select($this->getTable(), $where, $fields, $order, $limit);$/;"	v
+data	application/library/Base/Model/Abstract.php	/^            $data = $this->getCache($this->cacheKey, $preCacheKey);$/;"	v
+data	application/library/Base/Model/Abstract.php	/^            $data = array();$/;"	v
+data	application/library/Base/Model/Abstract.php	/^        $data = false;$/;"	v
+data	application/library/Db/Mysql.php	/^        $data = array();$/;"	v
+data	application/library/Util/Common.php	/^				$data = str_replace($s, $r, $data);$/;"	v
+data	application/library/Util/Common.php	/^		$data = rawurldecode($data); $/;"	v
+data	application/library/Util/Filecache.php	/^		$data = $this->parseData($options);$/;"	v
+data	application/library/Util/Queue.php	/^				$data = $return[1];$/;"	v
+database	application/library/Db/Mysql.php	/^    public $database = 'test';$/;"	v
+date	application/library/Process/Base.php	/^        $this->date = date("Ymd");$/;"	v
+date	application/library/Process/Base.php	/^    protected $date;$/;"	v
+dateDays	application/library/Tools.php	/^	public static function dateDays() {$/;"	f
+dateFrom	application/library/Tools.php	/^	public static function dateFrom($date) {$/;"	f
+dateMonths	application/library/Tools.php	/^	public static function dateMonths() {$/;"	f
+dateTo	application/library/Tools.php	/^	public static function dateTo($date) {$/;"	f
+dateYears	application/library/Tools.php	/^	public static function dateYears() {$/;"	f
+dateadd	application/library/Tools.php	/^	public static function dateadd($interval, $step, $date) {$/;"	f
+day	application/library/Carbon.php	/^        $day = ($day === null) ? date('j') : $day;$/;"	v
+day	application/library/Carbon.php	/^        $this->day = $value;$/;"	v
+day	application/library/Carbon.php	/^    public function day($value)$/;"	f
+dayOfWeek	application/library/Carbon.php	/^            $dayOfWeek = $this->dayOfWeek;$/;"	v
+days	application/library/Carbon.php	/^    protected static $days = array($/;"	v
+db	application/library/Db/Mysql.php	/^                $this->db = new PDO($dsn, $this->config->user, $this->config->password, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));$/;"	v
+db	application/library/Db/Mysql.php	/^    protected $db;$/;"	v
+db	application/library/Log/Import.php	/^	protected static $db;$/;"	v
+db	application/library/Util/Filecache.php	/^			$this->db = $item['db'];$/;"	v
+db	application/library/Util/Filecache.php	/^	private $db;$/;"	v
+dbname	application/library/Base/Model/Abstract.php	/^    protected $dbname;$/;"	v
+dbname	application/library/Log/Import.php	/^	protected static $dbname = 'itourism';$/;"	v
+dbname	application/library/Util/Filecache.php	/^		$dbname = $this->db;$/;"	v
+dbname	application/models/Language.php	/^    protected $dbname = 'itourism';$/;"	v
+dbname	application/models/Organization.php	/^    protected $dbname = 'itourism';$/;"	v
+dbname	application/models/Process.php	/^    protected $dbname = 'itourism';$/;"	v
+debug	application/library/Log/Debug.php	/^		$debug = self::getConfig();$/;"	v
+decode	application/library/Pack/Json.php	/^	public static function decode($data) {$/;"	f
+decode	application/library/Pack/Msgpack.php	/^	public static function decode($data) {$/;"	f
+default	application/library/Cache/Memcache.php	/^    protected static $default = array('host' => '127.0.0.1', 'port' => 11211);$/;"	v
+default	application/library/Cache/Redis.php	/^    protected static $default = array('host' => '127.0.0.1', 'port' => 6379, 'db' => 0);$/;"	v
+default	application/library/Db/Mysql.php	/^    protected static $default = array('host' => 'localhost', 'port' => '3306', 'database' => 'test', 'user' => 'root', 'password' => '111111');$/;"	v
+delCache	application/library/Base/Model/Abstract.php	/^    public function delCache($cacheKey, $preCacheKey = null) {$/;"	f
+delCacheList	application/library/Base/Model/Abstract.php	/^    public function delCacheList($ids, $preCacheKey = null) {$/;"	f
+delete	application/library/Base/Model/Abstract.php	/^    public function delete($where) {$/;"	f
+delete	application/library/Cache/Memcache.php	/^	public function delete($key) {$/;"	f
+delete	application/library/Db/Mysql.php	/^    public function delete($tblname, $cond) {$/;"	f
+deleteById	application/library/Base/Model/Abstract.php	/^    public function deleteById($id) {$/;"	f
+deleteDirectory	application/library/Tools.php	/^	public static function deleteDirectory($dirname, $delete_self = true) {$/;"	f
+delta	application/library/Carbon.php	/^            $delta = 1;$/;"	v
+delta	application/library/Carbon.php	/^            $delta = floor($delta \/ $divValue);$/;"	v
+delta	application/library/Carbon.php	/^        $delta = $other->diffInSeconds($this);$/;"	v
+destroy	application/library/Session/Proxy.php	/^	public function destroy($id) {$/;"	f
+destroy	application/library/Session/Writer/Redis.php	/^	public function destroy($id) {$/;"	f
+diff	crontab/Worker1.php	/^        	$diff = $now - $used;$/;"	v
+diffForHumans	application/library/Carbon.php	/^    public function diffForHumans(Carbon $other = null)$/;"	f
+diffInDays	application/library/Carbon.php	/^    public function diffInDays(Carbon $dt = null, $abs = true)$/;"	f
+diffInHours	application/library/Carbon.php	/^    public function diffInHours(Carbon $dt = null, $abs = true)$/;"	f
+diffInMinutes	application/library/Carbon.php	/^    public function diffInMinutes(Carbon $dt = null, $abs = true)$/;"	f
+diffInMonths	application/library/Carbon.php	/^    public function diffInMonths(Carbon $dt = null, $abs = true)$/;"	f
+diffInSeconds	application/library/Carbon.php	/^    public function diffInSeconds(Carbon $dt = null, $abs = true)$/;"	f
+diffInYears	application/library/Carbon.php	/^    public function diffInYears(Carbon $dt = null, $abs = true)$/;"	f
+dirname	application/library/Tools.php	/^		$dirname = rtrim($dirname, '\/') . '\/';$/;"	v
+dispatch	application/library/Util/Queue.php	/^	public static function dispatch($redis, $queue, $msg){$/;"	f
+dispatchLoopShutdown	application/plugins/Sample.php	/^	public function dispatchLoopShutdown(Yaf_Request_Abstract $request, Yaf_Response_Abstract $response) {$/;"	f
+dispatchLoopStartup	application/plugins/Sample.php	/^	public function dispatchLoopStartup(Yaf_Request_Abstract $request, Yaf_Response_Abstract $response) {$/;"	f
+displayError	application/library/Tools.php	/^	public static function displayError($string = 'Fatal error', $error = array(), $htmlentities = true) {$/;"	f
+divs	application/library/Carbon.php	/^        $divs = array($/;"	v
+doQuery	application/library/Db/Mysql.php	/^    protected function doQuery($tblname, $cond, $fields = '*', $order = null, $limit = null) {$/;"	f
+double_tags	application/library/Tools.php	/^		$double_tags = array("table", "tr", "td", "font", "a", "object", "embed", "p", "strong", "em", "u", "ol", "ul", "li", "div", "tbody", "span", "blockquote", "pre", "b", "font");$/;"	v
+dsn	application/library/Db/Mysql.php	/^                $dsn = 'mysql:host=' . $this->config->host . ';port=' . $this->config->port . ';dbname=' . $this->config->database;$/;"	v
+dt	application/library/Carbon.php	/^            $dt = parent::createFromFormat($format, $time);$/;"	v
+dt	application/library/Carbon.php	/^            $dt = parent::createFromFormat($format, $time, static::safeCreateDateTimeZone($tz));$/;"	v
+dt	application/library/Carbon.php	/^        $dt = $this->copy();$/;"	v
+dt	application/library/Carbon.php	/^        $dt = ($dt === null) ? static::now($this->tz) : $dt;$/;"	v
+dt1	application/library/Carbon.php	/^            $dt1 = $dt2;$/;"	v
+dt2	application/library/Carbon.php	/^            $dt2 = $temp;$/;"	v
+dump	application/library/Tools.php	/^	public static function dump($object, $kill = true) {$/;"	f
+echo_microtime	application/library/Tools.php	/^	public static function echo_microtime($tag) {$/;"	f
+encode	application/library/Pack/Json.php	/^	public static function encode($data) {$/;"	f
+encode	application/library/Pack/Msgpack.php	/^	public static function encode($data) {$/;"	f
+encrypt	application/library/Tools.php	/^	public static function encrypt($passwd) {$/;"	f
+endOfCentury	application/library/Carbon.php	/^    public function endOfCentury()$/;"	f
+endOfDay	application/library/Carbon.php	/^    public function endOfDay()$/;"	f
+endOfDecade	application/library/Carbon.php	/^    public function endOfDecade()$/;"	f
+endOfMonth	application/library/Carbon.php	/^    public function endOfMonth()$/;"	f
+endOfWeek	application/library/Carbon.php	/^    public function endOfWeek()$/;"	f
+endOfYear	application/library/Carbon.php	/^    public function endOfYear()$/;"	f
+eq	application/library/Carbon.php	/^    public function eq(Carbon $dt)$/;"	f
+err	application/library/Db/Mysql.php	/^        $err = $this->db->errorInfo();$/;"	v
+error	application/library/Db/Mysql.php	/^    public function error() {$/;"	f
+error	application/library/Lang/Msg.php	/^    public static function error($id, $params = array()) {$/;"	f
+errorAction	application/controllers/Error.php	/^	public function errorAction($exception) {$/;"	f
+errors	application/library/Carbon.php	/^        $errors = static::getLastErrors();$/;"	v
+escape	application/library/Util/Common.php	/^	public static function escape(&$data, $charset = 'UTF-8') { $/;"	f
+events	application/library/Validate.php	/^		$events = 'onmousedown|onmousemove|onmmouseup|onmouseover|onmouseout|onload|onunload|onfocus|onblur|onchange';$/;"	v
+exists	application/library/Process/System.php	/^    public static function exists($script) {$/;"	f
+exitJson	application/library/Tools.php	/^	public static function exitJson($code, $data, $native = false) {$/;"	f
+expire	application/library/Session/Writer/Redis.php	/^	public $expire = 3600;$/;"	v
+f	application/library/Password.php	/^                $f = fopen('\/dev\/urandom', 'r');$/;"	v
+factory	application/library/Cache/Memcache.php	/^	public static function factory($name='default') {$/;"	f
+factory	application/library/Cache/Redis.php	/^    public static function factory($name='default') {$/;"	f
+factory	application/library/Db/Mysql.php	/^    public static function factory($name = 'default') {$/;"	f
+field	application/library/Util/Filecache.php	/^		$field = $options['fields'] ? $options['fields'] : '*';$/;"	v
+fields	application/library/Db/Mysql.php	/^        $fields = implode('`, `', array_keys($data));$/;"	v
+file	application/library/Log/Base.php	/^			$file = $this->prefix .'_'. date('Ymd') . '.sql';$/;"	v
+file	application/library/Log/Base.php	/^    	$file = self::$config['path'].'\/' .$filename;$/;"	v
+file	application/library/Log/Debug.php	/^			$file = 'debug_'.date('YmdH');$/;"	v
+file	application/library/Log/Import.php	/^			$file = 'error_'. date('Ymd') . '.sql';$/;"	v
+file	application/library/Tools.php	/^			$file = self::file_get_contents($url);$/;"	v
+file_get_contents	application/library/Tools.php	/^	public static function file_get_contents($url, $use_include_path = false, $stream_context = null, $curl_timeout = 8) {$/;"	f
+filecache	application/library/Util/Filecache.php	/^        $filecache = $config['filecache'];$/;"	v
+files	application/library/Tools.php	/^			$files = scandir($dirname);$/;"	v
+files	application/library/Tools.php	/^		$files = scandir($real_path);$/;"	v
+filtered_files	application/library/Tools.php	/^		$filtered_files = array();$/;"	v
+firstOfMonth	application/library/Carbon.php	/^    public function firstOfMonth($dayOfWeek = null)$/;"	f
+firstOfQuarter	application/library/Carbon.php	/^    public function firstOfQuarter($dayOfWeek = null)$/;"	f
+firstOfYear	application/library/Carbon.php	/^    public function firstOfYear($dayOfWeek = null)$/;"	f
+flag	application/library/Cache/Memcache.php	/^		$flag = $compression ? MEMCACHE_COMPRESSED : 0;$/;"	v
+flag	application/library/Util/Common.php	/^				$flag = true;$/;"	v
+flag	application/library/Util/Common.php	/^		$flag = false;$/;"	v
+floorf	application/library/Tools.php	/^	public static function floorf($value, $precision = 0) {$/;"	f
+flush	application/library/Cache/Memcache.php	/^	public function flush() {$/;"	f
+force	application/library/Util/Queue.php	/^		$force = array();$/;"	v
+format	application/library/Carbon.php	/^            $format = preg_replace('#(?<!%)((?:%%)*)%e#', '\\1%#d', $format);$/;"	v
+formatLocalized	application/library/Carbon.php	/^    public function formatLocalized($format = self::COOKIE)$/;"	f
+fp	application/library/Tools.php	/^			$fp = @fopen($filepath, 'w');$/;"	v
+from60	application/library/Util/Common.php	/^    protected static function from60($num, $base = 60) {$/;"	f
+funs	application/library/Util/Filecache.php	/^			$funs = $item['method'];$/;"	v
+gc	application/library/Session/Proxy.php	/^	public function gc($maxLifeTime) {$/;"	f
+genHash	application/library/Hash.php	/^    public static function genHash($locationHash, $source)$/;"	f
+generateSyncID	application/library/Tools.php	/^    public static function generateSyncID($serialno) {$/;"	f
+get	application/library/Base/Model/Abstract.php	/^    public function get($where, $fields = '*', $preCacheKey = null) {$/;"	f
+get	application/library/Cache/Memcache.php	/^	public function get($key) {$/;"	f
+get	application/library/Db/Mysql.php	/^    public function get($tblname, $cond, $fields = '*') {$/;"	f
+getById	application/library/Base/Model/Abstract.php	/^    public function getById($id) {$/;"	f
+getByIds	application/library/Base/Model/Abstract.php	/^    public function getByIds($ids) {$/;"	f
+getCache	application/library/Base/Model/Abstract.php	/^    public function getCache($cacheKey, $preCacheKey = null) {$/;"	f
+getCacheKey	application/library/Base/Model/Abstract.php	/^    protected function getCacheKey($cacheKey, $preCacheKey = null) {$/;"	f
+getCacheList	application/library/Base/Model/Abstract.php	/^    public function getCacheList($cacheKeys) {$/;"	f
+getCacheNS	application/library/Base/Model/Abstract.php	/^    public function getCacheNS($preCacheKey = null) {$/;"	f
+getCodeUrl	application/models/Sms.php	/^    public function getCodeUrl( $id )$/;"	f
+getConfig	application/library/Cache/Memcache.php	/^    public static function getConfig($name) {$/;"	f
+getConfig	application/library/Cache/Redis.php	/^    public static function getConfig($name) {$/;"	f
+getConfig	application/library/Db/Mysql.php	/^    public static function getConfig($name) {$/;"	f
+getConfig	application/library/Log/Debug.php	/^	public static function getConfig($key=null) {$/;"	f
+getCpu	application/library/Process/System.php	/^    public static function getCpu() {$/;"	f
+getCurrentUrlProtocolPrefix	application/library/Tools.php	/^	public static function getCurrentUrlProtocolPrefix() {$/;"	f
+getDb	application/library/Base/Model/Abstract.php	/^    public function getDb() {$/;"	f
+getDb	application/library/Log/Import.php	/^	public static function getDb() {$/;"	f
+getExactTime	application/library/Tools.php	/^	public static function getExactTime() {$/;"	f
+getExtClass	application/library/Cache/Memcache.php	/^    public function getExtClass() {$/;"	f
+getFileExtension	application/library/Tools.php	/^	public static function getFileExtension($file) {$/;"	f
+getFullDate	application/library/Tools.php	/^	public static function getFullDate($timestamp = null) {$/;"	f
+getGravity	application/library/Tools.php	/^	public static function getGravity($time, $viewcount) {$/;"	f
+getGravityS	application/library/Tools.php	/^	public static function getGravityS($stime, $viewcount) {$/;"	f
+getHashedPassword	application/library/Hash.php	/^    public static function getHashedPassword($password)$/;"	f
+getHttpCode	application/library/Util/Curl.php	/^	public function getHttpCode() {$/;"	f
+getHttpHost	application/library/Tools.php	/^	public static function getHttpHost($http = false, $entities = false) {$/;"	f
+getInsertId	application/library/Base/Model/Abstract.php	/^    public function getInsertId() {$/;"	f
+getInsertId	application/library/Db/Mysql.php	/^    public function getInsertId() {$/;"	f
+getIp	application/library/Base/Controller/Abstract.php	/^    public function getIp() {$/;"	f
+getIp	application/library/Tools.php	/^    public static function getIp()$/;"	f
+getIsset	application/library/Tools.php	/^	public static function getIsset($key) {$/;"	f
+getLang	application/library/Lang/Msg.php	/^    public static function getLang($id, $params = array()) {$/;"	f
+getLimit	application/library/Db/Mysql.php	/^    protected function getLimit($items) {$/;"	f
+getList	application/library/Base/Model/Abstract.php	/^    public function getList($where, $fields = '*', $preCacheKey = null) {$/;"	f
+getMaxUploadSize	application/library/Tools.php	/^	public static function getMaxUploadSize($max_size = 0) {$/;"	f
+getMemcache	application/library/Base/Model/Abstract.php	/^    public function getMemcache() {$/;"	f
+getMemoryLimit	application/library/Tools.php	/^	public static function getMemoryLimit() {$/;"	f
+getOctets	application/library/Tools.php	/^	public static function getOctets($option) {$/;"	f
+getOrder	application/library/Db/Mysql.php	/^    protected function getOrder($items) {$/;"	f
+getProcessId	application/library/Process/System.php	/^    public static function getProcessId($script) {$/;"	f
+getProcessInfo	application/library/Process/System.php	/^    public static function getProcessInfo($script) {$/;"	f
+getProcessNum	application/library/Process/System.php	/^    public static function getProcessNum($script) {$/;"	f
+getRawBody	application/library/Base/Controller/Abstract.php	/^    public function getRawBody() {$/;"	f
+getRawbody	application/library/Util/Curl.php	/^	public function getRawbody() {$/;"	f
+getRedis	application/library/Base/Model/Abstract.php	/^    public function getRedis() {$/;"	f
+getReferer	application/library/Tools.php	/^	public static function getReferer() {$/;"	f
+getRemoteAddr	application/library/Tools.php	/^	public static function getRemoteAddr() {$/;"	f
+getRequest	test/Base.php	/^    public function getRequest() {$/;"	f
+getServerIp	application/library/Process/System.php	/^    public static function getServerIp() {$/;"	f
+getServerName	application/library/Tools.php	/^	public static function getServerName() {$/;"	f
+getSign	application/library/Base/Controller/Api.php	/^    public function getSign($params, $appSecret)$/;"	f
+getSimpleDate	application/library/Tools.php	/^	public static function getSimpleDate($timestamp = null) {$/;"	f
+getTable	application/library/Base/Model/Abstract.php	/^    public function getTable() {$/;"	f
+getTable	application/library/Log/Base.php	/^	public function getTable() {$/;"	f
+getTable	application/library/Log/Test.php	/^	public function getTable() {$/;"	f
+getTable	application/models/Language.php	/^    public function getTable() {$/;"	f
+getTable	application/models/Organization.php	/^    public function getTable() {$/;"	f
+getTable	application/models/Process.php	/^    public function getTable()$/;"	f
+getTestNow	application/library/Carbon.php	/^    public static function getTestNow()$/;"	f
+getTimeImageName	application/library/Tools.php	/^	public static function getTimeImageName($image_type = "image\/jpeg") {$/;"	f
+getToken	application/library/Tools.php	/^	public static function getToken($string) {$/;"	f
+getValue	application/library/Tools.php	/^	public static function getValue($key, $default_value = false) {$/;"	f
+getWriter	application/library/Session/Proxy.php	/^	public function getWriter() {$/;"	f
+getmicrotime	application/library/Tools.php	/^	public static function getmicrotime() {$/;"	f
+getter	application/library/Base/Controller/Abstract.php	/^        $getter = 'get' . ucfirst($name);$/;"	v
+getter	application/library/Base/Model/Abstract.php	/^        $getter = 'get' . ucfirst($name);$/;"	v
+group	application/library/Util/Lock.php	/^	protected static $group = 'default';$/;"	v
+group	application/library/Util/Queue.php	/^	protected static $group = 'queue';$/;"	v
+gt	application/library/Carbon.php	/^    public function gt(Carbon $dt)$/;"	f
+gte	application/library/Carbon.php	/^    public function gte(Carbon $dt)$/;"	f
+hasRelativeKeywords	application/library/Carbon.php	/^    public static function hasRelativeKeywords($time) {$/;"	f
+hasTestNow	application/library/Carbon.php	/^    public static function hasTestNow()$/;"	f
+hash	application/library/Password.php	/^        $hash = $hash_format . $salt;$/;"	v
+hash_format	application/library/Password.php	/^                $hash_format = sprintf("$2y$%02d$", $cost);$/;"	v
+headers	application/library/Tools.php	/^					$headers = array($headers);$/;"	v
+host	application/library/Cache/Memcache.php	/^    public $host;$/;"	v
+host	application/library/Cache/Redis.php	/^    public $host = '127.0.0.1';$/;"	v
+host	application/library/Db/Mysql.php	/^    public $host = 'localhost';$/;"	v
+host	application/library/Tools.php	/^			$host = htmlspecialchars($host, ENT_COMPAT, 'UTF-8');$/;"	v
+host	application/library/Tools.php	/^			$host = self::getCurrentUrlProtocolPrefix() . $host;$/;"	v
+host	application/library/Tools.php	/^		$host = (isset($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : $_SERVER['HTTP_HOST']);$/;"	v
+hour	application/library/Carbon.php	/^            $hour = date('G');$/;"	v
+hour	application/library/Carbon.php	/^        $this->hour = $value;$/;"	v
+hour	application/library/Carbon.php	/^    public function hour($value)$/;"	f
+hourGenerate	application/library/Tools.php	/^	public static function hourGenerate($hours, $minutes, $seconds) {$/;"	f
+htmlentitiesDecodeUTF8	application/library/Tools.php	/^	public static function htmlentitiesDecodeUTF8($string) {$/;"	f
+htmlentitiesUTF8	application/library/Tools.php	/^	public static function htmlentitiesUTF8($string, $type = ENT_QUOTES) {$/;"	f
+i	application/library/Log/Base.php	/^			$i = 0;$/;"	v
+i	application/library/Tools.php	/^				$i = join("¤", $i);$/;"	v
+i	application/library/Util/Filecache.php	/^		$i = 0;$/;"	v
+ids	application/library/Process/System.php	/^        $ids = self::getProcessId($script);$/;"	v
+indexAction	application/Modules/V1/controllers/Test.php	/^    public function indexAction() {$/;"	f
+indexAction	application/controllers/Index.php	/^    public function indexAction() {$/;"	f
+info	application/library/Password.php	/^        $info = password_get_info($hash);$/;"	v
+info	application/library/Process/System.php	/^            $info = shell_exec("cat \/proc\/cpuinfo");$/;"	v
+init	application/library/Base/Controller/Api.php	/^    public function init()$/;"	f
+init	application/library/Process/Base.php	/^    protected function init() {$/;"	f
+insert	application/library/Base/Model/Abstract.php	/^    public function insert($data) {$/;"	f
+insert	application/library/Db/Mysql.php	/^    public function insert($tblname, $data) {$/;"	f
+instance	application/library/Carbon.php	/^    public static function instance(DateTime $dt)$/;"	f
+instance	application/library/Session/Proxy.php	/^	private static $instance;$/;"	v
+instances	application/library/Base/Model/Abstract.php	/^    protected static $instances = array();$/;"	v
+instances	application/library/Cache/Memcache.php	/^	protected static $instances = array();$/;"	v
+instances	application/library/Cache/Redis.php	/^    protected static $instances = array();$/;"	v
+instances	application/library/Db/Mysql.php	/^    protected static $instances = array();$/;"	v
+instances	application/library/Log/Base.php	/^	private static $instances = array();$/;"	v
+intval	application/library/Tools.php	/^	public static function intval($val) {$/;"	f
+ip	application/library/Tools.php	/^            $ip = $_SERVER['REMOTE_ADDR'];$/;"	v
+ip	application/library/Tools.php	/^            $ip = getenv('HTTP_CLIENT_IP');$/;"	v
+ip	application/library/Tools.php	/^            $ip = getenv('HTTP_X_FORWARDED_FOR');$/;"	v
+ip	application/library/Tools.php	/^            $ip = getenv('REMOTE_ADDR');$/;"	v
+ip	application/library/Tools.php	/^        $ip = '0.0.0.0';$/;"	v
+ips	application/library/Tools.php	/^				$ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);$/;"	v
+isAbsoluteUrl	application/library/Validate.php	/^	public static function isAbsoluteUrl($url) {$/;"	f
+isAlias	application/library/Validate.php	/^	public static function isAlias($alias) {$/;"	f
+isBirthDate	application/library/Validate.php	/^	public static function isBirthDate($date) {$/;"	f
+isBool	application/library/Validate.php	/^	public static function isBool($bool) {$/;"	f
+isChinese	application/library/Validate.php	/^	public static function isChinese($data) {$/;"	f
+isCleanHtml	application/library/Validate.php	/^	public static function isCleanHtml($html) {$/;"	f
+isCli	application/library/Tools.php	/^	public static function isCli() {$/;"	f
+isCookie	application/library/Validate.php	/^	public static function isCookie($data) {$/;"	f
+isDate	application/library/Validate.php	/^	public static function isDate($date) {$/;"	f
+isDateFormat	application/library/Validate.php	/^	public static function isDateFormat($date) {$/;"	f
+isDirName	application/library/Validate.php	/^	public static function isDirName($dir) {$/;"	f
+isEmail	application/library/Validate.php	/^	public static function isEmail($email) {$/;"	f
+isEmpty	application/library/Tools.php	/^	public static function isEmpty($field) {$/;"	f
+isExpressNumber	application/library/Validate.php	/^	public static function isExpressNumber($data) {$/;"	f
+isFileName	application/library/Validate.php	/^	public static function isFileName($name) {$/;"	f
+isFloat	application/library/Validate.php	/^	public static function isFloat($float) {$/;"	f
+isFuture	application/library/Carbon.php	/^        $isFuture = $this->gt($other);$/;"	v
+isFuture	application/library/Carbon.php	/^    public function isFuture()$/;"	f
+isGenericName	application/library/Validate.php	/^	public static function isGenericName($name) {$/;"	f
+isIMEI	application/library/Validate.php	/^	public static function isIMEI($data) {$/;"	f
+isISBN	application/library/Validate.php	/^	public static function isISBN($isbn) {$/;"	f
+isInt	application/library/Validate.php	/^	public static function isInt($value) {$/;"	f
+isIpAddress	application/library/Validate.php	/^	public static function isIpAddress($data) {$/;"	f
+isLeapYear	application/library/Carbon.php	/^    public function isLeapYear()$/;"	f
+isLoadedObject	application/library/Validate.php	/^	public static function isLoadedObject($object) {$/;"	f
+isMd5	application/library/Validate.php	/^	public static function isMd5($md5) {$/;"	f
+isMessage	application/library/Validate.php	/^	public static function isMessage($message) {$/;"	f
+isMobilePhone	application/library/Validate.php	/^	public static function isMobilePhone($mobilePhone) {$/;"	f
+isMySQLEngine	application/library/Validate.php	/^	public static function isMySQLEngine($engine) {$/;"	f
+isName	application/library/Validate.php	/^	public static function isName($name) {$/;"	f
+isNegativePrice	application/library/Validate.php	/^	public static function isNegativePrice($price) {$/;"	f
+isNickname	application/library/Validate.php	/^	public static function isNickname($data) {$/;"	f
+isNow	application/library/Carbon.php	/^        $isNow = $other === null;$/;"	v
+isNullOrUnsignedId	application/library/Validate.php	/^	public static function isNullOrUnsignedId($id) {$/;"	f
+isNumber	application/library/Validate.php	/^	public static function isNumber($data) {$/;"	f
+isOptFloat	application/library/Validate.php	/^	public static function isOptFloat($float) {$/;"	f
+isOptNickname	application/library/Validate.php	/^	public static function isOptNickname($data) {$/;"	f
+isOptUnsignedId	application/library/Validate.php	/^	public static function isOptUnsignedId($id) {$/;"	f
+isOrderWay	application/library/Validate.php	/^	public static function isOrderWay($way) {$/;"	f
+isPasswd	application/library/Validate.php	/^	public static function isPasswd($passwd, $size = 6) {$/;"	f
+isPast	application/library/Carbon.php	/^    public function isPast()$/;"	f
+isPercentage	application/library/Validate.php	/^	public static function isPercentage($value) {$/;"	f
+isPrice	application/library/Validate.php	/^	public static function isPrice($price) {$/;"	f
+isPublishTime	application/library/Validate.php	/^	public static function isPublishTime($time) {$/;"	f
+isSearch	application/library/Validate.php	/^	public static function isSearch($search) {$/;"	f
+isSerializedArray	application/library/Validate.php	/^	public static function isSerializedArray($data) {$/;"	f
+isSha1	application/library/Validate.php	/^	public static function isSha1($sha1) {$/;"	f
+isSpider	application/library/Tools.php	/^	public static function isSpider() {$/;"	f
+isString	application/library/Validate.php	/^	public static function isString($data) {$/;"	f
+isSubmit	application/library/Tools.php	/^	public static function isSubmit($submit) {$/;"	f
+isTimestamp	application/library/Validate.php	/^	public static function isTimestamp($time) {$/;"	f
+isToday	application/library/Carbon.php	/^    public function isToday()$/;"	f
+isToken	application/library/Validate.php	/^	public static function isToken($token) {$/;"	f
+isTomorrow	application/library/Carbon.php	/^    public function isTomorrow()$/;"	f
+isUnixName	application/library/Validate.php	/^	public static function isUnixName($data) {$/;"	f
+isUnsignedFloat	application/library/Validate.php	/^	public static function isUnsignedFloat($float) {$/;"	f
+isUnsignedId	application/library/Validate.php	/^	public static function isUnsignedId($id) {$/;"	f
+isUnsignedInt	application/library/Validate.php	/^	public static function isUnsignedInt($value) {$/;"	f
+isUrl	application/library/Validate.php	/^	public static function isUrl($url) {$/;"	f
+isUrlOrEmpty	application/library/Validate.php	/^	public static function isUrlOrEmpty($url) {$/;"	f
+isWeekday	application/library/Carbon.php	/^    public function isWeekday()$/;"	f
+isWeekend	application/library/Carbon.php	/^    public function isWeekend()$/;"	f
+isX86_64arch	application/library/Tools.php	/^	public static function isX86_64arch() {$/;"	f
+isYesterday	application/library/Carbon.php	/^    public function isYesterday()$/;"	f
+is_arr2	application/library/Util/Common.php	/^	public static function is_arr2($arr, $strict = 1) {$/;"	f
+item	application/library/Log/Test.php	/^  		$item = array();$/;"	v
+item	application/library/Log/Test.php	/^    		$item = array();$/;"	v
+items	application/Bootstrap.php	/^		$items = Yaf_Registry::get("config");$/;"	v
+items	application/library/Db/Mysql.php	/^        $items = $config['db'];$/;"	v
+items	application/library/Log/Test.php	/^    	$items = array();$/;"	v
+json_encode	application/library/Util/Common.php	/^	public static function json_encode($arr) {$/;"	f
+k	application/library/Db/Mysql.php	/^            $k = array_shift($key);$/;"	v
+k	application/library/Tools.php	/^					$k = $stArr[$k];$/;"	v
+key	application/library/Base/Model/Abstract.php	/^        $key = 'db|' . $this->dbname;$/;"	v
+key	application/library/Base/Model/Abstract.php	/^        $key = 'memcache|' . $this->memSrvKey;$/;"	v
+key	application/library/Base/Model/Abstract.php	/^        $key = 'redis|' . $this->rdsSrvKey;$/;"	v
+key	application/library/Session/Writer/Redis.php	/^		$key = $this->getCacheKey($id);$/;"	v
+key	application/library/Tools.php	/^			$key = md5(str_replace('\\'', '\\\\\\'', $string));$/;"	v
+key	application/library/Util/Filecache.php	/^			$key = array($key);$/;"	v
+lastOfMonth	application/library/Carbon.php	/^    public function lastOfMonth($dayOfWeek = null)$/;"	f
+lastOfQuarter	application/library/Carbon.php	/^    public function lastOfQuarter($dayOfWeek = null)$/;"	f
+lastOfYear	application/library/Carbon.php	/^    public function lastOfYear($dayOfWeek = null)$/;"	f
+lastQuery	application/library/Db/Mysql.php	/^    public function lastQuery() {$/;"	f
+last_month	application/library/Carbon.php	/^        $last_month = $dt->month;$/;"	v
+limit	application/library/Db/Mysql.php	/^        $limit = $limit ? ' LIMIT ' . $limit : '';$/;"	v
+limit	application/library/Db/Mysql.php	/^        $limit = $this->getLimit($limit);$/;"	v
+list	application/library/Base/Model/Abstract.php	/^                $list = $this->db->select($this->getTable(), $where, $fields);$/;"	v
+list	application/library/Base/Model/Abstract.php	/^        $list = $this->setListKey($this->pkKey)->select($where, $this->pkKey);$/;"	v
+list	application/library/Log/Debug.php	/^	protected static $list = array();$/;"	v
+list	application/library/Process/Manager.php	/^            $this->list = ProcessModel::model()->search(array('state'=>1));$/;"	v
+list	application/library/Process/Manager.php	/^    protected $list = array();$/;"	v
+list	application/library/Tools.php	/^			$list = $zip->extract(PCLZIP_OPT_PATH, $to_dir);$/;"	v
+list	application/library/Tools.php	/^		$list = $zip->extract(PCLZIP_OPT_PATH, $to_dir);$/;"	v
+list	crontab/Worker1.php	/^    	$list = OrganizationModel::model()->search(array('deleted_at|exp'=>'is null'),'id');$/;"	v
+listKey	application/library/Db/Mysql.php	/^        $this->listKey = $key;$/;"	v
+listKey	application/library/Db/Mysql.php	/^    protected $listKey;$/;"	v
+local	application/library/Lang/Msg.php	/^    protected static $local = 'zh';$/;"	v
+lock	application/library/Util/Lock.php	/^	public static function lock($key, $cd = 5) {$/;"	f
+locks	application/library/Util/Lock.php	/^	protected static $locks = array();$/;"	v
+log	application/library/Log/Debug.php	/^	public static function log($msg, $dir='common'){$/;"	f
+log	application/library/Process/Control.php	/^        $log = $this->logPath . 'manager.log';$/;"	v
+log	application/library/Process/Manager.php	/^                    $log = $this->logPath . str_replace('\/', '__', $item['path']) . '_' . date('Ymd');$/;"	v
+logPath	application/library/Process/Base.php	/^        $this->logPath = $conf['crontab']['log_path'];$/;"	v
+logPath	application/library/Process/Base.php	/^    protected $logPath;$/;"	v
+lone_tags	application/library/Tools.php	/^		$lone_tags = array("img", "param", "br", "hr");$/;"	v
+lsJson	application/library/Tools.php	/^    public static function lsJson($code,$message,$body=array())$/;"	f
+lsPost	application/library/Tools.php	/^    public static function lsPost($param)$/;"	f
+lt	application/library/Carbon.php	/^    public function lt(Carbon $dt)$/;"	f
+lte	application/library/Carbon.php	/^    public function lte(Carbon $dt)$/;"	f
+makeId	application/library/Util/Common.php	/^    public static function makeId($channel, $oid, $uid) {$/;"	f
+manager	application/library/Process/Control.php	/^        $manager = $this->basePath . 'Manager.php';$/;"	v
+manager	crontab/Manager.php	/^$manager = new Process_Manager();$/;"	v
+max	application/library/Carbon.php	/^    public function max(Carbon $dt = null)$/;"	f
+memSrvKey	application/library/Base/Model/Abstract.php	/^    protected $memSrvKey;$/;"	v
+memcache	application/library/Cache/Memcache.php	/^			$this->memcache = new $cls();$/;"	v
+memcache	application/library/Cache/Memcache.php	/^	private $memcache;$/;"	v
+memcache	application/library/Cache/Memcache.php	/^        $memcache = $config['memcache'];$/;"	v
+memcache	application/library/Util/Lock.php	/^	public static function memcache() {$/;"	f
+memory_limit	application/library/Tools.php	/^		$memory_limit = @ini_get('memory_limit');$/;"	v
+method	test/Base.php	/^	protected $method = 'GET';$/;"	v
+method	test/Exp1.php	/^    protected $method = 'GET';$/;"	v
+mget	application/library/Cache/Memcache.php	/^	public function mget($keys) {$/;"	f
+min	application/library/Carbon.php	/^    public function min(Carbon $dt = null)$/;"	f
+minute	application/library/Carbon.php	/^            $minute = ($minute === null) ? 0 : $minute;$/;"	v
+minute	application/library/Carbon.php	/^            $minute = ($minute === null) ? date('i') : $minute;$/;"	v
+minute	application/library/Carbon.php	/^        $this->minute = $value;$/;"	v
+minute	application/library/Carbon.php	/^    public function minute($value)$/;"	f
+mode	application/library/Log/Base.php	/^	protected $mode = 0; \/\/0 queue, 1 file$/;"	v
+model	application/library/Base/Model/Abstract.php	/^    public static function model() {$/;"	f
+model	application/library/Log/Base.php	/^    public static function model() {$/;"	f
+module	test/Base.php	/^	protected $module = 'index';$/;"	v
+module	test/Exp1.php	/^    protected $module = 'index';$/;"	v
+month	application/library/Carbon.php	/^        $month = $dt->month;$/;"	v
+month	application/library/Carbon.php	/^        $month = ($month === null) ? date('n') : $month;$/;"	v
+month	application/library/Carbon.php	/^        $this->month = $value;$/;"	v
+month	application/library/Carbon.php	/^    public function month($value)$/;"	f
+msg	application/library/Lang/Msg.php	/^        $msg = self::getLang($id, $params);$/;"	v
+msg	application/library/Log/Debug.php	/^			$msg = var_export($msg,true);$/;"	v
+mtrand	application/library/Tools.php	/^        $mtrand = (float) $sec + ((float) $usec * 100000);$/;"	v
+ndArr	application/library/Tools.php	/^			$ndArr = array_keys(end($array));$/;"	v
+ne	application/library/Carbon.php	/^    public function ne(Carbon $dt)$/;"	f
+newkey	application/library/Tools.php	/^				$newkey = $function($key);$/;"	v
+next	application/library/Carbon.php	/^    public function next($dayOfWeek = null)$/;"	f
+nl2br	application/library/Tools.php	/^	public static function nl2br($str) {$/;"	f
+noBody	application/library/Util/Curl.php	/^		$this->noBody = $val;$/;"	v
+noBody	application/library/Util/Curl.php	/^	protected $noBody = false;$/;"	v
+noHeader	application/library/Util/Curl.php	/^		$this->noHeader = $val;$/;"	v
+noHeader	application/library/Util/Curl.php	/^	protected $noHeader = true;$/;"	v
+now	application/library/Carbon.php	/^    public static function now($tz = null)$/;"	f
+now	application/library/Util/Queue.php	/^					$now = microtime(true);$/;"	v
+now	crontab/Worker1.php	/^        	$now = memory_get_usage();$/;"	v
+ns	application/library/Base/Model/Abstract.php	/^            $ns = microtime(true);$/;"	v
+ns	application/library/Base/Model/Abstract.php	/^        $ns = $this->memcache->get($this->getCacheKey('NS', $preCacheKey));$/;"	v
+nthOfMonth	application/library/Carbon.php	/^    public function nthOfMonth($nth, $dayOfWeek)$/;"	f
+nthOfQuarter	application/library/Carbon.php	/^    public function nthOfQuarter($nth, $dayOfWeek)$/;"	f
+nthOfYear	application/library/Carbon.php	/^    public function nthOfYear($nth, $dayOfWeek)$/;"	f
+num	application/library/Process/Control.php	/^        $num = Process_System::getProcessNum($manager);$/;"	v
+num	application/library/Process/Manager.php	/^                $num = $item['num'] ? $item['num'] : $this->cpu;$/;"	v
+num	application/library/Util/Common.php	/^            $num = intval($num \/ $base);$/;"	v
+object2array	application/library/Tools.php	/^	public static function object2array(&$object) {$/;"	f
+oid	application/library/Util/Common.php	/^        $oid = self::to60($oid);$/;"	v
+op	application/library/Db/Mysql.php	/^            $op = '=';$/;"	v
+op	application/library/Db/Mysql.php	/^        $op = strtoupper($op);$/;"	v
+open	application/library/Session/Proxy.php	/^	public function open($path, $name) {$/;"	f
+options	application/library/Cache/Memcache.php	/^    		$options = array($options);$/;"	v
+opts	application/library/Tools.php	/^			$opts = stream_context_get_options($stream_context);$/;"	v
+order	application/library/Db/Mysql.php	/^        $order = $order ? ' ORDER BY ' . $order : '';$/;"	v
+order	application/library/Db/Mysql.php	/^        $order = $this->getOrder($order);$/;"	v
+other	application/library/Carbon.php	/^            $other = static::now($this->tz);$/;"	v
+output	application/library/Lang/Msg.php	/^    public static function output($body = null) {$/;"	f
+output	application/library/Log/Debug.php	/^	public static function output(){$/;"	f
+output	application/library/Tools.php	/^		$output = array();$/;"	v
+params	application/library/Db/Mysql.php	/^        $params = array();$/;"	v
+params	application/library/Log/Base.php	/^		$params = Yaf_Application::app()->getDispatcher()->getRequest()->getParams();$/;"	v
+params	application/library/Process/Base.php	/^        $this->params = $_SERVER['argv'];$/;"	v
+params	application/library/Process/Base.php	/^    protected $params = array();$/;"	v
+params	application/library/Util/Filecache.php	/^		$params = $this->parseParams($options['args']);$/;"	v
+params	test/Base.php	/^	protected $params = array();$/;"	v
+params	test/Exp1.php	/^    protected $params = array();$/;"	v
+parse	application/library/Carbon.php	/^    public static function parse($time = null, $tz = null)$/;"	f
+parseClass	application/library/Util/Filecache.php	/^	protected function parseClass($class, $funs){$/;"	f
+parseData	application/library/Util/Filecache.php	/^	protected function parseData($options) {$/;"	f
+parseFun	application/library/Util/Filecache.php	/^	protected function parseFun($fun, $options) {$/;"	f
+parseParams	application/library/Util/Filecache.php	/^	protected function parseParams($params) {$/;"	f
+parseReturn	application/library/Util/Filecache.php	/^	protected function parseReturn($params) {$/;"	f
+parts	application/library/Db/Mysql.php	/^        $parts = array();$/;"	v
+passwdGen	application/library/Tools.php	/^	public static function passwdGen($length = 8, $flag = self::FLAG_NO_NUMERIC) {$/;"	f
+password	application/library/Db/Mysql.php	/^    public $password = '111111';$/;"	v
+password_get_info	application/library/Password.php	/^    function password_get_info($hash) {$/;"	f
+password_hash	application/library/Password.php	/^    public static function password_hash($password, $algo, array $options = array()) {$/;"	f
+password_needs_rehash	application/library/Password.php	/^    function password_needs_rehash($hash, $algo, array $options = array()) {$/;"	f
+password_verify	application/library/Password.php	/^    function password_verify($password, $hash) {$/;"	f
+path	application/library/Log/Base.php	/^    	$path = dirname($file);$/;"	v
+path	application/library/Tools.php	/^		$path = rtrim(rtrim($path, '\\\\'), '\/') . '\/';$/;"	v
+patterns	application/library/Tools.php	/^		$patterns = array( \/* Lowercase *\/$/;"	v
+pconnect	application/library/Cache/Redis.php	/^    public $pconnect = false;$/;"	v
+persistent	application/library/Cache/Memcache.php	/^	public $persistent=true;$/;"	v
+pkKey	application/library/Base/Model/Abstract.php	/^    protected $pkKey;$/;"	v
+pkKey	application/models/Language.php	/^    protected $pkKey = 'id';$/;"	v
+pkKey	application/models/Organization.php	/^    protected $pkKey = 'id';$/;"	v
+pkKey	application/models/Process.php	/^    protected $pkKey = 'id';$/;"	v
+platform	application/library/Tools.php	/^        $platform = !empty($platform)?$platform:2;$/;"	v
+platform	application/library/Tools.php	/^        $platform = getenv('FX_REMOTE');$/;"	v
+port	application/library/Cache/Memcache.php	/^	public $port=11211;$/;"	v
+port	application/library/Cache/Redis.php	/^    public $port = '6379';$/;"	v
+port	application/library/Db/Mysql.php	/^    public $port = '3306';$/;"	v
+postBodyString	application/library/Tools.php	/^						$postBodyString = "";$/;"	v
+postDispatch	application/plugins/Sample.php	/^	public function postDispatch(Yaf_Request_Abstract $request, Yaf_Response_Abstract $response) {$/;"	f
+postFields	application/library/Tools.php	/^							$postFields = Tools::object2array($postFields);$/;"	v
+postMultipart	application/library/Tools.php	/^								$postMultipart = true;$/;"	v
+postMultipart	application/library/Tools.php	/^						$postMultipart = false;$/;"	v
+post_max_size	application/library/Tools.php	/^		$post_max_size = Tools::convertBytes(ini_get('post_max_size'));$/;"	v
+preCacheKey	application/library/Base/Model/Abstract.php	/^            $preCacheKey = $this->preCacheKey . $this->getCacheNS() . '|';$/;"	v
+preCacheKey	application/library/Base/Model/Abstract.php	/^    protected $preCacheKey = 'cache|';$/;"	v
+preCacheKey	application/library/Session/Writer/Redis.php	/^	protected $preCacheKey = 'Session_Writer_Redis|';$/;"	v
+preCacheKey	application/models/Language.php	/^    protected $preCacheKey = 'cache|LanguageModel|';$/;"	v
+preCacheKey	application/models/Organization.php	/^    protected $preCacheKey = 'cache|OrganizationModel|';$/;"	v
+preCacheKey	application/models/Process.php	/^    protected $preCacheKey = '';$/;"	v
+preDispatch	application/plugins/Sample.php	/^	public function preDispatch(Yaf_Request_Abstract $request, Yaf_Response_Abstract $response) {$/;"	f
+precisionFactor	application/library/Tools.php	/^		$precisionFactor = $precision == 0 ? 1 : pow(10, $precision);$/;"	v
+prefix	application/library/Log/Base.php	/^	protected $prefix = 'log';$/;"	v
+previous	application/library/Carbon.php	/^    public function previous($dayOfWeek = null)$/;"	f
+publish	application/library/Util/Queue.php	/^	public static function publish($queue, $msg=''){$/;"	f
+push	application/library/Cache/Memcache.php	/^	public function push($command, $params) {$/;"	f
+push	application/library/Cache/Redis.php	/^    public function push($command, $params) {$/;"	f
+qty	application/library/Tools.php	/^			$qty = (int)substr($value, 0, $value_length - 1);$/;"	v
+queue	application/library/Cache/Redis.php	/^        $this->queue = array();$/;"	v
+queue	application/library/Cache/Redis.php	/^    protected $queue = array();$/;"	v
+queue	application/library/Util/Queue.php	/^				$queue = $return[0];$/;"	v
+queues	application/library/Cache/Memcache.php	/^		$this->queues = array();$/;"	v
+queues	application/library/Cache/Memcache.php	/^	private $queues = array();$/;"	v
+queues	application/library/Util/Queue.php	/^		$queues = array_keys(self::$queues);$/;"	v
+queues	application/library/Util/Queue.php	/^	protected static $queues = array();$/;"	v
+r	application/library/Util/Filecache.php	/^		$r = array($/;"	v
+rand	application/library/Hash.php	/^    public static function rand($length)$/;"	f
+randStr	application/library/Hash.php	/^        $randStr = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ';$/;"	v
+randval	application/library/Tools.php	/^        $randval = mt_rand(1000,9000);$/;"	v
+raw_salt_len	application/library/Password.php	/^                $raw_salt_len = 16;$/;"	v
+rawbody	application/library/Base/Controller/Abstract.php	/^            $this->rawbody = strlen($body) > 0 ? $body : false;$/;"	v
+rawbody	application/library/Base/Controller/Abstract.php	/^    protected $rawbody;$/;"	v
+rawbody	application/library/Util/Curl.php	/^		$this->rawbody = curl_exec($s);$/;"	v
+rawbody	application/library/Util/Curl.php	/^	protected $rawbody;$/;"	v
+rdsSrvKey	application/library/Base/Model/Abstract.php	/^    protected $rdsSrvKey;$/;"	v
+read	application/library/Password.php	/^                    $read = strlen($buffer);$/;"	v
+read	application/library/Password.php	/^                $read = strlen($buffer);$/;"	v
+read	application/library/Session/Proxy.php	/^	public function read($id) {$/;"	f
+read	application/library/Session/Writer/Redis.php	/^	public function read($id) {$/;"	f
+real_ext	application/library/Tools.php	/^			$real_ext = '.' . $ext;$/;"	v
+real_ext	application/library/Tools.php	/^		$real_ext = false;$/;"	v
+real_ext_length	application/library/Tools.php	/^		$real_ext_length = strlen($real_ext);$/;"	v
+real_path	application/library/Tools.php	/^		$real_path = rtrim(rtrim($path . $dir, '\\\\'), '\/') . '\/';$/;"	v
+reboot	application/library/Process/Base.php	/^    protected $reboot = true;$/;"	v
+reboot	application/library/Process/Manager.php	/^    protected $reboot = false;$/;"	v
+receive	application/library/Util/Queue.php	/^	public static function receive($queue, $waittime=0){$/;"	f
+receiveAll	application/library/Util/Queue.php	/^	public static function receiveAll(){$/;"	f
+receiveByRpop	application/library/Util/Queue.php	/^	public static function receiveByRpop($queue){$/;"	f
+redirect	application/library/Tools.php	/^	public static function redirect($url, $headers = null) {$/;"	f
+redirectTo	application/library/Tools.php	/^	public static function redirectTo($link) {$/;"	f
+redis	application/library/Cache/Redis.php	/^            $this->redis = new Redis();$/;"	v
+redis	application/library/Cache/Redis.php	/^        $redis = $config['redis'];$/;"	v
+redis	application/library/Cache/Redis.php	/^    protected $redis;$/;"	v
+redis	application/library/Util/Queue.php	/^	public static function redis() {$/;"	f
+reg	application/library/Util/Queue.php	/^	public static function reg($queue, $callBack=null, $ts=0) {$/;"	f
+reg	crontab/Queue.php	/^    public function reg() {$/;"	f
+relativeKeywords	application/library/Carbon.php	/^    protected static $relativeKeywords = array($/;"	v
+remote	application/library/Util/Common.php	/^        $remote = $_SERVER['FX_REMOTE'] == 1 ? 'A' : 'B';$/;"	v
+removeXSS	application/library/Tools.php	/^	public static function removeXSS($str) {$/;"	f
+replaceAccentedChars	application/library/Tools.php	/^	public static function replaceAccentedChars($str) {$/;"	f
+replaceSpace	application/library/Tools.php	/^	public static function replaceSpace($url) {$/;"	f
+replacements	application/library/Tools.php	/^		$replacements = array($/;"	v
+request	application/library/Sms.php	/^        $request = self::HOST.':'.self::PORT.'\/sdkproxy\/sendsms.action';$/;"	v
+request	application/library/Util/Curl.php	/^		$request = Yaf_Dispatcher::getInstance()->getRequest();$/;"	v
+request	application/library/Util/Curl.php	/^	public function request($url = '', $postData = array(), $returnJson = 1) {$/;"	f
+request	test/Base.php	/^	protected $request;$/;"	v
+request	test/Base.php	/^    		$request = new Yaf_Request_Simple($/;"	v
+request	test/Base.php	/^    	$this->request = $request;$/;"	v
+required_salt_len	application/library/Password.php	/^                $required_salt_len = 22;$/;"	v
+resetToStringFormat	application/library/Carbon.php	/^    public static function resetToStringFormat()$/;"	f
+response	application/library/Tools.php	/^		$response = curl_exec($ch);$/;"	v
+result	application/library/Hash.php	/^        $result = '';$/;"	v
+result	application/library/Sms.php	/^        $result  = Tools::curl($request);$/;"	v
+result	application/library/Sms.php	/^        $result  = simplexml_load_string(trim($result));$/;"	v
+result	application/library/Tools.php	/^			$result = array();$/;"	v
+result	application/library/Tools.php	/^			$result = min($post_max_size, $upload_max_filesize);$/;"	v
+result	application/library/Tools.php	/^			$result = min($post_max_size, $upload_max_filesize, $max_size);$/;"	v
+result	application/library/Util/Lock.php	/^		$result = self::memcache()->add($key, 1, $cd);$/;"	v
+ret	application/library/Password.php	/^        $ret = crypt($password, $hash);$/;"	v
+ret	application/library/Tools.php	/^			$ret = trim(urldecode(preg_replace('\/((\\%5C0+)|(\\%00+))\/i', '', urlencode($ret))));$/;"	v
+ret	application/library/Tools.php	/^		$ret = (isset($_POST[$key]) ? $_POST[$key] : (isset($_GET[$key]) ? $_GET[$key] : $default_value));$/;"	v
+retryInterval	application/library/Cache/Memcache.php	/^	public $retryInterval=15;$/;"	v
+return	application/library/Password.php	/^        $return = array($/;"	v
+return	application/library/Util/Filecache.php	/^		$return = $this->parseReturn($options['args']);$/;"	v
+return	application/library/Util/Queue.php	/^			$return = self::redis()->brPop($queues, self::$waittime);$/;"	v
+return	application/library/Util/Queue.php	/^		$return = self::redis()->brPop(array($queue), $waittime);$/;"	v
+return	application/library/Util/Queue.php	/^		$return = self::redis()->rPop($queue);$/;"	v
+returnAjaxJson	application/library/Tools.php	/^	public static function returnAjaxJson($array) {$/;"	f
+rollback	application/library/Base/Model/Abstract.php	/^    public function rollback() {$/;"	f
+rollback	application/library/Cache/Memcache.php	/^	public function rollback() {$/;"	f
+rollback	application/library/Db/Mysql.php	/^    public function rollback() {$/;"	f
+routerShutdown	application/plugins/Sample.php	/^	public function routerShutdown(Yaf_Request_Abstract $request, Yaf_Response_Abstract $response) {$/;"	f
+routerStartup	application/plugins/Sample.php	/^	public function routerStartup(Yaf_Request_Abstract $request, Yaf_Response_Abstract $response) {$/;"	f
+rows	application/library/Util/Filecache.php	/^		$rows = Db_Pdo::factory($dbname)$/;"	v
+rt	application/library/Base/Model/Abstract.php	/^            $rt = $this->delCache($this->cacheKey);$/;"	v
+rt	application/library/Base/Model/Abstract.php	/^            $rt = $this->delCacheList(array_keys($list));$/;"	v
+rt	application/library/Base/Model/Abstract.php	/^        $rt = $this->db->delete($this->getTable(), $where);$/;"	v
+rt	application/library/Base/Model/Abstract.php	/^        $rt = $this->db->insert($this->getTable(), $data);$/;"	v
+rt	application/library/Base/Model/Abstract.php	/^        $rt = $this->db->update($this->getTable(), $data, $where);$/;"	v
+rt	application/library/Base/Model/Abstract.php	/^        $rt = $this->update($data, $where);$/;"	v
+rt	application/library/Util/Common.php	/^        $rt = 0;$/;"	v
+rt	application/library/Util/Common.php	/^        $rt = array();$/;"	v
+run	application/library/Log/Import.php	/^	public static function run($sql) {$/;"	f
+run	application/library/Process/Control.php	/^    public function run() {$/;"	f
+run	application/library/Process/Manager.php	/^    public function run() {$/;"	f
+run	crontab/Queue.php	/^    public function run() {$/;"	f
+run	crontab/Worker1.php	/^    public function run() {$/;"	f
+s	application/library/Lang/Msg.php	/^            $s = $r = array();$/;"	v
+s	application/library/Util/Common.php	/^			$s = $r = array();$/;"	v
+s	application/library/Util/Curl.php	/^		$s = curl_init();$/;"	v
+s	application/library/Util/Filecache.php	/^		$s = array($/;"	v
+safeCreateDateTimeZone	application/library/Carbon.php	/^    protected static function safeCreateDateTimeZone($object)$/;"	f
+safeOutput	application/library/Tools.php	/^	public static function safeOutput($string, $html = false) {$/;"	f
+safePostVars	application/library/Tools.php	/^	public static function safePostVars() {$/;"	f
+salt	application/library/Password.php	/^                        $salt = (string) $options['salt'];$/;"	v
+salt	application/library/Password.php	/^                    $salt = (string) $options['salt'];$/;"	v
+salt	application/library/Password.php	/^                $salt = str_replace('+', '.', base64_encode($salt));$/;"	v
+salt	application/library/Password.php	/^            $salt = str_replace('+', '.', base64_encode($buffer));$/;"	v
+salt	application/library/Password.php	/^        $salt = substr($salt, 0, $required_salt_len);$/;"	v
+save	application/library/Log/Base.php	/^    public static function save($filename, $data) {$/;"	f
+saveFile	application/library/Tools.php	/^	public static function saveFile($url, $filepath) {$/;"	f
+savePath	application/library/Util/Filecache.php	/^		$savePath = $filecache['save_path'];$/;"	v
+scandir	application/library/Tools.php	/^	public static function scandir($path, $ext = 'php', $dir = '', $recursive = false) {$/;"	f
+search	application/library/Base/Model/Abstract.php	/^    public function search($where, $fields = '*', $order = null, $limit = null) {$/;"	f
+sec	application/library/Util/Common.php	/^        $sec = self::to60($sec);$/;"	v
+second	application/library/Carbon.php	/^            $second = ($second === null) ? 0 : $second;$/;"	v
+second	application/library/Carbon.php	/^            $second = ($second === null) ? date('s') : $second;$/;"	v
+second	application/library/Carbon.php	/^        $this->second = $value;$/;"	v
+second	application/library/Carbon.php	/^    public function second($value)$/;"	f
+secureReferrer	application/library/Tools.php	/^	public static function secureReferrer($referrer) {$/;"	f
+select	application/library/Base/Model/Abstract.php	/^    public function select($where, $fields = '*', $order = null, $limit = null) {$/;"	f
+select	application/library/Db/Mysql.php	/^    public function select($tblname, $cond, $fields = '*', $order = null, $limit = null) {$/;"	f
+send	application/library/Util/Queue.php	/^	public static function send($queue, $msg=''){$/;"	f
+sendRefunds	application/models/Sms.php	/^    public function sendRefunds($order)$/;"	f
+sendSMS	application/library/Sms.php	/^    public static function sendSMS($mobile, $content)$/;"	f
+sendSms	application/models/Sms.php	/^    public function sendSms($order)$/;"	f
+sendToBrowser	application/library/Tools.php	/^	public static function sendToBrowser($file, $delaftersend = true, $exitaftersend = true) {$/;"	f
+server	application/library/Session/Writer/Redis.php	/^    public $server;$/;"	v
+session	application/library/Session/Proxy.php	/^        	$session = $config['session'];$/;"	v
+set	application/library/Cache/Memcache.php	/^	public function set($key,$value,$expire=0,$compression=true) {$/;"	f
+setBaseParams	application/library/Log/Base.php	/^	protected function setBaseParams(&$item) {$/;"	f
+setBody	application/library/Lang/Msg.php	/^    public static function setBody($body, $name = null) {$/;"	f
+setCacheKey	application/library/Base/Model/Abstract.php	/^    public function setCacheKey($key = null) {$/;"	f
+setCacheNS	application/library/Base/Model/Abstract.php	/^    private function setCacheNS($ns = null, $preCacheKey = null) {$/;"	f
+setCookieFile	application/library/Util/Curl.php	/^	public function setCookieFile($val) {$/;"	f
+setDate	application/library/Carbon.php	/^    public function setDate($year, $month, $day)$/;"	f
+setDateTime	application/library/Carbon.php	/^    public function setDateTime($year, $month, $day, $hour, $minute, $second)$/;"	f
+setListKey	application/library/Base/Model/Abstract.php	/^    public function setListKey($key = null) {$/;"	f
+setListKey	application/library/Db/Mysql.php	/^    public function setListKey($key = null) {$/;"	f
+setNoBody	application/library/Util/Curl.php	/^	public function setNoBody ($val) {$/;"	f
+setNoHeader	application/library/Util/Curl.php	/^	public function setNoHeader ($val) {$/;"	f
+setRequest	test/Base.php	/^    public function setRequest(Yaf_Request_Abstract $request = null) {$/;"	f
+setTestNow	application/library/Carbon.php	/^    public static function setTestNow(Carbon $testNow = null)$/;"	f
+setTime	application/library/Carbon.php	/^    public function setTime($hour, $minute, $second = 0)$/;"	f
+setTimeout	application/library/Util/Curl.php	/^	public function setTimeout($val) {$/;"	f
+setTimezone	application/library/Carbon.php	/^    public function setTimezone($value)$/;"	f
+setToStringFormat	application/library/Carbon.php	/^    public static function setToStringFormat($format)$/;"	f
+setUrl	application/library/Util/Curl.php	/^	public function setUrl($val) {$/;"	f
+setter	application/library/Base/Controller/Abstract.php	/^        $setter = 'set' . ucfirst($name);$/;"	v
+setter	application/library/Base/Model/Abstract.php	/^        $setter = 'set' . ucfirst($name);$/;"	v
+showOrgList	crontab/Worker1.php	/^    public function showOrgList() {$/;"	f
+sign	application/library/Base/Controller/Api.php	/^        $sign = trim($this->getPost('sign'));$/;"	v
+simpleArray	application/library/Tools.php	/^	public static function simpleArray($array, $key) {$/;"	f
+sleep	application/library/Process/Base.php	/^    public function sleep($cd) {$/;"	f
+spiders	application/library/Tools.php	/^			$spiders = array('spider', 'bot');$/;"	v
+sql	application/library/Db/Mysql.php	/^                    $sql = $column . ' ' . $op . ' ? ';$/;"	v
+sql	application/library/Db/Mysql.php	/^                    $sql = implode(' OR ', $cond);$/;"	v
+sql	application/library/Db/Mysql.php	/^                $sql = $column . ' ' . $cond;$/;"	v
+sql	application/library/Db/Mysql.php	/^                $sql = $column . ' ' . $op . ' ' . implode(' AND ', $cond);$/;"	v
+sql	application/library/Db/Mysql.php	/^                $sql = $column . ' ' . $op . ' (' . implode(', ', $cond) . ')';$/;"	v
+sql	application/library/Db/Mysql.php	/^                $sql = $this->_where($key, $values, $params);$/;"	v
+sql	application/library/Db/Mysql.php	/^                $sql = $this->where($values, $params, $check);$/;"	v
+sql	application/library/Db/Mysql.php	/^        $this->sql = "INSERT INTO `" . $tblname . "` (`$fields`) VALUES($values)";$/;"	v
+sql	application/library/Db/Mysql.php	/^        $this->sql = "SELECT " . $fields . " FROM `" . $tblname . "`" . $where . $order . $limit;$/;"	v
+sql	application/library/Db/Mysql.php	/^        $this->sql = 'DELETE FROM `' . $tblname . '` ' . $where;$/;"	v
+sql	application/library/Db/Mysql.php	/^        $this->sql = 'UPDATE `' . $tblname . '` SET ' . implode(',', $data) . $where;$/;"	v
+sql	application/library/Db/Mysql.php	/^    public $sql;$/;"	v
+sql	application/library/Log/Base.php	/^			$sql = $arr;$/;"	v
+sql	application/library/Log/Base.php	/^			$sql = 'INSERT INTO ' . $this->getTable();$/;"	v
+sql	application/library/Log/Base.php	/^			$sql = rtrim($sql, ';').';';$/;"	v
+sql	application/library/Log/Base.php	/^		$sql = '';$/;"	v
+sql	application/library/Log/Import.php	/^			$sql = rtrim($sql, ';').';';$/;"	v
+sql	application/library/Util/Filecache.php	/^		$sql = "select {$field} from `{$tblname}` where {$where}";$/;"	v
+st	application/library/Util/Queue.php	/^					$st = $now;$/;"	v
+st	application/library/Util/Queue.php	/^				$st = microtime(true);$/;"	v
+st	application/library/Util/Queue.php	/^		$st = microtime(true);$/;"	v
+stArr	application/library/Tools.php	/^			$stArr = array_keys($array);$/;"	v
+start	application/library/Process/Base.php	/^    public function start() {$/;"	f
+start	application/library/Process/System.php	/^    public static function start($bin, $script, $num = 1, $log = '\/dev\/null', $sudo = 'sudo -u nobody ') {$/;"	f
+start	application/library/Session/Proxy.php	/^	public static function start() {$/;"	f
+start	test/Base.php	/^    public function start() {$/;"	f
+startByRoot	application/library/Process/System.php	/^    public static function startByRoot($bin, $script, $num = 1, $log = '\/dev\/null') {$/;"	f
+startManager	application/library/Process/Control.php	/^    public function startManager() {$/;"	f
+startOfCentury	application/library/Carbon.php	/^    public function startOfCentury()$/;"	f
+startOfDay	application/library/Carbon.php	/^    public function startOfDay()$/;"	f
+startOfDecade	application/library/Carbon.php	/^    public function startOfDecade()$/;"	f
+startOfMonth	application/library/Carbon.php	/^    public function startOfMonth()$/;"	f
+startOfWeek	application/library/Carbon.php	/^    public function startOfWeek()$/;"	f
+startOfYear	application/library/Carbon.php	/^    public function startOfYear()$/;"	f
+status	application/library/Cache/Memcache.php	/^	public $status=true;$/;"	v
+status	application/library/Password.php	/^        $status = 0;$/;"	v
+status	application/library/Process/Control.php	/^            $status = Process_System::startByRoot($this->bin, $manager, 1, $log);$/;"	v
+status	application/library/Process/System.php	/^                    $status = false;$/;"	v
+status	application/library/Process/System.php	/^        $status = true;$/;"	v
+status	application/library/Util/Curl.php	/^		$this->status = curl_getinfo($s);$/;"	v
+status	application/library/Util/Curl.php	/^	protected $status;$/;"	v
+sth	application/library/Db/Mysql.php	/^        $sth = $this->db->prepare($this->sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));$/;"	v
+sth	application/library/Db/Mysql.php	/^        $sth = $this->doQuery($tblname, $cond, $fields, $order, $limit);$/;"	v
+sth	application/library/Db/Mysql.php	/^        $sth = null;$/;"	v
+stop	application/library/Process/System.php	/^    public static function stop($script) {$/;"	f
+stopByid	application/library/Process/System.php	/^    public static function stopByid($id) {        $/;"	f
+stopManager	application/library/Process/Control.php	/^    public function stopManager() {$/;"	f
+stopWorker	application/library/Process/Manager.php	/^    public function stopWorker() {$/;"	f
+str	application/library/Tools.php	/^				$str = '0123456789';$/;"	v
+str	application/library/Tools.php	/^				$str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';$/;"	v
+str	application/library/Tools.php	/^				$str = 'abcdefghijkmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';$/;"	v
+str	application/library/Tools.php	/^			$str = (isset($error) AND is_array($error) AND key_exists($key, $error)) ? ($htmlentities ? htmlentities($error[$key], ENT_COMPAT, 'UTF-8') : $error[$key]) : $string;$/;"	v
+str	application/library/Tools.php	/^			$str = preg_replace('\/&lt;' . $val . '(.*)&gt;\/isU', '<' . $val . "\\\\1>", $str);$/;"	v
+str	application/library/Tools.php	/^			$str = preg_replace('\/&lt;' . $val . '(.*)(\\\/?)&gt;\/isU', '<' . $val . "\\\\1\\\\2>", $str);$/;"	v
+str	application/library/Tools.php	/^			$str = preg_replace('\/&lt;\\\/' . $val . '&gt;\/is', '<\/' . $val . ">", $str);$/;"	v
+str	application/library/Tools.php	/^			$str = preg_replace('\/' . $tag . '\\(.*\\)\/isU', '\\\\1', $str);$/;"	v
+str	application/library/Tools.php	/^			$str = preg_replace('\/' . $tag . '\\s*:\/isU', $tag . '\\:', $str);$/;"	v
+str	application/library/Tools.php	/^			$str = preg_replace_callback('\/<' . $val . '(.+?)>\/i', create_function('$temp', 'return str_replace("&quot;","\\"",$temp[0]);'), $str);$/;"	v
+str	application/library/Tools.php	/^			$str = self::transCase($str);$/;"	v
+str	application/library/Tools.php	/^		$str = html_entity_decode($str, ENT_COMPAT, 'UTF-8');$/;"	v
+str	application/library/Tools.php	/^		$str = htmlspecialchars($str);$/;"	v
+str	application/library/Tools.php	/^		$str = preg_replace('\/&#0{0,8}[0-9]{2,3};\/is', '', $str);$/;"	v
+str	application/library/Tools.php	/^		$str = preg_replace('\/&#x0{0,8}[0-9a-f]{2};\/is', '', $str);$/;"	v
+str	application/library/Tools.php	/^		$str = preg_replace('\/&amp;\/i', '&', $str);$/;"	v
+str	application/library/Tools.php	/^		$str = preg_replace('\/(e|ｅ|Ｅ)(x|ｘ|Ｘ)(p|ｐ|Ｐ)(r|ｒ|Ｒ)(e|ｅ|Ｅ)(s|ｓ|Ｓ)(s|ｓ|Ｓ)(i|ｉ|Ｉ)(o|ｏ|Ｏ)(n|ｎ|Ｎ)\/is', 'expression', $str);$/;"	v
+str	application/library/Tools.php	/^		$str = preg_replace('\/[\\s]+on[\\w]+[\\s]*=\/is', '', $str);$/;"	v
+str	application/library/Tools.php	/^		$str = preg_replace('\/\\\\\\0{0,4}4[0-9a-f]\/is', '', $str);$/;"	v
+str	application/library/Tools.php	/^		$str = preg_replace('\/\\\\\\0{0,4}5[0-9a]\/is', '', $str);$/;"	v
+str	application/library/Tools.php	/^		$str = preg_replace('\/\\\\\\0{0,4}6[0-9a-f]\/is', '', $str);$/;"	v
+str	application/library/Tools.php	/^		$str = preg_replace('\/\\\\\\0{0,4}7[0-9a]\/is', '', $str);$/;"	v
+str	application/library/Tools.php	/^		$str = preg_replace('~\/\\*[ ]+\\*\/~i', '', $str);$/;"	v
+str	application/library/Tools.php	/^		$str = str_replace('<!--  -->', '', $str);$/;"	v
+str	application/library/Tools.php	/^		$str = utf8_decode($str);$/;"	v
+str	application/models/Sms.php	/^        $str = '【景旅通票台】您已成功预订'.$order['name'].$order['nums'].'张，订单号：'.$order['id'].'，您可在使用有效期内游玩，通过以下二维码链接进行手机二维码：http:\/\/'.self::PI_APP_DOMAIN.'\/qrcode_index_'.$order['id'].'.html 入园。';$/;"	v
+str	application/models/Sms.php	/^        $str = '您申请的【拉手网】'.$order['name'].$order['nums'].'张退款，已经为您办理，退款金额会在7个工作日退还到您的支付账户。';$/;"	v
+strReplaceFirst	application/library/Tools.php	/^	public static function strReplaceFirst($search, $replace, $subject, $cur = 0) {$/;"	f
+stream_context	application/library/Tools.php	/^			$stream_context = @stream_context_create(array('http' => array('timeout' => $curl_timeout)));$/;"	v
+string	application/library/Tools.php	/^			$string = strip_tags($string);$/;"	v
+string	application/library/Tools.php	/^			$string = stripslashes($string);$/;"	v
+stripslashes	application/library/Tools.php	/^	public static function stripslashes($string) {$/;"	f
+strlen	application/library/Tools.php	/^	public static function strlen($str, $encoding = 'UTF-8') {$/;"	f
+strtolower	application/library/Tools.php	/^	public static function strtolower($str) {$/;"	f
+strtoupper	application/library/Tools.php	/^	public static function strtoupper($str) {$/;"	f
+subDay	application/library/Carbon.php	/^    public function subDay()$/;"	f
+subDays	application/library/Carbon.php	/^    public function subDays($value)$/;"	f
+subHour	application/library/Carbon.php	/^    public function subHour()$/;"	f
+subHours	application/library/Carbon.php	/^    public function subHours($value)$/;"	f
+subMinute	application/library/Carbon.php	/^    public function subMinute()$/;"	f
+subMinutes	application/library/Carbon.php	/^    public function subMinutes($value)$/;"	f
+subMonth	application/library/Carbon.php	/^    public function subMonth()$/;"	f
+subMonths	application/library/Carbon.php	/^    public function subMonths($value)$/;"	f
+subSecond	application/library/Carbon.php	/^    public function subSecond()$/;"	f
+subSeconds	application/library/Carbon.php	/^    public function subSeconds($value)$/;"	f
+subWeek	application/library/Carbon.php	/^    public function subWeek()$/;"	f
+subWeekday	application/library/Carbon.php	/^    public function subWeekday()$/;"	f
+subWeekdays	application/library/Carbon.php	/^    public function subWeekdays($value)$/;"	f
+subWeeks	application/library/Carbon.php	/^    public function subWeeks($value)$/;"	f
+subYear	application/library/Carbon.php	/^    public function subYear()$/;"	f
+subYears	application/library/Carbon.php	/^    public function subYears($value)$/;"	f
+subdir	application/library/Tools.php	/^		$subdir = ($dir) ? $dir . '\/' : '';$/;"	v
+subscribe	application/library/Util/Queue.php	/^	public static function subscribe(){$/;"	f
+substr	application/library/Tools.php	/^	public static function substr($str, $start, $length = false, $encoding = 'utf-8') {$/;"	f
+sys_get_temp_dir	application/library/Tools.php	/^	public static function sys_get_temp_dir() {$/;"	f
+tab	application/library/Tools.php	/^		$tab = array();$/;"	v
+tab	application/library/Tools.php	/^		$tab = explode(' ', $date);$/;"	v
+tag	application/library/Tools.php	/^			$tag = preg_quote($tag);$/;"	v
+tags	application/library/Tools.php	/^		$tags = Array($/;"	v
+tbJson	application/library/Tools.php	/^    public static function tbJson($code)$/;"	f
+tbl	application/library/Util/Filecache.php	/^			$this->tbl = $item['tbl'];$/;"	v
+tbl	application/library/Util/Filecache.php	/^	private $tbl;$/;"	v
+tblname	application/library/Base/Model/Abstract.php	/^    protected $tblname = '';$/;"	v
+tblname	application/library/Log/Base.php	/^	protected $tblname;$/;"	v
+tblname	application/library/Log/Test.php	/^	protected $tblname = 'log_test';$/;"	v
+tblname	application/library/Util/Filecache.php	/^		$tblname = $this->tbl;$/;"	v
+tblname	application/models/Language.php	/^    protected $tblname = 'language';$/;"	v
+tblname	application/models/Organization.php	/^    protected $tblname = 'organizations';$/;"	v
+tblname	application/models/Process.php	/^    protected $tblname = 'process';$/;"	v
+temp	application/library/Carbon.php	/^            $temp = $dt1;$/;"	v
+temp	application/library/Tools.php	/^		$temp = tempnam(__FILE__, '');$/;"	v
+test	crontab/Queue.php	/^$test = new Crontab_Queue;$/;"	v
+test	crontab/Worker1.php	/^$test = new Crontab_Worker1;$/;"	v
+test	test/Exp1.php	/^$test = new Test_Exp1;$/;"	v
+testInstance	application/library/Carbon.php	/^            $testInstance = clone static::getTestNow();$/;"	v
+testNow	application/library/Carbon.php	/^    protected static $testNow;$/;"	v
+time	application/library/Carbon.php	/^            $time = $testInstance->toDateTimeString();$/;"	v
+timegap	application/library/Tools.php	/^		$timegap = ($_SERVER['REQUEST_TIME'] - $stime) \/ 3600;$/;"	v
+timegap	application/library/Tools.php	/^		$timegap = ($_SERVER['REQUEST_TIME'] - strtotime($time)) \/ 3600;$/;"	v
+timeout	application/library/Cache/Memcache.php	/^	public $timeout=15;$/;"	v
+timeout	application/library/Cache/Redis.php	/^    public $timeout = 60;$/;"	v
+timeout	application/library/Util/Curl.php	/^		$this->timeout = $val;$/;"	v
+timeout	application/library/Util/Curl.php	/^	protected $timeout = 30;$/;"	v
+timestamp	application/library/Carbon.php	/^        $this->timestamp = $value;$/;"	v
+timestamp	application/library/Carbon.php	/^    public function timestamp($value)$/;"	f
+timezone	application/library/Carbon.php	/^    public function timezone($value)$/;"	f
+tmp	application/library/Tools.php	/^			$tmp = array();$/;"	v
+tmp	application/library/Tools.php	/^			$tmp = array_unique($tmp);$/;"	v
+tmp	application/library/Tools.php	/^		$tmp = $value * $precisionFactor;$/;"	v
+tmp	application/library/Util/Filecache.php	/^				$tmp = "\\t\\t\\treturn \\$configs";$/;"	v
+tmp2	application/library/Tools.php	/^		$tmp2 = (string)$tmp;$/;"	v
+tmpArr	application/library/Tools.php	/^					$tmpArr = explode("¤", $v);$/;"	v
+tmpSign	application/library/Base/Controller/Api.php	/^        $tmpSign = $this->getSign($this->body, $appSecret);$/;"	v
+to60	application/library/Util/Common.php	/^    protected static function to60($num) {$/;"	f
+toATOMString	application/library/Carbon.php	/^    public function toATOMString()$/;"	f
+toBase	application/library/Util/Common.php	/^    protected static function toBase($num, $base = 2) {$/;"	f
+toCOOKIEString	application/library/Carbon.php	/^    public function toCOOKIEString()$/;"	f
+toDateString	application/library/Carbon.php	/^    public function toDateString()$/;"	f
+toDateTimeString	application/library/Carbon.php	/^    public function toDateTimeString()$/;"	f
+toDayDateTimeString	application/library/Carbon.php	/^    public function toDayDateTimeString()$/;"	f
+toFormattedDateString	application/library/Carbon.php	/^    public function toFormattedDateString()$/;"	f
+toISO8601String	application/library/Carbon.php	/^    public function toISO8601String()$/;"	f
+toRFC1036String	application/library/Carbon.php	/^    public function toRFC1036String()$/;"	f
+toRFC1123String	application/library/Carbon.php	/^    public function toRFC1123String()$/;"	f
+toRFC2822String	application/library/Carbon.php	/^    public function toRFC2822String()$/;"	f
+toRFC3339String	application/library/Carbon.php	/^    public function toRFC3339String()$/;"	f
+toRFC822String	application/library/Carbon.php	/^    public function toRFC822String()$/;"	f
+toRFC850String	application/library/Carbon.php	/^    public function toRFC850String()$/;"	f
+toRSSString	application/library/Carbon.php	/^    public function toRSSString()$/;"	f
+toStringFormat	application/library/Carbon.php	/^    protected static $toStringFormat = self::DEFAULT_TO_STRING_FORMAT;$/;"	v
+toTimeString	application/library/Carbon.php	/^    public function toTimeString()$/;"	f
+toW3CString	application/library/Carbon.php	/^    public function toW3CString()$/;"	f
+today	application/library/Carbon.php	/^    public static function today($tz = null)$/;"	f
+tomorrow	application/library/Carbon.php	/^    public static function tomorrow($tz = null)$/;"	f
+transCase	application/library/Tools.php	/^	public static function transCase($str) {$/;"	f
+transCounter	application/library/Db/Mysql.php	/^            $this->transCounter = 0;$/;"	v
+transCounter	application/library/Db/Mysql.php	/^    protected $transCounter = 0;$/;"	v
+truncate	application/library/Tools.php	/^	public static function truncate($str, $max_length, $suffix = '...') {$/;"	f
+try	application/library/Cache/Memcache.php	/^			$this->try = 0;$/;"	v
+try	application/library/Cache/Memcache.php	/^	private $try = 0;$/;"	v
+try	application/library/Cache/Redis.php	/^            $this->try = 0;$/;"	v
+try	application/library/Cache/Redis.php	/^    protected $try = 0;$/;"	v
+try	application/library/Db/Mysql.php	/^            $this->try = 0;$/;"	v
+try	application/library/Db/Mysql.php	/^    protected $try = 0;$/;"	v
+try	application/library/Process/Control.php	/^        $try = 0;$/;"	v
+tryLimit	application/library/Cache/Memcache.php	/^	private $tryLimit = 3;$/;"	v
+tryLimit	application/library/Cache/Redis.php	/^    protected $tryLimit = 3;$/;"	v
+tryLimit	application/library/Db/Mysql.php	/^    protected $tryLimit = 3;$/;"	v
+tryLimit	application/library/Process/Control.php	/^    protected $tryLimit = 2;$/;"	v
+txt	application/library/Carbon.php	/^        $txt = $delta . ' ' . $unit;$/;"	v
+tz	application/library/Carbon.php	/^                $tz = $testInstance->tz;$/;"	v
+tz	application/library/Carbon.php	/^        $tz = @timezone_open((string) $object);$/;"	v
+tz	application/library/Carbon.php	/^    public function tz($value)$/;"	f
+ua	application/library/Tools.php	/^			$ua = strtolower($_SERVER['HTTP_USER_AGENT']);$/;"	v
+ucfirst	application/library/Tools.php	/^	public static function ucfirst($str) {$/;"	f
+uid	application/library/Util/Common.php	/^        $uid = self::to60($uid);$/;"	v
+unLock	application/library/Util/Lock.php	/^	public static function unLock($key = null) {$/;"	f
+unescape	application/library/Util/Common.php	/^	public static function unescape(&$data, $charset = 'UTF-8') { $/;"	f
+unit	application/library/Carbon.php	/^                $unit = $divUnit;$/;"	v
+unit	application/library/Carbon.php	/^        $unit = 'year';$/;"	v
+unit	application/library/Tools.php	/^			$unit = strtolower(substr($value, $value_length - 1));$/;"	v
+update	application/library/Base/Model/Abstract.php	/^    public function update($data, $where = null) {$/;"	f
+update	application/library/Db/Mysql.php	/^    public function update($tblname, $data, $cond = null) {$/;"	f
+updateByAttr	application/library/Base/Model/Abstract.php	/^    public function updateByAttr($data, $where) {$/;"	f
+updateById	application/library/Base/Model/Abstract.php	/^    public function updateById($id, $data) {$/;"	f
+upload_max_filesize	application/library/Tools.php	/^		$upload_max_filesize = Tools::convertBytes(ini_get('upload_max_filesize'));$/;"	v
+url	application/library/Util/Curl.php	/^			$this->url = $url;$/;"	v
+url	application/library/Util/Curl.php	/^		$this->url = $val;$/;"	v
+url	application/library/Util/Curl.php	/^	protected $url;$/;"	v
+url_encode	application/library/Util/Common.php	/^	public static function url_encode($arr) {$/;"	f
+useMemcached	application/library/Cache/Memcache.php	/^    private static $useMemcached = true;$/;"	v
+usec	application/library/Util/Common.php	/^        $usec = self::to60(intval($usec * 1000000));$/;"	v
+used	crontab/Worker1.php	/^        	$used = memory_get_usage();$/;"	v
+user	application/library/Db/Mysql.php	/^    public $user = 'root';$/;"	v
+usingSecureMode	application/library/Tools.php	/^	public static function usingSecureMode() {$/;"	f
+v	application/library/Db/Mysql.php	/^            $v = $row[$k];$/;"	v
+val	application/library/Tools.php	/^			$val = preg_quote($val);$/;"	v
+value	application/library/Carbon.php	/^        $value = $dt->getTimestamp() - $this->getTimestamp();$/;"	v
+value	application/library/Util/Common.php	/^				$value = self::url_encode($value);$/;"	v
+value	application/library/Util/Common.php	/^				$value = urlencode($value);$/;"	v
+value_length	application/library/Tools.php	/^			$value_length = strlen($value);$/;"	v
+values	application/library/Db/Mysql.php	/^        $values = implode(',', $data);$/;"	v
+values	application/library/Log/Base.php	/^			$values = array();$/;"	v
+waittime	application/library/Util/Queue.php	/^	protected static $waittime = 10;$/;"	v
+waittime	application/library/Util/Queue.php	/^	public static function waittime($waittime){$/;"	f
+walkArray	application/library/Tools.php	/^	public static function walkArray(&$array, $function, $keys = false) {$/;"	f
+weight	application/library/Cache/Memcache.php	/^	public $weight=1;$/;"	v
+where	application/library/Db/Mysql.php	/^        $where = $this->where($cond, $params);$/;"	v
+where	application/library/Db/Mysql.php	/^    private function where($cond, &$params = array(), $op = 'AND') {$/;"	f
+where	application/library/Util/Filecache.php	/^		$where = $options['where'] ? $options['where'] : '1';$/;"	v
+worker	application/library/Process/Manager.php	/^                $worker = $this->basePath . $item['path'];$/;"	v
+write	application/library/Log/Base.php	/^	public function write($arr) {$/;"	f
+write	application/library/Session/Proxy.php	/^	public function write($id, $data) {$/;"	f
+write	application/library/Session/Writer/Redis.php	/^	public function write($id, $data) {$/;"	f
+writer	application/library/Session/Proxy.php	/^			$this->writer = new $cls($session['writer']);$/;"	v
+writer	application/library/Session/Proxy.php	/^	private $writer;$/;"	v
+yafAutoRender	application/library/Base/Controller/Abstract.php	/^    protected $yafAutoRender = true;$/;"	v
+year	application/library/Carbon.php	/^        $this->year = $value;$/;"	v
+year	application/library/Carbon.php	/^        $year = $dt->year;$/;"	v
+year	application/library/Carbon.php	/^        $year = ($year === null) ? date('Y') : $year;$/;"	v
+year	application/library/Carbon.php	/^    public function year($value)$/;"	f
+yesterday	application/library/Carbon.php	/^    public static function yesterday($tz = null)$/;"	f
+zip	application/library/Tools.php	/^			$zip = new PclZip($from_file);$/;"	v
+zip	application/library/Tools.php	/^			$zip = new ZipArchive();$/;"	v
+zip	application/library/Tools.php	/^		$zip = new PclZip($from_file);$/;"	v
+zip_decode	application/library/Util/Common.php	/^	public static function zip_decode($str) {$/;"	f
+zip_encode	application/library/Util/Common.php	/^	public static function zip_encode($str) {$/;"	f

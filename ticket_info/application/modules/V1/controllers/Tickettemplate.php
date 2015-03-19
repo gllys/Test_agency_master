@@ -73,6 +73,18 @@ class TickettemplateController extends Base_Controller_Api
         $name = trim(Tools::safeOutput($this->body['name']));
         $name && $where['name|like'] = array("%{$name}%");
 
+        $org_name = trim(Tools::safeOutput($this->body['org_name']));
+        if($org_name){
+            $orgs = ApiOrganizationModel::model()->listByName($org_name,'supply','id');
+            if($orgs){
+                $orgIds = array_keys($orgs);
+                $where['organization_id|in'] = $orgIds;
+            }
+            else {
+                Lang_Msg::output(array('data'=>array(),'pagination'=>array('count'=>0)));
+            }
+        }
+
         $ids = trim(Tools::safeOutput($this->body['ids']));
         preg_match("/^[\d,]+$/",$ids) && $ids = explode(',',$ids);
         $ids && $where['id|in']= $ids;
@@ -367,6 +379,9 @@ class TickettemplateController extends Base_Controller_Api
         $args['user_name'] && $return['user_name']=$args['user_name'];
 
 		//获取参数
+        //
+        if(isset($this->body['checked_open']) && in_array($this->body['checked_open'],array(0,1))) $args['checked_open'] = intval($this->body['checked_open']);
+        if(isset($this->body['message_open']) && in_array($this->body['message_open'],array(0,1))) $args['message_open'] = intval($this->body['message_open']);
 		if(isset($this->body[ 'name'])) $args[ 'name' ] = $this->body[ 'name'] ;
 		if(isset($this->body[ 'fat_price'])) $args[ 'fat_price' ] = $this->body[ 'fat_price'] ;
 		if(isset($this->body[ 'group_price'])) $args[ 'group_price' ] = $this->body[ 'group_price'] ;
@@ -390,7 +405,7 @@ class TickettemplateController extends Base_Controller_Api
         if(isset($this->body[ 'policy_id'])) $args[ 'policy_id' ] = intval($this->body[ 'policy_id']) ;
         if(isset($this->body[ 'sale_start_time'])) $args[ 'sale_start_time' ] = intval($this->body[ 'sale_start_time']) ;
         if(isset($this->body[ 'sale_end_time'])) $args[ 'sale_end_time' ] = intval($this->body[ 'sale_end_time']) ;
-        if(isset($this->body[ 'sms_template'])) $args[ 'sms_template' ] = trim(Tools::safeOutput($this->body['sms_template']));
+        if(isset($this->body[ 'sms_template'])) $args[ 'sms_template' ] = trim($this->body['sms_template']);
 
         if(isset( $this->body[ 'date_available' ] ))
         {
@@ -632,7 +647,6 @@ class TickettemplateController extends Base_Controller_Api
         foreach($baseItems as $base_id=>$num){
             !$base_id && Lang_Msg::error('ERROR_AddGenerate_26'); //请添加门票信息
         }
-
         !Validate::isString($this->body['name']) && Lang_Msg::error("ERROR_AddGenerate_1");
         !Validate::isPrice(floatval($this->body['fat_price'])) && Lang_Msg::error("ERROR_AddGenerate_2");
         !Validate::isPrice(floatval($this->body['group_price'])) && Lang_Msg::error("ERROR_AddGenerate_3");
@@ -662,7 +676,7 @@ class TickettemplateController extends Base_Controller_Api
          $state = null !== $this->body[ 'state' ] ? $this->body[ 'state' ] : 0;
         // 省市区关联暂不验证 @TODO
 
-        $sms_template = trim(Tools::safeOutput($this->body['sms_template']));
+        $sms_template = trim($this->body['sms_template']);
         // 发布票模板
         $ticketTemplateModel = new TicketTemplateModel();
         $data = array(
@@ -699,6 +713,8 @@ class TickettemplateController extends Base_Controller_Api
             'valid_flag' => intval($this->body['valid_flag']),
             'sms_template'=> $sms_template ? $sms_template : '',
         );
+        if(isset($this->body['checked_open']) && in_array($this->body['checked_open'],array(0,1))) $data['checked_open'] = intval($this->body['checked_open']);
+        if(isset($this->body['message_open']) && in_array($this->body['message_open'],array(0,1))) $data['message_open'] = intval($this->body['message_open']);
         $data['real_expire_end'] = $data['expire_end']-$data['scheduled_time'];
 
         $user = $this->getOperator();
@@ -740,7 +756,7 @@ class TickettemplateController extends Base_Controller_Api
         !Validate::isUnsignedId($this->body['user_id']) && Lang_Msg::error("用户id不能为空");
         // 省市区关联暂不验证 @TODO
 
-        $sms_template = trim(Tools::safeOutput($this->body['sms_template']));
+        $sms_template = trim($this->body['sms_template']);
         // 发布票模板
         $ticketTemplateModel = new TicketTemplateModel();
         $data = array(
@@ -806,7 +822,7 @@ class TickettemplateController extends Base_Controller_Api
         !Validate::isUnsignedId($this->body['user_id']) && Lang_Msg::error("用户id不能为空");
         // 省市区关联暂不验证 @TODO
 
-        $sms_template = trim(Tools::safeOutput($this->body['sms_template']));
+        $sms_template = trim($this->body['sms_template']);
         // 发布票模板
         $ticketTemplateModel = new TicketTemplateModel();
         $data = array(
@@ -940,6 +956,19 @@ class TickettemplateController extends Base_Controller_Api
                     }
                 }
             }
+
+            $org_name = trim(Tools::safeOutput($this->body['org_name']));
+            if($org_name){
+                $orgs = ApiOrganizationModel::model()->listByName($org_name,'supply','id');
+                if($orgs){
+                    $orgIds = array_keys($orgs);
+                    $where['organization_id|in'] = $orgIds;
+                }
+                else {
+                    Lang_Msg::output(array('data'=>array(),'pagination'=>array('count'=>0)));
+                }
+            }
+
             $TicketTemplateModel = new TicketTemplateModel();
             $this->count = $TicketTemplateModel->countResult($where);
             $this->pagenation();

@@ -38,6 +38,7 @@ class SubscribesController extends Base_Controller_Api
         !Validate::isString( $this->body[ 'type' ] ) && Lang_Msg::error( '没有type参数！');
         $args[ 'organization_id' ] = $this->body[ 'organization_id' ];
         $args[ 'type' ] = $this->body[ 'type' ];
+        if(isset($this->body['name']) && $this->body['name']) $args['name|like'] = array("%".trim($this->body['name'])."%");
         // 分页
         $count = reset(SubscribesModel::model()->search($args,'count(*) as count'));
         $this->count = $count['count'];

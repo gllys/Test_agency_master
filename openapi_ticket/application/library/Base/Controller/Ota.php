@@ -109,9 +109,10 @@ class Base_Controller_Ota extends Base_Controller_Abstract
     public function echoLog($title, $content, $filename = 'default.log', $path = '../log/'){
         //根据配置文件log.enabled决定是否输出日志
         if($this->config['log']['enabled']){
-            $fullname = $path . $filename;
-            $date = date("Y-m-d H:i:s",time());
-            error_log("|$title $date|", 3, $fullname);
+            $dateTime = date("Y-m-d H:i:s",time());
+            $date = date("Y-m-d",time());
+            $fullname = $path . $filename . $date;
+            error_log("|$title $dateTime|", 3, $fullname);
             error_log($content, 3, $fullname);
             error_log("|$title end|\n", 3, $fullname);
         }

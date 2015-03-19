@@ -1,0 +1,1 @@
+<?phpclass TicketRecordModel  extends Base_Model_Abstract{ 	protected $dbname = 'itourism';    protected $tblname = 'ticket_record';    protected $pkKey = 'id';    //protected $preCacheKey = 'cache|ticketRecordModel|';    public function getTable() {        return $this->tblname;    }}

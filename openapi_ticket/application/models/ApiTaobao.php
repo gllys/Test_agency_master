@@ -178,12 +178,16 @@ class ApiTaobaoModel extends Base_Model_Api{
      * @return Taobao_TopClient
      */
     private static function  _getTopClient(){
-        $topc             = new Taobao_TopClient();
-        $topc->appkey     = '23064138';
-        $topc->secretKey  = 'c4ac1087a720ffb4a23f0f0dde29c167';
-        $topc->gatewayUrl = 'http://gw.api.taobao.com/router/rest';
 
-        return $topc;
+        $taobao = Taobao_TopClientFactory::create();
+
+        return $taobao->topc;
+//        $topc             = new Taobao_TopClient();
+//        $topc->appkey     = '23064138';
+//        $topc->secretKey  = 'c4ac1087a720ffb4a23f0f0dde29c167';
+//        $topc->gatewayUrl = 'http://gw.api.taobao.com/router/rest';
+//
+//        return $topc;
     }
 
     private static function _getModelApi($srvKey = 'ticket_order'){
@@ -214,15 +218,22 @@ class ApiTaobaoModel extends Base_Model_Api{
         //取sub_outer_iid（在我们的库中是ota_code）对应的product_id
         $api = self::_getModelApi('ticket_info');
         $api->params = array(
-            'ota_code' => $params['sub_outer_iid'],
+            'code' => $params['sub_outer_iid'],
         );
-        $api->url = '/v1/TicketTemplate/ticketinfo';
+//        $api->url = '/v1/TicketTemplate/ticketinfo';
+        $api->url = '/v1/AgencyProduct/detail';
         $pro = json_decode($api->request(),true);
 
+        $payment = array(
+            1=> 'alipay',
+            2=> 'credit',
+            3=> 'advance',
+            4=> 'union',
+        );
         echo "pro:\n";
         var_dump($pro);
 
-        $res['product_id']      = $pro['body']['id'];
+        $res['product_id']      = $pro['body']['product_id'];
         $res['source']          = 1;
         $res['local_source']    = 1;
         $res['source_id']       = $params['orderId'];
@@ -239,7 +250,7 @@ class ApiTaobaoModel extends Base_Model_Api{
         $res['user_id']         = $params['taobao_sid'];//$this->userinfo['id'];
         $res['user_account']    = $params['seller_nick'];//$this->userinfo['id'];
 //        $res['user_name'] = $this->userinfo['name'];
-        $res['payment']         =  'credit';//intval($this->body['payment'])?'credit':'offline'; //支付方式,0为景点到付(offline),1为商户收款(credit信用)
+        $res['payment']         =  $payment[$pro['body']['payment']];
 //        $res['price'] = $this->body['price'];
         $res['ota_type']        = 'ota';
         $res['ota_account']     = 1;//$this->userinfo['id'];

@@ -1,0 +1,1 @@
+<?phpclass OtaAccountModel extends Base_Model_Abstract{	protected $dbname = 'itourism';    protected $tblname = 'ota_account';    protected $pkKey = 'id';    protected $preCacheKey = 'cache|OtaAccountModel|';    	 public function getTable() 	 {	      return $this->tblname;	 }}

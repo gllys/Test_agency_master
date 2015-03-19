@@ -1,0 +1,1 @@
+alter table bills add `receipt_status` tinyint(4) DEFAULT '0' COMMENT '收款状态 0未收款 1已收款';

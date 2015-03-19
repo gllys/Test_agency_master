@@ -74,17 +74,52 @@ class TickettemplatebaseController extends Base_Controller_Api
 
         $view_point = trim($this->body['view_point']);
         if($view_point && preg_match("/^[\d,]+$/",$view_point)) {
-            foreach(explode( ',', $view_point ) as $poi){
-                $where['FIND_IN_SET|EXP'] = "({$poi},view_point)";
+            $poiIds = explode( ',', $view_point );
+            $poidAnd = array();
+            foreach($poiIds as $poi){
+                array_push($poidAnd,"find_in_set({$poi},view_point)");
             }
+            $where['AND'] = implode(' OR ',$poidAnd);
         }
+
+        $poiId= array();
+        $name = '';
+        $poi_name = trim(Tools::safeOutput($this->body['poi_name']));
+        if($poi_name){
+            $poiParams = array('keyword'=>$poi_name,'status'=>1,'fields'=>'id','show_all'=>1);
+            isset($where['organization_id']) && $poiParams['organization_ids'] = $where['organization_id'];
+            $scenic_id && $poiParams['landscape_ids']= $scenic_id;
+            $view_point && $poiParams['ids']= $view_point;
+            $poiIds = ApiPoiModel::model()->GetPoiIds($poiParams);
+        }
+
+        $name = trim(Tools::safeOutput($this->body['name']));
+        if($poiIds && !$name){
+            $poidAnd = array();
+            foreach($poiIds as $poi){
+                array_push($poidAnd,"find_in_set({$poi},view_point)");
+            }
+            $where['AND'] = implode(' OR ',$poidAnd);
+        }
+        else if(!$poiIds && $name){
+            $where['name|like'] = array("%{$name}%");
+        }
+        else if($poiIds && $name){
+            $poidAnd = array();
+            foreach($poiIds as $poi){
+                array_push($poidAnd,"find_in_set({$poi},view_point)");
+            }
+            $where['OR'] = array(
+                'AND'=>implode(' OR ',$poidAnd),
+                'name|like'=> array("%{$name}%"),
+            );
+        }
+
+
 
         $state = intval($this->body[ 'state' ]);
         if(preg_match("/^\d+$/",$this->body[ 'state' ])) $where['state'] = $state;
         else if($this->body[ 'state' ]) $where['state|>'] = 0;
-
-        $name = trim(Tools::safeOutput($this->body['name']));
-        $name && $where['name|like'] = array("%{$name}%");
 
         $ids = trim(Tools::safeOutput($this->body['ids']));
         preg_match("/^[\d,]+$/",$ids) && $ids = explode(',',$ids);
@@ -115,7 +150,7 @@ class TickettemplatebaseController extends Base_Controller_Api
             $this->pagenation();
             $data = $this->count > 0 ? $TicketTemplateBaseModel->setGroupBy($groupBy)->search( $where,$fields, $this->getSortRule('updated_at'), $this->limit ):array();
         }
-
+        
         if($show_group) {
             $tmp_arr = array();
             foreach($data as $k=>$v) {
@@ -667,11 +702,11 @@ class TickettemplatebaseController extends Base_Controller_Api
         $types = trim(Tools::safeOutput($this->body['types']));
         $types && preg_match("/^[\d,]+$/",$types) && $where.= " AND type IN (".$types.") ";
 
-        if($this->body['use_time']) $where .= ' and expire_start<='.$now.' and (real_expire_end =0 or real_expire_end >='.$now.') and FIND_IN_SET( '.date('w').', week_time)';
+        if($this->body['use_time']) $where .= ' and expire_start<='.$now.' and (real_expire_end=0 or real_expire_end>='.$now.') and FIND_IN_SET( '.date('w').', week_time)';
         // fix 当天票
         $today = strtotime(date('Y-m-d'));
         if(!isset($this->body['expire_end']) || !$this->body['expire_end'])        // 筛选过有效期的门票，1显示过期，0不显示（默认）
-            $where.= " AND real_expire_end>=".$today." ";
+            $where.= " AND (real_expire_end=0 or real_expire_end>=".$today.") ";
 
         $TicketTemplateBaseModel = TicketTemplateBaseModel::model();
         $this->count = $TicketTemplateBaseModel->countResult($where);

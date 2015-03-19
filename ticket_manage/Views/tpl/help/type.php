@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<?php get_header();?>
+<body>
+<?php get_top_nav();?>
+<div class="sidebar-background">
+    <div class="primary-sidebar-background"></div>
+</div>
+<?php get_menu();?>
+
+<div class="main-content">
+<?php get_crumbs();?>
+<div id="show_msg"></div>
+
+			<div class="container-fluid padded">
+				<div class="box">
+					<div class="box-content padded">
+						<div class="tab-content">
+							<div class="tab-pane active">
+								<div class="box">
+									<div class="box-header">
+										<span class="title">帮助类别</span>
+										<ul class="box-toolbar">
+											<li>
+												<a data-toggle="modal" href="#modal-dialog">
+													<span class="label label-green">添加帮助类别</span>
+												</a>
+											</li>
+										</ul>
+									</div>
+									<div class="box-content">
+										<table class="table table-normal">
+											<thead>
+											<tr>
+												<td>名称</td>
+												<td>类别</td>
+												<td style="width: 60px">操作</td>
+											</tr>
+											</thead>
+											<tbody>
+											<?php if($allTypes): ?>
+											<?php foreach($allTypes as $type):?>
+											<tr class="status-pending">
+												<td><input type="text" id="name-<?php echo $type['id'];?>" value="<?php echo $type['name'];?>"/></td>
+												<td><input type="text" id="type-<?php echo $type['id'];?>" value="<?php echo $type['type'];?>"/></td>
+												<td class="icon">
+													<a href="javascript:;" onclick="update_type('<?php echo $type['id'];?>', 'name-<?php echo $type['id'];?>', 'type-<?php echo $type['id'];?>')"><i class="icon-edit"></i></a>
+													<a href="javascript:;" onclick="delete_type('<?php echo $type['id'];?>')"><i class="icon-trash"></i></a>
+												</td>
+											</tr>
+											<?php endforeach;?>
+											<?php endif;?>
+											</tbody>
+										</table>
+									</div>
+								</div>
+								<div class="dataTables_paginate paging_full_numbers">
+									<?php echo $pagination;?>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- 弹出框 -->
+		<div id="modal-dialog" class="modal hide fade">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h6 id="modal-formLabel">
+					添加帮助类别
+				</h6>
+			</div>
+			<form action="index.php?c=help&a=addType" method="post" id="ticket-type-form">
+				<div class="modal-body">
+					<div>
+						<input type="text" name="name" placeholder="输入名称" class="validate[required]" data-prompt-position="topLeft"/>
+						<input type="text" name="type" placeholder="输入类别" class="validate[required]" data-prompt-position="topLeft"/>
+					</div>
+					<div class="divider"><span></span></div>
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-default" data-dismiss="modal">关闭</button>
+					<button class="btn btn-blue" id="ticket-type-form-button">添加</button>
+				</div>
+			</form>
+		</div>
+		<script src="Views/js/common/common.js" type="text/javascript" charset="utf-8"></script>
+		<script src="Views/js/help/type.js" type="text/javascript" charset="utf-8"></script>
+	</body>
+</html>

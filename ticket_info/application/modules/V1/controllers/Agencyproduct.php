@@ -13,7 +13,7 @@ class AgencyproductController extends Base_Controller_Api {
      * @return [type]         [description]
      */
     public function listsAction() {
-        $where = array();
+        $where = [];
         // 来源ID
 		if (!isset($this->body['source'])) Lang_Msg::error("ERROR_AP_1");
         $where['source'] = ' A.source='.$this->body['source'].' and';
@@ -23,7 +23,9 @@ class AgencyproductController extends Base_Controller_Api {
         isset($this->body['product_id']) && $where['product_id'] = ' A.product_id='.$this->body['product_id'].' and';
 
         $AgencyProduct = AgencyProductModel::model();
-		$sql = 'select * from '. $AgencyProduct->getTable() .' A left join '. TicketTemplateModel::model()->getTable() . ' T on A.product_id=T.id'.
+		$sql = 'select A.*,T.fat_price,T.group_price,T.sale_price,T.listed_price,T.valid,T.max_buy,T.mini_buy,T.scenic_id,'.
+		'T.view_point,T.state,T.scheduled_time,T.week_time,T.refund,T.is_del,T.remark,T.organization_id,T.type,T.date_available,T.policy_id'.
+		' from '. $AgencyProduct->getTable() .' A left join '. TicketTemplateModel::model()->getTable() . ' T on A.product_id=T.id'.
 		' where ' . join(' ', $where) . ' 1=1 order by A.id desc';
 		$countRes = $AgencyProduct->db->selectBySql($sql);
         $this->count = count($countRes);
@@ -53,10 +55,12 @@ class AgencyproductController extends Base_Controller_Api {
     public function detailAction() {
         // filter
 		if (!isset($this->body['code'])) Lang_Msg::error("ERROR_AP_2");
-        $where['code'] = ' A.code='. $this->body['code'] .' and';
+        $where['code'] = ' A.code=\''. $this->body['code'] .'\' and';
 
         $AgencyProduct = AgencyProductModel::model();
-		$sql = 'select * from '. $AgencyProduct->getTable() .' A left join '. TicketTemplateModel::model()->getTable() . ' T on A.product_id=T.id'.
+		$sql = 'select A.*,T.fat_price,T.group_price,T.sale_price,T.listed_price,T.valid,T.max_buy,T.mini_buy,T.scenic_id,'.
+		'T.view_point,T.state,T.scheduled_time,T.week_time,T.refund,T.is_del,T.remark,T.organization_id,T.type,T.date_available,T.policy_id'.
+		' from '. $AgencyProduct->getTable() .' A left join '. TicketTemplateModel::model()->getTable() . ' T on A.product_id=T.id'.
 		' where ' . join(' ', $where) . ' 1=1 limit 1';
 		$result = $AgencyProduct->db->selectBySql($sql);
 
@@ -83,12 +87,65 @@ class AgencyproductController extends Base_Controller_Api {
 		$data['update_at']    = 0; //更新时间
 		$data['delete_at']    = 0; //删除时间
 		
+		if (empty($data['product_id']) || empty($data['agency_id']))
+			return Tools::lsJson(0, '请求数据不合法', []);
+		$AgencyProduct = AgencyProductModel::model();
+		$exist = $AgencyProduct->search(['product_id'=>$data['product_id'],'agency_id'=>$data['agency_id']]);
+		if (!empty($exist)) // 联合唯一索引验证
+			return Tools::lsJson(0, '数据已存在', []);
+		
 		try {
-			AgencyProductModel::model()->add($data);
-			Lang_Msg::output($data);
-		} catch (Exception $ex) {
-			Tools::lsJson($ex->getCode(), $ex->getMessage(), $data);
+			$AgencyProduct->add($data);
+		} catch (\Exception $ex) {
+			return Tools::lsJson(0, $ex->getMessage(), $data);
 		}
+		Lang_Msg::output($data);
+    }
+	
+    /**
+     * 删除分销商商品
+     * @param  [type] $fields [description]
+     * @return [type]         [description]
+     */
+    public function delAction() {
+		$id   = intval($this->body['id']); // pkid
+		!$id && Lang_Msg::error('ERROR_TICKET_1');
+		
+		try {
+			AgencyProductModel::model()->delete(['id' => $id]);
+		} catch (\Exception $ex) {
+			return Tools::lsJson(0, $ex->getMessage(), []);
+		}
+		Lang_Msg::output([]);
+    }
+	
+    /**
+     * 更新分销商商品
+     * @param  [type] $fields [description]
+     * @return [type]         [description]
+     */
+    public function updateAction() {
+		$id   = intval($this->body['id']); // pkid
+		!$id && Lang_Msg::error('ERROR_TICKET_1');
+		
+		$data['update_at'] = time(); //更新时间
+		
+		isset($this->body['product_name']) && $data['product_name'] = trim($this->body['product_name']); //票标题
+		isset($this->body['price'])        && $data['price']        = trim($this->body['price']); //价格
+		isset($this->body['source'])       && $data['source']       = trim($this->body['source']); //来源
+		isset($this->body['payment'])      && $data['payment']      = trim($this->body['payment']); //支付方式
+		isset($this->body['payment_list']) && $data['payment_list'] = trim($this->body['payment_list']); //可用支付方式
+		
+		$AgencyProduct = AgencyProductModel::model();
+		$agencyProduct = $AgencyProduct->getById($id);
+		empty($agencyProduct) && Lang_Msg::error('ERROR_TICKET_1');
+		
+		try {
+			$AgencyProduct->update($data, ['id' => $id]);
+		} catch (\Exception $ex) {
+			return Tools::lsJson(0, $ex->getMessage(), $data);
+		}
+		Lang_Msg::output($data+$agencyProduct);
     }
 
 }

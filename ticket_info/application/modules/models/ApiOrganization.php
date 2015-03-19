@@ -13,6 +13,15 @@ class ApiOrganizationModel extends Base_Model_Api
     protected $url = '';
     protected $method = 'POST';
 
+    public function listByName($name,$type='',$fields = ''){
+        $this->url = '/v1/organizations/listByName/';
+        $this->params = array('name'=>$name,'type'=>$type,'fields'=>$fields);
+        $r = json_decode($this->request(),true);
+        if(!$r || empty($r['body']))
+            return false;
+        return $r['body'];
+    }
+
     public function orgInfo($org_id){
         $this->url = '/v1/organizations/show/';
         $this->params = array('id'=>$org_id);

@@ -1,0 +1,7 @@
+rewrite "^/([a-zA-Z0-9]+).html$" /index.php?c=$1&a=index last;
+rewrite "^/logout.html$" /index.php?c=login&a=logout last;
+
+rewrite "^/api/([a-zA-Z0-9_]+)/([a-zA-Z0-9_]+).html$" /index.php?c=api&a=router&api_mapping_name=$1&api_mapping_method=$2 last;
+
+#通用的解析，单个的解析请放在这个之前
+rewrite "^/([a-zA-Z0-9]+)_([a-zA-Z0-9]+)_?([0-9]+)?.html$" /index.php?c=$1&a=$2&id=$3 last;

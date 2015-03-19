@@ -6,11 +6,11 @@
  * Time: 下午3:48
  */
 
-//define('SMARTY_SPL_AUTOLOAD',1);
-//require_once dirname(__FILE__)."/../Smarty/Smarty.class.php";
+define('SMARTY_SPL_AUTOLOAD',1);
+require_once dirname(__FILE__)."/../Smarty/Smarty.class.php";
 
 class Qunar_Service{
-
+    
     /*头部公共属性*/
     protected $application = '去哪儿门票.Menpiao.Agent';
     protected $processor = 'SupplierDataExchangeProcessor';
@@ -56,7 +56,11 @@ class Qunar_Service{
      * @param array $requestData 如果此参数不为空，则是被请求模式，否则是请求模式
      */
     public function __construct($requestData = array()){
-
+        $setting = unserialize(QUNAR_SETTING);
+        $this->qunar_url = $setting['qunar_url'];
+        $this->create_user = $this->supplier_identity = $setting['supplier_identity'];
+        $this->signedKey = $setting['signedKey'];
+        
         if($requestData){
             $params = json_decode(str_replace('\\"', '"', $requestData), true);
             $request_object = $this->decodeBase64($params['data']);

@@ -1,0 +1,46 @@
+.pagenumQu {
+    padding: 0 0 10px;
+    text-align: center;
+}
+.pagenumQu .paup {
+    padding: 0 8px 0 0;
+}
+.pagenumQu .padown {
+    padding: 0 0 0 8px;
+}
+.pagenumQu .pashu {
+    background: none repeat scroll 0 0 #fff;
+    border: 1px solid #d6d6d6;
+    margin: 0 9px 0 8px;
+    padding: 4px 8px 3px;
+}
+.pagenumQu .page, .pagenumQu .first, .pagenumQu .previous, .pagenumQu .next, .pagenumQu .last {
+    background: none repeat scroll 0 0 #fff;
+    border: 1px solid #d6d6d6;
+    display: inline;
+    margin: 0 0px;
+    padding: 8px 0 8px;
+    position: relative;
+}
+.pagenumQu .first,.pagenumQu .last{
+    display: none ;
+}
+.pagenumQu .selected {
+    background: none repeat scroll 0 0 #428bca;
+    border: 1px solid #428bca;
+    font-weight: bold;
+    margin: 0 0px;
+    padding: 8px 0 8px;
+    position: relative;
+}
+.pagenumQu .selected a {
+    color: #fff;
+}
+.pagenumQu .hidden {
+    display: none;
+}
+.pagenumQu a {
+    color:#636e7b;
+    padding: 0 12px;
+    text-decoration: none;
+}

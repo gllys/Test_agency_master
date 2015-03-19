@@ -13,6 +13,7 @@ class ConsumeAction extends Yaf_Action_Abstract{
     public function execute(){
         //获取本动作对应的控制器实例
         $ctrl = $this->getController();
+        $taobao = Taobao_TopClientFactory::create();
 
         //todo 调用此接口通知淘宝核销，
         $req = new Taobao_Request_VmarketEticketConsumeRequest();
@@ -20,11 +21,11 @@ class ConsumeAction extends Yaf_Action_Abstract{
         $req->setVerifyCode($ctrl->body['verify_code']);
         $req->setConsumeNum($ctrl->body['consume_num']);
         $req->setToken($ctrl->body['token']);
-        $req->setCodemerchantId($ctrl->merchantId);
+        $req->setCodemerchantId($taobao->merchantId);
         $req->setPosid($ctrl->body['posid']);
         $req->setSerialNum($ctrl->body['serial_num']);
 //        $req->setQrImages($qrImages);
-        $resp = $ctrl->topc->execute($req, $ctrl->sessionKey);
+        $resp = $taobao->topc->execute($req, $taobao->sessionKey);
 
         //日志输出
         $ctrl->echoLog('body', json_encode($ctrl->body), 'consume_bee.log');

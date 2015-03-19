@@ -12,24 +12,14 @@ class V1Controller extends Base_Controller_ApiDispatch{
     const MSG300 = '{"code":300}';
     const MSG500 = '{"code":501}';
 
-    var $topc;
-
-    /**
-     * @var string 码商通知密钥
-     */
-    var $noticeKey = '640acdef3601b939cf4a64bf09a2aa7c';
-    var $merchantId = '2346902211';
-    var $sessionKey = '6101a09fad0cca12d185838616f614ac6c013070d7dd2cf2346902211';
+    private $taobao;
 
     public function init(){
         parent::init(false);
 
         $this->body = $this->getParams();
 
-        $this->topc             = new Taobao_TopClient();
-        $this->topc->appkey     = '23064138';
-        $this->topc->secretKey  = 'c4ac1087a720ffb4a23f0f0dde29c167';
-        $this->topc->gatewayUrl = 'http://gw.api.taobao.com/router/rest';
+        $this->taobao = Taobao_TopClientFactory::create();
 
         self::echoLog('body', json_encode($this->body), 'errors_bee.log');
     }
@@ -72,8 +62,8 @@ class V1Controller extends Base_Controller_ApiDispatch{
             'valid_start'       => $this->body['valid_start'],
             'valid_ends'        => $this->body['valid_ends'],
 
-            'codemerchantId'    => $this->merchantId,
-            'sessionKey'        => $this->sessionKey,
+            'codemerchantId'    => $this->taobao->merchantId,
+            'sessionKey'        => $this->taobao->sessionKey,
         )));
 
         echo self::MSG200; //成功接收此通知
@@ -88,8 +78,8 @@ class V1Controller extends Base_Controller_ApiDispatch{
         Process_Async::send(array('ApiTaobaoModel','resendByAsync'),array(array(
             'orderId'           => $this->body['order_id'],
             'token'             => $this->body['token'],
-            'codemerchantId'    => $this->merchantId,
-            'sessionKey'        => $this->sessionKey,
+            'codemerchantId'    => $this->taobao->merchantId,
+            'sessionKey'        => $this->taobao->sessionKey,
         )));
 
         echo self::MSG200;
@@ -105,8 +95,8 @@ class V1Controller extends Base_Controller_ApiDispatch{
             'orderId'           => $this->body['order_id'],
             'token'             => $this->body['token'],
             'mobile'            => $this->body['mobile'],   //买家的手机号码（修改后的手机号）
-            'codemerchantId'    => $this->merchantId,
-            'sessionKey'        => $this->sessionKey,
+            'codemerchantId'    => $this->taobao->merchantId,
+            'sessionKey'        => $this->taobao->sessionKey,
         )));
 
         echo self::MSG200;
@@ -152,44 +142,7 @@ class V1Controller extends Base_Controller_ApiDispatch{
     }
 
     public function testAction(){ echo 'you are here';
-//        $client_id = $this->topc->appkey;
-//        $client_secret = $this->topc->secretKey;
-//        $url_authorize =  'https://oauth.tbsandbox.com/authorize';
-//        $url_authorize =  'https://oauth.taobao.com/authorize';
-//        $url_token =  'https://oauth.tbsandbox.com/token';
-//        $url_token = 'https://oauth.taobao.com/token';
-//        $refresh_key = '6100a01881326ecb7013dd5eda7335b26fce5a5c0c901902346902211';
-//
-//        $postFields = array(
-//            'client_id' => $client_id,
-//            'client_secret' => $client_secret,
-//            'grant_type'=> 'refresh_token',
-//            'refresh_token'=> $refresh_key,
-//        );
-//
-//        $resp = $this->topc->curl($url_token, $postFields);
-//        echo json_encode($resp);
-//        die;
 
-//        $postfields= array('grant_type'=>'authorization_code',
-//            'client_id'=>$client_id,
-//            'response_type'=>'code',
-//            'redirect_uri'=>'http://bt-ticket-api-order.demo.org.cn/taobao/v1/auth');
-//        $resp = $this->topc->curl($url_authorize, $postfields);
-//        echo $resp;
-//        die;
-
-        //从回调的url的code参数获取
-//        $code =  'gwWEmFEgQku7YkL4PeVDxSFv1243';
-//        $postfields= array('grant_type'=>'authorization_code',
-//            'client_id'=>$client_id,
-//            'client_secret'=>$client_secret,
-//            'response_type'=>'authorization_code',
-//            'code'=>$code,
-//            'redirect_uri'=>'http://bt-ticket-api-order.demo.org.cn/taobao/v1/auth');
-//        $resp = $this->topc->curl($url_token, $postfields);
-//        echo $resp;
-//        die;
     }
 
     /**
@@ -207,7 +160,7 @@ class V1Controller extends Base_Controller_ApiDispatch{
         //去除sign本身
         unset($req['sign']);
 
-        $str = $this->noticeKey;
+        $str = $this->taobao->noticeKey;
         foreach($req as $k=>$v){
             if(!Taobao_RequestCheckUtil::checkEmpty($v)){
                 $str .=$k.$v;

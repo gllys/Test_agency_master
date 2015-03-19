@@ -7,6 +7,9 @@
  */
 
 class ConsumeAction extends Yaf_Action_Abstract{
+
+    const CONSUME_URL = 'http://agent.beta.qunar.com/api/external/supplierServiceV2.qunar';
+
     /**
      * 用户消费(核销)通知（去哪儿）
      */
@@ -21,9 +24,16 @@ class ConsumeAction extends Yaf_Action_Abstract{
             'consumeInfo'=>'核销机具：'.$this->body['posid'].'，内部核销编号：'.$this->body['serial_num'],
         );
 
+        $ctrl->echoLog('data', var_export($data, true), 'qunar_noticeOrderConsumed.log');
+
 //        $service = new Qunar_RequestService();
         $service = new Qunar_Service();
+        $setting = unserialize(QUNAR_SETTING);
+        $service->qunar_url = $setting['consume_url'];
         $service->request('NoticeOrderConsumedRequest.xml', 'noticeOrderConsumed', $data);
+
+        $ctrl->echoLog('response_header', var_export($service->response_header, true), 'qunar_noticeOrderConsumed.log');
+        $ctrl->echoLog('response_body', var_export($service->response_body, true), 'qunar_noticeOrderConsumed.log');
 
         if($service->response_header->code == 1000){
             //todo 去哪儿核销成功
@@ -36,8 +46,7 @@ class ConsumeAction extends Yaf_Action_Abstract{
 
         }
 
-        $ctrl->echoLog('response_header', var_export($service->response_header, true), 'qunar_noticeOrderConsumed.log');
-        $ctrl->echoLog('response_body', var_export($service->response_body, true), 'qunar_noticeOrderConsumed.log');
+        Lang_Msg::error(json_encode($service->response_header->code.':'.$service->response_header->describe));
     }
 
 
