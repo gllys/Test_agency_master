@@ -32,6 +32,8 @@ $(function(){
         if (params.done == 0) {
             if (obj == 'fav') {
                 params.name = $(self).parent().parent().find('strong').text();
+                params.fat_price = $(self).parent().attr('data-fat');
+                params.group_price = $(self).parent().attr('data-group');
             } else {
                 params.name = $(self).parent().parent().parent().find('strong').text();
                 params.fat_price = $(self).parent().attr('data-fat');
@@ -51,13 +53,21 @@ $(function(){
                 if (result['code'] == 1) {
                     var g = $(self).hasClass('group') ? 'group' : '';
                     if (result['done'] == 1) {
+                        if(txt=="收藏"){
+                            var num = $("#favorite").html();
+                            var number = parseInt(num)+1
+                            $("#favorite").html(number);
+                        }
                         $(self).parent().html('<a class="bun '+obj+' '+g+' '+obj+'-done" href="javascript:;" title="取消'+txt+'">已'+txt+'</a>');
                     } else {
+                        if(txt=="收藏"){
+                            var num = $("#favorite").html();
+                            var number = parseInt(num)-1;
+                            $("#favorite").html(number);
+                        }
                         $(self).parent().html('<a class="bun '+obj+' '+g+'" href="javascript:;" title="加入'+txt+'">'+txt+'</a>');
                     }
-                    $('.bun').click(function(){
-                        h_click($(this));
-                    });
+
                 }
                 $('.bun').hover(function(e){
                     h_hover($(this));
@@ -67,7 +77,7 @@ $(function(){
         });
         return false;
     }
-    $('.bun').click(function(){
+    $('.pull-right').on("click",".bun",function(){
         h_click($(this));
     });
 });

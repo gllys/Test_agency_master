@@ -1,0 +1,5 @@
+/Logs/
+/Uploads/
+.DS_Store
+/nbproject/
+/Configs/Config.php

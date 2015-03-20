@@ -24,7 +24,7 @@ class AgencyproductController extends Base_Controller_Api {
 
         $AgencyProduct = AgencyProductModel::model();
 		$sql = 'select A.*,T.fat_price,T.group_price,T.sale_price,T.listed_price,T.valid,T.max_buy,T.mini_buy,T.scenic_id,'.
-		'T.view_point,T.state,T.scheduled_time,T.week_time,T.refund,T.is_del,T.remark,T.organization_id,T.type,T.date_available,T.policy_id'.
+		'T.view_point,T.state,T.scheduled_time,T.week_time,T.refund,T.is_del,T.remark,T.organization_id,T.type,T.date_available,T.policy_id, T.valid_flag'.
 		' from '. $AgencyProduct->getTable() .' A left join '. TicketTemplateModel::model()->getTable() . ' T on A.product_id=T.id'.
 		' where ' . join(' ', $where) . ' 1=1 order by A.id desc';
 		$countRes = $AgencyProduct->db->selectBySql($sql);
@@ -59,7 +59,7 @@ class AgencyproductController extends Base_Controller_Api {
 
         $AgencyProduct = AgencyProductModel::model();
 		$sql = 'select A.*,T.fat_price,T.group_price,T.sale_price,T.listed_price,T.valid,T.max_buy,T.mini_buy,T.scenic_id,'.
-		'T.view_point,T.state,T.scheduled_time,T.week_time,T.refund,T.is_del,T.remark,T.organization_id,T.type,T.date_available,T.policy_id'.
+		'T.view_point,T.state,T.scheduled_time,T.week_time,T.refund,T.is_del,T.remark,T.organization_id,T.type,T.date_available,T.policy_id, T.valid_flag'.
 		' from '. $AgencyProduct->getTable() .' A left join '. TicketTemplateModel::model()->getTable() . ' T on A.product_id=T.id'.
 		' where ' . join(' ', $where) . ' 1=1 limit 1';
 		$result = $AgencyProduct->db->selectBySql($sql);

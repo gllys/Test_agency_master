@@ -145,7 +145,7 @@ $this->breadcrumbs = array('订单管理', '任务单管理');
 					<th>门票名称</th>
 					<th>取票人</th>
 					<th>取票人手机号</th>
-					<th>游玩日期</th>
+					<th>产品有效期</th>
 					<th>票数</th>
 					<th>支付金额</th>
 					<th>订单状态</th>
@@ -179,7 +179,7 @@ $this->breadcrumbs = array('订单管理', '任务单管理');
 			<div class="panel-footer pagenumQu" style="padding-top:15px;text-align:right;border:1px solid #ddd;border-top:0">
 				<?php
 				if (isset($lists['data'])) {
-					$this->widget('CLinkPager', array(
+					$this->widget('common.widgets.pagers.ULinkPager', array(
 						'cssFile' => '',
 						'header' => '',
 						'prevPageLabel' => '上一页',

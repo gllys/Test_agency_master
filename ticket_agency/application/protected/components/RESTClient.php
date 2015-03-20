@@ -191,7 +191,7 @@ class RESTClient extends CComponent
 		echo "<h3>Response</h3>\n";
 
 		if ($this->response_string) {
-			echo "<code>" . nl2br(htmlentities($this->response_string)) . "</code><br/>\n\n";
+			echo "<code>" . nl2br($this->response_string) . "</code><br/>\n\n";
 		}
 
 		else {

@@ -1,0 +1,6 @@
+application.log*
+application/assets/*
+!application/assets/README
+nbproject
+application/runtime/*
+.idea/

@@ -23,44 +23,46 @@ $this->breadcrumbs = array('结算管理', '交易流水');
 				   data-original-title=""><i class="fa fa-times"></i></a>
 			</div>
 			<!-- panel-btns -->
-			<h4 class="panel-title">交易流水</h4>
+			<h4 class="panel-title" style="padding-left:0;">交易流水</h4>
 		</div>
 		<div class="panel-body">
-			<form class="form-inline" method="get">
-				<div class="mb10">
-					<div class="form-group" style="margin:0">
+			<form class="form-inline" action="/finance/blotter/view/" method="get">
+				
+					<div class="form-group">
 						 <input name="time[]" class="form-control datepicker" readonly placeholder="开始日期" type="text" value="<?php if(isset($get['time'])){ list($a,$b) = explode(' - ', $get['time']);echo $a;}?>"> ~
                                                  <input name="time[]" class="form-control datepicker" readonly placeholder="结束日期" type="text" value="<?php if(isset($get['time'])){ list($a,$b) = explode(' - ', $get['time']);echo $b;}?>">
 					</div>
 					<!-- form-group -->
 
-					<div class="form-group" style="margin:0">
-						<select id="mode_link" class="select2" data-placeholder="Choose One" style="width:150px;padding:0 10px;">
+					<div class="form-group">
+						<select name="mode" id="mode_link" class="select2" data-placeholder="Choose One" style="width:150px;padding:0 10px;">
 							<option value="">支付方式</option>
 							<?php foreach ($mode_type as $mode => $value) :?>
 								<option <?php echo isset($get['mode']) && $mode == $get['mode'] ? 'selected="selectd"' : ''?> value="<?php echo $mode?>"><?php echo $value?></option>
 							<?php endforeach; unset($mode, $value)?>
 						</select>
 					</div>
-					<div class="form-group" style="margin:0">
-						<select id="type_link" class="select2" data-placeholder="Choose One" style="width:150px;padding:0 10px;">
+					<div class="form-group">
+						<select name="type" id="type_link" class="select2" data-placeholder="Choose One" style="width:150px;padding:0 10px;">
 							<option value="">交易类型</option>
 							<?php foreach ($status_labels as $type => $label) :?>
 								<option <?php echo isset($get['type']) && $type == $get['type'] ? 'selected="selectd"' : ''?> value="<?php echo $type?>"><?php echo $label?></option>
 							<?php endforeach; unset($type, $label)?>
 						</select>
 					</div>
-				</div>
-					<div class="input-group input-group-sm mb15">
+                                        <div class="form-group">
+					     <input class="form-control" placeholder="请输入流水号"type="text" style="width:200px;" id="search_field" name="id" value="<?php echo isset($get['id'])?$get['id']:'' ?>">	
+					</div>
+				
+					<!--div class="input-group input-group-sm mb15">
 						<div class="input-group-btn">
 							<button readonly id="search_label" type="button" class="btn btn-default" tabindex="-1">流水号</button>
 						</div>
-						<!-- input-group-btn -->
 						<input id="search_field" name="id" value="<?php echo isset($get['id'])?$get['id']:'' ?>" type="text" class="form-control" style="z-index: 0"/>
-					</div>
+					</div-->
 					<!-- input-group -->
-					<div class="input-group input-group-sm mb15">
-						<button class="btn btn-primary btn-xs" type="submit">查询</button>
+					<div class="form-group">
+						<button class="btn btn-primary btn-sm" type="submit">查询</button>
 					</div>
 			</form>
 		</div>
@@ -84,22 +86,21 @@ $this->breadcrumbs = array('结算管理', '交易流水');
 	</ul>
 </div>
 		<style>
-			.tab-content .table tr > * {
-				text-align: center
-			}
-
-			.tab-content .ckbox {
-				display: inline-block;
-				width: 30px;
-				text-align: left
-
-			}
-
+		.pageheader{border-bottom:none; -webkit-box-shadow:none; box-shadow:none;}
 		</style>
-			<table class="table table-bordered mb30">
-				<thead>
-				<tr>
-					<th>交易日期</th>
+                <div class="tab-content mb30">
+            <div id="t1" class="tab-pane active">
+           		
+                    <table class="table table-bordered mb30">
+                        <thead>
+                            <tr>
+                            	<!--th width="100">
+                                    <div class="ckbox ckbox-primary" style="margin-left:17px;">
+                                        <input type="checkbox" class="ids" id="checkbox-allcheck" value="949">
+                                        <label for="checkbox-allcheck" class="allcheck">全选</label>
+                                    </div>
+                                </th-->
+                                <th width="150" style="padding-left:20px;">交易日期</th>
 					<th>操作人</th>
 					<th>支付方式</th>
 					<th>交易类型</th>
@@ -108,10 +109,18 @@ $this->breadcrumbs = array('结算管理', '交易流水');
 					<th>交易流水号</th>
 				</tr>
 				</thead>
-				<tbody>
+				 <tbody id="staff-body">
+                            
+                            	
 				<?php if (isset($lists['data']) && !empty($lists['data'])) : foreach ($lists['data'] as $blotter) :  ?>
 				<tr>
-					<td><?php echo date('Y年m月d日 H:i:s',$blotter['created_at'])?></td>
+                                        <!--td>
+                                            <div class="ckbox ckbox-primary" style="margin-left: 17px;">
+                                                <input type="checkbox" class="ids" id="checkbox943" value="943">
+                                                <label for="checkbox943"></label>
+                                            </div>
+                                       </td-->
+					<td style="padding-left:20px;"><?php echo date('Y年m月d日 H:i:s',$blotter['created_at'])?></td>
 					<td><?php 
                                      $rs = Users::model()->find('id=:id', array(':id'=>$blotter['op_id']));
                                      if(!empty($rs)){
@@ -136,11 +145,11 @@ $this->breadcrumbs = array('结算管理', '交易流水');
 				<?php endif; ?>
 				</tbody>
 			</table>
-			<!--/form-->
+            </div>
 			<div class="panel-footer pagenumQu" style="padding-top:15px;text-align:right;border:1px solid #ddd;border-top:0">
 				<?php
 				if (isset($lists['data']) && !empty($lists['data'])) {
-					$this->widget('CLinkPager', array(
+					$this->widget('common.widgets.pagers.ULinkPager', array(
 						'cssFile' => '',
 						'header' => '',
 						'prevPageLabel' => '上一页',
@@ -245,13 +254,13 @@ $this->breadcrumbs = array('结算管理', '交易流水');
             }
         });
 
-		$('#mode_link').change(function() {
-			location.href = '/finance/blotter/view/mode/'+$(this).val();
-		});
-
-		$('#type_link').change(function() {
-			location.href = '/finance/blotter/view/type/'+$(this).val();
-		});
+//		$('#mode_link').change(function() {
+//			location.href = '/finance/blotter/view/mode/'+$(this).val();
+//		});
+//
+//		$('#type_link').change(function() {
+//			location.href = '/finance/blotter/view/type/'+$(this).val();
+//		});
 	});
 </script>
 

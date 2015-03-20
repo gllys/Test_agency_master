@@ -28,6 +28,20 @@
 	/*! http://mths.be/placeholder v2.0.8 by @mathias */
 	;
 	(function (window, document, $) {
+		
+		/* 获取案件事件并作判断 */
+		this.IsNum = function(e) {
+            var k = window.event ? e.keyCode : e.which;
+            if (((k >= 48) && (k <= 57)) || k == 8 || k == 0) {
+            } else {
+                if (window.event) {
+                    window.event.returnValue = false;
+                }
+                else {
+                    e.preventDefault(); //for firefox 
+                }
+            }
+        } 
 
 		// Opera Mini v7 doesn’t support placeholder although its DOM seems to indicate so
 		var isOperaMini = Object.prototype.toString.call(window.operamini) == '[object OperaMini]';
@@ -251,7 +265,7 @@
 						<div class="input-group ">
 							<span class="input-group-addon"><i class="glyphicon glyphicon-phone"></i><span
 									class="asterisk" style="color: #ff0000">*</span></span>
-							<input id="reg_mobile" data-id="reg_mobile" name="RegisterForm[mobile]" type="text"
+							<input id="reg_mobile" data-id="reg_mobile" name="RegisterForm[mobile]" type="text" maxlength="11" onkeypress="return IsNum(event)"
 							       class="form-control validate[required,custom[mobile]]">
 						</div>
 						<!-- input-group -->
@@ -289,6 +303,47 @@
 						</div>
 						<!-- input-group -->
 					</div>
+					<div class="col-sm-6">确认密码 <br/>
+						<div class="input-group">
+							<span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i><span
+									class="asterisk" style="color: #ff0000">*</span></span>
+							<input type="text" class="hidden"/>
+							<input id="reg_repassword" data-id="reg_repassword" name="RegisterForm[repassword]"
+							       type="password"
+							       class="form-control validate[required]">
+						</div>
+						<!-- input-group -->
+					</div>
+				</div>
+				<!-- row -->
+				<div class="row" style="margin-bottom: 5px">
+					<div class="col-sm-6">
+                                <span id="chk_password">
+                                </span>
+					</div>
+					<div class="col-sm-6">
+                                <span id="chk_repassword">
+                                </span>
+					</div>
+				</div>
+				<!-- row -->
+				<div class="row">
+					<div class="col-sm-6"> 验证码 <br/>
+						<div class="input-group">
+							<span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i><span class="asterisk" style="color: #ff0000">*</span></span>
+							<input id="reg_verifycode" data-id="reg_verifycode" name="RegisterForm[verifycode]" type="text" class="form-control" style="display:inline-block">
+							<span class="input-group-addon" style="padding: 0">
+								<?php $this->widget('CCaptcha',array(
+									'showRefreshButton'=>false,
+									'clickableImage'=>true,
+									'imageOptions'=>array(
+										'alt'=>'刷新换图',
+										'title'=>'刷新换图',
+										'style'=>'cursor:pointer;')
+								)); ?>
+							</span>
+						</div>
+					</div>
 					<div class="col-sm-6">短信验证码 <br/>
 						<div class="input-group">
 							<span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i><span
@@ -309,16 +364,16 @@
 				<!-- row -->
 				<div class="row" style="margin-bottom: 5px">
 					<div class="col-sm-6">
-                                <span id="chk_password">
-                                </span>
-					</div>
+						<span id="chk_verifycode">
+						</span>
+			        </div>			            
 					<div class="col-sm-6">
 						<div class="input-group">
-                                    <span id="chk_code">
-                                        <?php
-                                        echo ($_POST && isset($user->errors['code'][0])) ? '<div id="show_msg"><div class="alert alert-error" style="color:red"><button type="button" class="close" data-dismiss="alert">×</button><i class="icon-warning-sign"></i>' . $user->errors['code'][0] . '</div></div>' : '';
-                                        ?>
-                                    </span>
+								<span id="chk_code">
+									<?php
+									echo ($_POST && isset($user->errors['code'][0])) ? '<div id="show_msg"><div class="alert alert-error" style="color:red"><button type="button" class="close" data-dismiss="alert">×</button><i class="icon-warning-sign"></i>' . $user->errors['code'][0] . '</div></div>' : '';
+									?>
+								</span>
 						</div>
 					</div>
 				</div>
@@ -390,6 +445,40 @@
 			}
 		}
 
+		/**
+		* @author xuejian
+		* @desc 检查确认密码情况 
+		* @param {object} chk 触发检查确认密码的元素对象=>password or repassword
+		* @return {bool} true 校验成功 false校验失败
+		*/
+	   function checkRepassword(chk) {
+		   /* 如果是密码框和重复密码框的触发检查ok 再确认密码是否成功 */
+		   var chk_password = $('#chk_password');
+		   var chk_repassword = $('#chk_repassword');
+		   var password = $('#reg_password').val();
+		   var repassword = $('#reg_repassword').val();
+		   if(($(chk).attr('id') == 'chk_password' || $(chk).attr('id') == 'chk_repassword') && 
+				   (password.length==6) && (repassword.length==6)) {
+
+			   chk_password.removeClass('chk-fail');
+			   chk_password.addClass('chk-ok');
+			   chk_password.html('<i class="glyphicon glyphicon-ok"></i>');
+			   /* 确认密码是否相等 */
+			   if(password != repassword) {
+				   chk_repassword.removeClass('chk-ok');
+				   chk_repassword.addClass('chk-fail');
+				   chk_repassword.html('<i class="glyphicon glyphicon-remove"></i>您输入的密码不一致。');
+				   return false;
+			   } else {
+				   chk_repassword.removeClass('chk-fail');
+				   chk_repassword.addClass('chk-ok');
+				   chk_repassword.html('<i class="glyphicon glyphicon-ok"></i>');
+				   return true;
+			   }
+		   }
+
+		   return true;
+		}
 		$('input').placeholder();
 		function chk_field(obj) {
 			var id = $(obj).attr('id') || $(obj).attr('data-id') || $(obj).data('id');
@@ -412,45 +501,84 @@
 				},
 				success: function (result) {
 					if (result == 'ok') {
-						$(chk).removeClass('chk-fail');
-						$(chk).addClass('chk-ok');
-						$(chk).html('<i class="glyphicon glyphicon-ok"></i>');
-						if (id == 'reg_mobile') {
-							$('#sendCode').removeAttr('disabled');
+						if(checkRepassword(chk)){								
+								$(chk).removeClass('chk-fail');
+								$(chk).addClass('chk-ok');
+								$(chk).html('<i class="glyphicon glyphicon-ok"></i>');
+								/**
+								 * 两种情况可以启动发送短信按钮
+								 * 1 验证码验证成功且手机号下为 对 号
+								 * 2 手机号验证成功且验证码下为 对 号
+								 */
+								if ((id == 'reg_verifycode' && $("#chk_mobile").html() == '<i class="glyphicon glyphicon-ok"></i>')|| 
+									(id == 'reg_mobile' && $('#chk_verifycode').html() == '<i class="glyphicon glyphicon-ok"></i>')) {
+									$('#sendCode').removeAttr('disabled');
+								}
 						}
 					} else {
+						/**
+						 * 如果是验证码或者手机号码验证错误
+						 * 确保发送短信按钮不可用
+						 */
+						if(id == 'reg_verifycode' || id == 'reg_mobile') {
+							$('#sendCode').attr('disabled', 'disabled');
+						}
 						$(chk).removeClass('chk-ok');
 						$(chk).addClass('chk-fail');
 						$(chk).html('<i class="glyphicon glyphicon-remove"></i>' + result);
 					}
 				},
 				complete: function () {
-					if ($('.glyphicon-ok').length == 4) {
+					if ($('.glyphicon-ok').length == 6) {
 					}
 				}
 			});
 
 		}
 
-		$('#reg_account').change(function () {
+		$('#reg_account').blur(function () {
 			chk_field($(this));
 		});
-		$('#reg_mobile').change(function () {
+		$('#reg_mobile').blur(function () {
 			chk_field($(this));
 		});
-		$('#reg_password').change(function () {
+		$('#reg_password').blur(function () {
+			if($(this).val().length != 6) {
+				var id = $(this).attr('id') || $(this).attr('data-id') || $(this).data('id');
+				var chk= id.replace('reg', 'chk');
+				chk = $('#'+chk);
+				$(chk).removeClass('chk-ok');
+				$(chk).addClass('chk-fail');
+				$(chk).html('<i class="glyphicon glyphicon-remove"></i>' + '密码 长度错误 (应为 6 字符串).');
+			} else {				
+				chk_field($(this));
+			}
+		});
+		$('#reg_repassword').blur(function () {
+			if($(this).val().length != 6) {
+				var id = $(this).attr('id') || $(this).attr('data-id') || $(this).data('id');
+				var chk= id.replace('reg', 'chk');
+				chk = $('#'+chk);
+				$(chk).removeClass('chk-ok');
+				$(chk).addClass('chk-fail');
+				$(chk).html('<i class="glyphicon glyphicon-remove"></i>' + '密码 长度错误 (应为 6 字符串).');
+			} else {				
+				chk_field($(this));
+			}
+		});
+		$('#reg_verifycode').blur(function () {
 			chk_field($(this));
 		});
-		$('#reg_code').change(function () {
+		$('#reg_code').blur(function () {
 			chk_field($(this));
 		});
 		$('#btn_reg').click(function () {
-			if ($('.glyphicon-ok').length < 4) {
+			if ($('.glyphicon-ok').length < 6) {
 				$('.form-control').each(function () {
 					$(this).trigger('change');
 				});
 			}
-			if ($('.glyphicon-ok').length == 4) {
+			if ($('.glyphicon-ok').length == 6) {
 				$('#RegisterForm').submit();
 			}
 			return false;
@@ -476,8 +604,39 @@
 				}
 			});
 		});
+		
+		/**
+		 * @author xuejian
+		 * @desc ajax 刷新验证码 
+		 * @return {void} 
+		 */
+		function refreshVerifycode() {
+			$.get('/site/captcha?refresh=1', function(result){
+				$("#yw0").attr({src: result.url});
+			},'json');
+		}
+
+		// 进入页面刷新验证码
+		refreshVerifycode();
+
+		// 单击鼠标刷新验证码
+		$("#yw0").click(function() {
+			refreshVerifycode();
+		});
 	});
 </script>
-
+<!--百度统计开始-->
+<div style="display: none">
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?4457f8eb25299a7dfde85c6ce9fe98c5";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script> 
+</div> 
+<!--百度统计结束-->
 </body>
 </html>

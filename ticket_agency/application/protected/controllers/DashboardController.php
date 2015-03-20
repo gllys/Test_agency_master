@@ -10,7 +10,7 @@ class DashboardController extends Controller
 {
 
 	public function actionIndex() {
-            
+            $data = array('num1'=>0,'num2'=>0,'num3'=>0,'num4'=>0,'num5'=>0);
             //未支付订单
             $par['status'] = 'unpaid';
             $par['type'] = 0;
@@ -55,7 +55,9 @@ class DashboardController extends Controller
              $data['d'] = $days['body'];
            //  print_r($days);
              
-
+             $rec = Recommend::api()->lists(array('pos_id'=>2,'expire_time'=>'true','status'=>1,'items'=>10000));
+             $rec = $rec['body']['data'];
+             $data['rec'] = $rec;
 		$this->render('index',$data);
 	}
 } 

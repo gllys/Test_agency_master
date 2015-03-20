@@ -1,9 +1,14 @@
-<?php
+<?php 
+
+use common\huilian\utils\Format;
+use common\huilian\models\District;
+
 $this->breadcrumbs = array('门票管理', '散客预定');
 $pid = isset($_GET['province_id'])?$_GET['province_id']:"";
 $jqname = isset($_GET['jqname'])?$_GET['jqname']:"";
 $typ = isset($_GET['type'])?$_GET['type']:"";
 $scenic = isset($_GET['scenic_id'])?$_GET['scenic_id']:"";
+
 ?>
 <script>
     var pid = '<?php echo $pid; ?>';
@@ -11,17 +16,60 @@ $scenic = isset($_GET['scenic_id'])?$_GET['scenic_id']:"";
     var typ = '<?php echo $typ; ?>';
     var scenic = '<?php echo $scenic; ?>';
 </script>
-<style>
-    .prov_p{width:120px;display:inline-block;height: 20px;text-align: left; cursor: pointer;}
-    .ticket_type{cursor: pointer;}
-    #proname{color:red;}
-    #tablecss th,#tablecss td{text-align: center;}
-	.bun {color: #999}
-	.fav-done {color: #269abc}
-	.sub-done {color: #643534}
-	.sub-done:hover {color: #801504}
+
+
+                <style>
+.rules {
+    position: relative;
+    display: inline-block;
+}
+.rules+.rules {
+    margin-left: 20px;
+}
+.rules > span {
+    color: #999;
+    font-size: 12px;
+    cursor: pointer
+}
+.rules > div >span {
+    margin: 0 10px
+}
+.rules > div {
+    display: none;
+    position: absolute;
+    top: 15px;
+    left: 50px;
+    z-index: 999;
+    width: 500px;
+    padding: 10px;
+    background-color: #f6fafd;
+    border: 1px solid #2a84d2;
+    border-radius: 2px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .2);
+    word-wrap: break-word;
+}
+.rules > div .table {
+    background: none;
+}
+.rules > div .table tr > * {
+    border: 1px solid #e0d9b6
+}
+.rules:hover > div {
+    display: block;
+}
+.prov_p {
+width: 120px;
+display: inline-block;
+height: 20px;
+text-align: left;
+cursor: pointer;
+}
+.table-bordered th:nth-child(1){padding-left:35px;}
+.table-bordered td:nth-child(1){padding-left:35px;}
+
 </style>
-<div class="contentpanel">
+		
+        <div class="contentpanel">
 
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -32,208 +80,119 @@ $scenic = isset($_GET['scenic_id'])?$_GET['scenic_id']:"";
             <h4 class="panel-title">门票查询</h4>
         </div>
         <div class="panel-body">
-            <form class="form-inline" method="get" action="" id="formsub">
-                <table>
-                    <tr>
-                        <th width="60">地区：</th>
-                        <td>
-                        <?php
-                            $province = Districts::model()->findAllByAttributes(array('level' => 1));
-                            $canProvinces = array(310000,110000,320000,330000,340000,350000);
-                            foreach ($province as $model) {  
-                                if(!in_array($model->id, $canProvinces))
-                                   continue;;
-                                ?>
-                              <a onclick='province("<?php echo $model->id;?>");' class='prov_p'><span<?php 
-                              if(isset($param['province_id'])){
-                                 if($param['province_id'] == $model->id){
-                                     echo  '  id=proname';
-                                 }
-                              } ?>><?php echo $model->name;?></span></a>
-                        <?php    } ?>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>类型：</th>
-                        <td>
-                            <a onclick="ticketType(0);" class="btn btn-sm ticket_type"><span
-                                  <?php 
-                              if(isset($param['type'])&&$param['type']!=""){
-                                 if($param['type'] == 0){
-                                     echo  '  id=proname';
-                                 }
-                              } ?>
-                                    >电子票</span></a>
-                            <!--a onclick="ticketType('1');" class="btn btn-sm ticket_type"><span
-                                        <?php 
-                                        if(isset($param['type'])&&$param['type']!=""){
-                                           if($param['type'] == 1){
-                                               echo  '  id=proname';
-                                           }
-                                        } ?>
-                                    >任务单</span></a-->
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            <div id="pro"></div><div id="ttype"></div>
-                        </th>
-                    
-                        <td>
-                            <div class="form-group">
-        
-                                <input class="form-control" type="text" placeholder="请输入门票名称" value="<?php echo isset($_GET['jqname'])?$_GET['jqname']:""; ?>" style="width:300px" name="jqname">
-                            </div>
-                            <button type="button" class="btn btn-primary mr5 btn-sm" id="ffsub">搜索</button>
-                        </td>
-                     
-                    </tr>
-                </table>
+            <form class="form-inline" method="get" action="/ticket/sale/index" id="formsub">
+            <!--门票查询改动-->
+<style>
+.form-inline .select2-container{
+	width:200px!important
+ 
+ }
+.select2-drop{
+	width:300px!important;
+}
+.select2-results li.select2-result-with-children > .select2-result-label{
+	background-color:#f6fafd
+}
+
+
+</style>
+            	<div class="form-group" style="width:270px">
+                    <label>地区：</label>
+					<select data-placeholder="Choose One" id="distributor-select-search" name="scenic_id" class="select2-offscreen">
+						<?php foreach(District::initial() as $k => $provinces) { ?>
+						<optgroup label="<?= $k ?>">
+						<option value="">选择地区</option>
+						<?= $k == 'ABCDE' ? '<option value="">全部地区</option>' : '' ?>
+						<?php foreach($provinces as $province) { ?>
+							<option value="<?= $province->id ?>" <?= $province->id == $pid ? 'selected' : '' ?>><?= $province->name ?></option>			
+						<?php } ?>
+						</optgroup>
+						<?php } ?>
+					</select>
+                </div>
+            	<div class="form-group" style="width:200px">
+                	<label class="pull-left">票种：</label>
+                    <div class="ckbox ckbox-primary pull-left">
+                        <input type="checkbox"  name="ticket_type" value="0" id="checkboxPrimary1" <?= ($param['is_union'] == -1 || $param['is_union'] == 0) ? 'checked' : '' ?>>
+                        <label for="checkboxPrimary1">单票</label>
+                    </div>
+                    <div class="ckbox ckbox-primary pull-left">
+                        <input type="checkbox"  name="ticket_type" value="1" id="checkboxPrimary" <?= ($param['is_union'] == -1 || $param['is_union'] == 1) ? 'checked' : '' ?>>
+                        <label for="checkboxPrimary">联票</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <input class="form-control" type="text" placeholder="请输入门票名称" value="<?php echo isset($_GET['jqname'])?$_GET['jqname']:""; ?>" style="width:300px" name="jqname">
+                </div>
+                <div class="form-group">	
+                    <button class="btn btn-primary btn-sm" type="button" id="ffsub">搜索</button>
+                </div>
              </form>
         </div><!-- panel-body -->
     </div>
-<?php if(!empty($param['province_id'])||(isset($param['type'])&&$param['type']!='')): ?>
-    <div class="panel panel-default">
-        <div class="panel-body">
-            所有分类 > 
-            <?php
-                
-                    if(isset($param['province_id'])){
-                       $pro = Districts::model()->find('id=:id',array(':id'=>$param['province_id']));  
-                         echo "<a  class=btn btn-xs mr5'> $pro[name] <i class='fa fa-times' id='getOver0'></i></a> >";
-                    }
-                    if(isset($param['type'])&&$param['type']!=""){
-                        $str = $param['type']?'任务单':'电子票';
-                        echo "<a  class=btn btn-xs mr5'> $str <i class='fa fa-times' id='getOver1'></i></a> ";
-                    }
-                    
-            ?>
-        </div><!-- panel-body -->
-    </div>
-<?php endif; ?>
-<?php if(!empty($param['province_id'])): ?>
-    <div class="panel panel-default">
-        <div class="panel-body">
-            <form class="form-inline">
-                <table>
-                    <tr>
-                        <th width="60">
-                            <?php
-                             if(isset($landscapes) && !empty($landscapes)){
-                                 $province = $landscapes[0]['province_id'];
-                                 $pro = Districts::model()->find('id=:id',array(':id'=>$province));
-                                 echo $pro['name'];
-                             }
-                            ?>
-                        </th>
-                        <td>
-                           <?php 
-                         if(isset($landscapes) && !empty($landscapes)){
-                            foreach($landscapes as $item):
-                           ?> 
-                            <a onclick="getLandspace(<?php echo $item['id'];?>);" class="btn btn-xs mr5"><?php echo $item['name'];?></a>
-                         <?php endforeach; }?>  
-                        </td>
-                    </tr>
-                </table>
-            </form>
-        </div><!-- panel-body -->
-    </div>
-<?php endif; ?>
-    <div class="panel panel-default">
+   <div class="panel panel-default">
         <div class="panel-heading">
-            <h4 class="panel-title">商品列表</h4>
+            <h4 class="panel-title">商品列表<div style="float:right;"><a href="/channel/tb/" class="btn btn-xs btn-default">淘宝账号及产品绑定</a></div></h4>
         </div>
-        <style>
-		.table-responsive img{
-			max-width:100px
-		}
-		.table-responsive th,.table-responsive td{
-			vertical-align:middle!important
-		}
-		.rules{
-			position:relative;
-			display:inline-block;
-		}
-		.rules+.rules{
-			margin-left:20px;
-			}
-		.rules > span{
-			color:#999;
-			font-size:12px;
-			cursor:pointer
-		}
-		.rules > div >span{
-			margin:0 10px
-			}
-		.rules > div{
-			display:none;
-			position:absolute;
-			top:15px;
-			left:50px;
-			z-index:999;
-			width:500px;
-			padding:10px;
-			background-color:#fbf8e9;
-			border:1px solid #fed202;
-			border-radius:2px;
-			box-shadow:0 0 10px rgba(0,0,0,.2);
-		}
-		.rules > div .table{
-			background:none;
-		}
-		.rules > div .table tr > *{
-			border:1px solid #e0d9b6
-		}
-		.rules:hover > div{
-			display:block;
-		}
-		</style>
         <div class="table-responsive">
             <table class="table table-bordered mb30" id="tablecss">
                 <thead>
                     <tr>
-                        <th style="width:5%; ">票种</th>
-                        <th style="text-align:left;width:17%">景区</th>
-                        <th style="text-align:left;width:240px">门票名称</th>
-                        <th style="text-align:left">供应商</th>
-                        <th style="width:15%">游玩日期</th>
-                        <th style="text-align:right;width:5%">销售价</th>
-                        <th style="text-align:right;width:5%">挂牌价</th>
-                        <th style="text-align:right;width:5%">散客价</th>
-                        <th style="width:5%">类型</th>
-                        <th style="width:5%">操作</th>
+                        <th>票种</th>
+                        <th>景区</th>
+                        <th style="width:15%">门票名称</th>
+                        <th>供应商</th>
+                        <th style="width:130px">游玩有效期</th>
+                        <th>门市挂牌价</th>
+                        <th>网络销售价</th>
+                        <th>散客结算价</th>
+                        <th>类型</th>
+                        <th style="width:105px;">操作</th>
                     </tr>
                 </thead>
                 <tbody>
-                <?php 
-                foreach($lists as $model):
-                ?> 
+				<?php foreach($lists as $model) { ?>
                     <tr>
-                    	<td><?php echo $model['is_union'] == 1 ?'联票': '单票'?></td>
-                        <td style="text-align:left"><?php
-                        $result = Landscape::api()->lists(array("ids" => $model['scenic_id']));
-                        $landspaceInfo = ApiModel::getLists($result);
-                        foreach ($landspaceInfo as $value) {   
-                        	echo "<a href='/ticket/show/?id=" . $value['id'] . "'>" . $value['name'] . "</a><br>";
-                        }
-                        ?></td>
+                    	<td><?= $model['is_union'] == 1 ? '联票' : '单票' ?></td>
+                        <td style="text-align:left;color: #636e7b;">
+	                        <?php
+                                //单例，性能优化
+                                if (!isset($singleLans)) {
+                                    //得到所有景点信息
+                                    $ids = PublicFunHelper::arrayKey($lists, 'scenic_id');
+                                    $param = array();
+                                    $param['ids'] = join(',', $ids);
+                                    $param['items'] = 100000;
+                                    $param['fields'] = 'id,name';
+                                    $data = Landscape::api()->lists($param, true, 30);
+                                    $singleLans = PublicFunHelper::ArrayByUniqueKey(ApiModel::getLists($data), 'id');
+                                    //print_r($singleLans);
+                                }
+                                $_lans = explode(',', $model['scenic_id']);
+                                //print_r($_lans);
+                                $html = '';
+                                foreach ($_lans as $id) {
+                                    if (!empty($singleLans[$id])) {
+                                        $html .= "<a href='/ticket/show/?id=" . $singleLans[$id]['id'] . "'>" . $singleLans[$id]['name'] . "</a><br>";
+                                    }
+                                }
+                                ?>
+                            <div class="lanpart<?php echo $model['id']?>">
+         						<?php echo $html?>
+                            </div>
+                            <div class="lan<?php echo $model['id']?>" style="display: none"><?php echo $html;?></div>
+                        </td>
                         <td style="text-align:left">
 	                        <div class="col-md-12">
-		                        <div class="pull-left"><strong><?php echo  $model['name'];?></strong></div>
-		                        <div class="pull-right" data-id="<?php echo $model['id'] ?>"><?php
-			                        echo isset($model['favor']) && $model['favor'] == 1
-			                            ? '<a class="bun fav fav-done" href="javascript:;" title="取消收藏">已收藏</a>'
-				                        : '<a class="bun fav" href="javascript:;" title="加入收藏">收藏</a>';
-		                        ?></div>
+		                        <div class="pull-left"><a href="/ticket/show/product/?price_type=0&id=<?= $model['id'] ?>"><strong><?= $model['name'] ?></strong></a></div>
 	                        </div>
 	                        <div class="col-md-12">
 		                        <div class="pull-left">
-			                        <div class="rules"><span>订票规则</span>
+			                        <div class="rules"><span>门票说明</span>
 				                        <div class="table-responsive">
 					                        <table class="table table-bordered mb30">
-						                        <?php echo $model['remark'];?>
-					                        </table>
+					                        	<?= $model['remark'] ?>
+						                    </table>
 				                        </div>
 			                        </div>
 			                        <div class="rules"><span>游玩星期</span>
@@ -263,63 +222,73 @@ $scenic = isset($_GET['scenic_id'])?$_GET['scenic_id']:"";
 					                        ?></div>
 			                        </div>
 		                        </div>
-		                        <div class="pull-right" data-id="<?php echo $model['id'] ?>" data-fat="<?php echo $model['fat_price'] ?>" data-group="<?php echo $model['group_price'] ?>"><?php
-			                        echo isset($model['sub']) && $model['sub'] == 1
-				                        ? '<a class="bun sub sub-done" href="javascript:;" title="取消订阅">已订阅</a>'
-				                        : '<a class="bun sub" href="javascript:;" title="加入订阅">订阅</a>';
-			                        ?></div>
 	                        </div>
                         </td>
-                        <td style="text-align:left">
-                            <?php
-                              $organ = Organizations::api()->show(array('id'=>$model['organization_id']));
-                              echo isset($organ['body']['name'])?$organ['body']['name']:"";
-                            ?></td>
+                        <td style="text-align:left"><?php
+                                    //单例，性能优化
+                                if (!isset($singleOrgans)) {
+                                    //得到所有景点信息
+                                    $ids = PublicFunHelper::arrayKey($lists, 'organization_id');
+                                    $param = array();
+                                    $param['ids'] = join(',', $ids);
+                                    $param['items'] = 100000;
+                                    $param['fields'] = 'id,name';
+                                    $data = Organizations::api()->list($param,true,30);
+                                    $singleOrgans = PublicFunHelper::ArrayByUniqueKey(ApiModel::getLists($data), 'id');
+                                   // print_r($singleOrgans);
+                                }
+                                echo isset($singleOrgans[$model['organization_id']]) ? $singleOrgans[$model['organization_id']]['name'] : "";
+                                ?></td>
                         <td>
-                        	<?php 
+                        <?php 
                         		$time = explode(',',$model['date_available']);
                                         if(!empty($time[0]) && !empty($time[1])){
-                                            echo date('m月d日',$time[0]) . '~' .date('m月d日',$time[1]);
+                                            echo date('Y年m月d日',$time[0]) . '~<br/>' .date('Y年m月d日',$time[1]);
                                         }else{
                                             echo '';
                                         }
                         		
                         	?>
-                        </td>
-                        <td style="text-align:right"><del><?php echo $model['sale_price'];?></del></td>
-                        <td style="text-align:right"><del><?php echo $model['listed_price'];?></del></td>
-                        <td style="text-align:right" class="text-success"><?php echo number_format($model['fat_price'],2);?></td>
-                        <td><?php echo $model['type']?'任务单':'电子票';?></td>
-                        <td>
-                            <a class="btn btn-success btn-xs" href=".bs-example-modal-lg" onclick="buy('<?php echo $model['id'] ?>','<?php echo $model['organization_id']?>');" data-toggle="modal">购买</a>
+                          </td>
+                        <td style="text-align:right"><del><?= $model['listed_price'];?></del></td>
+                        <td style="text-align:right"><del><?= $model['sale_price'];?></del></td>
+                        <td style="text-align:right" class="text-success"><?= number_format($model['fat_price'],2) ?></td>
+                        <td><?= $model['type'] ? '任务单' : '电子票' ?></td>
+                        <td style=" line-height:51px;">
+                            <div class="pull-left"><a class="btn btn-success btn-xs" href=".bs-example-modal-lg" onclick="buy('<?= $model['id'] ?>','<?= $model['organization_id']?>');" data-toggle="modal">购买</a><strong style="display:none;"><?= $model['name'] ?></strong></a></div>
+                        	<div class="pull-right" style="margin-right:3px;" data-id="<?= $model['id'] ?>" data-fat="<?= $model['fat_price'] ?>" data-group="<?= $model['group_price']?>"><?php
+			                        echo isset($model['sub']) && $model['sub'] == 1
+			                            ? '<a class="bun fav fav-done" href="javascript:;" title="取消收藏">已收藏</a>'
+				                        : '<a class="bun fav" href="javascript:;" title="加入收藏">收藏</a>';
+		                        ?>
+		                   </div>
                         </td>
                     </tr>
-                 <?php endforeach;?>   
+                	<?php } ?>
                 </tbody>
             </table>
 
-        </div>
-
-          <div style="text-align:center" class="panel-footer">
-            <div id="basicTable_paginate" class="pagenumQu">
-                <?php
-                $this->widget('CLinkPager', array(
-                    'cssFile' => '',
-                    'header' => '',
-                    'prevPageLabel' => '上一页',
-                    'nextPageLabel' => '下一页',
-                    'firstPageLabel' => '',
-                    'lastPageLabel' => '',
-                    'pages' => $pages,
-                    'maxButtonCount' => 5, //分页数量
-                        )
-                );
-                ?>
-            </div>
-        </div>
-        
-        
+        </div>        
     </div>
+    <div class="panel-footer" style="margin-top:-25px;">
+        <div class="row">
+                <div class="pagenumQu">
+                   <?php
+	                $this->widget('common.widgets.pagers.ULinkPager', array(
+	                    'cssFile' => '',
+	                    'header' => '',
+	                    'prevPageLabel' => '上一页',
+	                    'nextPageLabel' => '下一页',
+	                    'firstPageLabel' => '',
+	                    'lastPageLabel' => '',
+	                    'pages' => $pages,
+	                    'maxButtonCount' => 5, //分页数量
+	                        )
+	                );
+	                ?>
+            	</div>
+        </div>
+	</div>
 </div><!-- contentpanel -->
 
 <style>
@@ -328,8 +297,40 @@ $scenic = isset($_GET['scenic_id'])?$_GET['scenic_id']:"";
 
 <!--购买票开始-->
  <div class="modal fade bs-example-modal-lg" id="verify-modal-buy" tabindex="-1" role="dialog"></div>
+ <div class="modal fade bs-example-modal-static" id="verify-modal-alert" tabindex="-2" role="dialog"></div>
+ <div class="modal-dialog modal-lg" id="modalalert" style="width:500px;display: none;">
+     <div class="modal-content">
+<!--         <div class="modal-header">                
+            <h4 class="modal-title"></h4>
+        </div>-->
+        <div class="modal-body">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <span style="font-size: 18px;line-height: 30px;">请等待景区确认！</span><br />
+                    <span style="font-size: 18px;line-height: 30px;">景区确认后，您会收到一条消息提醒，请注意查收！</span>
+                </div>
+            </div>
+        </div>
+        <!--<div class="modal-footer"></div>-->
+     </div>
+ </div>
+
+
 
 <script type="text/javascript">
+
+jQuery(document).ready(function(){
+	$(window).scroll(function() {
+		$('#select2-drop-mask').trigger('click');
+	});
+	$("#distributor-select-search").select2();   
+   	$("#distributor-select-search").change(function() {
+   		province($(this).val());
+   	});             
+ });
+
+
+
 function buy(id,supplier_id){
      document.getElementById('verify-modal-buy').innerHTML = '';
      //$('#verify-modal-buy').html('');
@@ -337,18 +338,31 @@ function buy(id,supplier_id){
             $('#verify-modal-buy').html(data);
         });
 }
+
 // <!--购买票结束-->
 
+//全展示
+$('.lanview').click(function(){
+    var id = $(this).attr('data-id');
+    $('.lanpart' + id).hide();
+    $('.lan' + id).show();
+
+})
+
 $("#ffsub").click(function(){
-    jqname = $('input[name="jqname"]').val(); 
-    var url = "/ticket/sale?province_id="+pid+"&jqname="+jqname+"&type="+typ;
-   window.location.href = url;
+    jqname = $('input[name="jqname"]').val();
+	var checked = $('input[name="ticket_type"]:checked');
+	var is_union = checked.length == 1 ? checked.val() : -1;
+// 	alert(is_union);
+// 	return 
+    var url = "/ticket/sale?province_id="+pid+"&jqname="+jqname+"&type="+typ+"&is_union="+is_union;
+
+	window.location.href = url;
     //$("#formsub").submit();
 });
 
 
 function province(provinceid){
-   // alert($(this));
     pid = provinceid; 
     var url = "/ticket/sale?province_id="+pid+"&jqname="+jqname+"&type="+typ;
    window.location.href = url;

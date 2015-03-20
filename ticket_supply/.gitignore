@@ -1,0 +1,4 @@
+application.log*
+application/assets/*
+nbproject
+application/runtime/*

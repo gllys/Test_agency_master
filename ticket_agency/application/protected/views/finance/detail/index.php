@@ -1,6 +1,6 @@
 <div class="contentpanel">
     <div class="panel panel-default"><div class="panel-heading">
-            <h4 class="panel-title">应付账款</h4>
+            <h4 class="panel-title">应付账款单明细</h4>
         </div>
         <div class="panel-body">
             <?php if ($detail): ?>
@@ -9,7 +9,7 @@
                     <div class="panel-heading">
                         <h4 class="panel-title"><span class="mr20">账单日期：<?php echo $detail['created_at'] ?></span>
                             <span id="pay_status">应付账款单支付状态：
-                            <?php if($detail['pay_status'] == 0 && $detail['bill_amount'] > 0):?>
+                            <?php if($detail['pay_status'] == 0 && $detail['bill_amount'] != 0):?>
                                 <b class="text-danger">未打款</b>
                             <?php elseif($detail['bill_amount'] == 0):?>
                                 <b class="text-warning">无需打款</b>
@@ -26,7 +26,7 @@
                                 <th>单号</th>
                                 <th>门票名称</th>
                                 <th>预订日期</th>
-                                <th>游玩日期</th>
+                                <th>产品有效期</th>
                                 <th>取票人</th>
                                 <th>取票人手机</th>
                                 <th>支付金额</th>
@@ -62,11 +62,11 @@
                                 <td><?php echo $detail['bill_amount'] ?></td>
                             </tr>
                             <tr <?php if($detail['bill_amount'] == 0){echo "style='display:none'";}?>>
-                                <th>打款日期:</th>
+                                <th>分销打款日期:</th>
                                 <td><?php echo $detail['payed_at'] == 0 ? '未打款' : $detail['payed_at']?></td>
                             </tr>
                             <tr <?php if($detail['bill_amount'] == 0){echo "style='display:none'";}?>>
-                                <th>打款凭证:</th>
+                                <th>分销打款凭证:</th>
                                 <td>
 
 
@@ -162,8 +162,8 @@
                 $('#bill_finish').attr('disabled',true);
                 $.post('/finance/detail/finish', {id: $('input[name=id]').val(), payed_img: $('input[name=payed_img]').val()}, function(data) {
                     if (data.error === 0) {
-                        alert('打款成功');
-                        window.location.href = '/finance/payment';
+                        alert('打款成功',function(){window.location.href = '/finance/payment';});
+                        
                     } else {
                         alert(data.msg);
                     }

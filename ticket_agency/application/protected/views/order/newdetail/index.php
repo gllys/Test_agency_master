@@ -372,8 +372,7 @@ $this->breadcrumbs = array('订单管理', '订单详情');
 	function cancel(id) {
         $.post('/order/newdetail/cancel', {id: id}, function(data) {
             if (data.error === 0) {
-                alert('订单已取消');
-                setTimeout("location.href='/order/renwu/'", '1000');
+                alert('订单已取消',function(){setTimeout("location.href='/order/renwu/'", '1000');});
             } else {
                 alert(data.msg);
             }
@@ -383,8 +382,7 @@ $this->breadcrumbs = array('订单管理', '订单详情');
     function paid(id) {
         $.post('/order/newdetail/paid', {id: id}, function(data) {
             if (data.error === 0) {
-                alert('订单已确认');
-                setTimeout("location.href='/order/renwu/'", '1000');
+                alert('订单已确认',function(){ setTimeout("location.href='/order/renwu/'", '1000');}); 
             } else {
                 alert(data.msg);
             }

@@ -1,4 +1,4 @@
-<div class="leftpanel" style="position:fixed;top:60px">
+<div class="leftpanel">
     <!--<div class="media profile-left">
         <a href="#" class="pull-left profile-thumb">
             <img alt="" src="/img/profile.png" class="img-circle">
@@ -8,15 +8,14 @@
         </div>
     </div><!-- media -->
 
-    <ul class="nav nav-pills nav-stacked" id="child_nav"  style="margin-top:10px">
-        <li></li>
+    <ul class="nav nav-pills nav-stacked" id="child_nav" style="margin-top:10px">
         <?Php
-        echo CreateUrl::model()->createBody($this->nav);
+        echo CreateUrl::model()->createMenu($this->nav);
         ?>
     </ul>
 
 </div><!-- leftpanel -->
 
 <script type="text/javascript">
-$('#child_nav a[href="<?php echo $this->childNav ?>"]').parent().addClass('active');
+$('#child_nav a[href="<?php echo $this->childNav ?>"]').parent().addClass('active').parent().show();
 </script>

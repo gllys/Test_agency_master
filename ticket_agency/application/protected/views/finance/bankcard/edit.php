@@ -23,38 +23,34 @@
 					</div>
 				<?php endif;?>
 				</div>
-                               <div class="form-group">
+                               <div class="form-group" style="clear:both">
 					<label class="col-sm-2 control-label">开户行:</label>
 					<div class="col-sm-10" style="position:static">
-						<input type="text" data-prompt-position="topLeft"  class="form-control validate[required]" name="open_bank" value="<?php echo $bank_list['open_bank']?>">
+						<input type="text" data-prompt-position="topLeft"  class="form-control validate[required]" tag="开户行" name="open_bank" value="<?php echo $bank_list['open_bank']?>">
 					</div>
 				</div>
 				<div class="form-group">
 					<label class="col-sm-2 control-label">卡号:</label>
 					<div class="col-sm-10" style="position:static">
-						<input type="text" class="form-control validate[required,custom[onlyNumberSp],minSize[15],maxSize[20]]" name="account" value="<?php echo $bank_list['account']?>">
+						<input type="text" class="form-control validate[required,custom[onlyNumberSp],minSize[15],maxSize[20]]" tag="卡号" name="account" value="<?php echo $bank_list['account']?>">
 					</div>
 				</div>
 				<div class="form-group">
 					<label class="col-sm-2 control-label">账户名:</label>
 					<div class="col-sm-10" style="position:static">
-						<input type="text" class="form-control validate[required]" name="account_name" value="<?php echo $bank_list['account_name']?>">
+						<input type="text" class="form-control validate[required]" tag="账户名" name="account_name" value="<?php echo $bank_list['account_name']?>">
 					</div>
 				</div>
 		  </div>
 
 		  <div class="modal-footer">
-				<button type="button" class="btn btn-success" id="edit_bank_card">修改</button>
+				<button type="button" class="btn btn-success" id="edit_bank_card_btn">修改</button>
 		  </div>
 	 	</form>
 	 	<?php endforeach;?>
 	<?php endif;?>
 	  </div>
 	</div>
-<script type="text/javascript" src="/js/jquery-1.11.1.min.js"></script>
-<script src="/js/jquery.validationEngine.js"></script>
-<script src="/js/jquery.validationEngine-zh-CN.js"></script>
-
 <script>
 jQuery(document).ready(function() {
        $('#edit_bank_card').validationEngine({
@@ -63,12 +59,11 @@ jQuery(document).ready(function() {
             autoHideDelay: 3000,
             maxErrorsPerField: 1
         });
-	$('#edit_bank_card').click(function(){
+	$('#edit_bank_card_btn').click(function(){
 		if($('#edit_bank_card').validationEngine('validate')==true){
 		$.post('/finance/bankcard/editBank',$('#edit_bank_card').serialize(),function(data){
 			if(data.error===0){
-                    alert('修改成功');
-                    window.location.reload();
+                    alert('修改成功',function(){window.location.reload();});
                 }else{
                     alert(data.msg);
                 }

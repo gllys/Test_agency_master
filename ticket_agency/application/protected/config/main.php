@@ -2,7 +2,7 @@
 
 Yii::setPathOfAlias('common', realpath(dirname(__FILE__) . '/../../../common'));
 include(dirname(__FILE__) . '/../../../../setting/ticket_agency.php');
-
+defined('VERSION') || define('VERSION', '1.6.4');
 // This is the main Web application configuration. Any writable
 // CWebApplication properties can be configured here.
 $config = array(
@@ -49,6 +49,12 @@ $config = array(
         'api',
     ),
     'components' => array(
+        'versionUrl' => array(
+            'class' => 'common.components.VersionUrl',
+            'openDirRule'=>false,
+            'v' => VERSION,
+            'url' => '',
+        ),
         'user' => array(
             'class' => 'system.web.auth.CWebUser',
             'allowAutoLogin' => true,
@@ -133,5 +139,6 @@ defined('PW_REDIS') || define('PW_REDIS', 'a:0:{}');
 defined('PW_DB') || define('PW_DB', 'a:0:{}');
 defined('EXT') || define('EXT', 'a:0:{}');
 defined('PARAMS') || define('PARAMS', 'a:0:{}');
+defined('REPORT_URL') || define('REPORT_URL','http://report.agency.test.demo.org.cn');//'http://t_agency.piaotai.com');//
 return array_replace_recursive($config, unserialize(PW_CACHE), unserialize(PW_REDIS), unserialize(PW_DB), unserialize(EXT), unserialize(PARAMS));
 

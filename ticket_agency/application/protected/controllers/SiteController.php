@@ -12,13 +12,13 @@ class SiteController extends Controller {
         return array(// captcha action renders the CAPTCHA image displayed on the contact page
             'captcha' => array(
                 'class' => 'CCaptchaAction',
-                'height' => 36,
-                'width' => 70,
+                'height' => 23,
+                'width' => 50,
                 'padding' => 0,
-                'transparent' => true,
-                'offset' => -2,
+                'transparent' => false,
                 'minLength' => 4,
-                'maxLength' => 4
+                'maxLength' => 4,
+				'testLimit'=> 30,
             ), // page action renders "static" pages stored under 'protected/views/site/pages'
             // They can be accessed via: index.php?r=site/page&view=FileName
             'page' => array('class' => 'CViewAction')
@@ -81,23 +81,28 @@ class SiteController extends Controller {
             if ($attributes['code'] == Yii::app()->redis->get('code_for_register:' . Yii::app()->getSession()->getSessionId())) {
                 unset($attributes['code']);
                 $identity = new UserIdentity($attributes['account'], $attributes['password']);
+				Users::$verifycodeAllowEmpty = false;
                 $user = new Users();
 
                 $user['password'] = $identity->getHashedPassword($attributes['password']);
+                $user['repassword'] = $identity->getHashedPassword($attributes['repassword']);
                 $user['account'] = $attributes['account'];
                 $user['mobile'] = $attributes['mobile'];
+                $user['verifycode'] = $attributes['verifycode'];
                 $user['created_at'] = date('Y-m-d H:i:s');
                 $user['updated_at'] = date('Y-m-d H:i:s');
                 $user['is_super'] = 1;
 
-                $user->save();
-                Yii::import("common.models.ULoginForm");
-                $model = new ULoginForm;
-                $model->attributes = array(
-                    'username' => $attributes['account'],
-                    'password' => $attributes['password']
-                );
-                $this->validate_and_login($model);
+				if($user->save()) {					
+					Yii::import("common.models.ULoginForm");
+					$model = new ULoginForm;
+					$model->attributes = array(
+						'username' => $attributes['account'],
+						'password' => $attributes['password']
+					);
+					$this->validate_and_login($model);
+					Yii::app()->end();
+				}
             }
         }
         $this->renderPartial('reg_user', array('user' => $user));
@@ -115,7 +120,7 @@ class SiteController extends Controller {
             $str_name = 'register';
         }
         $SmsHandler = new SMS();
-        if ($SmsHandler->sendSMS($mobile, '【景旅通票台】'.$str_type . $code)) {
+        if ($SmsHandler->sendSMS($mobile, $str_type . $code)) {
             Yii::app()->redis->setEx('code_for_'.$str_name.':' . Yii::app()->getSession()->getSessionId(), 600, $code);
             echo 1; //$code;
         } else {
@@ -126,6 +131,7 @@ class SiteController extends Controller {
     public function actionPre() {
         $chk = Yii::app()->request->getParam('chk');
         $chk = substr($chk, 4);
+		Users::$verifycodeAllowEmpty = false;
         $user = new Users();
         $val = Yii::app()->request->getParam('val');
         $val = trim($val);
@@ -148,6 +154,10 @@ class SiteController extends Controller {
         if (!Yii::app()->user->isGuest) {
             $this->redirect('/');
         }
+        
+        $rec = Recommend::api()->lists(array('pos_id'=>1,'expire_time'=>'true','status'=>1,'items'=>10000));
+        $rec = $rec['body']['data'];
+        
         Yii::import("common.models.ULoginForm");
         $model = new ULoginForm;
         // if it is ajax validation request
@@ -163,7 +173,10 @@ class SiteController extends Controller {
         }
 
         // display the login form
-        $this->renderPartial('login', array('model' => $model));
+        if (isset($_GET['return_url']))
+        	$this->renderPartial('rlogin', array('model' => $model,'rec'=>$rec,'count'=>count($rec)));
+        else 
+        	$this->renderPartial('login', array('model' => $model,'rec'=>$rec,'count'=>count($rec)));
     }
 
     private function validate_and_login(&$model) {
@@ -225,7 +238,7 @@ class SiteController extends Controller {
                         'msg' => '注册时手机号填写不正确！'
                             ), JSON_UNESCAPED_UNICODE);
                     Yii::app()->end();
-                } else if ($SmsHandler->sendSMS($user['mobile'], '【景旅通票台】重设密码验证码 ' . $code)) {
+                } else if ($SmsHandler->sendSMS($user['mobile'], '重设密码验证码 ' . $code)) {
                     Yii::app()->redis->setEx('code_for_reset:' . $account, 600, $code);
                     echo json_encode(array(
                         'code' => 1,
@@ -253,26 +266,31 @@ class SiteController extends Controller {
                 'condition' => 'account=:account AND deleted_at IS NULL',
                 'params' => array(':account' => trim($account)),
             ));
-            if (is_null($user)) {
-                echo json_encode(array(
-                    'code' => -1,
-                    'msg' => '用户名不存在！'
-                        ), JSON_UNESCAPED_UNICODE);
-                Yii::app()->end();
-            }
+//            if (is_null($user)) {
+//                echo json_encode(array(
+//                    'code' => -1,
+//                    'msg' => '用户名不存在！'
+//                        ), JSON_UNESCAPED_UNICODE);
+//                Yii::app()->end();
+//            }
             $code_err = null;
-            if ($code != '' && $code == Yii::app()->redis->get('code_for_reset:' . $account)) {
-                $user['password'] = $password;
-                if ($user->validate()) {
-                    $user['password'] = password_hash($password, PASSWORD_BCRYPT, array('cost' => 8));
-                    if ($user->save()) {
-                        $this->redirect('/site/login');
-                    }
-                }
-            } else {
-                $code_err = '验证码不正确';
-            }
-            $this->renderPartial('reset', array('user' => $user, 'code_err' => $code_err));
+			$password_err = null;
+			if(strlen($password) != 6) {
+                $password_err = '密码必须为6位';
+			} else {				
+				if ($code != '' && $code == Yii::app()->redis->get('code_for_reset:' . $account)) {
+					$user['password'] = $password;
+					if ($user->validate()) {
+						$user['password'] = password_hash($password, PASSWORD_BCRYPT, array('cost' => 8));
+						if ($user->save()) {
+							$this->redirect('/site/login');
+						}
+					}
+				} else {
+					$code_err = '验证码不正确';
+				}
+			}
+            $this->renderPartial('reset', array('user' => $user, 'code_err' => $code_err, 'password_err'=>$password_err));
             Yii::app()->end();
         } else {
             $this->renderPartial('reset');

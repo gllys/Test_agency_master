@@ -50,23 +50,31 @@ class Controller extends CController {
         if (isset($_POST) && $_POST) {
             Filter::htmls($_POST);
         }
+    }
 
-        #得到主导航菜单
+    //  检测权限
+    protected function beforeAction($action) {
+        if (Yii::app()->request->isPostRequest||Yii::app()->request->isAjaxRequest) {
+            return true;
+        }
+
+         #得到主导航菜单
         if (!$this->nav) {
             $this->nav = substr($this->id, 0, strpos($this->id, '/'));
         }
 
         #得到子导航
         if (!$this->childNav) {
-            $this->childNav = CreateUrl::model()->getChildNav('/' . $this->id . '/');
+            $this->childNav = CreateUrl::model()->getChildNav('/' . $this->id . '/'.$this->action->id.'/');
             if (!$this->childNav) {
-                $this->childNav = '/' . $this->id . '/';
+                $this->childNav = CreateUrl::model()->getChildNav('/' . $this->id . '/');
+            }
+            
+            if(!$this->childNav){
+                 $this->childNav = '/' . $this->id . '/';
             }
         }
-    }
-
-    //  检测权限
-    protected function beforeAction($action) {
+        
         #完善机构信息url
         if (Yii::app()->user->id) {
             $org_id = Yii::app()->user->org_id;
@@ -190,6 +198,7 @@ class Controller extends CController {
 
     public function notification($message, $next_url, $next_title, $type = 'notification') {
         $this->renderPartial('/layouts/notification', compact('message', 'next_url', 'next_title', 'type'));
+        Yii::app()->end();
     }
 
     public function success($message, $next_url, $next_title) {

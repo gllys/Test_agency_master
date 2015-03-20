@@ -6,7 +6,7 @@
  * Time: 3:45 PM
  */
 
-class Order extends REST_API
+class Order extends ApiModel
 {
 	protected $param_key = 'ticket-api-order'; #请求api地址，对应config main里面的 key
 } 

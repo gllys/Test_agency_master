@@ -1,0 +1,65 @@
+<?php
+
+// base
+define('SET_DOMAIN', 'demo.org.cn');
+
+// db
+define('SET_DB', serialize(array(
+	//'itourism' => array('host' => '192.168.1.248', 'user' => 'dbaroot', 'password' => 'dbaroot20090606', 'database' => 'fx', 'port' => '3306'),
+	 //'itourism' => array('host' => 'localhost', 'user' => 'dbaroot', 'password' => 'dbaroot20090606', 'database' => 'fx', 'port' => '3306'),
+	 'itourism' => array('host' => 'rdsna2yuazjavf2.mysql.rds.aliyuncs.com', 'user' => 'fx', 'password' => 'c3f9558d', 'database' => 'fx', 'port' => '3306'),
+)));
+
+// redis
+define('SET_REDIS', serialize(array('cache' => array('host' => '127.0.0.1', 'port' => 6379, 'db' => 0), 'nosql' => array('host' => '127.0.0.1', 'port' => 6379, 'db' => 1), 'queue' => array('host' => '127.0.0.1', 'port' => 6379, 'db' => 2),)));
+
+// mongodb 相关设置
+define('SET_MONGODB', serialize(array('master' => array('host' => '127.0.0.1', 'port' => 11611, 'db' => 'db'), 'slave' => array('host' => '127.0.0.1', 'port' => 11611, 'db' => 'db'),)));
+
+// memcache 相关设置
+define('SET_MEMCACHE', serialize(array('master' => array('host' => '127.0.0.1', 'port' => 11211), 'user' => array('host' => '127.0.0.1', 'port' => 13210))));
+
+// itourism api
+define('SET_ITOURISM_API_URL', 'http://api.dev.test1.demo.org.cn/');
+
+// itourism auth
+define('SET_ITOURISM_API_AUTH', serialize(array('username' => 'itourism-distribution-api', 'password' => 'itourism-distribution-api')));
+
+// upload url
+// define('PI_UPLOADS_URL', 'http://test.upload.ihuilian.com/');
+// define('SET_UPLOADS_URL', 'http://u.ihuilian.com/');
+define('SET_UPLOADS_URL', 'http://product.api.ihuilian.com/attachments/');
+define('SET_UPLOADS_USER','itourism-distribution-api');
+define('SET_UPLOADS_PWD','itourism-distribution-api');
+
+// scenic
+define('SET_SCENIC_VER', '0.1');
+define('SET_SCENIC_NAME', 'scenic');
+define('SET_SCENIC_DOMAIN_PREFIX', 'fx-scenic');
+
+// agency
+define('SET_AGENCY_VER', '0.1');
+define('SET_AGENCY_NAME', 'agency');
+define('SET_AGENCY_DOMAIN_PREFIX', 'fx-agency');
+define('SET_AGENCY_SMS_CONTROL', 1);
+
+// api
+define('SET_API_VER', '0.1');
+define('SET_API_NAME', 'api');
+define('SET_API_DOMAIN_PREFIX', 'fx-api');
+
+// phprpc开启的服务
+define('SET_API_PHPRPC_ACTIONS', serialize(array(array('class' => 'RpcController', 'methods' => array('qrcode')), array('class' => 'RpcController', 'methods' => array('test')))));
+
+// phprpc的用户名和密码
+define('SET_API_PHPRPC_USER', serialize(array('account' => 'demo', 'password' => 'fe01ce2a7fbac8fafaed7c982a04e229')));
+
+// API auth 的用户名和密码
+define('SET_API_AUTH_USER', serialize(array('username' => 'hljj', 'password' => '8038da89e49ac5eabb489cfc6cea9fc1')));
+
+// sync api
+define('SET_SYNCAPI_VER', '0.1');
+define('SET_SYNCAPI_NAME', 'syncapi');
+define('SET_SYNCAPI_DOMAIN_PREFIX', 'fx-syncapi');
+define('SET_SYNCAPI_DOMAIN', 'fx-sync-api.demo.org.cn');
+define('SET_SYNCAPI_URL', 'http://fx-sync-api.demo.org.cn');

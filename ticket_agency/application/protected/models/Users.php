@@ -29,7 +29,10 @@
  */
 class Users extends UActiveRecord {
 
-    /**
+	public $repassword;
+    public $verifycode;
+	public static $verifycodeAllowEmpty = true;
+	/**
      * Returns the static model of the specified AR class.
      * @return Users the static model class
      */
@@ -53,11 +56,14 @@ class Users extends UActiveRecord {
         return array(
             array('account', 'unique'),
             array('account', 'match', 'pattern' => '/^[a-z0-9\-_]+$/', 'message' => '账号不合法，必须为字母数字或下划线！'),
-            array('account, password, mobile', 'required'),
-            array('mobile', 'length', 'is' => 11),
+            array('account,  password, mobile', 'required'),
+			array('repassword', 'required', 'on'=>'create'),
+            array('mobile', 'match', 'pattern' => "/^1\d{10}$/", 'allowEmpty'=>false, 'message' => "手机号码格式不正确"),
             array('account', 'length', 'min' => 3, 'max' => 30),
-            array('password', 'length', 'min' => 6),
-            array('status, is_super, is_guide, last_updated_source', 'numerical', 'integerOnly' => true),
+//            array('password', 'length', 'is' => 6),
+//			array('repassword', 'length', 'is'=>6, 'on'=>'create'),
+			array('verifycode', 'captcha', 'allowEmpty'=> Users::$verifycodeAllowEmpty),
+			array('status, is_super, is_guide, last_updated_source', 'numerical', 'integerOnly' => true),
             array('account, password, name, email, mobile, telephone, identity, position', 'length', 'max' => 100),
             array('organization_id, created_by', 'length', 'max' => 10),
             array('gender', 'length', 'max' => 6),
@@ -86,6 +92,7 @@ class Users extends UActiveRecord {
             'id' => 'ID',
             'account' => '用户名',
             'password' => '密码',
+			'repassword' => '确认密码',
             'name' => 'Name',
             'organization_id' => 'Organization',
             'gender' => 'Gender',

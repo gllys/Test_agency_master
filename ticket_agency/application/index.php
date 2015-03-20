@@ -14,12 +14,17 @@ if (!function_exists('boolval')) {
 $yii    = dirname(__FILE__) . '/../framework/yii.php';
 $config = dirname(__FILE__) . '/protected/config/main.php';
 // remove the following lines when in production mode
-defined('YII_DEBUG') or define('YII_DEBUG', true);
+//defined('YII_DEBUG') or define('YII_DEBUG', true);
 // specify how many levels of call stack should be shown in each log message
 defined('YII_TRACE_LEVEL') or define('YII_TRACE_LEVEL', 3);
 defined('JSON_UNESCAPED_UNICODE') or define('JSON_UNESCAPED_UNICODE', 256);
 require_once($yii);
-Yii::createWebApplication($config)->run();
+$app = Yii::createWebApplication($config);
+Yii::import('application.extensions.PHPExcel');
+require_once "PHPExcel.php";
+require_once "PHPExcel/Autoloader.php";
+Yii::registerAutoloader(array('PHPExcel_Autoloader','Load'), true);
+$app->run();
 
 if ($xhprof_enable) {
 	$data = xhprof_disable(); //返回运行数据

@@ -1,6 +1,29 @@
 <?php
 $this->breadcrumbs = array('首页', '工作台');
 ?>
+<style>
+    b.red{color:#d9534f; font-size:26px;}
+	 .extend-list{max-height:500px; overflow-y:scroll; overflow-x:hidden;}
+	 .table.extend-table>tbody>tr>td{text-align:left; padding-left:10px; vertical-align:top;}
+	 .extend-table .txt-detail{
+	 margin:15px 0; 
+	 height:36px;
+	 line-height:18px;
+	 max-width:1230px;
+	 display:inline-block;
+	 overflow:hidden;
+	 text-overflow:ellipsis;
+    -o-text-overflow:ellipsis; 
+	 }
+	 
+	 
+	 .extend-table .pr20 i{font-style:normal;}
+	 .extend-table .pr20{padding-right:20px;}
+	 .extend-table .pr20 a.all{cursor:pointer;}
+	 a.ft18{font-size:18px; font-weight:bold;}
+	 
+    </style>
+    
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 <div class="contentpanel">
     <!--div class="panel panel-default">
@@ -51,6 +74,32 @@ $this->breadcrumbs = array('首页', '工作台');
         </div>
     </div>
 
+    
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4 class="panel-title" style="font-size:14px;">推广内容</h4>
+      </div>
+      <div class="panel-body extend-list">
+        <table class="table table-bordered extend-table">
+            <tbody>
+            
+            <?php if (isset($rec)):foreach ($rec as $r):?>
+            <tr>
+                    <th width="170"><img src="<?php echo $r['bimg']?>" width="170" height="120"></th>
+                    <td>
+                    	<div><a href="<?php echo $r['url']?$r['url']:'###'?>" target="_blank" class="ft18"><?php echo $r['title']?></a></div>
+                        <div class="txt-detail"><?php echo $r['detail']?></div>
+                        <div class="pr20"><span class="pull-left">发布日期：<i><?php echo date('Y-m-d',$r['created_at'])?></i></span><span class="pull-right"> <a class="all">[详细]</a></span></div>
+                    </td>
+                </tr>
+              <?php endforeach;endif;?>
+            </tbody>
+        </table>
+      </div>
+      <!-- panel-body --> 
+    </div>
+    
+    
     <div class="panel panel-default">
         <div class="panel-body">
             <div class="row">
@@ -74,6 +123,20 @@ $this->breadcrumbs = array('首页', '工作台');
 </div><!-- contentpanel -->
 	<script src="/js/esl.js"></script>
 <script>
+
+$(function(){
+	$('.pr20 a.all').toggle(function(e){
+		$(this).html('[收起]');
+            
+		//$(this).closest('td').find('.txt-detail').is
+		$(this).closest('td').find('.txt-detail').css({'overflow':'visible','max-height':'inherit'});
+	},function(){
+		$(this).html('[详细]');	
+		$(this).closest('td').find('.txt-detail').css({'overflow':'hidden','max-height':'36px'});
+	}) ;
+})
+
+
 require.config({
 	paths:{
 		echarts:'/js/echarts/build/echarts-map',
