@@ -28,8 +28,7 @@ class ConsumeAction extends Yaf_Action_Abstract{
 
 //        $service = new Qunar_RequestService();
         $service = new Qunar_Service();
-        $setting = unserialize(QUNAR_SETTING);
-        $service->qunar_url = $setting['consume_url'];
+        $service->qunar_url = $this->config['qunar']['consume_url'];
         $service->request('NoticeOrderConsumedRequest.xml', 'noticeOrderConsumed', $data);
 
         $ctrl->echoLog('response_header', var_export($service->response_header, true), 'qunar_noticeOrderConsumed.log');

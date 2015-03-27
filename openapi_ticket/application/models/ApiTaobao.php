@@ -203,6 +203,9 @@ class ApiTaobaoModel extends Base_Model_Api{
      * @return array 我们的订单参数
      */
     private static function _getOrderInfo($params = array()){
+        
+        //由于帐号可能是中文字符，会有编码问题
+        $params['seller_nick'] = iconv('GB2312', 'UTF-8', $params['seller_nick']);
 
         //取淘宝卖家对应的分销商信息
         $api = self::_getModelApi('ticket_organization');

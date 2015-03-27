@@ -326,7 +326,12 @@ class OrderController extends Base_Controller_Ota
         $r = ApiOrderModel::model()->scenicUsed($params);
 
         if(isset($r['code']) && $r['code'] == 'succ'){
-            Lang_Msg::output($r['body']);
+            $body = $r['body'];
+            if (isset($body['list']) && is_array($body['list'])) {
+                $body['list'] = array_values($body['list']);
+            }
+            
+            Lang_Msg::output($body);
         }else{
             Lang_Msg::error('EOOR_API_1', 400, array('error'=>$r['message']));
         }

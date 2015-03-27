@@ -5,3 +5,4 @@
 /vendor
 public/templates_c
 /nbproject/private/
+.DS_Store

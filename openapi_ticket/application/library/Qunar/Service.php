@@ -56,11 +56,16 @@ class Qunar_Service{
      * @param array $requestData 如果此参数不为空，则是被请求模式，否则是请求模式
      */
     public function __construct($requestData = array()){
-        $setting = unserialize(QUNAR_SETTING);
-        $this->qunar_url = $setting['qunar_url'];
-        $this->create_user = $this->supplier_identity = $setting['supplier_identity'];
-        $this->signedKey = $setting['signedKey'];
-        
+        $config = Yaf_Registry::get('config');
+        $this->create_user = $this->supplier_identity = $config['qunar']['supplier_identity'];
+        $this->signedKey = $config['qunar']['signedKey'];
+        $this->qunar_url =  $config['qunar']['qunar_url'];
+
+//        $setting = unserialize(QUNAR_SETTING);
+//        $this->qunar_url = $setting['qunar_url'];
+//        $this->create_user = $this->supplier_identity = $setting['supplier_identity'];
+//        $this->signedKey = $setting['signedKey'];
+
         if($requestData){
             $params = json_decode(str_replace('\\"', '"', $requestData), true);
             $request_object = $this->decodeBase64($params['data']);

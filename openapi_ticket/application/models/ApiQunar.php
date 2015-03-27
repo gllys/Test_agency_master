@@ -8,8 +8,8 @@
 class ApiQunarModel extends Base_Model_Api{
     public static function sendCodeNotice($data){
         try{
-             $setting = unserialize(QUNAR_SETTING);
-             $send_code_url = $setting['sendcode_url'];
+             $config = Yaf_Registry::get('config');
+             $send_code_url = $config['qunar']['sendcode_url'];
 
             $service = new Qunar_Service(array());
             

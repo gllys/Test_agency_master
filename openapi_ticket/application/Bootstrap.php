@@ -24,6 +24,9 @@ class Bootstrap extends Yaf_Bootstrap_Abstract{
 		if ($arr['redis'] && $arr['redis']['servers']) {
 			$arr['redis']['servers'] = unserialize($arr['redis']['servers']);
 		}
+                if($arr['qunar']){
+                    $arr['qunar'] = unserialize($arr['qunar']);
+                }
 
 		Yaf_Registry::set('config', $arr);
 	}

@@ -10,7 +10,6 @@ class V1Controller extends Base_Controller_ApiDispatch {
 
     protected $agency_id = 219;//147;
     protected $user_id = '3383470907'; //'2147483647';
-    protected $settings = array();
     
     const SOURCE = 10;
     const PRICE_TYPE = 0;
@@ -29,9 +28,8 @@ class V1Controller extends Base_Controller_ApiDispatch {
 
     public function init() {
         parent::init(false);
-        $this->settings = unserialize(QUNAR_SETTING);
-        $this->user_id = $this->settings['user_id'];
-        $this->agency_id = $this->settings['agency_id'];
+        $this->user_id = $this->config['qunar']['user_id'];
+        $this->agency_id = $this->config['qunar']['agency_id'];
         $this->initErrorMap();
 
         self::echoLog('body', var_export($this->body, true), 'qunar_bee.log');
@@ -43,7 +41,7 @@ class V1Controller extends Base_Controller_ApiDispatch {
     public function restAction() {
 //        $this->body = array (
 //            'method' => 'createOrderForAfterPaySync',
-//            'requestParam' => '{\\"data\\":\\"PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/Pg0KPHJlcXVlc3QgeG1sbnM9Imh0dHA6Ly9waWFvLnF1bmFyLmNvbS8yMDEzL1FNZW5waWFvUmVxdWVzdFNjaGVtYSI+DQo8aGVhZGVyPg0KPGFwcGxpY2F0aW9uPg0KUXVuYXIuTWVucGlhby5BZ2VudDwvYXBwbGljYXRpb24+DQo8cHJvY2Vzc29yPg0KU3VwcGxpZXJEYXRhRXhjaGFuZ2VQcm9jZXNzb3I8L3Byb2Nlc3Nvcj4NCjx2ZXJzaW9uPg0KdjIuMC4wPC92ZXJzaW9uPg0KPGJvZHlUeXBlPg0KQ3JlYXRlT3JkZXJGb3JBZnRlclBheVN5bmNSZXF1ZXN0Qm9keTwvYm9keVR5cGU+DQo8Y3JlYXRlVXNlcj4NClF1bmFyLk1lbnBpYW8uQWdlbnQ8L2NyZWF0ZVVzZXI+DQo8Y3JlYXRlVGltZT4NCjIwMTUtMDMtMTYgMTg6NTQ6NTY8L2NyZWF0ZVRpbWU+DQo8c3VwcGxpZXJJZGVudGl0eT4NCk1FSUpJTkdURVNUMjwvc3VwcGxpZXJJZGVudGl0eT4NCjwvaGVhZGVyPg0KPGJvZHkgeHNpOnR5cGU9IkNyZWF0ZU9yZGVyRm9yQWZ0ZXJQYXlTeW5jUmVxdWVzdEJvZHkiIHhtbG5zOnhzaT0iaHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEtaW5zdGFuY2UiPg0KPG9yZGVySW5mbz4NCjxvcmRlcklkPg0KMjU4OTM3MTExNjwvb3JkZXJJZD4NCjxwcm9kdWN0Pg0KPHJlc291cmNlSWQ+DQo5MzU8L3Jlc291cmNlSWQ+DQo8cHJvZHVjdE5hbWU+DQrkuZDlpKnkuqflk4Hlk4flk4jlk4g8L3Byb2R1Y3ROYW1lPg0KPHZpc2l0RGF0ZT4NCjwvdmlzaXREYXRlPg0KPHNlbGxQcmljZT4NCjEwMDwvc2VsbFByaWNlPg0KPGNhc2hCYWNrTW9uZXk+DQowPC9jYXNoQmFja01vbmV5Pg0KPC9wcm9kdWN0Pg0KPGNvbnRhY3RQZXJzb24+DQo8bmFtZT4NCmRmZGE8L25hbWU+DQo8bmFtZVBpbnlpbj4NCjwvbmFtZVBpbnlpbj4NCjxtb2JpbGU+DQoxODgxNzIwOTQ4MDwvbW9iaWxlPg0KPGVtYWlsPg0KPC9lbWFpbD4NCjxhZGRyZXNzPg0KPC9hZGRyZXNzPg0KPHppcENvZGU+DQo8L3ppcENvZGU+DQo8L2NvbnRhY3RQZXJzb24+DQo8dmlzaXRQZXJzb24+DQo8cGVyc29uPg0KPG5hbWU+DQpvOW85PC9uYW1lPg0KPG5hbWVQaW55aW4+DQo8L25hbWVQaW55aW4+DQo8Y3JlZGVudGlhbHM+DQo8L2NyZWRlbnRpYWxzPg0KPGNyZWRlbnRpYWxzVHlwZT4NCklEX0NBUkQ8L2NyZWRlbnRpYWxzVHlwZT4NCjxkZWZpbmVkMVZhbHVlPg0KPC9kZWZpbmVkMVZhbHVlPg0KPGRlZmluZWQyVmFsdWU+DQo8L2RlZmluZWQyVmFsdWU+DQo8L3BlcnNvbj4NCjwvdmlzaXRQZXJzb24+DQo8b3JkZXJRdWFudGl0eT4NCjI8L29yZGVyUXVhbnRpdHk+DQo8b3JkZXJQcmljZT4NCjIwMDwvb3JkZXJQcmljZT4NCjxvcmRlckNhc2hCYWNrTW9uZXk+DQowPC9vcmRlckNhc2hCYWNrTW9uZXk+DQo8b3JkZXJTdGF0dXM+DQpQUkVQQVlfT1JERVJfUFJJTlRJTkc8L29yZGVyU3RhdHVzPg0KPG9yZGVyUmVtYXJrPg0KPC9vcmRlclJlbWFyaz4NCjxvcmRlclNvdXJjZT4NCk5PUk1BTDwvb3JkZXJTb3VyY2U+DQo8cGF5bWVudFNlcmlhbG5vPg0KcGlhbzI1ODkzNzExMTY8L3BheW1lbnRTZXJpYWxubz4NCjwvb3JkZXJJbmZvPg0KPC9ib2R5Pg0KPC9yZXF1ZXN0Pg==\\",\\"securityType\\":\\"MD5\\",\\"signed\\":\\"debug\\"}',
+//            'requestParam' => '{\\"data\\":\\"PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/Pg0KPHJlcXVlc3QgeG1sbnM9Imh0dHA6Ly9waWFvLnF1bmFyLmNvbS8yMDEzL1FNZW5waWFvUmVxdWVzdFNjaGVtYSI+DQo8aGVhZGVyPg0KPGFwcGxpY2F0aW9uPg0KUXVuYXIuTWVucGlhby5BZ2VudDwvYXBwbGljYXRpb24+DQo8cHJvY2Vzc29yPg0KU3VwcGxpZXJEYXRhRXhjaGFuZ2VQcm9jZXNzb3I8L3Byb2Nlc3Nvcj4NCjx2ZXJzaW9uPg0KdjIuMC4wPC92ZXJzaW9uPg0KPGJvZHlUeXBlPg0KQ3JlYXRlT3JkZXJGb3JBZnRlclBheVN5bmNSZXF1ZXN0Qm9keTwvYm9keVR5cGU+DQo8Y3JlYXRlVXNlcj4NClF1bmFyLk1lbnBpYW8uQWdlbnQ8L2NyZWF0ZVVzZXI+DQo8Y3JlYXRlVGltZT4NCjIwMTUtMDMtMTYgMjM6NDE6MDg8L2NyZWF0ZVRpbWU+DQo8c3VwcGxpZXJJZGVudGl0eT4NCk1FSUpJTkdURVNUMjwvc3VwcGxpZXJJZGVudGl0eT4NCjwvaGVhZGVyPg0KPGJvZHkgeHNpOnR5cGU9IkNyZWF0ZU9yZGVyRm9yQWZ0ZXJQYXlTeW5jUmVxdWVzdEJvZHkiIHhtbG5zOnhzaT0iaHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEtaW5zdGFuY2UiPg0KPG9yZGVySW5mbz4NCjxvcmRlcklkPg0KNjAwMzYzODA3PC9vcmRlcklkPg0KPHByb2R1Y3Q+DQo8cmVzb3VyY2VJZD4NCjkzNTwvcmVzb3VyY2VJZD4NCjxwcm9kdWN0TmFtZT4NCuWOu+WTquWEv1RXTzwvcHJvZHVjdE5hbWU+DQo8dmlzaXREYXRlPg0KPC92aXNpdERhdGU+DQo8c2VsbFByaWNlPg0KMTAwPC9zZWxsUHJpY2U+DQo8Y2FzaEJhY2tNb25leT4NCjA8L2Nhc2hCYWNrTW9uZXk+DQo8L3Byb2R1Y3Q+DQo8Y29udGFjdFBlcnNvbj4NCjxuYW1lPg0KYWRkPC9uYW1lPg0KPG5hbWVQaW55aW4+DQo8L25hbWVQaW55aW4+DQo8bW9iaWxlPg0KMTg4MTcyMDk0ODA8L21vYmlsZT4NCjxlbWFpbD4NCjwvZW1haWw+DQo8YWRkcmVzcz4NCjwvYWRkcmVzcz4NCjx6aXBDb2RlPg0KPC96aXBDb2RlPg0KPC9jb250YWN0UGVyc29uPg0KPHZpc2l0UGVyc29uPg0KPHBlcnNvbj4NCjxuYW1lPg0KYTI8L25hbWU+DQo8bmFtZVBpbnlpbj4NCjwvbmFtZVBpbnlpbj4NCjxjcmVkZW50aWFscz4NCjwvY3JlZGVudGlhbHM+DQo8Y3JlZGVudGlhbHNUeXBlPg0KSURfQ0FSRDwvY3JlZGVudGlhbHNUeXBlPg0KPGRlZmluZWQxVmFsdWU+DQo8L2RlZmluZWQxVmFsdWU+DQo8ZGVmaW5lZDJWYWx1ZT4NCjwvZGVmaW5lZDJWYWx1ZT4NCjwvcGVyc29uPg0KPHBlcnNvbj4NCjxuYW1lPg0KYTE8L25hbWU+DQo8bmFtZVBpbnlpbj4NCjwvbmFtZVBpbnlpbj4NCjxjcmVkZW50aWFscz4NCjwvY3JlZGVudGlhbHM+DQo8Y3JlZGVudGlhbHNUeXBlPg0KSURfQ0FSRDwvY3JlZGVudGlhbHNUeXBlPg0KPGRlZmluZWQxVmFsdWU+DQo8L2RlZmluZWQxVmFsdWU+DQo8ZGVmaW5lZDJWYWx1ZT4NCjwvZGVmaW5lZDJWYWx1ZT4NCjwvcGVyc29uPg0KPC92aXNpdFBlcnNvbj4NCjxvcmRlclF1YW50aXR5Pg0KMjwvb3JkZXJRdWFudGl0eT4NCjxvcmRlclByaWNlPg0KODAwMDwvb3JkZXJQcmljZT4NCjxvcmRlckNhc2hCYWNrTW9uZXk+DQowPC9vcmRlckNhc2hCYWNrTW9uZXk+DQo8b3JkZXJTdGF0dXM+DQpQUkVQQVlfT1JERVJfUFJJTlRJTkc8L29yZGVyU3RhdHVzPg0KPG9yZGVyUmVtYXJrPg0KPC9vcmRlclJlbWFyaz4NCjxvcmRlclNvdXJjZT4NCk5PUk1BTDwvb3JkZXJTb3VyY2U+DQo8cGF5bWVudFNlcmlhbG5vPg0KcGlhbzYwMDM2MzgwNzwvcGF5bWVudFNlcmlhbG5vPg0KPC9vcmRlckluZm8+DQo8L2JvZHk+DQo8L3JlcXVlc3Q+\\",\\"securityType\\":\\"MD5\\",\\"signed\\":\\"debug\\"}',
 //        );
 
         if (isset($this->body['method']) && !empty($this->body['method'])) {
@@ -85,7 +83,7 @@ class V1Controller extends Base_Controller_ApiDispatch {
             $api_arr = array(
                 'current' => $req->currentPage,
                 'items' => $req->pageSize,
-                'source' => 1, //source的值？
+                'source' => 10, //source的值？
                 'agency_id' => $this->agency_id             //agency_id的值？
             );
 
@@ -117,9 +115,9 @@ class V1Controller extends Base_Controller_ApiDispatch {
             $productInfos[$key]['paymentType'] = 'PREPAY';
             $productInfos[$key]['remind'] = $remind;
             $productInfos[$key]['smsTemplet'] = $smsTemplet;
-            $productInfos[$key]['validType'] = 'BETWEEN_BOOK_DATE_AND_N_DAYSAFTER';
 
-            $productInfos[$key]['daysAfterBookDateValid'] = ($product['valid'] == 0) ? 365 : $product['valid'];   //几天内有效
+            $productInfos[$key]['validType'] = $product['valid_flag'] == 0 ? 'BETWEEN_BOOK_DATE_AND_N_DAYSAFTER' : 'BETWEEN_USE_DATE_START_AND_END';
+            $productInfos[$key]['daysAfterBookDateValid'] = $product['valid'] + 1;   //几天内有效，valid==0 表示当天有效，故需要加1
             $date_available = explode(',',$product['date_available']);
             $productInfos[$key]['periodStart'] = date('Y-m-d',$date_available[0]);             //有效期开始日
             $productInfos[$key]['periodEnd'] =  date('Y-m-d',$date_available[1]);               //有效期结束日
@@ -129,7 +127,7 @@ class V1Controller extends Base_Controller_ApiDispatch {
             $productInfos[$key]['minimum'] = $product['mini_buy'];//最小购买量
             $productInfos[$key]['maximum'] = $product['max_buy'];//最大购买量
             //景区信息
-            $api_res = ApiScenicModel::model()->lists(array('ids', $product['scenic_id']));
+            $api_res = ApiScenicModel::model()->lists(array('ids' => $product['scenic_id']));
 
             $sights = $api_res['body']['data'];
             if ($sights) {
