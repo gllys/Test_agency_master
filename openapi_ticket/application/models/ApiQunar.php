@@ -12,10 +12,11 @@ class ApiQunarModel extends Base_Model_Api{
              $send_code_url = $config['qunar']['sendcode_url'];
 
             $service = new Qunar_Service(array());
-            
+echo 'ApiQunar-sendCodeNotice:';
+var_dump($data);
             $service->qunar_url = $send_code_url;
             $arr = $service->request('NoticeOrderEticketSendedRequest.xml', 'noticeOrderEticketSended', $data);
-
+var_dump($arr);
             if($arr && isset($arr->message)){
                 return $arr->message;
             }

@@ -82,20 +82,17 @@ class AgencyproductController extends Base_Controller_Api {
 		$data['payment']      = trim($this->body['payment']); //支付方式
 		$data['payment_list'] = trim($this->body['payment_list']); //可用支付方式
 		
-		$data['code']         = md5($data['agency_id'] .'|'. $data['product_id']); //对接码
+		list($usec, $sec) = explode(' ', microtime());
+		$data['code']         = md5($data['agency_id'] .'|'. $data['product_id'] .'|'. $data['source'] .'|'. time() .'|'. substr($usec, 3, 2) . rand(100000, 9999999)); //对接码
 		$data['create_at']    = time(); //创建时间
 		$data['update_at']    = 0; //更新时间
 		$data['delete_at']    = 0; //删除时间
 		
 		if (empty($data['product_id']) || empty($data['agency_id']))
 			return Tools::lsJson(0, '请求数据不合法', []);
-		$AgencyProduct = AgencyProductModel::model();
-		$exist = $AgencyProduct->search(['product_id'=>$data['product_id'],'agency_id'=>$data['agency_id']]);
-		if (!empty($exist)) // 联合唯一索引验证
-			return Tools::lsJson(0, '数据已存在', []);
 		
 		try {
-			$AgencyProduct->add($data);
+			AgencyProductModel::model()->add($data);
 		} catch (\Exception $ex) {
 			return Tools::lsJson(0, $ex->getMessage(), $data);
 		}

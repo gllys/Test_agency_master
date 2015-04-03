@@ -21,14 +21,15 @@ class ConsumeAction extends Yaf_Action_Abstract{
             'partnerorderId'=> $ctrl->body['verify_code'],
             'orderQuantity'=> $ctrl->body['num'],
             'useQuantity'=> $ctrl->body['used_num'],
-            'consumeInfo'=>'核销机具：'.$this->body['posid'].'，内部核销编号：'.$this->body['serial_num'],
+            'consumeInfo'=>'核销机具：'.$ctrl->body['posid'].'，内部核销编号：'.$ctrl->body['serial_num'],
         );
 
         $ctrl->echoLog('data', var_export($data, true), 'qunar_noticeOrderConsumed.log');
 
 //        $service = new Qunar_RequestService();
+        $config = Yaf_Registry::get("config");
         $service = new Qunar_Service();
-        $service->qunar_url = $this->config['qunar']['consume_url'];
+        $service->qunar_url = $config['qunar']['consume_url'];
         $service->request('NoticeOrderConsumedRequest.xml', 'noticeOrderConsumed', $data);
 
         $ctrl->echoLog('response_header', var_export($service->response_header, true), 'qunar_noticeOrderConsumed.log');
