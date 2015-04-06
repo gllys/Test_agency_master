@@ -235,19 +235,23 @@ class OrderController extends Base_Controller_Ota
 
             isset($r['code']) && $r['code']=='fail' && Lang_Msg::error('EOOR_API_1', 400, array('error'=>$r['message']));
             $orderInfo = $r['body'];
-            $orderInfo['status']!='paid' && Lang_Msg::error('订单已使用或过期');
-            $validNum = $orderInfo['nums']-$orderInfo['used_nums']-$orderInfo['refunding_nums']-$orderInfo['refunded_nums'];
-            if($params['nums']<1) {
-                $params['nums'] = $validNum;
+            
+            try {
+                $this->checkCancel($orderInfo, $params['nums']);
+            } catch (Exception $ex) {
+                Lang_Msg::error($ex->getMessage());
             }
-            if(intval($params['nums'])<1 || $params['nums']>$validNum) Lang_Msg::error('没有可退的票');
+//            $orderInfo['status']!='paid' && Lang_Msg::error('订单已使用或过期');
+//            $validNum = $orderInfo['nums']-$orderInfo['used_nums']-$orderInfo['refunding_nums']-$orderInfo['refunded_nums'];
+//            if($params['nums']<1) {
+//                $params['nums'] = $validNum;
+//            }
+//            if(intval($params['nums'])<1 || $params['nums']>$validNum) Lang_Msg::error('没有可退的票');
 
             $r = ApiOrderModel::model()->cancelAndRefund($params);
             if(!$r || !$r['code'] || $r['code'] == 'fail') {
                 Lang_Msg::error('EOOR_API_1', 400, array('error'=>$r['message']));
             }
-
-            $orderInfo = $r['body'];
 
             $callbackParams = array(
                 'id'=>$orderId,
@@ -256,17 +260,26 @@ class OrderController extends Base_Controller_Ota
                 'sign'=>$sign,
                 'timestamp'=>time()
             );
+            
+            $validNum = $orderInfo['nums']-$orderInfo['used_nums']-$orderInfo['refunding_nums']-$orderInfo['refunded_nums'];
 
-            $data = Tools::curl($params['notify_url'],'POST',$callbackParams);
-            $r = json_decode($data,true);
-            if(!$r['code'] || $r['code'] == 'fail') {
-                $logData = array(
-                    'order_id'=>$orderId,
-                    'desc'=>'取消訂單回調失敗'
-                );
-                self::echoLog('body', json_encode($logData), 'order_cancel.log');
+            if (isset($params['notify_url']) && $params['notify_url']) {
+                Process_Async::send(array('ApiNotifyModel', 'sendByAsync'), array(array(
+                    'notify_url' => $params['notify_url'],
+                    'callbackParams' => $callbackParams,
+                    'order_id' => $orderId
+                )));
+//                $data = Tools::curl($params['notify_url'],'POST',$callbackParams);
+//                $r = json_decode($data,true);
+//                if(!$r['code'] || $r['code'] == 'fail') {
+//                    $logData = array(
+//                        'order_id'=>$orderId,
+//                        'desc'=>'取消訂單回調失敗'
+//                    );
+//                    self::echoLog('body', json_encode($logData), 'order_cancel.log');
+//                }    
             }
-
+            
             Lang_Msg::output(array( //ticket_order/v1/order/update需同步改orderIterm
                 'id'=>$orderId ,
                 'status'=>$validNum > $params['nums'] ? 1 : 0,
@@ -336,6 +349,31 @@ class OrderController extends Base_Controller_Ota
             Lang_Msg::error('EOOR_API_1', 400, array('error'=>$r['message']));
         }
     }
+    
+    public function checkCancelAction() {
+        $orderId = $this->body['id'];
+        $nums = isset($this->body['nums']) ? (int)$this->body['nums'] : 1;
+        
+        if (!$orderId) {
+            Lang_Msg::error('参数错误');
+        }
+        
+        $r = ApiOrderModel::model()->detail(array('id'=> $orderId));
+        if (isset($r['code']) && $r['code']=='fail') {
+            Lang_Msg::error('EOOR_API_1', 400, array('error'=>$r['message']));
+        }
+        $order = $r['body'];
+        
+        try {
+            $this->checkCancel($order, $nums);
+            Lang_Msg::output(array(
+                'code' => 200,
+                'nums' => $nums
+            ));
+        } catch (Exception $ex) {
+            Lang_Msg::error($ex->getMessage());
+        }
+    }
 
     public function ticketUsedAction() {
         $params = $this->body;
@@ -347,6 +385,58 @@ class OrderController extends Base_Controller_Ota
             Lang_Msg::output($r['body']);
         }else{
             Lang_Msg::error('EOOR_API_1', 400, array('error'=>$r['message']));
+        }
+    }
+    
+    /**
+     * （重）发入园凭证
+     */
+    public function sendOrderEticketAction() {
+        $orderId = $this->body['id'];
+        $phoneNumber = $this->body['phone_number'];
+        if (!$orderId) {
+            Lang_Msg::error('参数错误');
+        }
+        
+        $r = ApiOrderModel::model()->detail(array('id'=> $orderId));
+        if (isset($r['code']) && $r['code']=='fail') {
+            Lang_Msg::error('EOOR_API_1', 400, array('error'=>$r['message']));
+        }
+        $order = $r['body'];
+        
+        $api_arr = array(
+            'id' => $order['id'],
+            'phoneNumber' => $phoneNumber, //目前没有考虑让内部api添加该参数
+        );
+        $send = ApiOrderModel::model()->sendTicket($api_arr);
+
+        self::echoLog('body', var_export($send, true), 'sendOrderEticket.log');
+
+        if ($send['code'] != 'succ') {
+            Lang_Msg::error('重发凭证失败，原因为订单未支付或订单状态不正确');
+        } else {
+            Lang_Msg::output(array(
+                'code' => 200
+            ));
+        }
+    }
+    
+    /**
+     * 检查订单能不能退，当不能退的时候会抛出异常
+     * 
+     * @param array $order
+     * @param int $cancelNums 要退掉的张数
+     * @expectedException Exception
+     */
+    private function checkCancel($order, $cancelNums = 1) {
+        if ($order['status'] !='paid') {
+            throw new Exception('订单已使用或过期');
+        }
+        $validNum = $order['nums']-$order['used_nums']-$order['refunding_nums']-$order['refunded_nums'];
+        $cancelNums < 1 && $cancelNums = $validNum;
+        
+        if(intval($cancelNums)<1 || $cancelNums>$validNum) {
+            throw new Exception('没有可退的票');
         }
     }
 

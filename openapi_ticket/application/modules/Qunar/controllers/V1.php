@@ -8,7 +8,7 @@
  */
 class V1Controller extends Base_Controller_ApiDispatch {
 
-    protected $agency_id = 219;//147;
+//    protected $agency_id ;//147;
     protected $user_id = '3383470907'; //'2147483647';
     
     const SOURCE = 10;
@@ -29,7 +29,7 @@ class V1Controller extends Base_Controller_ApiDispatch {
     public function init() {
         parent::init(false);
         $this->user_id = $this->config['qunar']['user_id'];
-        $this->agency_id = $this->config['qunar']['agency_id'];
+//        $this->agency_id = $this->config['qunar']['agency_id'];
         $this->initErrorMap();
 
         self::echoLog('body', var_export($this->body, true), 'qunar_bee.log');
@@ -84,7 +84,7 @@ class V1Controller extends Base_Controller_ApiDispatch {
                 'current' => $req->currentPage,
                 'items' => $req->pageSize,
                 'source' => 10, //source的值？
-                'agency_id' => $this->agency_id             //agency_id的值？
+                'agency_id' => $this->service->agency_id             //agency_id的值？
             );
 
             $api_res = ApiProductModel::model()->getProductListByCode($api_arr);
@@ -110,22 +110,46 @@ class V1Controller extends Base_Controller_ApiDispatch {
         $productInfos = array();
         foreach ($products as $key => $product) {
 
-            $productInfos[$key]['resourceId'] = $product['code'];
-            $productInfos[$key]['productName'] = $product['product_name'];
-            $productInfos[$key]['paymentType'] = 'PREPAY';
-            $productInfos[$key]['remind'] = $remind;
-            $productInfos[$key]['smsTemplet'] = $smsTemplet;
+            $productInfos[$key]['resourceId']   = $product['code'];
+            $productInfos[$key]['productName']  = $product['product_name'];
+            $productInfos[$key]['paymentType']  = 'PREPAY';
+            $productInfos[$key]['remind']       = !empty($product['description']) ? $product['description'] : $remind;
+            $productInfos[$key]['smsTemplet']   = !empty($product['extra']['msg_custom']) ? $product['extra']['msg_custom'] : $smsTemplet;
+
+            $productInfos[$key]['canRefund'] = $product['refund'] == 1 ? 'TRUE' : 'FALSE';
+            $productInfos[$key]['bookAdvanceDay'] = floor($product['scheduled_time'] / 86400);
+            $productInfos[$key]['bookAdvanceTime'] = gmstrftime('%H:%M', $product['scheduled_time'] % 86400);
+            $productInfos[$key]['autoCancelTime'] = $product['extra']['cancel_time'];
+            $productInfos[$key]['visitPersonRequiredForQuantity'] = $product['extra']['user_per_infos'];
+
+            $buyer_fileds = explode( ',', $product['extra']['buyer_fileds']);
+            $productInfos[$key]['contactNamePinyinRequired']    = in_array('namePinyinRequired', $buyer_fileds) ? 'TRUE' : 'FALSE';
+            $productInfos[$key]['contactEmailRequired']         =  in_array('emailRequired', $buyer_fileds) ? 'TRUE' : 'FALSE';
+            $productInfos[$key]['contactAddressRequired']       =  in_array('addressRequired', $buyer_fileds) ? 'TRUE' : 'FALSE';
+//            $user_fileds = explode($product['extra']['user_fileds'], ',');
+//            $productInfos[$key]['visitNamePinyinRequired'] = in_array('namePinyinRequired', $user_fileds) ? TRUE : FALSE;
+            $productInfos[$key]['perPhoneMaximum'] = $product['extra']['mobile_limit'];
+
+            $productInfos[$key]['feeInfo']          = $product['consumption_detail'];
+            $productInfos[$key]['cashBackMoney']    = intval($product['extra']['derate']) * 100;
+            $productInfos[$key]['refundApplyTimeBeforeValidEndDay'] = $product['extra']['refund_time'];
+            $refundChargeType = array(1 => 'QUANTITY', 2 => 'ORDER');
+            $productInfos[$key]['refundChargeType'] = isset($product['extra']['refund_type']) ? $refundChargeType[$product['extra']['refund_type']] : '';
+            $productInfos[$key]['refundCharge']     = intval($product['extra']['refund_fee']) * 100;
+            $productInfos[$key]['refundInfo']       = $product['refund_detail'];
+
 
             $productInfos[$key]['validType'] = $product['valid_flag'] == 0 ? 'BETWEEN_BOOK_DATE_AND_N_DAYSAFTER' : 'BETWEEN_USE_DATE_START_AND_END';
             $productInfos[$key]['daysAfterBookDateValid'] = $product['valid'] + 1;   //几天内有效，valid==0 表示当天有效，故需要加1
             $date_available = explode(',',$product['date_available']);
             $productInfos[$key]['periodStart'] = date('Y-m-d',$date_available[0]);             //有效期开始日
-            $productInfos[$key]['periodEnd'] =  date('Y-m-d',$date_available[1]);               //有效期结束日
+            $productInfos[$key]['periodEnd'] = date('Y-m-d',$date_available[1]);               //有效期结束日
 
-            $productInfos[$key]['marketPrice'] = intval($product['listed_price']) * 100;             //票面价格单位：分
-            $productInfos[$key]['sellPrice'] = floatval($product['price']) * 100;               //Qunar 销售产品单价单位：分
-            $productInfos[$key]['minimum'] = $product['mini_buy'];//最小购买量
-            $productInfos[$key]['maximum'] = $product['max_buy'];//最大购买量
+            $productInfos[$key]['validWeek']    = $product['week_time'];
+            $productInfos[$key]['marketPrice']  = intval($product['listed_price2']) * 100;             //票面价格单位：分
+            $productInfos[$key]['sellPrice']    = floatval($product['price']) * 100;               //Qunar 销售产品单价单位：分
+            $productInfos[$key]['minimum']      = $product['mini_buy'];//最小购买量
+            $productInfos[$key]['maximum']      = $product['max_buy'];//最大购买量
             //景区信息
             $api_res = ApiScenicModel::model()->lists(array('ids' => $product['scenic_id']));
 
@@ -170,7 +194,7 @@ class V1Controller extends Base_Controller_ApiDispatch {
         } else {
             $params['use_day'] = date('Y-m-d');
         }
-        $params['distributor_id'] = $this->agency_id;
+        $params['distributor_id'] = $this->service->agency_id;
         $params['price_type'] = self::PRICE_TYPE;
         $params['local_source'] = self::LOCAL_SOURCE;
         
@@ -187,13 +211,11 @@ class V1Controller extends Base_Controller_ApiDispatch {
                 foreach ($orderInfo->visitPerson->person as $visitor) {
                     $visitors[] = array(
                         'visitor_name' => $visitor->name,
-                        'visitor_mobile' => ""
                     );
                 }
             } else {
                 $visitors[] = array(
                     'visitor_name' => $orderInfo->visitPerson->person->name,
-                    'visitor_mobile' => ""
                 );
             }
             $params['visitors'] = json_encode($visitors);
@@ -315,7 +337,7 @@ class V1Controller extends Base_Controller_ApiDispatch {
             $params['use_day'] = date('Y-m-d');
         }
 
-        $params['distributor_id'] = $this->agency_id; // $this->userinfo['distributor_id'];
+        $params['distributor_id'] = $this->service->agency_id; // $this->userinfo['distributor_id'];
         $params['price_type'] = self::PRICE_TYPE;
         $params['nums'] = intval($orderInfo->orderQuantity);
         if (!$params['ticket_template_id'] || !is_numeric($params['ticket_template_id'])) {

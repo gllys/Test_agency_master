@@ -19,10 +19,6 @@ class Qunar_Service{
     protected $supplier_identity = 'MEIJINGTEST2';
     protected $signedKey='MEIJINGTESTSIGN';
     
-//    protected $create_user = 'DEBUGSUPPLIER';
-//    protected $supplier_identity = 'DEBUGSUPPLIER';
-//    protected $signedKey='DEBUGSINGKEY';
-    
     protected $type = 'default';
     protected $time;
     /*头部不同属性*/
@@ -52,25 +48,25 @@ class Qunar_Service{
     public $request_body;
     public $qunar_url = 'http://agentat.piao.qunar.com/singleApiDebugData';
 
+    /*其他属性*/
+    public $agency_id;
+
     /**
      * @param array $requestData 如果此参数不为空，则是被请求模式，否则是请求模式
      */
     public function __construct($requestData = array()){
         $config = Yaf_Registry::get('config');
-        $this->create_user = $this->supplier_identity = $config['qunar']['supplier_identity'];
-        $this->signedKey = $config['qunar']['signedKey'];
+//        $this->create_user = $this->supplier_identity = $config['qunar']['supplier_identity'];
+//        $this->signedKey = $config['qunar']['signedKey'];
         $this->qunar_url =  $config['qunar']['qunar_url'];
-
-//        $setting = unserialize(QUNAR_SETTING);
-//        $this->qunar_url = $setting['qunar_url'];
-//        $this->create_user = $this->supplier_identity = $setting['supplier_identity'];
-//        $this->signedKey = $setting['signedKey'];
 
         if($requestData){
             $params = json_decode(str_replace('\\"', '"', $requestData), true);
             $request_object = $this->decodeBase64($params['data']);
             $this->request_body = $request_object->body;
             $this->request_header = $request_object->header;
+
+            $this->setIdentity($this->request_header->supplierIdentity);
 
             $this->securityType = $params['securityType'];
             $this->signed = $params['signed'];
@@ -296,4 +292,27 @@ class Qunar_Service{
         }
     }
 
+    /**
+     * 设置验证信息
+     * @param $id
+     * @param string $type          type=account | type=organization_id
+     */
+    public function setIdentity($id, $type='account'){
+        $api_res = ApiOrganizationModel::model()->orgDetail(
+            array(
+                'source'=>10,
+                $type => $id,
+            ));
+//        Log_Base::save('qunar_debug', 'orgDetail :'.var_export($api_res, true));
+        if($api_res['code'] == 'succ'){
+            $org = $api_res['body'];
+            $this->create_user          = $org['account'];
+            $this->supplier_identity    = $org['account'];
+            $this->signedKey            = $org['ext']['api_password'];
+            $this->agency_id            = $org['organization_id'];
+        }else{
+            $this->response_code = "90006";
+            $this->response_desc = "供应商标识不存在";
+        }
+    }
 }

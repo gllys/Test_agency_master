@@ -157,6 +157,9 @@ class ApiTaobaoModel extends Base_Model_Api{
     public static function cancel($params){
         $api = self::_getModelApi();
 
+        //由于帐号可能是中文字符，会有编码问题
+        $params['seller_nick'] = iconv('GB2312', 'UTF-8', $params['seller_nick']);
+
         //todo 先申请退款
         $api->params = array(
             'source_id' => $params['source_id'],
@@ -209,10 +212,16 @@ class ApiTaobaoModel extends Base_Model_Api{
 
         //取淘宝卖家对应的分销商信息
         $api = self::_getModelApi('ticket_organization');
+//        $api->params = array(
+//            'account_taobao' => $params['seller_nick'],
+//        );
+//        $api->url = '/v1/organizations/show';
+//        $distributor = json_decode($api->request(),true);
         $api->params = array(
-            'account_taobao' => $params['seller_nick'],
+            'source'=>1,
+            'account' => $params['seller_nick'],
         );
-        $api->url = '/v1/organizations/show';
+        $api->url = '/v1/organizations/orgDetail';
         $distributor = json_decode($api->request(),true);
 
         echo "distributor:\n";
@@ -226,6 +235,27 @@ class ApiTaobaoModel extends Base_Model_Api{
 //        $api->url = '/v1/TicketTemplate/ticketinfo';
         $api->url = '/v1/AgencyProduct/detail';
         $pro = json_decode($api->request(),true);
+        //如果获取产品不成功，则给分销商发送站内信
+        if($pro['code'] != 'succ'){
+            $content = "您在淘宝上的订单：".$params['orderId']." 没有找到对应的产品，请确认是否绑定淘宝产品！（编码：". $params['sub_outer_iid']."）谢谢！！";
+            $api = self::_getModelApi('ticket_organization');
+            $api->params = array(
+                'content' => $content,
+                'sms_type'=> 1,
+                'sys_type'=> 3,
+                'send_source'=> 1,
+                'send_status'=> 1,
+                'send_user'=> 1,
+                'send_organization' => 1,
+//                'receiver_organization'=> $distributor['body']['id'],
+//                'organization_name' => $distributor['body']['name'],
+                'receiver_organization'=> $distributor['organization_id'],
+            );
+            $api->url = '/v1/message/add';
+            $sms = json_decode($api->request(),true);
+            echo "sms:\n";
+            var_dump($sms);
+        }
 
         $payment = array(
             1=> 'alipay',
@@ -242,7 +272,8 @@ class ApiTaobaoModel extends Base_Model_Api{
         $res['source_id']       = $params['orderId'];
         $res['source_token']    = $params['token'];
         $res['price_type']      = 0;
-        $res['distributor_id']  = $distributor['body']['id'];//分销商需要有购票权限才行,在 ticket_organization -> organization -> id
+//        $res['distributor_id']  = $distributor['body']['id'];//分销商需要有购票权限才行,在 ticket_organization -> organization -> id
+        $res['distributor_id']  = $distributor['organization_id'];
         $res['use_day']         = date('Y-m-d', strtotime($params['valid_start'])); //2015-01-11
         $res['expire_end']      = date('Y-m-d', strtotime($params['valid_ends'])); //2015-01-11
         $res['nums']            = $params['num']; //1

@@ -24,19 +24,19 @@
 					<bookConfig>
 						<paymentType>{{$product.paymentType}}</paymentType>
 						<advanceOption>
-							<bookAdvanceDay></bookAdvanceDay>
-							<bookAdvanceTime></bookAdvanceTime>
+							<bookAdvanceDay>{{$product.bookAdvanceDay}}</bookAdvanceDay>
+							<bookAdvanceTime>{{$product.bookAdvanceTime}}</bookAdvanceTime>
 							<useAdvanceHour></useAdvanceHour>
 						</advanceOption>
-						<autoCancelTime></autoCancelTime>
+						<autoCancelTime>{{$product.autoCancelTime}}</autoCancelTime>
 						<contactPersonRequired>
 							<nameRequired></nameRequired>
-							<namePinyinRequired></namePinyinRequired>
-							<emailRequired></emailRequired>
-							<addressRequired></addressRequired>
+							<namePinyinRequired>{{$product.contactNamePinyinRequired}}</namePinyinRequired>
+							<emailRequired>{{$product.contactEmailRequired}}</emailRequired>
+							<addressRequired>{{$product.contactAddressRequired}}</addressRequired>
 						</contactPersonRequired>
 						<bookPersonType></bookPersonType>
-						<visitPersonRequiredForQuantity></visitPersonRequiredForQuantity>
+						<visitPersonRequiredForQuantity>{{$product.visitPersonRequiredForQuantity}}</visitPersonRequiredForQuantity>
 						<visitPersonRequired>
 							<nameRequired></nameRequired>
 							<namePinYinRequired></namePinYinRequired>
@@ -45,7 +45,7 @@
 							<userRequiredDefined1></userRequiredDefined1>
 							<userRequiredDefined2></userRequiredDefined2>
 						</visitPersonRequired>
-						<perPhoneMaximum></perPhoneMaximum>
+						<perPhoneMaximum>{{$product.perPhoneMaximum}}</perPhoneMaximum>
 						<perPhoneMaximumType></perPhoneMaximumType>
 					</bookConfig>
 					<priceConfig>
@@ -66,7 +66,7 @@
 						<periodPrice>
 							<periodStart>{{$product.periodStart}}</periodStart>
 							<periodEnd>{{$product.periodEnd}}</periodEnd>
-							<validWeek></validWeek>
+							<validWeek>{{$product.validWeek}}</validWeek>
 							<invalidDate></invalidDate>
 							<marketPrice>{{$product.marketPrice}}</marketPrice>
 							<sellPrice>{{$product.sellPrice}}</sellPrice>
@@ -76,21 +76,21 @@
 						</periodPrice>
 					</priceConfig>
 					<promoteConfig>
-						<cashBackMoney></cashBackMoney>
+						<cashBackMoney>{{$product.cashBackMoney}}</cashBackMoney>
 					</promoteConfig>
 					<productDescription>
-						<feeInfo></feeInfo>
+						<feeInfo>{{$product.feeInfo}}</feeInfo>
 						<feeInclude></feeInclude>
 						<feeExclude></feeExclude>
 						<pickupTime></pickupTime>
 						<pickupAddress></pickupAddress>
 						<remind>{{$product.remind}}</remind>
 						<refundOption>
-							<canRefund></canRefund>
-							<refundApplyTimeBeforeValidEndDay></refundApplyTimeBeforeValidEndDay>
-							<refundChargeType></refundChargeType>
-							<refundCharge></refundCharge>
-							<refundInfo></refundInfo>
+							<canRefund>{{$product.canRefund}}</canRefund>
+							<refundApplyTimeBeforeValidEndDay>{{$product.refundApplyTimeBeforeValidEndDay}}</refundApplyTimeBeforeValidEndDay>
+							<refundChargeType>{{$product.refundChargeType}}</refundChargeType>
+							<refundCharge>{{$product.refundCharge}}</refundCharge>
+							<refundInfo>{{$product.refundInfo}}</refundInfo>
 						</refundOption>
 					</productDescription>
 					<otherConfig>

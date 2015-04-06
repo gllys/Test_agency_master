@@ -16,7 +16,7 @@ class ConsumeAction extends Yaf_Action_Abstract{
     public function execute(){
         //获取本动作对应的控制器实例
         $ctrl = $this->getController();
-        
+
         $data = array(
             'partnerorderId'=> $ctrl->body['verify_code'],
             'orderQuantity'=> $ctrl->body['num'],
@@ -26,10 +26,9 @@ class ConsumeAction extends Yaf_Action_Abstract{
 
         $ctrl->echoLog('data', var_export($data, true), 'qunar_noticeOrderConsumed.log');
 
-//        $service = new Qunar_RequestService();
-        $config = Yaf_Registry::get("config");
         $service = new Qunar_Service();
-        $service->qunar_url = $config['qunar']['consume_url'];
+        $service->setIdentity($ctrl->body['distributor_id'], 'organization_id');
+        $service->qunar_url = $ctrl->config['qunar']['consume_url'];
         $service->request('NoticeOrderConsumedRequest.xml', 'noticeOrderConsumed', $data);
 
         $ctrl->echoLog('response_header', var_export($service->response_header, true), 'qunar_noticeOrderConsumed.log');
