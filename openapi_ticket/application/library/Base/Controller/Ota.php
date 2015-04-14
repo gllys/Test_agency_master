@@ -78,7 +78,9 @@ class Base_Controller_Ota extends Base_Controller_Abstract
         if ($token) {
             session_id($token);
             $this->sess->start();
-            if (!$this->sess->userinfo) Lang_Msg::error("ERROR_SIGN_2");
+            if (!$this->sess->userinfo) {
+                Lang_Msg::error('token已过期');
+            }
             $this->userinfo = $this->sess->userinfo;
         }
         if (empty($this->userinfo)) {

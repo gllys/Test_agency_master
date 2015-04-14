@@ -192,8 +192,8 @@ class OrderController extends Base_Controller_Ota
          isset($orderInfo['landscape_ids']) && $order_item['landscape_ids'] = $orderInfo['landscape_ids'];
          isset($orderInfo['use_day']) && $order_item['use_day'] = $orderInfo['use_day'];
          
-        $endDate = strtotime("+{$order_item['valid']} day", strtotime($order_item['use_day']));
-        if($endDate > $order_item['expire_end']) $endDate = $order_item['expire_end'];
+        $endDate = strtotime("+{$orderInfo['valid']} day", strtotime($order_item['use_day']));
+        if($endDate > $orderInfo['expire_end']) $endDate = $orderInfo['expire_end'];
         $endDate = date('Y-m-d', $endDate);
         Lang_Msg::output(array( //ticket_order/v1/order/update需同步改orderIterm
             'id'=>$orderInfo['id'] ,

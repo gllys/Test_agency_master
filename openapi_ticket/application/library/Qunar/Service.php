@@ -304,6 +304,14 @@ class Qunar_Service{
                 $type => $id,
             ));
 //        Log_Base::save('qunar_debug', 'orgDetail :'.var_export($api_res, true));
+        $config = Yaf_Registry::get('config');
+        if($id == $config['qunar']['supplier_identity'] || ($type='organization_id' && $id == $config['qunar']['agency_id'])){
+            $this->create_user          = $config['qunar']['supplier_identity'];
+            $this->supplier_identity    = $config['qunar']['supplier_identity'];
+            $this->signedKey            = $config['qunar']['signedKey'];
+            $this->agency_id            = $config['qunar']['agency_id'];
+            return ;
+        }
         if($api_res['code'] == 'succ'){
             $org = $api_res['body'];
             $this->create_user          = $org['account'];

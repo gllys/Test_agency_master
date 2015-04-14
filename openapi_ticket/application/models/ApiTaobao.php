@@ -249,7 +249,7 @@ class ApiTaobaoModel extends Base_Model_Api{
                 'send_organization' => 1,
 //                'receiver_organization'=> $distributor['body']['id'],
 //                'organization_name' => $distributor['body']['name'],
-                'receiver_organization'=> $distributor['organization_id'],
+                'receiver_organization'=> $distributor['body']['organization_id'],
             );
             $api->url = '/v1/message/add';
             $sms = json_decode($api->request(),true);
@@ -273,7 +273,7 @@ class ApiTaobaoModel extends Base_Model_Api{
         $res['source_token']    = $params['token'];
         $res['price_type']      = 0;
 //        $res['distributor_id']  = $distributor['body']['id'];//分销商需要有购票权限才行,在 ticket_organization -> organization -> id
-        $res['distributor_id']  = $distributor['organization_id'];
+        $res['distributor_id']  = $distributor['body']['organization_id'];
         $res['use_day']         = date('Y-m-d', strtotime($params['valid_start'])); //2015-01-11
         $res['expire_end']      = date('Y-m-d', strtotime($params['valid_ends'])); //2015-01-11
         $res['nums']            = $params['num']; //1

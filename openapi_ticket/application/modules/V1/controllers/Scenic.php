@@ -110,31 +110,27 @@ class ScenicController extends Base_Controller_Ota
             $res_products   = ApiProductModel::model()->products($req_products);
 
             $products       = array();
+            
             if($res_products['code'] == 'succ' && !empty($res_products['body']['data'])){
-                if(isset($res_products['body']['data'][$result['id']])) {
-                    $pros = $res_products['body']['data'][$result['id']];
-
-                    foreach($pros as $pro){
-                        $product = array(
-                            'id'        => $pro['id'],
-                            'name'      => $pro['name'],
-                            'scenic_id' => $pro['scenic_id'],
-                            'payment'   => 2,
-                            //以下信息尚未明确
-                            'fee'       => '',
-                            'exchange'  => '',
-                            'term'      => '',
-                            'audience'  => $pro['remark'],
-                            'advance_booking_min_days'  => '',
-                            'advance_booking_max_days'  => '',
-                            'requirement'   => '',
-                            'price'         => $pro['sale_price'],
-                            'market_price'  => $pro['listed_price'],
-                        );
-                        $products[] = $product;
-                    }
+                foreach($res_products['body']['data'] as $pro) {
+                    $product = array(
+                        'id'        => $pro['id'],
+                        'name'      => $pro['name'],
+                        'scenic_id' => $pro['scenic_id'],
+                        'payment'   => 2,
+                        //以下信息尚未明确
+                        'fee'       => '',
+                        'exchange'  => '',
+                        'term'      => '',
+                        'audience'  => $pro['remark'],
+                        'advance_booking_min_days'  => '',
+                        'advance_booking_max_days'  => '',
+                        'requirement'   => '',
+                        'price'         => $pro['sale_price'],
+                        'market_price'  => $pro['listed_price'],
+                    );
+                    $products[] = $product;
                 }
-
             }
             $result['products'] = $products;
 

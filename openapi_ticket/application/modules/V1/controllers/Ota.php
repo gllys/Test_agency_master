@@ -24,37 +24,33 @@ class OtaController extends Base_Controller_Abstract {
         $id = strtoupper(uniqid());
         $salt = substr(str_shuffle(uniqid()),0, 8);
         $secret = strtoupper(md5(uniqid()));
-        $pwd = md5($salt . md5($salt . $secret));
+        $pwd = uniqid();
         $distributor_id = (int)$_POST['distributor_id'];
+        $notify_url = '';
        
-        /**
-        $notify_url = $_POST['notify_url'];
-        $tmp = parse_url($notify_url);
-        if (!$tmp || !isset($tmp['host']) || !isset($tmp['scheme'])) {
-            Lang_Msg::error('notify_url 格式错误');
-        }
-         * 
-         */
-        
         $record = OtaAccountModel::model()->get('name=\'' . addslashes($name) . '\'');
         if ($record) {
             Lang_Msg::error("$name 已经存在了");
         }
+        $last = OtaAccountModel::model()->select('1=1', 'source', 'source desc', 1);
+        $source = empty($last) ? 1 : $last[0]['source'] + 1;
         
         $r = OtaAccountModel::model()->add(array(
             'id' => $id,
             'name' => $name,
             'salt' => $salt,
             'secret' => $secret,
-            'pwd' => $pwd,
+            'pwd' => md5($salt . md5($salt . $pwd)),
             'distributor_id' => $distributor_id,
-            'notify_url' => $notify_url
+            'notify_url' => $notify_url,
+            'source' => $source
         ));
         
         if ($id) {
             Lang_Msg::output(array(
                 'client_id' => $id,
-                'client_secret' => $secret
+                'client_secret' => $secret,
+                'password' => $pwd
             ));
         } else {
             Lang_Msg::error('创建失败');

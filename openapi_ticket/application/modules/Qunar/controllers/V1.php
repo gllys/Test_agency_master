@@ -145,7 +145,7 @@ class V1Controller extends Base_Controller_ApiDispatch {
             $productInfos[$key]['periodStart'] = date('Y-m-d',$date_available[0]);             //有效期开始日
             $productInfos[$key]['periodEnd'] = date('Y-m-d',$date_available[1]);               //有效期结束日
 
-            $productInfos[$key]['validWeek']    = $product['week_time'];
+            $productInfos[$key]['validWeek']    = str_replace('0','7',$product['week_time']);
             $productInfos[$key]['marketPrice']  = intval($product['listed_price2']) * 100;             //票面价格单位：分
             $productInfos[$key]['sellPrice']    = floatval($product['price']) * 100;               //Qunar 销售产品单价单位：分
             $productInfos[$key]['minimum']      = $product['mini_buy'];//最小购买量
@@ -228,17 +228,23 @@ class V1Controller extends Base_Controller_ApiDispatch {
         $params['user_account'] = self::USER_ACCOUNT;
         $params['user_name'] = self::USER_NAME;
         $params['remark'] = is_string($orderInfo->orderRemark) ? $orderInfo->orderRemark : 'quna订单';
-        if (strpos(strtoupper($orderInfo->orderStatus), 'PREPAY') !== FALSE) {
-            $params['payment'] = 'credit';
-        } else {
-            $params['payment'] = 'offline';
-        }
 
         $params['price'] = $product->sellPrice / 100;
         $error = null;
 
         //get prod detail by code
         $productDetail = $this->getProdByCode($product->resourceId);
+        if (strpos(strtoupper($orderInfo->orderStatus), 'PREPAY') !== FALSE) {
+            $payment = array(
+                1=> 'alipay',
+                2=> 'credit',
+                3=> 'advance',
+                4=> 'union',
+            );
+            $params['payment'] = $payment[$productDetail['payment']];
+        } else {
+            $params['payment'] = 'offline';
+        }
         if ($productDetail) {
             $params['ticket_template_id'] = $productDetail['product_id'];
             if ($productDetail['price'] != $params['price']) {
