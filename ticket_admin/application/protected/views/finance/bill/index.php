@@ -2,17 +2,18 @@
 $this->breadcrumbs = array('结算管理', '应收账款');
 ?>
 <style>
-                .table-bordered th {
-                    line-height: 2em !important;
-                }
-                .table-bordered th,
-                .table-bordered td {
-                    vertical-align: middle !important;
-                }
-                .table-bordered a:hover {
-                    text-decoration: none;
-                }
-                </style>
+    .table-bordered th {
+        line-height: 2em !important;
+    }
+    .table-bordered th,
+    .table-bordered td {
+        vertical-align: middle !important;
+    }
+    .table-bordered a:hover {
+        text-decoration: none;
+    }
+    .ui-datepicker { z-index:9999!important }
+</style>
 <div class="contentpanel">
 
 	<div class="panel panel-default">
@@ -105,25 +106,25 @@ $this->breadcrumbs = array('结算管理', '应收账款');
 					<tr><td colspan="8" style="text-align:center">暂无数据</td></tr>
 		<?php endif;?>
 		</tbody>
-	  </table>
-	</div>
-	<div class="panel-footer pagenumQu" style="padding-top:15px;text-align:right;border:1px solid #ddd;border-top:0">
-		<?php
-		if (isset($bill)) {
-			$this->widget('common.widgets.pagers.ULinkPager', array(
-				'cssFile' => '',
-				'header' => '',
-				'prevPageLabel' => '上一页',
-				'nextPageLabel' => '下一页',
-				'firstPageLabel' => '',
-				'lastPageLabel' => '',
-				'pages' => $pages,
-				'maxButtonCount' => 3, //分页数量
-			));
-		}
-		?>
-	</div>
-	
+	</table>
+    
+    <div class="panel-footer pagenumQu" style="padding-top:15px;text-align:right;border:1px solid #ddd;border-top:0">
+        <?php
+        if (isset($bill)) {
+            $this->widget('common.widgets.pagers.ULinkPager', array(
+                'cssFile' => '',
+                'header' => '',
+                'prevPageLabel' => '上一页',
+                'nextPageLabel' => '下一页',
+                'firstPageLabel' => '',
+                'lastPageLabel' => '',
+                'pages' => $pages,
+                'maxButtonCount' => 3, //分页数量
+            ));
+        }
+        ?>
+    </div>
+
 </div><!-- contentpanel -->
 <script>
 jQuery(document).ready(function() {
@@ -147,7 +148,30 @@ jQuery('#timepicker2').timepicker({showMeridian: false});
 jQuery('#timepicker3').timepicker({minuteStep: 15});
 
 // Date Picker
-jQuery('.datepicker').datepicker({showOtherMonths: true, selectOtherMonths: true});
+$('.datepicker').datepicker({
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: 'yy-mm-dd',
+        monthNamesShort: [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" ],
+        yearRange: "1995:2065",
+		beforeShow: function(d){
+			setTimeout(function(){
+				$('.ui-datepicker-title select').select2({
+					minimumResultsForSearch: -1
+				});
+			},0)
+		},
+		onChangeMonthYear: function(){
+			setTimeout(function(){
+				$('.ui-datepicker-title select').select2({
+					minimumResultsForSearch: -1
+				});
+			},0)
+		},
+        onClose: function(dateText, inst) { 
+            $('.select2-drop').hide(); 
+        }
+    });
 jQuery('#datepicker-inline').datepicker();
 jQuery('#datepicker-multiple').datepicker({
     numberOfMonths: 3,

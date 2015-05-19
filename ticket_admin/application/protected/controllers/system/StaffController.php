@@ -4,13 +4,23 @@ Yii::import('ext.phpPasswordHashingLib.passwordLib', true);
 
 class StaffController extends Controller {
 
+	const PAGE_SIZE = 20;
+	
     public function actionIndex() {
         $criteria = new CDbCriteria();
         $criteria->order = 'status DESC,id DESC';
-        $lists = Users::model()->findAll($criteria);
-        $this->render('index', compact('lists'));
-    }
+        $criteria->condition = 'is_delete=0';
 
+		// 分页信息
+		$criteria->limit = self::PAGE_SIZE;
+		$criteria->offset = ((isset($_GET['page']) ? $_GET['page'] : 0)-1)*20;
+        
+		$data['lists'] = Users::model()->findAll($criteria);
+        $data['pages'] = new CPagination(Users::model()->count());
+        $data['pages']->pageSize = self::PAGE_SIZE;
+        $this->render('index', $data);
+    }
+	
     public function actionAccountexist() {
         $model = Users::model()->findByAttributes(array('account' => $_POST['account']));
         if ($model) {
@@ -45,7 +55,7 @@ class StaffController extends Controller {
                 $user->account = $_POST['account'];
                 $user->status = isset($_POST['status']) ? $_POST['status'] : 1;
                 $user->updated_at = date('Y-m-d H:i:s');
-                if (!empty($_POST['password'])) {
+                if (isset($_POST['password']) && (!empty($_POST['password']))) {
                     $user->password = password_hash(trim($_POST['password']), PASSWORD_BCRYPT, array('cost' => 8));
                 }
                 if ($user->update()) {
@@ -75,8 +85,6 @@ class StaffController extends Controller {
             }else{
                 try {
                     $_POST['password'] = password_hash(trim($_POST['password']), PASSWORD_BCRYPT, array('cost' => 8));
-                    $_POST['organization_id'] = Yii::app()->user->org_id;
-                    $_POST['created_by'] = Yii::app()->user->org_id;
                     $_POST['created_at'] = $_POST['updated_at'] = date('Y-m-d H:i:s');
 
                     $model = new Users();
@@ -88,9 +96,9 @@ class StaffController extends Controller {
                         $roleUser->save();
                         $this->_end(0, '添加员工成功');
                     }
-                    $this->_end(1, '该账号已存在');
+                    $this->_end(1, $model->getErrors());
                 } catch (Exception $e) {
-                    $this->_end(0, $e . getmessage());
+                    $this->_end(1, $e->getMessage());
                 }
             }
         }
@@ -99,13 +107,31 @@ class StaffController extends Controller {
     //删除员工
     public function actionDel() {
         if (Yii::app()->request->isPostRequest) {
-            $id = $_POST['id'];
-            $count = Users::model()->deleteByPk($id);
-            if ($count > 0) {
-                $this->_end(0, '删除员工成功');
-            } else {
-                $this->_end(1, '删除员工失败');
-            }
+	        $transaction = Yii::app()->db->beginTransaction();
+			try{
+				$id = $_POST['id'];
+				$user = Users::model()->findByPk($id);
+				$user->is_delete = 1;
+				$user->deleted_at = date('Y-m-d h:i:s', time());;
+				if($user->save()) {
+					$roleUser = RoleUser::model()->findByAttributes(array('uid'=>$id));
+					$roleUser->is_delete = 1;
+					$roleUser->deleted_at = date('Y-m-d h:i:s', time());;
+					if($roleUser->save()) {
+						$transaction->commit();
+						$this->_end('succ', '删除员工成功！');
+					} else {
+						$transaction->rollback();
+						$this->_end('fail', $roleUser->getErrors());
+					}
+				} else {
+					$transaction->rollback();
+					$this->_end('fail', $user->getErrors());
+				}
+			} catch(Exception $ex){
+				$transaction->rollback();
+				$this->_end('fail', $user->getErrors());
+			}
         }
     }
 

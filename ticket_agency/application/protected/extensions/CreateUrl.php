@@ -12,24 +12,6 @@ class CreateUrl {
         return self::$_model;
     }
 
-    public function createMenu() {
-        $count = count($this->titles);
-        $html = '';
-        for ($i = 0; $i < $count; $i++) {
-            $list = $this->createList($i);
-            if (empty($list))
-                continue;
-
-            $title = $this->createTitle($i);
-            
-            if (empty($title))
-                continue;
-            $html .= sprintf('<li class="parent">%s<ul class="children">%s</ul></li>', $title, $list);
-        }
-
-        return $html;
-    }
-
     public function createHeader() {
         $count = count($this->titles);
         $html = '';
@@ -111,12 +93,12 @@ class CreateUrl {
         if (!isset($this->titles[$index]))
             return null;
         if ($this->titles[$index]['content'] == '') {
-            return '';
+            $html = '<a style="display:none" href="/site/header/index/' . $index . '/" id="drop' . $index . '">';
         } else {
-            $html = '<a href="javascript:void(0);" id="drop_' . $index . '"><i class="' . $this->titles[$index]['params']['class'] . '"></i> <span>';
+            $html = '<a href="/site/header/index/' . $index . '/" id="drop' . $index . '">';
         }
 
-        $html .= sprintf('%s</span></a>', $this->titles[$index]['content']);
+        $html .= sprintf('%s</a>', $this->titles[$index]['content']);
 
         return $html;
     }
@@ -130,11 +112,16 @@ class CreateUrl {
         foreach ($this->lists[$index] as $item) {
             if (!$this->checkAuth($item))
                 continue;
-            $html .= '<li><a';
+
+            $html .= '<li class=""><a';
             foreach ($item['params'] as $key => $value) {
                 $html .= sprintf(' %s="%s"', $key, $value);
             }
-            $html .= sprintf('>%s</a></li>', $item['content']);
+            $html .= '><i';
+            foreach ($item['paramIcos'] as $key => $value) {
+                $html .= sprintf(' %s="%s"', $key, $value);
+            }
+            $html .= sprintf('></i><span>%s</span></a></li>', $item['content']);
         }
         return $html;
     }
@@ -174,7 +161,7 @@ class CreateUrl {
         //return true;
         #得到用户信息
         $user = self::$_singles['users'] = isset(self::$_singles['users']) ? self::$_singles['users'] : #单例，可以不看
-            Users::model()->findByAttributes(array('account' => Yii::app()->user->id));
+                Users::model()->findByAttributes(array('account' => Yii::app()->user->id));
 
         #如果是超级管理员，有所有权限
         if ($user['is_super']) {
@@ -183,7 +170,7 @@ class CreateUrl {
 
         #得到用户较色
         $userRole = self::$_singles['userRole'] = isset(self::$_singles['userRole']) ? self::$_singles['userRole'] : #单例，可以不看
-            RoleUser::model()->findByAttributes(array('uid' => $user['id']));
+                RoleUser::model()->findByAttributes(array('uid' => $user['id']));
         if (!$userRole) {
             return false;
         }
@@ -191,7 +178,7 @@ class CreateUrl {
 
         #得到用户权限
         $role = self::$_singles['role'] = isset(self::$_singles['role']) ? self::$_singles['role'] : #单例，可以不看
-            Role::model()->findByPk($userRole['role_id']);
+                Role::model()->findByPk($userRole['role_id']);
         if (!$role || !$role['status']) {
             return false;
         }
@@ -201,14 +188,13 @@ class CreateUrl {
         }
         return false;
     }
-
+    
     public $TitleIndexs = array(
         'index' => 0,
         'ticket' => 1,
         'order' => 2,
         'finance' => 3,
-        'channel' => 4,
-        'system' => 5,
+        'system' => 4,
     );
 
     public function getIndex($nav) {
@@ -216,18 +202,16 @@ class CreateUrl {
     }
 
     public $titles = array(
-        array('params' => array('class' => 'fa fa-barcode'), 'content' => ''),
-        array('params' => array('class' => 'fa fa-barcode'), 'content' => '门票'),
-        array('params' => array('class' => 'fa fa-list-ol'), 'content' => '订单'),
-        array('params' => array('class' => 'fa fa-credit-card'), 'content' => '结算'),
-        array('params' => array('class' => 'fa fa-magnet'), 'content' => '渠道对接'),
-        array('params' => array('class' => 'fa fa-cog'), 'content' => '系统管理'),
-        array('params' => array('class' => 'fa fa-envelope-o'), 'content' => '消息查看'),
+        array('params' => array('class' => 'fa fa-fw fa-home'), 'content' => ''),
+        array('params' => array('class' => 'fa fa-fw fa-barcode'), 'content' => '门票'),
+        array('params' => array('class' => 'fa fa-fw fa-th-list'), 'content' => '订单'),
+        array('params' => array('class' => 'fa fa-fw fa-credit-card'), 'content' => '结算'),
+        array('params' => array('class' => 'fa fa-fw fa-gear'), 'content' => '系统管理'),
     );
     public $lists = array(
         array(
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-home"), 'params' => array('href' => '/dashboard'), 'content' => '工作台'),
-        //array('auth' => '', 'paramIcos' => array("class" => "fa fa-envelope-o"), 'params' => array('href' => '/system/message/'), 'content' => '消息', 'right' => 'msg'),
+          array('auth' => '', 'paramIcos' => array("class" => "fa fa-home"), 'params' => array('href' => '/dashboard'), 'content' => '工作台'),
+          //array('auth' => '', 'paramIcos' => array("class" => "fa fa-envelope-o"), 'params' => array('href' => '/system/message/'), 'content' => '消息', 'right' => 'msg'),
         ),
         array(
             array('auth' => '', 'paramIcos' => array("class" => "fa fa-home"), 'params' => array('href' => '/ticket/sale/'), 'content' => '散客预定'),
@@ -239,7 +223,6 @@ class CreateUrl {
             array('auth' => '', 'paramIcos' => array("class" => "fa fa-home"), 'params' => array('href' => '/order/history/'), 'content' => '订单管理'),
             //array('auth' => '', 'paramIcos' => array("class" => "fa fa-home"), 'params' => array('href' => '/order/renwu/'), 'content' => '任务单管理'),
             array('auth' => '', 'paramIcos' => array("class" => "fa fa-home"), 'params' => array('href' => '/order/refund/'), 'content' => '退票查询'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-home"), 'params' => array('href' => '/order/check/'), 'content' => '验票记录'),
         ),
         array(
             array('auth' => '', 'paramIcos' => array("class" => "fa fa-home"), 'params' => array('href' => '/finance/payment/'), 'content' => '应付账款'),
@@ -249,21 +232,11 @@ class CreateUrl {
             array('auth' => '', 'paramIcos' => array("class" => "fa fa-home"), 'params' => array('href' => '/finance/bankcard/'), 'content' => '我的银行卡'),
         ),
         array(
-            array('params' => array('href' => '/channel/tb/'), 'content' => '淘宝绑定'),
-        ),
-        array(
             array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/system/organization/'), 'content' => '用户信息'),
             array('auth' => '', 'paramIcos' => array("class" => "fa fa-group"), 'params' => array('href' => '/system/staff/'), 'content' => '员工管理'),
             array('auth' => '', 'paramIcos' => array("class" => "fa fa-edit"), 'params' => array('href' => '/system/role/'), 'content' => '角色权限'),
+            array('auth' => '', 'paramIcos' => array("class" => "fa fa-envelope-o"), 'params' => array('href' => '/system/message/'), 'content' => '消息查看'),
             array('auth' => '', 'paramIcos' => array("class" => "fa fa-lock"), 'params' => array('href' => '/system/account/'), 'content' => '密码修改'),
-        ),
-        array(
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-group"), 'params' => array('href' => '/system/message/view/type/advice/'), 'content' => '公告'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-edit"), 'params' => array('href' => '/system/message/view/type/order/'), 'content' => '订单'),
-           // array('auth' => '', 'paramIcos' => array("class" => "fa fa-edit"), 'params' => array('href' => '/system/message/view/type/subscribe/'), 'content' => '订阅'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-lock"), 'params' => array('href' => '/system/message/view/type/organization/'), 'content' => '机构'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-lock"), 'params' => array('href' => '/system/message/view/type/remind/'), 'content' => '提醒'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-lock"), 'params' => array('href' => '/system/message/view/type/subscribe/'), 'content' => '收藏'),
         ),
     );
 
@@ -280,13 +253,13 @@ class CreateUrl {
         }
         return false;
     }
-
+    
     public function getChildNav($controllerId) {
         $setting = array(
             '/ticket/buy/' => array('/ticket/sale/', '/ticket/group/',),
             '/order/payments/' => '/order/history/',
             '/order/newdetail/' => '/order/renwu/',
-            '/order/detail/' => '/order/history/',
+            '/order/detail/'  => '/order/history/',
             '/finance/detail/' => '/finance/payment/',
         );
 
@@ -296,7 +269,7 @@ class CreateUrl {
         return null;
     }
 
-    //自己定义控制器对比，去掉大小定，和路径问题
+        //自己定义控制器对比，去掉大小定，和路径问题
     private function inArray($b, $a) {
         foreach ($a as $value) {
             if (trim(strtolower($value), '/') == trim(strtolower($b), '/')) {
@@ -306,5 +279,4 @@ class CreateUrl {
         }
         return false;
     }
-
 }

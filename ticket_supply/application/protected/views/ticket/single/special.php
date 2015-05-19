@@ -89,6 +89,7 @@ $this->breadcrumbs = array('单票', '设定特定日期的'.$labels[$type]);
 		<?php endforeach; unset($ticket); endif; ?>
 	</div>
 </div>
+<script src="<?php echo Yii::app()->versionUrl->changeUrl('/js/jquery-ui.multidatespicker.js') ?>"></script>
 <script>
 	jQuery(document).ready(function () {
 		var selected = {};

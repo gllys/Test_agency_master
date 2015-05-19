@@ -19,11 +19,11 @@ $this->breadcrumbs = array('首页','工作台');
 					</tr>
 					<tr>
 						<th>待查看消息</th>
-                                                <td><a href="/system/message/all"><?php echo $mun2;?></a></td>
+                                                <td><a href="/system/message/"><?php echo $mun2;?></a></td>
 					</tr>
 					<tr>
 						<th>即将到期产品提醒</th>
-						<td><a href="/system/message/rem/"><?php echo $mun3;?></td>
+						<td><a href="/system/message/view/type/due/"><?php echo $mun3;?></td>
 					</tr>
 					</tbody>
 				  </table>

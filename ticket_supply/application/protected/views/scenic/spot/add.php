@@ -9,7 +9,7 @@
                 <div class="form-group">
                     <label class="col-sm-2 control-label">景点名称:</label>
                     <div class="col-sm-10">
-                        <input type="text" name="name" class="form-control" id="name">
+                        <input type="text" name="name" class="form-control" maxlength="15" id="name">
                     </div>
                 </div>
                 <div class="form-group">

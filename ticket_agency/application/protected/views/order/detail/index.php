@@ -2,19 +2,21 @@
 $this->breadcrumbs = array('订单管理', '订单详情');
 ?>
 <div class="contentpanel">
+<!--    <?php if (isset($ticket[0])): ?>
+        <h4 class="lg-title"><?php echo $ticket[0]['name'] ?></h4>
+    <?php endif; ?> -->
     <div class="panel panel-default">
         <div class="panel-heading">
             <h4 class="panel-title">可游玩景点</h4>
         </div>
         <div class="panel-body">
-            <?php 
-            if (!empty($ticket)) {
-                    $ticketFirst = current($ticket) ;
-                    $linfo = explode(',', $ticketFirst['landscape_ids']);   //票景区
-			        $result = Landscape::api()->lists(array('ids' => $ticketFirst['landscape_ids']));
+            <?php
+            if (isset($ticket[0])) {
+                    $linfo = explode(',', $ticket[0]['landscape_ids']);   //票景区
+			        $result = Landscape::api()->lists(array('ids' => $ticket[0]['landscape_ids']));
 			        $landscapeInfo = ApiModel::getLists($result);
-			        $field['landscape_ids'] = $ticketFirst['landscape_ids'];
-              		$field['ids'] = $ticketFirst['view_point'];
+			        $field['landscape_ids'] = $ticket[0]['landscape_ids'];
+              		$field['ids'] = $ticket[0]['view_point'];
                		$datas = Poi::api()->lists($field);
                		$data = ApiModel::getLists($datas);
                		$str ='';
@@ -34,14 +36,12 @@ $this->breadcrumbs = array('订单管理', '订单详情');
                	}else{
                		echo '该景区已被删除';	
                	}	         		
-            }   
+            }           
             ?>
         </div>
     </div>
 
-    <?php if (isset($detail)): 
-		$order_item = current($detail['order_items']);
-	?>
+    <?php if (isset($detail)): ?>
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">订单信息</h4>
@@ -76,7 +76,7 @@ $this->breadcrumbs = array('订单管理', '订单详情');
                             
                             <tr <?php echo in_array($detail['status'],array('paid','finish','billed'),true)? '' : 'hidden'; ?>>
                                 <th>支付时间：</th>
-                                <td><?php echo date('Y-m-d H:i:s', $detail['pay_at'])?></td>
+                                <td><?php echo date('Y年m月d日', $detail['pay_at'])?></td>
                                 </tr>
                                   <tr <?php echo in_array($detail['status'],array('paid','finish','billed'),true)? '' : 'hidden'; ?>>
                                 <th>支付方式：</th>
@@ -84,11 +84,11 @@ $this->breadcrumbs = array('订单管理', '订单详情');
                             </tr>
                             <tr>
                                 <th>预定时间：</th>
-                                <td><?php echo date('Y-m-d H:i:s', $detail['created_at']) ?></td>
+                                <td><?php echo date('Y年m月d日', $detail['created_at']) ?></td>
                                 </tr>
                                   <tr>
                                 <th>游玩时间：</th>
-                                <td><?php echo date('Y-m-d', strtotime($detail['use_day'])) ?></td>
+                                <td><?php echo date('Y年m月d日', strtotime($detail['use_day'])) ?></td>
                             </tr>
                             <tr>
                                 <th>订单类型：</th>
@@ -118,25 +118,25 @@ $this->breadcrumbs = array('订单管理', '订单详情');
                             <thead>
                                 <tr>
                                     <th>门票名称</th>
-                                    <th>门票张数</th>
-                                    <th><?php echo $detail['price_type'] == 0 ? '散客结算价' : '团队结算价' ?></th>
+                                    <th>订单张数</th>
+                                    <th><?php echo $ticket[0]['price_type'] == 0 ? '散客价' : '团队价' ?></th>
                                     <th>当日价格</th>
                                     <th>总计</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td><?php echo $detail['name'] ?></td>
-                                    <td><?php echo $detail['nums'] ?></td>
-                                    <td><del><?php echo $detail['price_type'] == 0 ? $detail['fat_price'] : $detail['group_price'] ?></del></td>
-                                    <td><?php echo $detail['price']?></td>
-                                    <td><?php echo number_format($detail['amount'],2);?></td>
+                                    <td><?php echo $ticket[0]['name'] ?></td>
+                                    <td><?php echo $ticket[0]['nums'] ?></td>
+                                    <td><del><?php echo $ticket[0]['price_type'] == 0 ? $ticket[0]['fat_price'] : $ticket[0]['group_price'] ?></del></td>
+                                    <td><?php echo $ticket[0]['price']?></td>
+                                    <td><?php echo number_format($ticket[0]['price'] * $ticket[0]['nums'],2);?></td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
-                <div class="panel-footer" style="text-align:right" id="take-ticket-footer">
+                <div class="panel-footer" style="text-align:center" id="take-ticket-footer">
                     <span style="margin-right:30px">合计票数:<b class="text-danger" id="totalnum"><?php echo $detail['nums'] ?></b>张</span>
                     <span style="margin-right:30px">合计支付金额:<b class="text-danger"><?php echo $detail['amount']?></b>元</span>
 
@@ -163,10 +163,8 @@ $this->breadcrumbs = array('订单管理', '订单详情');
                                     <label for="radio5">储蓄支付（可用额度：1000.00元）</label>
                             </div>
                     </div-->
-                    <?php $can_pay = strtotime($detail['use_day'].' 10:00:00') >= strtotime('10:00:00');?>
-                    <?php if ($detail['status'] == 'unaudited') : ?>
-                        <button class="btn btn-danger" type="button" onclick="cancel(<?php echo $detail['id'] ?>)">取消订单</button>
-                    <?php elseif ($can_pay && $detail['status'] == 'unpaid' && !empty($detail['payment_id'])) : ?>
+                    <?php $can_pay = strtotime($detail['use_day'].' 10:00:00') >= strtotime('10:00:00');
+                    if ($can_pay && $detail['status'] == 'unpaid' && !empty($detail['payment_id'])) : ?>
                         <a href="/order/payments/method/pid/<?php echo $detail['payment_id'] ?>" class="btn btn-primary">继续支付</a>
                         <button class="btn btn-danger" type="button" onclick="cancel(<?php echo $detail['id'] ?>)">取消订单</button>
                     <?php elseif($can_pay && $detail['status'] == 'unpaid'):?>
@@ -184,7 +182,7 @@ $this->breadcrumbs = array('订单管理', '订单详情');
                 </div>
             </div>
 
-    <div class="panel panel-default" style="display: <?php if ($detail['status'] != 'paid' || $ticket[key($ticket)]['refund'] != 1){ echo 'none'; } ?>">
+    <div class="panel panel-default" style="display: <?php if ($detail['status'] != 'paid' || $ticket[0]['refund'] != 1){ echo 'none'; } ?>">
                         <div class="panel-body form-inline">
                             <form action="/order/detail/apply" method="post" id="applyform">
                                 <input type="hidden" name="order_id" value="<?php echo $detail['id'] ?>">
@@ -238,7 +236,7 @@ $this->breadcrumbs = array('订单管理', '订单详情');
                         <table class="table table-bordered">
                             <thead>
                             <tbody>
-        <?php $agencyInfo = Organizations::api()->show(array('id' => intval($ticket[key($ticket)]['distributor_id']))); ?>
+        <?php $agencyInfo = Organizations::api()->show(array('id' => intval($ticket[0]['distributor_id']))); ?>  
                                 <tr>
                                     <th width="150">用户名称：</th><td><?php echo isset($agencyInfo['body']['name']) ? $agencyInfo['body']['name'] : ''; ?></td>
                                 </tr>
@@ -258,12 +256,12 @@ $this->breadcrumbs = array('订单管理', '订单详情');
                         <table class="table table-bordered">
                             <thead>
                             <tbody>
-        <?php $supplyInfo = Organizations::api()->show(array('id' => $ticket[key($ticket)]['supplier_id'])); ?>
+        <?php $supplyInfo = Organizations::api()->show(array('id' => $ticket[0]['supplier_id'])); ?> 
                                 <tr>
                                     <th width="150">供应商名称：</th><td><?php echo $supplyInfo['body']['name'] ?></td>
                                 </tr>
                                 <tr>
-                                    <th>操作人：</th><td><?php echo !empty($order_item['user_name'])?$order_item['user_name']:$supplyInfo['body']['contact'] ?></td>
+                                    <th>操作人：</th><td><?php echo !empty($detail['order_items'][0]['user_name'])?$detail['order_items'][0]['user_name']:$supplyInfo['body']['contact'] ?></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -275,21 +273,8 @@ $this->breadcrumbs = array('订单管理', '订单详情');
                     <h4 class="panel-title">订单备注</h4>
                 </div>
                 <div class="panel-body">
-                    <textarea id="remark" placeholder="暂无备注信息" class="form-control" rows="5" maxlength="200" <?php if ($detail['status'] != 'reject'){ echo 'readonly="readonly"'; } ?>><?php echo html_entity_decode($detail['remark']) ?></textarea>
-                </div>
-                <input type="hidden" id="remark_ori" value="<?php echo html_entity_decode($detail['remark']) ?>" />
-                <?php if ($detail['status'] == 'reject') :?>
-                <div class="panel-heading">
-                    <h4 class="panel-title">驳回理由</h4>
-                </div>
-                <div class="panel-body">
-                    <textarea class="form-control" rows="5" maxlength="200" readonly="readonly"><?php echo html_entity_decode($detail['reason']) ?></textarea>
+                        <textarea placeholder="暂无备注信息" class="form-control" rows="5" maxlength="200" readonly="readonly"><?php echo html_entity_decode($detail['remark']) ?></textarea>
                 </div><!-- panel-body -->
-                <div class="panel-footer" style="text-align:right" id="take-ticket-footer">  
-                    <button class="btn btn-danger" type="button" onclick="cancel(<?php echo $detail['id'] ?>,'reject')">取消订单</button>
-                    <button class="btn btn-success" type="button" onclick="repost(<?php echo $detail['id'] ?>)">重新提交</button>
-                </div>
-                <?php endif; ?>
             </div>
 
             <div class="panel panel-default">
@@ -298,7 +283,7 @@ $this->breadcrumbs = array('订单管理', '订单详情');
                         <tr>
                             <th width="120">购买规定</th>
                             <td>
-        						<?php echo $ticket[key($ticket)]['remark'] ?>
+        						<?php echo $ticket[0]['remark'] ?>
                         	</td>
                         </tr>
                     </tbody>
@@ -354,33 +339,14 @@ $this->breadcrumbs = array('订单管理', '订单详情');
     });
 
     function cancel(id) {
-        PWConfirm('您确认取消该订单吗？',function(){
-             $.post('/order/detail/cancel', {id: id}, function(data) {
-                 if (data.error === 0) {
-                     alert('订单已取消');
-                     setTimeout("location.href='/order/history/'", '1000');
-                 } else {
-                     alert(data.msg);
-                 }
-             }, 'json')
-         });
-    }
-    function repost(id) {
-        var remark_ori = $('#remark_ori').val().replace(/(^\s+)|(\s+$)/g,"");
-        var remark = $('#remark').val().replace(/(^\s+)|(\s+$)/g,"");
-        var receiver_organization = <?php echo $ticket[key($ticket)]['supplier_id']?>;
-        if(remark_ori == remark){
-            alert('请修改备注内容后提交');
-        }else{
-            $.post('/order/detail/repost', {id: id,remark: remark,receiver_organization : receiver_organization}, function(data) {
-                if (data.error === 0) {
-                    alert('订单已重新提交');
-                    setTimeout("location.href='/order/history/'", '1000');
-                } else {
-                    alert(data.msg);
-                }
-            }, 'json')
-        }
+        $.post('/order/detail/cancel', {id: id}, function(data) {
+            if (data.error === 0) {
+                alert('订单已取消');
+                setTimeout("location.href='/order/history/'", '1000');
+            } else {
+                alert(data.msg);
+            }
+        }, 'json')
     }
 </script>
 

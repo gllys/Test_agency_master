@@ -7,9 +7,12 @@ CREATE TABLE IF NOT EXISTS `organizations`(
   `mobile` varchar(20) NOT NULL DEFAULT '' COMMENT '手机号码',
   `contact` varchar(50) NOT NULL DEFAULT '' COMMENT '联系人',
   `fax` varchar(20) NOT NULL DEFAULT '' COMMENT '公司传真',
+  `abbreviation` varchar(20) NOT NULL DEFAULT '' COMMENT '简称',
   `email` varchar(100) NOT NULL DEFAULT '' COMMENT '联系邮箱',
   `telephone` varchar(20) NOT NULL DEFAULT '' COMMENT '固定电话',
-  `district_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '所在地',
+  `province_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '所在省',
+  `city_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '所在市',
+  `district_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '所在区',
   `address` varchar(100) NOT NULL DEFAULT '' COMMENT '详细地址',
   `description` text NOT NULL COMMENT '简介',
   `business_license` varchar(255) NOT NULL DEFAULT '' COMMENT '营业执照',
@@ -32,3 +35,11 @@ CREATE TABLE IF NOT EXISTS `organizations`(
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '机构';
+
+-- 供应商绑定分销商关联表
+CREATE TABLE IF NOT EXISTS `supply_agency`(
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `supply_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '供应商id',
+  `agency_id` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '分销商id',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '供应分销关联';

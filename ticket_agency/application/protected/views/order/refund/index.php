@@ -26,60 +26,49 @@ $this->breadcrumbs = array('订单管理', '退票查询');
             <h4 class="panel-title">退票查询</h4>
         </div>
         <div class="panel-body">
-            <form class="form-inline" action="/order/refund/index" method="get">
-                <!--交易日期开始-->
-                <div class="form-group">
-                    <input class="form-control datepicker" style="cursor: pointer;cursor: hand;background-color: #ffffff" readonly placeholder="交易日期" type="text" name="createdat[]" value="<?php echo isset($getval['createdat'][0]) ? $getval['createdat'][0] : ''; ?>"> ~
-                    <input class="form-control datepicker" style="cursor: pointer;cursor: hand;background-color: #ffffff" readonly placeholder="交易日期" type="text" name="createdat[]" value="<?php echo isset($getval['createdat'][1]) ? $getval['createdat'][1] : ''; ?>">
-                </div><!-- form-group -->
-                <!--交易日期结束-->
+            <form class="form-inline" action="" method="get">
+                <div class="mb20">
+                    <div class="form-group" style="margin:0">
+                        <input class="form-control datepicker" style="cursor: pointer;cursor: hand;background-color: #ffffff" readonly placeholder="交易日期" type="text" name="createdat[]" value="<?php echo isset($getval['createdat'][0])?$getval['createdat'][0]:'';?>"> ~
+                        <input class="form-control datepicker" style="cursor: pointer;cursor: hand;background-color: #ffffff" readonly placeholder="交易日期" type="text" name="createdat[]" value="<?php echo isset($getval['createdat'][1])?$getval['createdat'][1]:'';?>">
+                    </div><!-- form-group -->
 
-                <!--支付方式开始-->
-                <div class="form-group">
-                    <select class="select2" data-placeholder="Choose One" style="width:150px;padding:0 10px;" name="pay_app_id">
-                        <option value="">支付方式</option>
-                        <!--option value="cash" <?php echo isset($getval['pay_app_id']) ? ($getval['pay_app_id'] == 'cash' ? "selected" : '') : ''; ?>>现金</option>
-                        <option value="offline" <?php echo isset($getval['pay_app_id']) ? ($getval['pay_app_id'] == 'offline' ? "selected" : '') : ''; ?>>线下</option-->
-                        <option value="credit" <?php echo isset($getval['pay_app_id']) ? ($getval['pay_app_id'] == 'credit' ? "selected" : '') : ''; ?>>信用支付</option>
-                        <!--option value="pos" <?php echo isset($getval['pay_app_id']) ? ($getval['pay_app_id'] == 'pos' ? "selected" : '') : ''; ?>>pos机</option-->
-                        <option value="alipay" <?php echo isset($getval['pay_app_id']) ? ($getval['pay_app_id'] == 'alipay' ? "selected" : '') : ''; ?>>支付宝</option>
-                        <option value="advance" <?php echo isset($getval['pay_app_id']) ? ($getval['pay_app_id'] == 'advance' ? "selected" : '') : ''; ?>>储值支付</option>
-                        <option value="union" <?php echo isset($getval['pay_app_id']) ? ($getval['pay_app_id'] == 'union' ? "selected" : '') : ''; ?>>平台支付</option>
-                        <option value="kuaiqian" <?php echo isset($getval['pay_app_id']) ? ($getval['pay_app_id'] == 'kuaiqian' ? "selected" : '') : ''; ?>>快钱</option>
-                        <!--option value="taobao" <?php echo isset($getval['pay_app_id']) ? ($getval['pay_app_id'] == 'taobao' ? "selected" : '') : ''; ?>>淘宝支付</option-->
-                    </select>
+                    <div class="form-group" style="margin:0">
+                        <select class="select2" data-placeholder="Choose One" style="width:150px;padding:0 10px;" name="pay_app_id">
+                            <option value="">支付方式</option>
+                            <!--option value="cash" <?php echo isset($getval['pay_app_id'])?($getval['pay_app_id']=='cash'?"selected":''):'';?>>现金</option>
+                            <option value="offline" <?php echo isset($getval['pay_app_id'])?($getval['pay_app_id']=='offline'?"selected":''):'';?>>线下</option-->
+                            <option value="credit" <?php echo isset($getval['pay_app_id'])?($getval['pay_app_id']=='credit'?"selected":''):'';?>>信用支付</option>
+                            <!--option value="pos" <?php echo isset($getval['pay_app_id'])?($getval['pay_app_id']=='pos'?"selected":''):'';?>>pos机</option>
+                            <option value="alipay" <?php echo isset($getval['pay_app_id'])?($getval['pay_app_id']=='alipay'?"selected":''):'';?>>支付宝</option-->
+                            <option value="advance" <?php echo isset($getval['pay_app_id'])?($getval['pay_app_id']=='advance'?"selected":''):'';?>>储值支付</option>
+                            <option value="union" <?php echo isset($getval['pay_app_id'])?($getval['pay_app_id']=='union'?"selected":''):'';?>>平台支付</option>
+                            <option value="kuaiqian" <?php echo isset($getval['pay_app_id'])?($getval['pay_app_id']=='kuaiqian'?"selected":''):'';?>>快钱</option>
+                            <!--option value="taobao" <?php echo isset($getval['pay_app_id'])?($getval['pay_app_id']=='taobao'?"selected":''):'';?>>淘宝支付</option-->
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin:0">
+                        <select class="select2" data-placeholder="Choose One" style="width:150px;padding:0 10px;" name="status">
+                            <option value="">退款状态</option>
+                             <option value="0" <?php echo isset($getval['status'])?($getval['status']=='0'?"selected":''):'';?>>退款中</option>
+                              <option value="1" <?php echo isset($getval['status'])?($getval['status']=='1'?"selected":''):'';?>>退款成功</option>
+                               <option value="2" <?php echo isset($getval['status'])?($getval['status']=='2'?"selected":''):'';?>>退款失败</option>
+                        </select>
+                    </div>
                 </div>
-                <!--支付方式结束-->
-
-                <!--退款状态开始-->
-                <div class="form-group">
-                    <select class="select2" data-placeholder="Choose One" style="width:150px;padding:0 10px;" name="status">
-                        <option value="">退款状态</option>
-                        <option value="0" <?php echo isset($getval['status']) ? ($getval['status'] == '0' ? "selected" : '') : ''; ?>>退款中</option>
-                        <option value="1" <?php echo isset($getval['status']) ? ($getval['status'] == '1' ? "selected" : '') : ''; ?>>退款成功</option>
-                        <option value="2" <?php echo isset($getval['status']) ? ($getval['status'] == '2' ? "selected" : '') : ''; ?>>退款失败</option>
-                    </select>
-                </div>
-                <!--退款状态结束-->
-
-                <!--订单号开始-->
-                <div class="form-group">
-                    <input class="form-control" placeholder="订单号"type="text" style="width:250px;" name="order_id">
-                </div>
-                <!--订单号结束-->
-
-                <!--查询开始-->
-                <div class="form-group">
+                <div>
+                    <div class="form-group" style="margin: 0 5px 0 0">
+                        <input class="form-control" placeholder="订单号"type="text" style="width:320px;" name="order_id">
+                    </div>
                     <button class="btn btn-primary btn-xs" type="submit">查询</button>
                 </div>
-                <!--查询结束-->
             </form>
         </div><!-- panel-body -->
     </div>
     <table class="table table-bordered mb30">
         <thead>
             <tr>
-                <th>退款申请单号</th>
+                <th>订单号</th>
                 <th>门票名称</th>
                 <th>申请时间</th>
                 <th>票数</th>
@@ -93,7 +82,7 @@ $this->breadcrumbs = array('订单管理', '退票查询');
             foreach ($list as $key => $item):
                 ?>
             <tr data-target=".bs-example-modal-static"  onclick="point('<?php echo $item['order_id'];?>','<?php echo $item['id'];?>')"data-toggle="modal">
-                    <td><a href="#"><?php echo $item['id'] ?></a></td>
+                    <td><a href="#"><?php echo $item['order_id'] ?></a></td>
                     <td><?php echo $item['name']; ?></td>
                     <td><?php echo date("Y-m-d", $item['created_at']); ?></td>
                     <td><?php echo $item['nums']; ?></td>
@@ -117,23 +106,23 @@ $this->breadcrumbs = array('订单管理', '退票查询');
         </tbody>
     </table>
 
-    <div class="panel-footer">
-        <!--分页开始-->
-        <div class="pagenumQu">
-            <?php
-            $this->widget('common.widgets.pagers.ULinkPager', array(
-                'cssFile' => '',
-                'header' => '',
-                'prevPageLabel' => '上一页',
-                'nextPageLabel' => '下一页',
-                'firstPageLabel' => '',
-                'lastPageLabel' => '',
-                'pages' => $pages,
-                'maxButtonCount' => 5, //分页数量
-            ));
-            ?>
-        </div>	
-        <!--分页结束-->
+</div>
+
+<div style="text-align:center" class="panel-footer">
+    <div id="basicTable_paginate" class="pagenumQu">
+        <?php
+        $this->widget('CLinkPager', array(
+            'cssFile' => '',
+            'header' => '',
+            'prevPageLabel' => '上一页',
+            'nextPageLabel' => '下一页',
+            'firstPageLabel' => '',
+            'lastPageLabel' => '',
+            'pages' => $pages,
+            'maxButtonCount' => 5, //分页数量
+                )
+        );
+        ?>
     </div>
 </div>
  <div class="modal fade bs-example-modal-static" id="verify-modal-point" tabindex="-1" role="dialog"></div>

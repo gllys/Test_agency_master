@@ -3,18 +3,38 @@
 class CreateUrl {
 
     public $baseUrl = '/';
+    // 供应商的滚动条
+    public $topbarUrl = '/js/message.js';
     private static $_model = null;
 
     public static function model($className = __CLASS__) {
-         #如果是景区账号,走景区核销配置
-        if(!Yii::app()->user->isGuest&&Yii::app()->user->lan_id){
-            $className = 'CreateUrlLan' ;
+        #如果是景区账号,走景区验票配置
+        if (!Yii::app()->user->isGuest && Yii::app()->user->lan_id) {
+            $className = 'CreateUrlLan';
         }
-        
+
         if (self::$_model == null) {
             self::$_model = new $className();
         }
         return self::$_model;
+    }
+
+    public function createMenu() {
+        $count = count($this->titles);
+        $html = '';
+        for ($i = 0; $i < $count; $i++) {
+            $list = $this->createList($i);
+            if (empty($list))
+                continue;
+
+            $title = $this->createTitle($i);
+
+            if (empty($title))
+                continue;
+            $html .= sprintf('<li class="parent">%s<ul class="children">%s</ul></li>', $title, $list);
+        }
+
+        return $html;
     }
 
     public function createHeader() {
@@ -98,12 +118,12 @@ class CreateUrl {
         if (!isset($this->titles[$index]))
             return null;
         if ($this->titles[$index]['content'] == '') {
-            $html = '<a style="display:none" href="/site/header/index/' . $index . '/" id="drop' . $index . '">';
+            return '';
         } else {
-            $html = '<a href="/site/header/index/' . $index . '/" id="drop' . $index . '">';
+            $html = '<a href="javascript:void(0);" id="drop_' . $index . '"><i class="' . $this->titles[$index]['params']['class'] . '"></i> <span>';
         }
 
-        $html .= sprintf('%s</a>', $this->titles[$index]['content']);
+        $html .= sprintf('%s</span></a>', $this->titles[$index]['content']);
 
         return $html;
     }
@@ -117,16 +137,11 @@ class CreateUrl {
         foreach ($this->lists[$index] as $item) {
             if (!$this->checkAuth($item))
                 continue;
-
-            $html .= '<li class=""><a';
+            $html .= '<li><a';
             foreach ($item['params'] as $key => $value) {
                 $html .= sprintf(' %s="%s"', $key, $value);
             }
-            $html .= '><i';
-            foreach ($item['paramIcos'] as $key => $value) {
-                $html .= sprintf(' %s="%s"', $key, $value);
-            }
-            $html .= sprintf('></i><span>%s</span></a></li>', $item['content']);
+            $html .= sprintf('>%s</a></li>', $item['content']);
         }
         return $html;
     }
@@ -146,17 +161,34 @@ class CreateUrl {
         return $this->lists[0];
     }
 
-    //跳转第一个有权限的菜单做为首页
+    //跳转默认首页(homepage=>true)的菜单做为首页，如果默认菜单不在权限中，选择第一个有权限的菜单
     public function getRedirectOne() {
         $count = count($this->titles);
+		$firstAuthTtem = null;	// 保存第一个有权限的菜单项
         for ($i = 0; $i < $count; $i++) {
             foreach ($this->lists[$i] as $item) {
-                if (!$this->checkAuth($item))
+				// 首先检查条目是否权限
+				if (!$this->checkAuth($item)) {
                     continue;
-                return $item;
+				}
+				
+				// 满足权限的item是否被设置成了首页
+				if(isset($item['homepage']) && $item['homepage']) {
+                    return $item;
+				}
+
+				// 第一个菜单项是否存在
+				if(!$firstAuthTtem) {
+					$firstAuthTtem = $item;
+				}
             }
         }
-        return $this->lists[0];
+
+		if($firstAuthTtem) {
+			return $firstAuthTtem;
+		} else {
+	        return $this->lists[0];
+		}
     }
 
     // 检测权限，在 auth 字段为空时，根据 URL 进行权限验证
@@ -195,7 +227,7 @@ class CreateUrl {
     }
 
     public $TitleIndexs = array(
-        'index' =>0,
+        'index' => 0,
         'scenic' => 1,
         'ticket' => 2,
         'order' => 3,
@@ -211,55 +243,67 @@ class CreateUrl {
 
     public $titles = array(
         array('params' => array('class' => 'fa fa-fw fa-home'), 'content' => ''),
-        array('params' => array('class' => 'fa fa-fw fa-home'), 'content' => '景区'),
+        array('params' => array('class' => 'fa fa-barcode'), 'content' => '景区'),
         array('params' => array('class' => 'fa fa-fw fa-th-list'), 'content' => '产品'),
-        array('params' => array('class' => 'fa fa-fw fa-money'), 'content' => '订单'),
-        array('params' => array('class' => 'fa fa-fw fa-credit-card'), 'content' => '核销'),
-        array('params' => array('class' => 'fa fa-fw fa-credit-card'), 'content' => '结算'),
-        array('params' => array('class' => 'fa fa-fw fa-barcode'), 'content' => '分销商'),
-        array('params' => array('class' => 'fa fa-fw fa-barcode'), 'content' => '系统'),
+        array('params' => array('class' => 'fa fa-list-ol'), 'content' => '订单'),
+       // array('params' => array('class' => 'fa fa-envelope'), 'content' => '验票'),
+        array('params' => array('class' => 'fa fa-credit-card'), 'content' => '结算'),
+        array('params' => array('class' => 'fa fa-sitemap'), 'content' => '分销商'),
+    	array('params' => array('class' => 'fa fa-sitemap'), 'content' => '统计'),
+        array('params' => array('class' => 'fa fa-cog'), 'content' => '系统'),
+        array('params' => array('class' => 'fa fa-envelope-o'), 'content' => '消息查看'),
     );
     public $lists = array(
         array(
-          array('auth' => '', 'paramIcos' => array("class" => "fa fa-home"), 'params' => array('href' => '/dashboard'), 'content' => '工作台'),
+            array('auth' => '', 'paramIcos' => array("class" => "fa fa-home"), 'params' => array('href' => '/dashboard'), 'content' => '工作台'),
         ),
         array(
             array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/scenic/scenic/'), 'content' => '景区列表'),
         ),
         array(
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/ticket/goods/'), 'content' => '发布产品'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/ticket/product/'), 'content' => '产品'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/ticket/depot/'), 'content' => '仓库管理'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/ticket/strategy/'), 'content' => '价格库存规则'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/ticket/single/'), 'content' => '货架管理'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/ticket/limitagency/'), 'content' => '限制分销商'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/ticket/discount/'), 'content' => '优惠规则'),
+            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/ticket/goods/'), 'content' => '门票管理'),
+            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/ticket/single/'), 'content' => '产品管理'),
+//            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/ticket/limitagency/'), 'content' => '限制分销商'),
+//            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/ticket/discount/'), 'content' => '优惠规则'),
+            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/ticket/policy/'), 'content' => '分销策略'),
         ),
         array(
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/order/history/'), 'content' => '订单管理'),
+            array('homepage'=>true, 'auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/order/history/'), 'content' => '订单管理'),
             //array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/order/renwu/'), 'content' => '任务单管理'),
             array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/order/refund/'), 'content' => '退款管理'),
+            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/check/check/orderCheck/'), 'content' => '验票记录'),
         ),
-        array(
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/check/used/'), 'content' => '核销'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/check/check/'), 'content' => '核销管理'),
-        ),
+        /*array(
+            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/check/used/'), 'content' => '验票'),
+            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/check/check/'), 'content' => '验票记录'),
+        ),*/
         array(
             array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/finance/account/'), 'content' => '收款账号'),
             array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/finance/bill/'), 'content' => '应收账款'),
             array('auth' => '', 'paramIcos' => array("class" => "fa fa-home"), 'params' => array('href' => '/finance/platform/'), 'content' => '平台资产'),
             array('auth' => '', 'paramIcos' => array("class" => "fa fa-home"), 'params' => array('href' => '/finance/blotter/'), 'content' => '交易流水'),
+            array('auth' => '', 'paramIcos' => array("class" => "fa fa-home"), 'params' => array('href' => '/finance/stat/'), 'content' => '图表统计'),
         ),
         array(
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/agency/account/'), 'content' => '添加分销商'),
+        		array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/agency/account/addagency/'), 'content' => '注册添加分销商'),
+        		array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/agency/account/res/'), 'content' => '查询添加分销商'),
             array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/agency/manager/'), 'content' => '分销商管理'),
         ),
         array(
+            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/stat/agency/'), 'content' => '分销商统计'),
+            array('auth' => '', 'paramIcos' => array("class" => "fa fa-group"), 'params' => array('href' => '/stat/product/'), 'content' => '产品统计'),
+        ),
+    	array(
             array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/system/organization/'), 'content' => '用户信息'),
             array('auth' => '', 'paramIcos' => array("class" => "fa fa-group"), 'params' => array('href' => '/system/staff/'), 'content' => '员工管理'),
             array('auth' => '', 'paramIcos' => array("class" => "fa fa-edit"), 'params' => array('href' => '/system/role/'), 'content' => '角色权限'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-envelope-o"), 'params' => array('href' => '/system/message/'), 'content' => '消息查看'),
             array('auth' => '', 'paramIcos' => array("class" => "fa fa-lock"), 'params' => array('href' => '/system/account/'), 'content' => '密码修改'),
+        ),
+        array(
+            array('auth' => '', 'paramIcos' => array("class" => "fa fa-envelope-o"), 'params' => array('href' => '/system/message/view/type/order/'), 'content' => '订单提醒'),
+            array('auth' => '', 'paramIcos' => array("class" => "fa fa-envelope-o"), 'params' => array('href' => '/system/message/view/type/refund/'), 'content' => '退款提醒'),
+            array('auth' => '', 'paramIcos' => array("class" => "fa fa-envelope-o"), 'params' => array('href' => '/system/message/view/type/due/'), 'content' => '到期提醒'),
+            array('auth' => '', 'paramIcos' => array("class" => "fa fa-envelope-o"), 'params' => array('href' => '/system/message/view/type/advice/'), 'content' => '公告信息'),
         ),
     );
 
@@ -267,6 +311,7 @@ class CreateUrl {
         if (!is_array($access)) {
             $access = array($access);
         }
+        
         foreach ($access as $_access) {
             $item = array();
             $item['params']['href'] = $_access;
@@ -282,9 +327,10 @@ class CreateUrl {
             '/order/newdetail/' => '/order/renwu/',
             '/order/detail/' => '/order/history/',
             '/finance/detail/' => '/finance/bill/',
+            '/agency/account/addagency/'=>'/agency/account/addagency/',
+            '/agency/account/res/'=>'/agency/account/res/',
+            '/check/check/orderCheck/'=>'/check/check/orderCheck/',
         );
-
-
         if (isset($setting[$controllerId])) {
             return $setting[$controllerId];
         }

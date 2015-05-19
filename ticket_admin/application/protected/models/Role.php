@@ -43,10 +43,9 @@ class Role extends UActiveRecord
 			array('created_dataline, status', 'numerical', 'integerOnly'=>true),
 			array('name', 'length', 'max'=>30),
 			array('description', 'length', 'max'=>255),
-			array('organization_id', 'length', 'max'=>10),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, name, description, permissions, organization_id, created_dataline, status', 'safe', 'on'=>'search'),
+			array('id, name, description, permissions, created_dataline, status', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -71,7 +70,6 @@ class Role extends UActiveRecord
 			'name' => 'Name',
 			'description' => 'Description',
 			'permissions' => 'Permissions',
-			'organization_id' => 'Organization',
 			'created_dataline' => 'Created Dataline',
 			'status' => 'Status',
 		);
@@ -92,7 +90,6 @@ class Role extends UActiveRecord
 		$criteria->compare('name',$this->name,true);
 		$criteria->compare('description',$this->description,true);
 		$criteria->compare('permissions',$this->permissions,true);
-		$criteria->compare('organization_id',$this->organization_id,true);
 		$criteria->compare('created_dataline',$this->created_dataline);
 		$criteria->compare('status',$this->status);
 

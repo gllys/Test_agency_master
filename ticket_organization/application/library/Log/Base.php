@@ -21,16 +21,21 @@ class Log_Base
     }
 
     public static function save($filename, $data) {
-    	if (!self::$config) {
-        	$config = Yaf_Registry::get("config");
-        	self::$config = $config['log'];
+        try {
+            if (!self::$config) {
+                $config = Yaf_Registry::get("config");
+                self::$config = $config['log'];
+            }
+            $file = self::$config['path'] . '/' . $filename;
+            $path = dirname($file);
+            if (!is_dir($path)) {
+                @mkdir($path, 0777, true);
+            }
+            file_put_contents($file, $data . "\n", FILE_APPEND);
+            return true;
+        } catch (Exception $e){
+            return false;
         }
-    	$file = self::$config['path'].'/' .$filename;
-    	$path = dirname($file);
-    	if (!is_dir($path)) {
-			@mkdir($path, 0777, true);
-		}
-		file_put_contents($file, $data."\n", FILE_APPEND);
 	}
   
 	public function getTable() {

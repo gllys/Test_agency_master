@@ -26,4 +26,19 @@ class ApiUnionMoneyModel extends Base_Model_Api
         $r = json_decode($this->request(),true);
         return $r;
     }
+
+    public function unionMoneyDetail($org_id){
+        $this->url = '/v1/unionmoney/detail';
+        $this->params = array('org_id'=>$org_id);
+        $r = json_decode($this->request(),true);
+        return $r;
+    }
+
+    public function inOut5($params){ //平台收支应付款打款接口
+        $this->url = '/v1/unionmoney/inout5';
+        $this->params = $params;
+        $r = $this->request();
+        $r = json_decode($r,true);
+        return $r;
+    }
 }

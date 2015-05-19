@@ -3,7 +3,7 @@
 class AccountController extends Controller {
 
     public function actionIndex() {
-        $bank = Bank::api()->list();
+        $bank = Bank::api()->list(array('fields'=>'id, name'));
         $data['bank'] = $bank['body'];
 
         $param['p'] = isset($param['page']) ? $param['page'] : 1;

@@ -19,7 +19,7 @@ class ElectronicController extends Controller {
     }
 
     public function actionEdit() {
-        $ticket = TicketTemplate::api()->ticketinfo($_GET);
+        $ticket = Tickettemplate::api()->ticketinfo($_GET);
         $data['ticket'] = $ticket['body'];
         $data['ticket']['from_to_time'] = explode(',', $data['ticket']['date_available']);
         $data['ticket']['from_to_time'][0] = date('Y-m-d', $data['ticket']['from_to_time'][0]);
@@ -69,7 +69,7 @@ class ElectronicController extends Controller {
                         $_POST['scheduled_time'] = $day + $second;
                         unset($_POST['more_time']);
                         //$_POST['remark'] = preg_match("/[ '.,:;*?~`!@#$%^&+=)(<>{}]|\]|\[|\/|\\\|\"|\|/",$_POST['remark']);
-                        $data = TicketTemplate::api()->addGenerate($_POST);
+                        $data = Tickettemplate::api()->addGenerate($_POST);
                         if ($data['code'] == 'succ') {
                             echo json_encode(array('succ' => '保存成功'));
                         } else {
@@ -106,7 +106,7 @@ class ElectronicController extends Controller {
                         $_POST['scheduled_time'] = $day + $second;
                         unset($_POST['more_time']);
                         //$_POST['remark'] = preg_match("/[ '.,:;*?~`!@#$%^&+=)(<>{}]|\]|\[|\/|\\\|\"|\|/",$_POST['remark']);
-                        $data = TicketTemplate::api()->update($_POST);
+                        $data = Tickettemplate::api()->update($_POST);
                         if ($data['code'] == 'succ') {
                             echo json_encode(array('succ' => '保存成功'));
                         } else {

@@ -106,19 +106,6 @@ $this->breadcrumbs = array('分销商', '查找分销商');
         // Form Toggles
         jQuery('.toggle').toggles({on: true});
 
-        // Time Picker
-        jQuery('#timepicker').timepicker({defaultTIme: false});
-        jQuery('#timepicker2').timepicker({showMeridian: false});
-        jQuery('#timepicker3').timepicker({minuteStep: 15});
-
-        // Date Picker
-        jQuery('.datepicker').datepicker();
-        jQuery('#datepicker-inline').datepicker();
-        jQuery('#datepicker-multiple').datepicker({
-            numberOfMonths: 3,
-            showButtonPanel: true
-        });
-
         // Input Masks
         jQuery("#date").mask("99/99/9999");
         jQuery("#phone").mask("(999) 999-9999");
@@ -174,11 +161,9 @@ $this->breadcrumbs = array('分销商', '查找分销商');
         function add(id){
         	$.post('/agency/manager/addcredit',{'id':id},function(data){
         		if(data.error==0){
-                    alert("添加成功");
-                    setTimeout("location.href='/agency/manager/history'", '1000');
+                    alert("添加成功",function(){setTimeout("location.href='/agency/manager/history'", '1000');});
                 }else{
-                    alert("添加失败,"+data.msg);
-                    location.reload();
+                    alert("添加失败,"+data.msg,function(){location.reload();});
                 }
         	},'json')
         }

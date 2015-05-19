@@ -7,13 +7,22 @@ class RenwuController extends Controller
 	}
 	public function actionIndex() {
 		$params = $_REQUEST;
-		$data['status_labels'] = array('unpaid'=>'未确认','paid' => '已确认','cancel' => '已取消','finish' => '已结束','billed' => '已结款');
-		$data['status_class'] = array('unpaid'=>'danger','cancel' => 'warning','paid' => 'success','finish' => 'info','billed' => 'error');
+		$data['status_labels'] = array('unpaid'=>'未确认','paid' => '已确认','canceled' => '已取消','billed' => '已结款');
+		$data['status_class'] = array('unpaid'=>'danger','canceled' => 'warning','paid' => 'success','billed' => 'error');
 		$data['status'] = array_keys($data['status_labels']);
 		if (!empty($params)) {
-			if (isset($params['status']) && !in_array($params['status'], $data['status'])) {
-				unset($params['status']);
-			}
+            if (isset($params['status'])) {
+                foreach (Order::$status as $status_type => $status_lists) {
+                    foreach ($status_lists as $status_item => $status_value) {
+                        if ($params['status'] == $status_item) {
+                            $params[$status_item] = $status_value;
+                            break 2;
+                        }
+                    }
+                    unset($status_item, $status_value);
+                }
+                unset($status_type, $status_lists, $params['status']);
+            }
 		}
 		$data['get']       = $params;
 		$params['supplier_id'] = Yii::app()->user->org_id;

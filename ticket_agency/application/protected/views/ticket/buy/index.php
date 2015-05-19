@@ -12,12 +12,9 @@ if (isset($info['partner_price'])) {
         <input type="hidden" name="price_type" value="<?Php echo $_GET['price_type'] ?>" />
         <input type="hidden" name="type" value="<?php echo $info['type']?>" />
         <input type="hidden" name="price" value="<?Php echo $price ?>"/>
-        <input type="hidden" name="returnflag" id="returnflag" value="0"/>
-        <input type="hidden" name="supply_type" id="supply_type" value="<?php echo $supply_type; ?>"/>
-        <input type="hidden" name="receiver_organization" value="<?php echo $info['organization_id']?>" />
         <div class="modal-content">
             <div class="modal-header">
-                <button aria-hidden="true" data-dismiss="modal" class="close" onclick="return false;" type="button">&times;</button>
+                <button aria-hidden="true" data-dismiss="modal" class="close" type="button">&times;</button>
                 <h4 class="modal-title"><?Php echo $info['name'] ?></h4>
             </div>
             <div class="modal-body">
@@ -33,17 +30,17 @@ if (isset($info['partner_price'])) {
                                     <tr>
                                         <th><span class="text-danger">*</span>游玩日期</th>
                                         <!--th>订购数</th-->
-                                        <th>门市挂牌价</th>
-                                        <th>网络销售价</th>
-                                        <th><?php echo $_GET['price_type'] == 0 ? '散客结算价' : '团队结算价' ?></th>
+                                        <th>销售价</th>
+                                        <th>挂牌价</th>
+                                        <th><?php echo $_GET['price_type'] == 0 ? '散客价' : '团队价' ?></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td style="width:300px"><input style="background-position:90% 50%;" id="datepicker"  class="form-control datepicker" type="text" placeholder="游玩日期" name="use_day" readonly="readonly"></td>
+                                        <td style="width:300px"><input id="datepicker"  class="form-control datepicker" type="text" placeholder="" name="use_day" readonly="readonly"></td>
                                         <!--td><input type="text" name="nums" id="order-count" value="<?php echo $info['mini_buy'] ?>"></td-->
-                                        <td><del><?php echo $info['listed_price'] ?></del></td>
                                         <td><del><?php echo $info['sale_price'] ?></del></td>
+                                        <td><del><?php echo $info['listed_price'] ?></del></td>
                                         <td class="text-success"><?Php echo $price ?></td>
                                     </tr>
                                 </tbody>
@@ -61,15 +58,11 @@ if (isset($info['partner_price'])) {
                             <table class="table table-bordered mb30" id="take-ticket">
                                 <tbody>
                                     <tr>
-                                        <td style="font-weight:bold;width:70px;"><span class="text-danger">*</span>姓名</td>
-                                        <td><input placeholder="必填" name="owner_name[]" type="text" class="form-control name" placeholder=""></td>
-                                        <td style="padding-left:30px;font-weight:bold;width:90px;"><span class="text-danger">*</span>手机号码</td>
-                                        <td><input placeholder="必填" name="owner_mobile[]" type="text" class="form-control phone" placeholder=""></td>
-                                        <td style="padding-left:30px;font-weight:bold;width:80px;"><span class="text-danger">*</span>订购数</td>
-                                        <td><input type="text" class="num" name="nums[]" id="order-count-0" value="<?php echo $info['mini_buy'] ?>"></td>
-                                        <td style="padding-left:30px;font-weight:bold;width:100px;">身份证号码</td>
-                                        <td><input placeholder="非必填" type="text" name="owner_card[]" class="form-control card" placeholder=""></td>
-                                        <td style="padding-left:30px;"><a class="btn btn-success btn-xs" href="javascript:void(0)" id="take-ticket-add">增加</a></td>
+                                        <th><span class="text-danger">*</span>姓名</th><td><input placeholder="必填" name="owner_name[]" type="text" class="form-control name" placeholder=""></td>
+                                        <th><span class="text-danger">*</span>手机号码</th><td><input placeholder="必填" name="owner_mobile[]" type="text" class="form-control phone validate[custom[mobile]]" placeholder=""></td>
+                                        <th><span class="text-danger">*</span>订购数</th><td><input type="text" class="num" name="nums[]" id="order-count-0" value="<?php echo $info['mini_buy'] ?>"></td>
+                                        <th>身份证号码</th><td><input placeholder="非必填" type="text" name="owner_card[]" class="form-control card validate[custom[chinaId]]" placeholder=""></td>
+                                        <td><a class="btn btn-success btn-xs" href="javascript:void(0)" id="take-ticket-add">增加</a></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -88,7 +81,7 @@ if (isset($info['partner_price'])) {
                         <h4 class="panel-title">订单备注</h4>
                     </div>
                     <div class="panel-body">
-                        <textarea rows="2" style="width:840px;margin:0 auto;" id="note" name='note' class="form-control" placeholder="限定200字以内" maxlength="200"></textarea>
+                        <textarea rows="2" id="note" name='note' class="form-control" placeholder="限定200字以内" maxlength="200"></textarea>
                     </div><!-- panel-body -->
                 </div>
             </div>
@@ -101,33 +94,6 @@ if (isset($info['partner_price'])) {
 </div>
 <script type="text/javascript">
     $(function() {
-        //检查备注文本域是否有内容，判断是否是回传订单
-        $(document).on('blur',"#note",function() {
-                var fnum = $(this).val();
-                var supply_type = $("#supply_type").val();
-                if(fnum == '' || supply_type == '0'){
-                    $("#returnflag").val('0');
-                    $('#add_cart').css('cursor','pointer');
-                    $('#add_cart').removeAttr('disabled','disabled');
-                }else{
-                    $("#returnflag").val('1');
-                    $('#add_cart').css('cursor','not-allowed');
-                    $('#add_cart').attr('disabled','disabled');
-                }
-            });
-        $(document).on('keyup',"#note",function() {
-                var fnum = $(this).val();
-                var supply_type = $("#supply_type").val();
-                if(fnum == '' || supply_type == '0'){
-                    $("#returnflag").val('0');
-                    $('#add_cart').css('cursor','pointer');
-                    $('#add_cart').removeAttr('disabled','disabled');
-                }else{
-                    $("#returnflag").val('1');
-                    $('#add_cart').css('cursor','not-allowed');
-                    $('#add_cart').attr('disabled','disabled');
-                }
-            });
         //游玩时间改变，价格改变
         //var price = '<?php echo $price ?>';
         $('#datepicker').change(function(){
@@ -199,56 +165,17 @@ if (isset($info['partner_price'])) {
             }
             , 'json');
         });*/
-        //姓名验证
-        $('#form').delegate('.name','blur',function(){
-            if ($(this).val() == '') {
-                $(this).PWShowPrompt('取票人姓名不能为空');
-                //$(this).focus();
-                return false;
-            }
-            return false;
-        });
-        //手机号
-        $('#form').delegate('.phone','blur',function(){
-            var _str = $(this).val();
-            if (_str.length !== 11 || !/^1\d{10}$/.test(_str)) {
-            	$(this).PWShowPrompt('取票人手机号码为11位数字');
-                //$(this).focus();
-                return false;
-            }
-           return false;
-        });
-        //身份证
-        $('#form').delegate('.card','blur',function(){
-            var _card = $(this).val();
-             if(_card != ''){
-                    if(_card.length > 0){
-                        var reg = /(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
-                        if(IdCardValidate(_card) === false){
-                                $(this).PWShowPrompt('身份证号码错误');
-                                //$(this).focus();
-                                return false;
-                        } 
-                    }   
-                    
-                }   
-                return false;
-        });
-        
         //确认下单
         $('#place_order').click(function() {
-            //是否回传下单
-            var returnflag = $('#returnflag').val();            
-            //弹窗结束
             if ($('[name=use_day]').val() == '') {
-            	$('[name=use_day]').PWShowPrompt('请输入产品有效期'); 
+                alert('游玩日期不能为空');
                 $('[name=use_day]').focus();
                 return false;
             }
 
             for (i = 0; i < $('.name').length; i++) {
                 if ($('.name').eq(i).val() === '') {
-                	$('.name').eq(i).PWShowPrompt('请输入取票人姓名'); 
+                    alert('取票人姓名不能为空');
                     $('.name').eq(i).focus();
                     return false;
                 }
@@ -256,7 +183,7 @@ if (isset($info['partner_price'])) {
 
             for (i = 0; i < $('.name').length; i++) {
                 if ($('.name').eq(i).val().length > 13) {
-                	$('.name').eq(i).PWShowPrompt('取票人姓名不能超过13个汉字'); 
+                    alert('取票人姓名不能超过13个汉字');
                     $('.name').eq(i).focus();
                     return false;
                 }
@@ -265,8 +192,8 @@ if (isset($info['partner_price'])) {
 
             for (i = 0; i < $('.phone').length; i++) {
                 var _str = $('.phone').eq(i).val();
-                if (_str.length !== 11 || !/^1\d{10}$/.test(_str)) {
-                	$('.phone').eq(i).PWShowPrompt('请输入取票人手机号码');
+                if (_str.length !== 11 || isNaN(_str)) {
+                    alert('取票人手机号码为11位数字');
                     $('.phone').eq(i).focus();
                     return false;
                 }
@@ -277,8 +204,8 @@ if (isset($info['partner_price'])) {
             	if(_card != ''){
                     if(_card.length > 0){
                         var reg = /(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
-                        if(IdCardValidate(_card) === false){
-                                $('.card').eq(i).PWShowPrompt('身份证号码错误');
+                        if(reg.test(_card) === false){
+                                alert('身份证号码错误');
                                 $('.card').eq(i).focus();
                                 return false;
                         } 
@@ -289,30 +216,14 @@ if (isset($info['partner_price'])) {
 
             var _note = $('#note').val();
             if (_note.length > 200) {
-            	$('[name=note]').PWShowPrompt('订单备注不能超过200个字');
+                alert('订单备注不能超过200个字');
                 $('[name=note]').focus();
                 return false;
             }
 
             $.post('/ticket/buy/placeOrder/', $('#form').serialize(), function(data) {
                 if (data.error === 0) {
-                    //提交订单返回成功后弹窗代码
-                    if(returnflag == '1'){
-                        //回传订单，弹提示后关闭
-                        $("#verify-modal-buy").modal('hide');
-                        $("#verify-modal-alert").html($("#modalalert")).modal('show');
-                        $('#modalalert').show(); 
-                        setTimeout(function(){
-                            $('#modalalert').hide(); 
-                            $("#verify-modal-alert").modal('hide');
-                        },2000);
-                        //setTimeout(function(){window.location.reload()},800);
-                        return false;
-                    }else{
-                        //非回传订单，按老流程
-                        window.location.href = '/order/payments/method/combine/' + data.params.join(',');
-                    }
-                    
+                    window.location.href = '/order/payments/method/combine/' + data.params.join(',');
                 } else {
                     alert(data.msg);
                 }
@@ -332,14 +243,14 @@ if (isset($info['partner_price'])) {
         //加入购物车
         $('#add_cart').click(function() {
             if ($('[name=use_day]').val() == '') {
-            	$('[name=use_day]').PWShowPrompt('产品有效期不能为空'); 
+                alert('游玩日期不能为空');
                 $('[name=use_day]').focus();
                 return false;
             }
 
             for (i = 0; i < $('.name').length; i++) {
                 if ($('.name').eq(i).val() === '') {
-                    $('.name').eq(i).PWShowPrompt('取票人姓名不能为空'); 
+                    alert('取票人姓名不能为空');
                     $('.name').eq(i).focus();
                     return false;
                 }
@@ -347,7 +258,7 @@ if (isset($info['partner_price'])) {
 
             for (i = 0; i < $('.name').length; i++) {
                 if ($('.name').eq(i).val().length > 13) {
-                    $('.name').eq(i).PWShowPrompt('取票人姓名不能超过13个汉字'); 
+                    alert('取票人姓名不能超过13个汉字');
                     $('.name').eq(i).focus();
                     return false;
                 }
@@ -356,8 +267,8 @@ if (isset($info['partner_price'])) {
 
             for (i = 0; i < $('.phone').length; i++) {
                 var _str = $('.phone').eq(i).val();
-                  if (_str.length !== 11 || !/^1\d{10}$/.test(_str)) {
-                    $('.phone').eq(i).PWShowPrompt('取票人手机号码为11位数字'); 
+                if (_str.length !== 11 || isNaN(_str)) {
+                    alert('取票人手机号码为11位数字');
                     $('.phone').eq(i).focus();
                     return false;
                 }
@@ -367,8 +278,8 @@ if (isset($info['partner_price'])) {
             	var _card = $('.card').eq(i).val();
             	if(_card.length > 0){
                      var reg = /(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
-                    if(IdCardValidate(_card) === false){
-                            $('.card').eq(i).PWShowPrompt('身份证号码错误'); 
+                    if(reg.test(_card) === false){
+                            alert('身份证号码错误');
                             $('.card').eq(i).focus();
                             return false;
                     } 
@@ -377,14 +288,15 @@ if (isset($info['partner_price'])) {
 
 			var _note = $('#note').val();
             if (_note.length > 200) {
-                $('[name=note]').PWShowPrompt('订单备注不能超过200个字');
+                alert('订单备注不能超过200个字');
                 $('[name=note]').focus();
                 return false;
             }
 
             $.post('/ticket/buy/addCart/', $('#form').serialize(), function(data) {
                 if (data.error === 0) {
-                    alert('加入成功',function(){window.location.reload();});
+                    alert('加入成功');
+                    window.location.reload();
                 } else {
                     alert(data.msg);
                 }
@@ -418,7 +330,7 @@ if (isset($info['partner_price'])) {
             var addIndex = 0;
             $('#take-ticket-add').click(function() {
                 addIndex++;
-                var tpl = '<tr><th><span class="text-danger">*</span>姓名</th><td><input type="text" name="owner_name[]" class="form-control name" placeholder=""></td><th><span class="text-danger">*</span>手机号码</th><td><input type="text"  name="owner_mobile[]"  class="form-control phone" placeholder=""></td><th><span class="text-danger">*</span>订购数</th><td><input type="text" name="nums[]" class="num" id="order-count-' + addIndex + '" value="<?php echo $info['mini_buy'] ?>"></td><th>身份证号码</th><td><input type="text"  name="owner_card[]"   class="form-control" placeholder=""></td><td><a class="btn btn-success btn-xs take-ticket-del" href="javascript:void(0)">删除</a></td></tr>';
+                var tpl = '<tr><th>姓名</th><td><input type="text" name="owner_name[]" class="form-control name" placeholder=""></td><th>手机号码</th><td><input type="text"  name="owner_mobile[]"  class="form-control phone" placeholder=""></td><th>订购数</th><td><input type="text" name="nums[]" class="num" id="order-count-' + addIndex + '" value="<?php echo $info['mini_buy'] ?>"></td><th>身份证号码</th><td><input type="text"  name="owner_card[]"   class="form-control" placeholder=""></td><td><a class="btn btn-success btn-xs take-ticket-del" href="javascript:void(0)">删除</a></td></tr>';
                 takeTicketObj.append(tpl);
                 updown(addIndex);
                 total()
@@ -500,90 +412,6 @@ if (isset($info['partner_price'])) {
 
 
     });
-    
-    
-
-
-//身份证验证
-var Wi = [ 7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2, 1 ];    // 加权因子   
-var ValideCode = [ 1, 0, 10, 9, 8, 7, 6, 5, 4, 3, 2 ];            // 身份证验证位值.10代表X   
-function IdCardValidate(idCard) { 
-    idCard = trim(idCard.replace(/ /g, ""));               //去掉字符串头尾空格                     
-    if (idCard.length == 15) {   
-        return isValidityBrithBy15IdCard(idCard);       //进行15位身份证的验证    
-    } else if (idCard.length == 18) {   
-        var a_idCard = idCard.split("");                // 得到身份证数组   
-        if(isValidityBrithBy18IdCard(idCard)&&isTrueValidateCodeBy18IdCard(a_idCard)){   //进行18位身份证的基本验证和第18位的验证
-            return true;   
-        }else {   
-            return false;   
-        }   
-    } else {   
-        return false;   
-    }   
-}   
-/**  
- * 判断身份证号码为18位时最后的验证位是否正确  
- * @param a_idCard 身份证号码数组  
- * @return  
- */  
-function isTrueValidateCodeBy18IdCard(a_idCard) {   
-    var sum = 0;                             // 声明加权求和变量   
-    if (a_idCard[17].toLowerCase() == 'x') {   
-        a_idCard[17] = 10;                    // 将最后位为x的验证码替换为10方便后续操作   
-    }   
-    for ( var i = 0; i < 17; i++) {   
-        sum += Wi[i] * a_idCard[i];            // 加权求和   
-    }   
-    valCodePosition = sum % 11;                // 得到验证码所位置   
-    if (a_idCard[17] == ValideCode[valCodePosition]) {   
-        return true;   
-    } else {   
-        return false;   
-    }   
-}   
-/**  
-  * 验证18位数身份证号码中的生日是否是有效生日  
-  * @param idCard 18位书身份证字符串  
-  * @return  
-  */  
-function isValidityBrithBy18IdCard(idCard18){   
-    var year =  idCard18.substring(6,10);   
-    var month = idCard18.substring(10,12);   
-    var day = idCard18.substring(12,14);   
-    var temp_date = new Date(year,parseFloat(month)-1,parseFloat(day));   
-    // 这里用getFullYear()获取年份，避免千年虫问题   
-    if(temp_date.getFullYear()!=parseFloat(year)   
-          ||temp_date.getMonth()!=parseFloat(month)-1   
-          ||temp_date.getDate()!=parseFloat(day)){   
-            return false;   
-    }else{   
-        return true;   
-    }   
-}   
-  /**  
-   * 验证15位数身份证号码中的生日是否是有效生日  
-   * @param idCard15 15位书身份证字符串  
-   * @return  
-   */  
-  function isValidityBrithBy15IdCard(idCard15){   
-      var year =  idCard15.substring(6,8);   
-      var month = idCard15.substring(8,10);   
-      var day = idCard15.substring(10,12);   
-      var temp_date = new Date(year,parseFloat(month)-1,parseFloat(day));   
-      // 对于老身份证中的你年龄则不需考虑千年虫问题而使用getYear()方法   
-      if(temp_date.getYear()!=parseFloat(year)   
-              ||temp_date.getMonth()!=parseFloat(month)-1   
-              ||temp_date.getDate()!=parseFloat(day)){   
-                return false;   
-        }else{   
-            return true;   
-        }   
-  }   
-//去掉字符串头尾空格   
-function trim(str) {   
-    return str.replace(/(^\s*)|(\s*$)/g, "");   
-}    
 </script>
 <style type="text/css">
     /***可选颜色设置***/

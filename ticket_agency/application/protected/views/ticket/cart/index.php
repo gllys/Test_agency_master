@@ -1,101 +1,116 @@
 <?php
-$this->breadcrumbs = array(
-	'门票管理',
-	'购物车'
-);
+$this->breadcrumbs = array('门票管理', '购物车');
 ?>
 <div class="contentpanel">
-	<div class="panel panel-default">
-		<div class="panel-heading">
-			<h4 class="panel-title">我的购物车</h4>
-		</div>
-		<style>
-.table-responsive img {
-	max-width: 100px
-}
 
-.table-responsive th, .table-responsive td {
-	vertical-align: middle !important
-}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="panel-title">我的购物车</h4>
+        </div>
+        <style>
+            .table-responsive img{
+                max-width:100px
+            }
+            .table-responsive th,.table-responsive td{
+                vertical-align:middle!important
+            }
+            .panel-footer b{
+                font-size:22px;
+                padding:0 5px;
+            }
+        </style>
+        <div class="table-responsive">
+            <table class="table table-bordered mb30" id="take-ticket">
+                <thead>
+                <tr>
+                    <th><button type="button" class="btn btn-success btn-xs" id="all-btn">全选</button></th>
+                    <th>门票名称</th>
+                    <th>取票人</th>
+                    <th>取票人手机号</th>
+                    <th>游玩日期</th>
+                    <th>门票单价</th>
+                    <th>票数</th>
+                    <th>小计</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php if(isset($cartList)&&!empty($cartList)): ?>
+                	<tr id="ele">
+                		<td colspan="9" style="text-align:left">
+                            电子票
+                		</td>
+                	</tr>
+                    <?php foreach($cartList as $cart): ?>
+                        <tr>
+                            <td style="text-align:center">
+	                            <input type="checkbox" class="all-btn" value="<?php echo $cart['id']; ?>" data-food="<?php echo $cart['id']; ?>">
+                            </td>
+                            <td><?php echo $cart['ticket_name'] ?></td>
+                            <td>
+                                <input type="text" class="form-control" name="name" value="<?php echo $cart['name']; ?>">
+                            </td>
+                            <td><input type="text" class="form-control" name="phone" value="<?php echo $cart['phone'] ?>"></td>
+                            <td><?php echo $cart['date']; ?></td>
+                            <td class="text-success">
+                                <?php echo number_format($cart['price'],2) ?>
+                            </td>
+                            <td><input type="text" class="form-control num" name="num" price="<?php echo $cart['price'] ?>" value="<?php echo $cart['num'] ?>"></td>
+                            <td class="text-success"><?php echo sprintf('%.2f',$cart['price']*$cart['num']) ?></td>
+                            <td>
+                                <a class="btn btn-success btn-xs del-btn" data-id="<?php echo $cart['id']; ?>" href="">删除</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif;?>
 
-.panel-footer b {
-	font-size: 22px;
-	padding: 0 5px;
-}
+                <?php if(isset($renwu)&&!empty($renwu)): ?>
+                	<tr id="ren">
+                		<td colspan="9" style="text-align:left">
+                            任务单  <span style="margin-left:15px"class="text-danger">任务单无需支付，生成订单后前往任务单管理进行确认</span>
+                		</td>
+                	</tr>
+                    <?php foreach($renwu as $cart): ?>
+                        <tr>
+                            <td style="text-align: center">
+                                    <input type="checkbox" class="all-btn" value="<?php echo $cart['id']; ?>" data-food="<?php echo $cart['id']; ?>">
+                            </td>
+                            <td><?php echo $cart['ticket_name'] ?></td>
+                            <td>
+                                <input type="text" class="form-control" name="name" value="<?php echo $cart['name']; ?>">
+                            </td>
+                            <td><input type="text" class="form-control" name="phone" value="<?php echo $cart['phone'] ?>"></td>
+                            <td><?php echo $cart['date']; ?></td>
+                            <td class="text-success">
+                                <?php echo number_format($cart['price'],2) ?>
+                            </td>
+                            <td><input type="text" class="form-control num" name="num" price="<?php echo $cart['price'] ?>" value="<?php echo $cart['num'] ?>"></td>
+                            <td class="text-success"><?php echo sprintf('%.2f',$cart['price']*$cart['num']) ?></td>
+                            <td>
+                                <a class="btn btn-success btn-xs del-btn" data-id="<?php echo $cart['id']; ?>" href="">删除</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif;?>
+                <?php if(empty($cartList)&&empty($renwu)):?>
+                    <tr class="empty">
+                        <td colspan="10" style="text-align: center;">
+                            购物车空空如也,点<a href="/ticket/sale">这里</a>购买门票!</td>
+                    </tr>
+                <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
 
-.panel-default .panel-heading {
-	padding: 10px 0;
-}
+        <div class="panel-footer" style="text-align:right" id="take-ticket-footer">
+            <span style="margin-right:30px">共计门票:<b class="text-danger">0</b>张</span>
+            <span style="margin-right:30px">共计票数:<b class="text-danger">0</b>张</span>
+            <span style="margin-right:30px">总金额:<b class="text-danger">0</b>元</span>
 
-.table thead>tr>th:nth-child(1) {
-	text-align: center !important
-}
-
-.table tbody>tr:nth-child(1)>td:nth-child(1) {
-	text-align: left !important
-}
-
-.table tbody>tr>td:nth-child(1) {
-	text-align: center !important
-}
-</style>
-		<div class="table-responsive">
-			<table class="table table-bordered mb30" id="take-ticket">
-				<thead>
-					<tr>
-						<th>
-							<div class="ckbox ckbox-primary" style="margin-left: 17px;"  id="checkbox-allcheck">>
-								<input type="checkbox" class="ids" value="949"> <label for="checkbox-allcheck" class="allcheck">全选</label>
-							</div>
-						</th>
-						<th>门票名称</th>
-						<th>取票人</th>
-						<th>取票人手机号</th>
-						<th>游玩有效期</th>
-						<th>门票单价</th>
-						<th>票数</th>
-						<th>小计</th>
-						<th>操作</th>
-					</tr>
-				</thead>
-				<tbody>
-					<?php if(isset($cartList)&&!empty($cartList)): ?>
-					<tr id="ele">
-						<td colspan="9">电子票</td>
-					</tr>
-						<?php foreach($cartList as $cart): ?>
-						<tr>
-							<td>
-								<div class="ckbox ckbox-primary" style="margin-left: 17px;">
-									<input type="checkbox" class="ids" id="checkbox<?= $cart['id'] ?>" value="<?= $cart['id'] ?>">
-									<label for="checkbox<?= $cart['id'] ?>" class="all-btn"></label>
-								</div>
-							</td>
-							<td><?= $cart['ticket_name'] ?></td>
-							<td><input type="text" class="form-control" name="name" value="<?= $cart['name']; ?>"></td>
-							<td><input type="text" class="form-control" name="phone" value="<?= $cart['phone'] ?>"></td>
-							<td><?= $cart['date']; ?></td>
-							<td class="text-success"><?= $cart['price'] > 0 ? number_format($cart['price'], 2) : 0 ?></td>
-							<td><input type="text" class="form-control num" name="num" price="<?= $cart['price'] > 0 ? $cart['price'] : 0 ?>" value="<?= $cart['num'] ?>"></td>
-							<td class="text-success"><?= $cart['price'] > 0 ? sprintf('%.2f',$cart['price']*$cart['num']) : 0 ?></td>
-							<td><a class="btn btn-success btn-xs del-btn" data-id="<?= $cart['id']; ?>" href="">删除</a></td>
-						</tr>
-					   <?php endforeach; ?>
-                	<?php endif;?>
-					
-				</tbody>
-			</table>
-		</div>
-		<div class="panel-footer" style="text-align: right" id="take-ticket-footer">
-			<span style="margin-right: 30px">共计门票:<b class="text-danger">0</b>张
-			</span> <span style="margin-right: 30px">共计票数:<b class="text-danger">0</b>张
-			</span> <span style="margin-right: 30px">总金额:<b class="text-danger">0</b>元
-			</span>
-			<button class="btn btn-primary" type="submit" disabled>生成订单</button>
-		</div>
-	</div>
-</div>
-<!-- contentpanel -->
+            <button class="btn btn-primary" type="submit" disabled>生成订单</button>
+        </div>
+    </div>
+</div><!-- contentpanel -->
 <script>
     jQuery(document).ready(function(){
         
@@ -127,68 +142,64 @@ $this->breadcrumbs = array(
 
         !function(){
             var takeTicketFooter = $('#take-ticket-footer'),
-                allBtn = $('#checkbox-allcheck')
+                allBtn = $('#all-btn')
 
             //全选
             allBtn.click(function(){
                 var obj = $(this).parents('table')
-                if($(this).find('label').text() == '全选'){ 
-                    obj.find('input').prop('checked', true); 
-                    obj.find('tbody tr[class!="empty"]').addClass('selected'); 
-                    $(this).find('label').text('全不选') ;
-                }else{ 
-                    obj.find('input').prop('checked', false); 
-                    obj.find('tbody tr').removeClass('selected'); 
-                    $(this).find('label').text('全选'); 
+                if($(this).text() == '全选'){
+                    obj.find('input').prop('checked', true)
+                    obj.find('tbody tr[class!="empty"]').addClass('selected')
+                    $(this).text('全不选')
+                }else{
+                    obj.find('input').prop('checked', false)
+                    obj.find('tbody tr').removeClass('selected')
+                    $(this).text('全选')
                 }
-                total();
-				return false;
+                total()
             })
 
             $('.del-btn').click(function(){
                 var obj = $(this);
                 var id = obj.attr('data-id');
-
-                PWConfirm('确定删除该条门票信息吗?',function(){  
-                    if(id!=""&&id!=undefined){
-                        $.post('/ticket/cart/delCart/',{ids:id},function(data){
-                            if(data.error==0){
-                                if(obj.parents('tr').siblings().length<=0){//如果购物车删除后为空
-                                    var tbodyObj = obj.closest('tbody');
-                                    obj.parents('tr').remove();
-                                    tbodyObj.append('<tr class="empty"><td colspan="10" style="text-align: center;">'+
-                                    '购物车空空如也,点<a href="/ticket/sale">这里</a>购买门票!</td></tr>');
-                                }else{
-                                    obj.parents('tr').remove();
-                                    var ele = $('#ele').nextAll('tr[id != "ren"]').length;
-                                    var ren = $('#ren').nextAll().length;
-                                    if(ele <= 0){
-                                    	$('#ele').remove();
-                                    	parent.location.reload();
-                                    }
-                                    if(ren <= 0){
-                                    	$('#ren').remove();
-                                    	parent.location.reload();
-                                    }
-                                }
-                                total()
+                if(id!=""&&id!=undefined){
+                    $.post('/ticket/cart/delCart/',{ids:id},function(data){
+                        if(data.error==0){
+                            if(obj.parents('tr').siblings().length<=0){//如果购物车删除后为空
+                                var tbodyObj = obj.closest('tbody');
+                                obj.parents('tr').remove();
+                                tbodyObj.append('<tr class="empty"><td colspan="10" style="text-align: center;">'+
+                                '购物车空空如也,点<a href="/ticket/sale">这里</a>购买门票!</td></tr>');
                             }else{
-                                alert(data.msg);
+                                obj.parents('tr').remove();
+                                var ele = $('#ele').nextAll('tr[id != "ren"]').length;
+                                var ren = $('#ren').nextAll().length;
+                                if(ele <= 0){
+                                	$('#ele').remove();
+                                	parent.location.reload();
+                                }
+                                if(ren <= 0){
+                                	$('#ren').remove();
+                                	parent.location.reload();
+                                }
                             }
-                        },'json') ;
-                    $(".allcheck"+attr('data-food')).atrr('checked',false);
-                    parent.location.reload();
-                    }else{
-                        alert("删除失败!");
-                    }
-                });   
+                            total()
+                        }else{
+                            alert(data.msg);
+                        }
+                    },'json') ;
+                $(".all-btn"+attr('data-food')).atrr('checked',false);
+                parent.location.reload();
+                }else{
+                    alert("删除失败!");
+                }
                 return false
             })
 
-            $('.ids').click(function(){ 
-                $(this).parents('tr').toggleClass('selected');
-                total();
-            });
+            $('.all-btn').click(function(){
+                $(this).parents('tr').toggleClass('selected')
+                total()
+            })
 
 
             $('.num').keyup(function(){

@@ -192,7 +192,12 @@ abstract class Base_Model_Abstract
         $this->db->setListKey($key);
         return $this;
     }
-    
+
+    public function setGroupBy($groupBy = null){
+        $this->db->setGroupBy($groupBy);
+        return $this;
+    }
+
     public function get($where, $fields = '*', $preCacheKey = null) {
         $data = false;
         if ($this->cacheKey) {
@@ -205,6 +210,7 @@ abstract class Base_Model_Abstract
             }
         }
         $this->cacheKey = null;
+        $this->db->setGroupBy(null);
         return $data;
     }
     
@@ -250,7 +256,7 @@ abstract class Base_Model_Abstract
         }
         return $this->db->select($this->getTable(), $where, $fields);
     }
-    
+
     public function select($where, $fields = '*', $order = null, $limit = null) {
         $data = false;
         if ($this->cacheKey) {
@@ -265,7 +271,7 @@ abstract class Base_Model_Abstract
             }
         }
         $this->cacheKey = null;
-        
+        $this->db->setGroupBy(null);
         return $data;
     }
     
@@ -304,7 +310,7 @@ abstract class Base_Model_Abstract
         if ($rt && $list) {
             $this->delCacheList(array_keys($list));
         }
-        return $rt;
+        return $rt && $this->setCacheNS();
     }
     
     public function delete($where) {
@@ -368,7 +374,18 @@ abstract class Base_Model_Abstract
     }
 
     public function countResult($where){
-        return intval(reset(reset($this->search($where,"count(*) as count"))));
+        $r = $this->search($where,"count(*) as count");
+        if(is_array($r) && count($r)>0) {
+            $r=reset($r);
+        } else {
+            return 0;
+        }
+        if(is_array($r) && count($r)>0) {
+            $r=reset($r);
+            return intval($r);
+        } else {
+            return 0;
+        }
     }
 
     public function exec($sql) {
@@ -377,5 +394,10 @@ abstract class Base_Model_Abstract
             $this->setCacheNS();
         }
         return $rt;
+    }
+
+    public function setCd($sec = 3600){
+        $this->cd = $sec;
+        return $this;
     }
 }

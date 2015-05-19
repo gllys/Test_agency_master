@@ -270,7 +270,11 @@ class Qunar_Service{
     protected function validRequestXml(){
         $xml = new DOMDocument();
         $xml->loadXML($this->xml);
+        error_reporting(0);
         $this->is_valid = $xml->schemaValidate(dirname(__FILE__) . '/Resource/QMRequestDataSchema.xsd');
+        if($this->is_valid == false){
+            $this->is_valid = $xml->schemaValidate(dirname(__FILE__) . '/Resource/QMRequestDataSchema-v2.1.0.xsd');
+        }
         if($this->is_valid == false){
             $this->response_code = "1014";
             $this->response_desc = "报文解析异常，请检查报文结构";
@@ -279,7 +283,11 @@ class Qunar_Service{
     protected function validResponseXml(){
         $xml = new DOMDocument();
         $xml->loadXML($this->xml);
+        error_reporting(0);
         $this->is_valid = $xml->schemaValidate(dirname(__FILE__) . '/Resource/QMResponseDataSchema.xsd');
+        if($this->is_valid == false){
+            $this->is_valid = $xml->schemaValidate(dirname(__FILE__) . '/Resource/QMResponseDataSchema-v2.1.0.xsd');
+        }
     }
     protected function checkSigned(){
         if($this->is_valid == true){
@@ -303,7 +311,8 @@ class Qunar_Service{
                 'source'=>10,
                 $type => $id,
             ));
-//        Log_Base::save('qunar_debug', 'orgDetail :'.var_export($api_res, true));
+//        Log_Base::save('qunar_setIdentity', 'orgDetail '.date('Y-m-d H:i:s', time()).':'.var_export($api_res, true));
+        Util_Logger::getLogger('qunar')->info(__METHOD__, $api_res, '', '分销商信息');
         $config = Yaf_Registry::get('config');
         if($id == $config['qunar']['supplier_identity'] || ($type='organization_id' && $id == $config['qunar']['agency_id'])){
             $this->create_user          = $config['qunar']['supplier_identity'];

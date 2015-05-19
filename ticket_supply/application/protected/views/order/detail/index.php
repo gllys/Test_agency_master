@@ -5,43 +5,10 @@ $this->breadcrumbs = array('订单', '订单详情');
 <!--<?php if(isset($landscape)):?>
 	<h4 class="lg-title"><?php echo $landscape['name']?></h4>
 <?php endif;?> -->
-	<div class="panel panel-default">
-		<div class="panel-heading">
-			<h4 class="panel-title">可游玩景点</h4>
-		</div>
-		<div class="panel-body">
-        <?php
-            if (isset($ticket[0])) {
-                    $linfo = explode(',', $ticket[0]['landscape_ids']);   //票景区
-			        $result = Landscape::api()->lists(array('ids' => $ticket[0]['landscape_ids']));
-			        $landscapeInfo = ApiModel::getLists($result);
-			        $field['landscape_ids'] = $ticket[0]['landscape_ids'];
-              		$field['ids'] = $ticket[0]['view_point'];
-               		$datas = Poi::api()->lists($field);
-               		$data = ApiModel::getLists($datas);
-               		$str ='';
-               	if(!empty($landscapeInfo)){
-               		foreach ($linfo as $id){
-                        foreach($landscapeInfo as $key=>$model){
-                            if($id == $model['id']) {$str= '<span class="mr20">' . $str.$model['name']."：</span>";}
-                      	}
-                      	$vals = '';
-                       	foreach ($data as $key=>$item){
-                        	if($id == $item['landscape_id']){
-                                     $vals = '<span class="mr20">' . $vals.$item['name'].'</span>';}
-                                }
-                        $str =$str.$vals.'<br>';
-                    }
-                    echo $str;
-               	}else{
-               		echo '该景区已被删除';	
-               	}	         		
-            }           
-            ?>
-        </div>
-	</div>
-	
-	<?php if(isset($detail)):?>
+    
+	<?php if(isset($detail)):
+		$order_item = current($detail['order_items']);
+	?>
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h4 class="panel-title">订单信息</h4>
@@ -66,48 +33,79 @@ $this->breadcrumbs = array('订单', '订单详情');
                             <table class="table table-bordered" id="t1">
 				<tbody>
 				  <tr>
-					  <th width="150">订单号：</th>
-					  <td><?php echo $detail['id']?></td>
+                      <?php if ($detail['partner_type'] == 1) : ?>
+                          <th width="150">订单号：</th>
+                          <td colspan="5"><?php echo $detail['id']; ?></td>
+                          <th width="150">大漠订单号：</th>
+                          <td colspan="10"><?php echo $detail['partner_order_id']; ?></td>
+                      <?php else : ?>
+                          <th width="150">订单号：</th>
+                          <td colspan="15"><?php echo $detail['id']; ?></td>
+                      <?php endif;?>
                                  </tr>
                                   <tr>
 					  <th width="150">订单状态：</th>
-					  <td><?php echo $status_labels[$detail['status']] ?></td>
+					  <td colspan="15"><?php echo $status_labels[$detail['status']] ?></td>
 				  </tr>
-				  <tr <?php echo in_array($detail['status'],array('paid','finish','billed'),true)? '' : 'hidden'; ?>>
+				  <tr  <?php echo in_array($detail['status'],array('paid','finish','billed'),true)? '' : 'hidden'; ?>>
 					  <th>支付时间：</th>
-					  <td><?php echo date("Y年m月d日",$detail['pay_at']);?></td>
+					  <td colspan="15"><?php echo date("Y-m-d H:i:s",$detail['pay_at']);?></td>
                                     </tr>
                                   <tr <?php echo in_array($detail['status'],array('paid','finish','billed'),true)? '' : 'hidden'; ?>>
 					  <th>支付方式：</th>
-                                          <td><?php if(!empty($detail['payment'])){echo $paid_type[$detail['payment']];}?></td>
+                      <td colspan="15"><?php if(!empty($detail['payment'])){echo $paid_type[$detail['payment']];}?></td>
 				  </tr>
 				  <tr>
 					  <th>预定时间：</th>
-					  <td><?php echo date('Y年m月d日',$detail['created_at'])?></td>
+					  <td colspan="15"><?php echo date('Y-m-d H:i:s',$detail['created_at'])?></td>
                                   </tr>
                                      <tr>
 					  <th>游玩时间：</th>
-					  <td><?php echo date('Y年m月d日',strtotime($detail['use_day']))?></td>
+					  <td colspan="15"><?php echo date('Y-m-d',strtotime($detail['use_day']))?></td>
 				  </tr>
+                  <tr>
+                      <th>入园时间：</th>
+                      <?php
+                      $dateNums = array();
+                      if(is_array($detail['order_items'])) {
+                          foreach($detail['order_items'] as $val) {
+                              // 表示已使用的状态
+                              if ($val['status'] == 2) {
+                                  $usedDate = date('Y-m-d H:m:s', $val['use_time']);
+                                  if(!isset($dateNums[$usedDate])) {
+                                      $dateNums[$usedDate] = 1;
+                                  } else {
+                                      $dateNums[$usedDate] += 1;
+                                  }
+                              }
+                          }
+                      }
+                      ?>
+                      <td colspan="15">
+                      <?php foreach($dateNums as $key => $val):?>
+                          <?php echo $key." &nbsp;&nbsp;".$val."张<br/>";?>
+                      <?php endforeach;?>
+                      </td>
+                  </tr>
 				  <tr>
 					  <th>订单类型：</th>
-					  <td colspan="3">电子票</td>
+					  <td colspan="15">电子票</td>
 				  </tr>
 				<tr <?php echo ($detail['nums'] - $detail['used_nums'] - $detail['refunding_nums'] - $detail['refunded_nums'])== 0?'hidden':'';?>>
 					  <th>未使用张数：</th>
-					  <td><?php echo $detail['nums'] - $detail['used_nums'] - $detail['refunding_nums'] - $detail['refunded_nums']?>张</td>
+					  <td colspan="15"><?php echo $detail['nums'] - $detail['used_nums'] - $detail['refunding_nums'] - $detail['refunded_nums']?>张</td>
 					  </tr>
                                      <tr <?php echo $detail['used_nums'] == 0? 'hidden' : '';?>>
                                           <th>已使用张数：</th>
-					  <td><?php echo $detail['used_nums'] == 0? '0' : $detail['used_nums']?>张</td>
+					  <td colspan="15"><?php echo $detail['used_nums'] == 0? '0' : $detail['used_nums']?>张</td>
 				  </tr>
 				  <tr <?php echo $detail['refunding_nums'] == 0? 'hidden' : '';?>>
 					  <th>退款中张数：</th>
-					  <td><?php echo $detail['refunding_nums'] == 0? '0' : $detail['refunding_nums']?>张</td>
+					  <td colspan="15"><?php echo $detail['refunding_nums'] == 0? '0' : $detail['refunding_nums']?>张</td>
 					  </tr>
                                      <tr <?php echo $detail['refunded_nums'] == 0? 'hidden' : '';?>>
                                           <th>已退款张数：</th>
-					  <td><?php echo $detail['refunded_nums'] == 0? '0' : $detail['refunded_nums']?>张</td>
+					  <td colspan="15"><?php echo $detail['refunded_nums'] == 0? '0' : $detail['refunded_nums']?>张</td>
 				  </tr>
 				</tbody>
 			  </table>
@@ -118,18 +116,19 @@ $this->breadcrumbs = array('订单', '订单详情');
 				  <tr>
 					<th>门票名称</th>
 					<th>门票张数</th>
-					<th><?php echo $ticket[0]['price_type'] == 0 ? '散客价' : '团队价'?></th>
+					<th><?php echo $detail['price_type'] == 0 ? '散客结算价' : '团队结算价'?></th>
 					<th>当日价格</th>
 					<th>总计</th>
 				  </tr>
 				</thead>
 				<tbody>
 	                <tr>
-                        <td><?php echo $ticket[0]['name'] ?></td>
-                        <td><?php echo $ticket[0]['nums'] ?></td>
-                        <td><del><?php echo $ticket[0]['price_type'] == 0 ? $ticket[0]['fat_price'] : $ticket[0]['group_price'] ?></del></td>
-                        <td><?php echo $ticket[0]['price']?></td>
-                        <td><?php echo number_format($ticket[0]['price'] * $ticket[0]['nums'],2);?></td>
+                        <td><?php 
+                         echo $detail['name'] ?></td>
+                        <td><?php echo $detail['nums']?></td>
+                        <td><del><?php echo $detail['price_type'] == 0 ? $detail['fat_price'] : $detail['group_price'] ?></del></td>
+                        <td><?php echo $detail['price']?></td>
+                        <td><?php echo number_format($detail['amount'],2);?></td>
                     </tr>
 				</tbody>
 			  </table>
@@ -139,6 +138,17 @@ $this->breadcrumbs = array('订单', '订单详情');
 		<div class="panel-footer" style="text-align:right" id="take-ticket-footer">
                     <span style="margin-right:30px">合计票数:<b class="text-danger" id="totalnum"><?php echo $detail['nums']?></b>张</span>
 			<span style="margin-right:30px">合计支付金额:<b class="text-danger"><?php echo $detail['amount']?></b>元</span>
+			
+			<?php if ($detail['status'] == 'unaudited' ) : ?>
+            <!--/**
+             *hefeng
+             *2015-01-29
+             *新增 确定 驳回 按钮 unaudited
+             **/-->
+            
+                <a id="isConfirm" href="javascript:;" class="btn btn-primary">确定</a>
+                <button class="btn btn-danger" id="una" type="button" data-toggle="modal" data-target="#myModal" >驳回</button>
+            <?php endif; ?>
 		</div>
 	</div>
 	
@@ -165,7 +175,7 @@ $this->breadcrumbs = array('订单', '订单详情');
 		<tbody>
 		  <tr>
 			<td>取票人姓名：<?php echo $detail['owner_name']?></td>
-			<td>取票人手机号码：<?php echo $detail['owner_mobile']?> <!--button class="btn btn-primary btn-xs ml10" type="button">重发短信</button--></td>
+			<td>取票人手机号码：<?php echo $detail['owner_mobile'];?> <!--button class="btn btn-primary btn-xs ml10" type="button">重发短信</button--></td>
 			<td>取票人身份证号码：<?php echo $detail['owner_card']?></td>
 		  </tr>
 		</tbody>
@@ -180,7 +190,7 @@ $this->breadcrumbs = array('订单', '订单详情');
 			  <table class="table table-bordered">
 				<thead>
 				<tbody>
-				  <?php $agencyInfo = Organizations::api()->show(array('id' => intval($ticket[0]['distributor_id'])));?>  
+				  <?php $agencyInfo = Organizations::api()->show(array('id' => intval($ticket[key($ticket)]['distributor_id'])));?>  
 				  <tr>
 					<th width="150">用户名称：</th><td><?php echo $agencyInfo['body']['name']?></td>
 				  </tr>
@@ -199,12 +209,12 @@ $this->breadcrumbs = array('订单', '订单详情');
 			  <table class="table table-bordered">
 				<thead>
 				<tbody>
-				  <?php $supplyInfo = Organizations::api()->show(array('id' => $ticket[0]['supplier_id']));?> 
+				  <?php $supplyInfo = Organizations::api()->show(array('id' => $ticket[key($ticket)]['supplier_id']));?> 
 				  <tr>
 					<th width="150">供应商名称：</th><td><?php echo $supplyInfo['body']['name']?></td>
 				  </tr>
 				  <tr>
-					<th>操作人：</th><td><?php echo  !empty($detail['order_items'][0]['user_name'])?$detail['order_items'][0]['user_name']:$supplyInfo['body']['contact']?></td>
+					<th>操作人：</th><td><?php echo  !empty($order_item['user_name'])?$order_item['user_name']:$supplyInfo['body']['contact']?></td>
 				  </tr>
 				</tbody>
 			  </table>
@@ -217,26 +227,55 @@ $this->breadcrumbs = array('订单', '订单详情');
 				<h4 class="panel-title">订单备注</h4>
 			</div>
 			<div class="panel-body">
-	<?php if ($detail['status'] == 'unpaid') :?>
-
-	<textarea placeholder="限定200字以内" class="form-control" rows="5" maxlength="200" ></textarea>
-	<?php else :?>
-		<p><?php echo html_entity_decode($detail['remark'])?></p>
-	<?php endif;?>
+                <p><?php echo $detail['remark'];?></p>	
 			</div><!-- panel-body -->
 	</div>
 	
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="panel-title">可游玩景点</h4>
+        </div>
+        <div class="panel-body">
+        <?php 
+        if(isset($infos['ticket_infos'])){ foreach ($infos['ticket_infos'] as $item){?>
+        <div class="table-responsive mb10">
+            <table class="table table-bordered">
+                <tr>
+                    <th colspan="2"><?php echo $item['sceinc_name'];?></th>
+                    <th>退票张数： <?php echo $infos['refunded_nums'] * $item['num'];?></th></tr>
+                <tr>
+                    <th>景点</th><th>未使用张数</th><th>已使用张数</th>
+                </tr>
+                <?php foreach ($infos['poi_counts'][$item['scenic_id']] as $poi){?>
+                <tr>
+                    <td><?php echo $infos['poi_names'][$poi['poi_id']];?></td>
+                    <td><?php echo $poi['unuse_num'];?></td>
+                    <td><?php echo $poi['used_num'];?></td>
+                </tr>
+                <?php }?>
+            </table>
+        </div>
+        <?php } }else{ echo '该景区已被删除';}?>
+        </div>
+    </div>
+    
 	<div class="panel panel-default">
 		<table class="table table-bordered mb30">
 		<tbody>
 		<tr>
-		<th width="120">购买规定</th>
-		<td><?php echo $ticket[0]['remark']?></td>
+		<th width="120">产品说明</th>
+		<td><?php echo $detail['ticket_template_remark']?></td>
 		</tr>
 		</tbody>
 		</table>
 	</div>	
 </div><!-- contentpanel -->
+
+ <div class="panel-footer" style="padding-left:5%">
+    <button class="btn btn-default" type="button" onclick="javascript:history.go(-1);" id="export">返回</button>
+</div>
+
+
 <script>
 $("#applysub").click(function(){
     var mun = $("#ticketmun").val();
@@ -384,4 +423,136 @@ function total(){
     });
 
 </script>
+<script type="text/javascript">
+	/**
+	 *打开弹窗，关闭弹窗，提交
+	 *hefeng
+	 *2015-1-30
+	 **/
+    $(function(){
+        $("#s").on("click",function(){
+
+            // body...
+            if($.trim($("#rejectedContent").val())==""){
+                alert("驳回理由不能为空");
+                $("#rejectedContent").focus();
+                return false;
+            }
+            var rejectedContent = $.trim($("#rejectedContent").val());
+            var orderId = $.trim($("#olderId").val());
+            var receiver_organization = <?php echo $ticket[key($ticket)]['distributor_id']?>;
+
+            if(rejectedContent!="" && orderId!=""){
+                $.post("/order/detail/rejected/",{orderId:orderId,receiver_organization:receiver_organization,rejectedContent:rejectedContent,t:Math.random()},function(data){
+                    if(data.code=="succ"){
+                        //alert("驳回成功");
+                        //window.location.href=data.url;
+
+                        setTimeout(function(){
+			                alert('驳回成功',function(){window.location.reload();});
+			            },500)
+                    }else{
+                        //alert("驳回失败");
+                        //window.location.href=data.url;
+                        setTimeout(function(){
+			                alert('驳回失败',function(){window.location.reload();});
+			            },500)
+                    }
+                } ,' json ');
+            }
+        })
+    });
+    $(function(){
+        $("#isConfirm").on("click",function(){
+            $.get("/order/detail/checkStatus/id/<?php echo $detail["id"] ?>"+"/t/"+Math.random(),function(data){
+                if(data=="cancel"){
+                   // alert("订单已经取消");
+                   //location.reload();
+                    alert('订单已经取消',function(){window.location.reload();});
+                    return false;
+                }else{
+                    
+                	PWConfirm("是否确定审核通过",function(){
+                		$.get("/order/detail/confirm/id/<?php echo $detail["id"] ?>"+"/receiver_organization/<?php echo $ticket[key($ticket)]['distributor_id']?>"+"/t/"+Math.random(),function(data){
+                            if(data.code=="succ"){
+                         
+                                setTimeout(function(){
+			                        alert('审核成功',function(){window.location.reload();});
+			                    },500)
+                            }else{
+                                setTimeout(function(){
+			                        alert('审核失败',function(){window.location.reload();});
+			                    },500)
+                            }
+                        },' json ');
+                	});
+
+                   /*if(confirm('是否确定审核通过')){
+                        $.get("/order/detail/confirm/id/<?php echo $detail["id"] ?>"+"/receiver_organization/<?php echo $ticket[key($ticket)]['distributor_id']?>"+"/t/"+Math.random(),function(data){
+                            if(data.code=="succ"){
+                                alert("审核成功");
+                                window.location.href=data.url;
+                            }else{
+                                alert("审核失败");
+                                window.location.href=data.url;
+                            }
+                        },' json ');
+                    }else{
+                        return false;
+                    }*/
+                }
+            })
+			return false;
+        });
+        $("#una").on("click",function(){
+            $.get("/order/detail/checkStatus/id/<?php echo $detail["id"] ?>"+"/t/"+Math.random(),function(data){
+                if(data=="cancel"){
+                    $("#myModal").hide();
+                    //alert("订单已经取消");
+                    //location.reload();
+                    alert('订单已经取消',function(){window.location.reload();});
+                    return false;
+                }
+            });
+        	$("#rejectedContent").val("");
+        });
+    })
+
+    function checkStatus(){
+        $.get("/order/detail/checkStatus/id/<?php echo $detail["id"] ?>"+"/t/"+Math.random(),function(data){
+                return data;
+        })
+    }
+</script>
+<!--
+	**
+	*驳回订单弹窗
+	*hefeng
+	*2015-1-30
+	**-->
+<style>
+    .close {
+        line-height: 0px;
+    }
+</style>
+<form action="#" method="post" name="form1">
+    <input type="hidden" value="<?php echo $detail['id']?>" id="olderId" name="olderId">
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">请输入驳回理由</h4>
+            </div>
+            <div class="modal-body">
+                <textarea name="rejectedContent" id="rejectedContent" cols="51" rows="5" ></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="cancel" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button"  id="s" class="btn btn-primary">确定驳回</button>
+            </div>
+        </div>
+    </div>
+</div>
+</form>
 

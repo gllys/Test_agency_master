@@ -34,7 +34,22 @@ class ApiOrderModel extends Base_Model_Api
         return $r;
     }
 
+    /**
+     * 该方法不建议使用
+     * @writer cuilin
+     * @date 2015.05.12
+     */
     public function cancel($params){
+        $this->url = '/v1/refund/apply';
+        $this->params = $params;
+        $r = json_decode($this->request(),true);
+        return $r;
+    }
+
+    /**
+     * 申请退款方法
+     */
+    public function refundApply($params){
         $this->url = '/v1/refund/apply';
         $this->params = $params;
         $r = json_decode($this->request(),true);

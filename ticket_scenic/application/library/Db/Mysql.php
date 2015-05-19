@@ -200,6 +200,41 @@ class Db_Mysql
         $this->sql = "INSERT INTO `" . $tblname . "` (`$fields`) VALUES($values)";
         return $this->db->prepare($this->sql)->execute($params);
     }
+
+    public function replace($tblname, $data) {
+        $this->connect();
+        $params = array();
+        $mult = false;
+        foreach ($data as $key => $val) {
+            if (is_numeric($key)) {
+                $mult = true;
+                break;
+            }
+            $data[$key] = '?';
+            $params[] = is_array($val) ? json_encode($val) : $val;
+        }
+
+        if (!$mult) {
+            $fields = implode('`, `', array_keys($data));
+            $values = '('. implode(',', $data) . ')';
+        } else {
+            $fields = implode('`, `', array_shift($data));
+            $values = array();
+            foreach ($data as $row) {
+                $values[] = "('". implode("','", $row) . "')";
+            }
+            $values = implode(',', $values);
+        }
+
+        $this->sql = "REPLACE INTO `" . $tblname . "` (`$fields`) VALUES $values";
+        $dbh = $this->db->prepare($this->sql);
+        $rt = $dbh->execute($params);
+        if (!$rt) {
+            $err = $dbh->errorInfo();
+            throw new Exception(array_pop($err));
+        }
+        return $rt;
+    }
     
     public function getInsertId() {
         return $this->db->lastInsertId();

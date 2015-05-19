@@ -11,6 +11,7 @@ $this->breadcrumbs = array('订单', '任务单管理');
 	.table-bordered a:hover {
 		text-decoration: none;
 	}
+    .ui-datepicker { z-index:9999!important }
 </style>
 <div class="contentpanel">
 
@@ -179,7 +180,7 @@ $this->breadcrumbs = array('订单', '任务单管理');
 			<div class="panel-footer pagenumQu" style="padding-top:15px;text-align:right;border:1px solid #ddd;border-top:0">
 				<?php
 				if (isset($lists['data'])) {
-					$this->widget('CLinkPager', array(
+					$this->widget('common.widgets.pagers.ULinkPager', array(
 						'cssFile' => '',
 						'header' => '',
 						'prevPageLabel' => '上一页',
@@ -218,7 +219,30 @@ $this->breadcrumbs = array('订单', '任务单管理');
 				$(this).text('全选')
 			}
 		});
-		jQuery('.datepicker').datepicker({dateFormat: 'yy-mm-dd'});
+		$('.datepicker').datepicker({
+            changeMonth: true,
+            changeYear: true,
+            dateFormat: 'yy-mm-dd',
+            monthNamesShort: [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" ],
+            yearRange: "1995:2065",
+            beforeShow: function(d){
+                setTimeout(function(){
+                    $('.ui-datepicker-title select').select2({
+                        minimumResultsForSearch: -1
+                    });
+                },0)
+            },
+            onChangeMonthYear: function(){
+                setTimeout(function(){
+                    $('.ui-datepicker-title select').select2({
+                        minimumResultsForSearch: -1
+                    });
+                },0)
+            },
+            onClose: function(dateText, inst) { 
+                $('.select2-drop').hide(); 
+            }
+        });
 
 
 		$('#btn-chk-all').click(function(){
@@ -243,19 +267,6 @@ $this->breadcrumbs = array('订单', '任务单管理');
 
 // Form Toggles
         jQuery('.toggle').toggles({on: true});
-
-// Time Picker
-        jQuery('#timepicker').timepicker({defaultTIme: false});
-        jQuery('#timepicker2').timepicker({showMeridian: false});
-        jQuery('#timepicker3').timepicker({minuteStep: 15});
-
-// Date Picker
-        jQuery('.datepicker').datepicker({showOtherMonths: true, selectOtherMonths: true});
-        jQuery('#datepicker-inline').datepicker();
-        jQuery('#datepicker-multiple').datepicker({
-            numberOfMonths: 3,
-            showButtonPanel: true
-        });
 
 // Input Masks
         jQuery("#date").mask("99/99/9999");

@@ -36,12 +36,13 @@
                     $.each(data.errors, function(i, n) {
                         tmp_errors += n;
                     });
-                    var warn_msg = '<div class="alert alert-error"><button data-dismiss="alert" class="close" type="button">×</button><i class="icon-warning-sign"></i>' + tmp_errors + '</div>';
-                    $('#verify_return').html(warn_msg);
+                    alert(tmp_errors);
                 } else{
                     var succss_msg = '<div class="alert alert-success"><button data-dismiss="alert" class="close" type="button">×</button><strong>操作成功!</strong></div>';
                     $('#verify_return').html(succss_msg);
-                    setTimeout("location.href='/scenic/Spot/?id="+$('#landscape_id').val()+"'", '2000');
+                    alert('操作成功!', function() {
+                        location.href='/site/switch/#/scenic/Spot/?id='+$('#landscape_id').val();
+                    });
                 }
             }, "json");
             return false; 

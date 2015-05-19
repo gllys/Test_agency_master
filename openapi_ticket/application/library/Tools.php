@@ -1386,7 +1386,7 @@ class Tools {
 		curl_setopt($ch, CURLOPT_FAILONERROR, false);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_TIMEOUT, 50);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 100);
 
 		if (strlen($url) > 5 && strtolower(substr($url, 0, 5)) == "https")
 		{

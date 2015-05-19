@@ -64,7 +64,7 @@
             if ($('#edit_bank_card').validationEngine('validate') == true) {
                 $.post('/finance/account/editBank', $('#edit_bank_card').serialize(), function(data) {
                     if (data.error === 0) {
-                        alert('修改成功',function(){window.location.reload();});
+                        alert('修改成功',function(){window.location.partReload();});
                     } else {
                         alert(data.msg);
                     }

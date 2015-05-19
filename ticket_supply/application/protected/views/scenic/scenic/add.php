@@ -4,18 +4,18 @@
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
             <h4 class="modal-title">新增子景点</h4>
         </div>
-        
+        <form action="#" id="form">
             <div class="modal-body">
                 <div class="form-group">
                     <label class="col-sm-2 control-label">景点名称:</label>
                     <div class="col-sm-10">
-                        <input type="text" name="name" class="form-control" id="name">
+                        <input maxlength="100" type="text" tag="景点名称" name="name" class="validate[required]  form-control" id="name">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-sm-2 control-label">介绍:</label>
                     <div class="col-sm-10">
-                        <textarea rows="5" placeholder="" class="form-control" style="word-break: break-all; word-wrap:break-word;" name="description" id="description"></textarea>
+                        <textarea maxlength="255" rows="5" tag="介绍" placeholder="" class="validate[required] form-control" style="word-break: break-all; word-wrap:break-word;" name="description" id="description"></textarea>
                     </div>
                 </div>
             </div>
@@ -23,12 +23,23 @@
             <div class="modal-footer">
                 <button class="btn btn-success" type="button" id="buttonsub">保存</button>
             </div>
-       
+        </form>
     </div>
 </div>
 
 <script type="text/javascript">
+    //提示设置
+         $('#form').validationEngine({
+            autoHidePrompt: false,
+            scroll: false,
+            autoHideDelay: 3000,
+            maxErrorsPerField: 1,
+            showOneMessage: true
+        });
     $("#buttonsub").click(function(){
+        if ($('#form').validationEngine('validate') !== true) {
+                return false;
+        }
         var name =$('#name').val();
         var description =$('#description').val();
         if(name !='' && description !=''){

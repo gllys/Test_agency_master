@@ -3,6 +3,8 @@
 class CreateUrlLan {
 
     public $baseUrl = '/';
+    // 验票账号的滚动条
+    public $topbarUrl = '/js/check-message.js';
     private static $_model = null;
 
     public static function model($className = __CLASS__) {
@@ -12,6 +14,24 @@ class CreateUrlLan {
         return self::$_model;
     }
 
+    public function createMenu() {
+        $count = count($this->titles);
+        $html = '';
+        for ($i = 0; $i < $count; $i++) {
+            $list = $this->createList($i);
+            if (empty($list))
+                continue;
+
+            $title = $this->createTitle($i);
+            
+            if (empty($title))
+                continue;
+            $html .= sprintf('<li class="parent">%s<ul class="children">%s</ul></li>', $title, $list);
+        }
+
+        return $html;
+    }
+    
     public function createHeader() {
         $count = count($this->titles);
         $html = '';
@@ -89,17 +109,17 @@ class CreateUrlLan {
         echo $string;
     }
 
-    // 菜单标题
+     // 菜单标题
     public function createTitle($index) {
         if (!isset($this->titles[$index]))
             return null;
         if ($this->titles[$index]['content'] == '') {
-            $html = '<a style="display:none" href="/site/header/index/' . $index . '/" id="drop' . $index . '">';
+            return '';
         } else {
-            $html = '<a href="/site/header/index/' . $index . '/" id="drop' . $index . '">';
+            $html = '<a href="javascript:void(0);" id="drop_' . $index . '"><i class="' . $this->titles[$index]['params']['class'] . '"></i> <span>';
         }
 
-        $html .= sprintf('%s</a>', $this->titles[$index]['content']);
+        $html .= sprintf('%s</span></a>', $this->titles[$index]['content']);
 
         return $html;
     }
@@ -113,16 +133,11 @@ class CreateUrlLan {
         foreach ($this->lists[$index] as $item) {
             if (!$this->checkAuth($item))
                 continue;
-
-            $html .= '<li class=""><a';
+            $html .= '<li><a';
             foreach ($item['params'] as $key => $value) {
                 $html .= sprintf(' %s="%s"', $key, $value);
             }
-            $html .= '><i';
-            foreach ($item['paramIcos'] as $key => $value) {
-                $html .= sprintf(' %s="%s"', $key, $value);
-            }
-            $html .= sprintf('></i><span>%s</span></a></li>', $item['content']);
+            $html .= sprintf('>%s</a></li>', $item['content']);
         }
         return $html;
     }
@@ -159,6 +174,7 @@ class CreateUrlLan {
     private static $_singles = array();
 
     private function checkAuth($item) {
+        return true;
         #得到用户信息
         $user = self::$_singles['users'] = isset(self::$_singles['users']) ? self::$_singles['users'] : #单例，可以不看
             Users::model()->findByAttributes(array('account' => Yii::app()->user->id));
@@ -169,7 +185,7 @@ class CreateUrlLan {
         }
 
         #得到用户权限
-        $permissions = array('/check/used/','/check/check/');
+        $permissions = array('/check/used/','/check/check/','/check/order/','/message/notice/');
         if ($this->inArray($item['params']['href'], $permissions)) {
             return true;
         }
@@ -202,7 +218,8 @@ class CreateUrlLan {
     }
     
     public $TitleIndexs = array(
-        'check' => 0
+        'check' => 0,
+        'message' => 1,
     );
 
     public function getIndex($nav) {
@@ -210,12 +227,17 @@ class CreateUrlLan {
     }
 
     public $titles = array(
-        array('params' => array('class' => 'fa fa-fw fa-credit-card'), 'content' => '核销'),
+        array('params' => array('class' => 'fa fa-fw fa-credit-card'), 'content' => '验票'),
+        array('params' => array('class' => 'fa fa-fw fa-credit-card'), 'content' => '消息'),
     );
     public $lists = array(
         array(
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/check/used/'), 'content' => '核销'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/check/check/'), 'content' => '核销管理'),
+            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/check/used/'), 'content' => '验票'),
+            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/check/check/'), 'content' => '验票记录'),
+            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/check/order/'), 'content' => '订单管理'),
+        ),
+        array(
+            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/message/notice/view/type/all/'), 'content' => '公告信息'),
         ),
     );
     

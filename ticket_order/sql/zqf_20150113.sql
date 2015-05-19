@@ -1,0 +1,5 @@
+alter table `bills_items201410` add `payment` varchar(30) DEFAULT NULL COMMENT '支付渠道:cash,offline,credit,pos,alipay,advance,union,kuaiqian,taobao' after `owner_mobile`;
+alter table `bills_items201411` add `payment` varchar(30) DEFAULT NULL COMMENT '支付渠道:cash,offline,credit,pos,alipay,advance,union,kuaiqian,taobao' after `owner_mobile`;
+alter table `bills_items201412` add `payment` varchar(30) DEFAULT NULL COMMENT '支付渠道:cash,offline,credit,pos,alipay,advance,union,kuaiqian,taobao' after `owner_mobile`;
+alter table `bills_items201501` add `payment` varchar(30) DEFAULT NULL COMMENT '支付渠道:cash,offline,credit,pos,alipay,advance,union,kuaiqian,taobao' after `owner_mobile`;
+alter table `bills_items201502` add `payment` varchar(30) DEFAULT NULL COMMENT '支付渠道:cash,offline,credit,pos,alipay,advance,union,kuaiqian,taobao' after `owner_mobile`;

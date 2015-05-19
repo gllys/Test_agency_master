@@ -21,7 +21,7 @@
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label"><span class="text-danger">*</span>输入原密码</label>
                                     <div class="col-sm-6">
-                                        <input type="password" autocomplete="off" id="old_pass" name="user[oldpass]" tag="原密码" class="validate[required,minSize[6],maxSize[16]] error form-control">
+                                        <input type="password" autocomplete="off" id="old_pass" name="user[oldpass]" tag="原密码" class="validate[required,minSize[6],maxSize[16],custom[onlyLetterNumber]] error form-control" onkeypress="return IsOnlyNumLetter(event)">
                                     </div>
                                 </div>
                                 <!-- form-group -->
@@ -29,7 +29,7 @@
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label"><span class="text-danger">*</span>输入新密码</label>
                                     <div class="col-sm-6">
-                                        <input type="password" autocomplete="off" id="password" name="user[password]" tag="新密码" class="validate[required,minSize[6],maxSize[16]] form-control error">
+                                        <input type="password" autocomplete="off" id="password" name="user[password]" tag="新密码" class="validate[required,minSize[6],maxSize[16],custom[onlyLetterNumber]] form-control error" onkeypress="return IsOnlyNumLetter(event)">
                                     </div>
                                 </div>
                                 <!-- form-group -->
@@ -37,7 +37,7 @@
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label"><span class="text-danger">*</span>确认新密码</label>
                                     <div class="col-sm-6">
-                                        <input type="password" autocomplete="off" name="user[confirm_password]" tag="确认新密码" class="validate[required,equals[password],minSize[6],maxSize[16]] form-control error">
+                                        <input type="password" autocomplete="off" name="user[confirm_password]" tag="确认新密码" class="validate[required,equals[password],minSize[6],maxSize[16],custom[onlyLetterNumber]] form-control error" onkeypress="return IsOnlyNumLetter(event)">
                                     </div>
                                 </div>
                                 <!-- form-group -->
@@ -82,7 +82,7 @@
 <script>
     $(document).ready(function() {
 
-// 表单验证
+        // 表单验证
         $('#repass-form').validationEngine({
             autoHidePrompt: false,
             scroll: false,
@@ -90,7 +90,6 @@
             maxErrorsPerField: 1
         });
         $('#repass-form-button').click(function() {
-            $('#show_msg').empty();
             var obj = $('#repass-form');
             if (obj.validationEngine('validate') == true) {
                 $.post('/system/account/index', {"old": $('#old_pass').val(), "assword": $('#password').val()}, function(data) {
@@ -99,14 +98,11 @@
                         $.each(data.errors, function(i) {
                             tmp_errors += data.errors[i];
                         });
-                        var warn_msg = '<div class="alert alert-danger"><button data-dismiss="alert" class="close" type="button">×</button>' + tmp_errors + '</div>';
-                        $('#show_msg').html(warn_msg);
+                        alert(tmp_errors);
                     } else {
-                        type_msg = '密码修改成功';
-                        var succss_msg = '<div class="alert alert-success"><button data-dismiss="alert" class="close" type="button">×</button>' + type_msg + '! </div>';
-                        $('#show_msg').html(succss_msg);
-                        setTimeout("location.href='/system/account/'", '2000');
-
+                        alert('密码修改成功！', function() {
+                            location.partReload();
+                        });
                     }
                 }, 'json');
             };

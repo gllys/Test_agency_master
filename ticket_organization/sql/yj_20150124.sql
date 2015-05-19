@@ -1,0 +1,1 @@
+ALTER TABLE `union_money_log` ADD `activity_money` decimal(10,2) DEFAULT '0.00' COMMENT '平台抵用券金额';

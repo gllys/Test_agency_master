@@ -407,7 +407,7 @@
 
 					} else {
 						$("html, body").animate({
-							scrollTop: destination - 65
+							scrollTop: destination
 						}, 1100, function(){
 							if(options.focusFirstField) first_err.focus();
 						});
@@ -488,7 +488,7 @@
 									// the field is invalid, show the red error prompt
 									errorInForm|=true;
 									if (options.allrules[msg]) {
-										var txt = options.allrules[msg].alertText.replace('{tag}', field.attr("tag"));
+										var txt = options.allrules[msg].alertText;
 										if (txt)
 											msg = txt;
 									}
@@ -711,21 +711,8 @@
 			//the 3rd condition is added so that even empty password fields should be equal
 			//otherwise if one is filled and another left empty, the "equal" condition would fail
 			//which does not make any sense
-			(function () {
-				if (!Array.prototype.indexOf) {
-					Array.prototype.indexOf = function (obj, start) {
-						for (var i = (start || 0), j = this.length; i < j; i++) {
-							if (this[i] === obj) {
-								return i;
-							}
-						}
-						return -1;
-					};
-				}
-			})();
-
 			if(!required && !(field.val()) && field.val().length < 1 && rules.indexOf("equals") < 0) options.isError = false;
-			
+
 			// Hack for radio/checkbox group button, the validation go into the
 			// first radio/checkbox of the group
 			var fieldType = field.prop("type");
@@ -933,7 +920,7 @@
 						|| ( dv_placeholder && field_val == dv_placeholder )
 						|| ( placeholder    && field_val == placeholder    )
 					) {
-						return options.allrules[rules[i]].alertText.replace('{tag}', field.attr("tag"));
+						return options.allrules[rules[i]].alertText;
 					}
 					break;
 				case "radio":
@@ -941,7 +928,7 @@
 					// new validation style to only check dependent field
 					if (condRequired) {
 						if (!field.attr('checked')) {
-							return options.allrules[rules[i]].alertTextCheckboxMultiple.replace('{tag}', field.attr("tag"));
+							return options.allrules[rules[i]].alertTextCheckboxMultiple;
 						}
 						break;
 					}
@@ -950,9 +937,9 @@
 					var name = field.attr("name");
 					if (form.find("input[name='" + name + "']:checked").size() == 0) {
 						if (form.find("input[name='" + name + "']:visible").size() == 1)
-							return options.allrules[rules[i]].alertTextCheckboxe.replace('{tag}', field.attr("tag"));
+							return options.allrules[rules[i]].alertTextCheckboxe;
 						else
-							return options.allrules[rules[i]].alertTextCheckboxMultiple.replace('{tag}', field.attr("tag"));
+							return options.allrules[rules[i]].alertTextCheckboxMultiple;
 					}
 					break;
 			}
@@ -979,7 +966,7 @@
 			}); 
 
 			if(!isValid) {
-		  return options.allrules[rules[i]].alertText.replace('{tag}', field.attr("tag"));
+		  return options.allrules[rules[i]].alertText;
 		}
 		},
 		/**
@@ -1009,7 +996,7 @@
 					}
 					var pattern = new RegExp(ex);
 
-					if (!pattern.test(field.val())) return options.allrules[customRule].alertText.replace('{tag}', field.attr("tag"));
+					if (!pattern.test(field.val())) return options.allrules[customRule].alertText;
 					
 			} else if(rule["func"]) {
 				fn = rule["func"]; 
@@ -1020,7 +1007,7 @@
 				}
 				 
 				if (!fn(field, rules, i, options))
-					return options.allrules[customRule].alertText.replace('{tag}', field.attr("tag"));
+					return options.allrules[customRule].alertText;
 			} else {
 				alert("jqv:custom type not allowed "+customRule);
 					return;
@@ -1069,7 +1056,7 @@
 			var equalsField = rules[i + 1];
 
 			if (field.val() != $("#" + equalsField).val())
-				return options.allrules.equals.alertText.replace('{tag}', field.attr("tag"));
+				return options.allrules.equals.alertText;
 		},
 		/**
 		* Check the maximum size (in characters)
@@ -1087,7 +1074,7 @@
 
 			if (len > max) {
 				var rule = options.allrules.maxSize;
-				return rule.alertText.replace('{tag}', field.attr("tag")) + max + rule.alertText2;
+				return rule.alertText + max + rule.alertText2;
 			}
 		},
 		/**
@@ -1106,7 +1093,7 @@
 
 			if (len < min) {
 				var rule = options.allrules.minSize;
-				return rule.alertText.replace('{tag}', field.attr("tag")) + min + rule.alertText2;
+				return rule.alertText + min + rule.alertText2;
 			}
 		},
 		/**
@@ -1125,8 +1112,8 @@
 
 			if (len < min) {
 				var rule = options.allrules.min;
-				if (rule.alertText2) return rule.alertText.replace('{tag}', field.attr("tag")) + min + rule.alertText2;
-				return rule.alertText.replace('{tag}', field.attr("tag")) + min;
+				if (rule.alertText2) return rule.alertText + min + rule.alertText2;
+				return rule.alertText + min;
 			}
 		},
 		/**
@@ -1145,9 +1132,9 @@
 
 			if (len >max ) {
 				var rule = options.allrules.max;
-				if (rule.alertText2) return rule.alertText.replace('{tag}', field.attr("tag")) + max + rule.alertText2;
+				if (rule.alertText2) return rule.alertText + max + rule.alertText2;
 				//orefalo: to review, also do the translations
-				return rule.alertText.replace('{tag}', field.attr("tag")) + max;
+				return rule.alertText + max;
 			}
 		},
 		/**
@@ -1179,8 +1166,8 @@
 
 			if (vdate > pdate ) {
 				var rule = options.allrules.past;
-				if (rule.alertText2) return rule.alertText.replace('{tag}', field.attr("tag")) + methods._dateToString(pdate) + rule.alertText2;
-				return rule.alertText.replace('{tag}', field.attr("tag")) + methods._dateToString(pdate);
+				if (rule.alertText2) return rule.alertText + methods._dateToString(pdate) + rule.alertText2;
+				return rule.alertText + methods._dateToString(pdate);
 			}
 		},
 		/**
@@ -1213,8 +1200,8 @@
 			if (vdate < pdate ) {
 				var rule = options.allrules.future;
 				if (rule.alertText2)
-					return rule.alertText.replace('{tag}', field.attr("tag")) + methods._dateToString(pdate) + rule.alertText2;
-				return rule.alertText.replace('{tag}', field.attr("tag")) + methods._dateToString(pdate);
+					return rule.alertText + methods._dateToString(pdate) + rule.alertText2;
+				return rule.alertText + methods._dateToString(pdate);
 			}
 		},
 		/**
@@ -1252,17 +1239,17 @@
 		_dateRange: function (field, rules, i, options) {
 			//are not both populated
 			if ((!options.firstOfGroup[0].value && options.secondOfGroup[0].value) || (options.firstOfGroup[0].value && !options.secondOfGroup[0].value)) {
-				return options.allrules[rules[i]].alertText.replace('{tag}', field.attr("tag")) + options.allrules[rules[i]].alertText2;
+				return options.allrules[rules[i]].alertText + options.allrules[rules[i]].alertText2;
 			}
 
 			//are not both dates
 			if (!methods._isDate(options.firstOfGroup[0].value) || !methods._isDate(options.secondOfGroup[0].value)) {
-				return options.allrules[rules[i]].alertText.replace('{tag}', field.attr("tag")) + options.allrules[rules[i]].alertText2;
+				return options.allrules[rules[i]].alertText + options.allrules[rules[i]].alertText2;
 			}
 
 			//are both dates but range is off
 			if (!methods._dateCompare(options.firstOfGroup[0].value, options.secondOfGroup[0].value)) {
-				return options.allrules[rules[i]].alertText.replace('{tag}', field.attr("tag")) + options.allrules[rules[i]].alertText2;
+				return options.allrules[rules[i]].alertText + options.allrules[rules[i]].alertText2;
 			}
 		},
 		/**
@@ -1275,15 +1262,15 @@
 		_dateTimeRange: function (field, rules, i, options) {
 			//are not both populated
 			if ((!options.firstOfGroup[0].value && options.secondOfGroup[0].value) || (options.firstOfGroup[0].value && !options.secondOfGroup[0].value)) {
-				return options.allrules[rules[i]].alertText.replace('{tag}', field.attr("tag")) + options.allrules[rules[i]].alertText2;
+				return options.allrules[rules[i]].alertText + options.allrules[rules[i]].alertText2;
 			}
 			//are not both dates
 			if (!methods._isDateTime(options.firstOfGroup[0].value) || !methods._isDateTime(options.secondOfGroup[0].value)) {
-				return options.allrules[rules[i]].alertText.replace('{tag}', field.attr("tag")) + options.allrules[rules[i]].alertText2;
+				return options.allrules[rules[i]].alertText + options.allrules[rules[i]].alertText2;
 			}
 			//are both dates but range is off
 			if (!methods._dateCompare(options.firstOfGroup[0].value, options.secondOfGroup[0].value)) {
-				return options.allrules[rules[i]].alertText.replace('{tag}', field.attr("tag")) + options.allrules[rules[i]].alertText2;
+				return options.allrules[rules[i]].alertText + options.allrules[rules[i]].alertText2;
 			}
 		},
 		/**
@@ -1304,8 +1291,8 @@
 			if (groupSize > nbCheck) {
 				options.showArrow = false;
 				if (options.allrules.maxCheckbox.alertText2)
-					 return options.allrules.maxCheckbox.alertText.replace('{tag}', field.attr("tag")) + " " + nbCheck + " " + options.allrules.maxCheckbox.alertText2;
-				return options.allrules.maxCheckbox.alertText.replace('{tag}', field.attr("tag"));
+					 return options.allrules.maxCheckbox.alertText + " " + nbCheck + " " + options.allrules.maxCheckbox.alertText2;
+				return options.allrules.maxCheckbox.alertText;
 			}
 		},
 		/**
@@ -1325,7 +1312,7 @@
 			var groupSize = form.find("input[name='" + groupname + "']:checked").size();
 			if (groupSize < nbCheck) {
 				options.showArrow = false;
-				return options.allrules.minCheckbox.alertText.replace('{tag}', field.attr("tag")) + " " + nbCheck + " " + options.allrules.minCheckbox.alertText2;
+				return options.allrules.minCheckbox.alertText + " " + nbCheck + " " + options.allrules.minCheckbox.alertText2;
 			}
 		},
 		/**
@@ -1357,7 +1344,7 @@
 				}
 				valid = sum % 10 == 0;
 			}
-			if (!valid) return options.allrules.creditCard.alertText.replace('{tag}', field.attr("tag"));
+			if (!valid) return options.allrules.creditCard.alertText;
 		},
 		/**
 		* Ajax field validation
@@ -1449,14 +1436,14 @@
 								 // resolve the msg prompt
 								 if(msg) {
 									 if (options.allrules[msg]) {
-										 var txt = options.allrules[msg].alertText.replace('{tag}', field.attr("tag"));
+										 var txt = options.allrules[msg].alertText;
 										 if (txt) {
 											msg = txt;
 							}
 									 }
 								 }
 								 else
-									msg = rule.alertText.replace('{tag}', field.attr("tag"));
+									msg = rule.alertText;
 
 								 if (options.showPrompts) methods._showPrompt(errorField, msg, "", true, options);
 							 } else {
@@ -2069,8 +2056,8 @@
 		onSuccess: false,
 		onFailure: false,
 		validateAttribute: "class",
-		addSuccessCssClassToField: "success",
-		addFailureCssClassToField: "failure",
+		addSuccessCssClassToField: "",
+		addFailureCssClassToField: "",
 		
 		// Auto-hide prompt
 		autoHidePrompt: false,
@@ -2087,7 +2074,7 @@
 	 // Custom ID uses suffix
 	 useSuffix: "",
 	 // Only show one message per error prompt
-	 showOneMessage: true
+	 showOneMessage: false
 	}};
 	$(function(){$.validationEngine.defaults.promptPosition = methods.isRTL()?'topLeft':"topRight"});
 })(jQuery);

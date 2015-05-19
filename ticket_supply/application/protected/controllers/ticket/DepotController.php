@@ -29,10 +29,11 @@ class DepotController extends Controller
             $param['organization_id'] = yii::app()->user->org_id;
             $param['state'] = 0;
             
-          // TicketTemplate::api()->debug = true;
+          // Tickettemplate::api()->debug = true;
             $param['current'] = isset($param['page']) ? $param['page'] : 1;
             $param['items'] = 15;
-            $lists = TicketTemplate::api()->store_list($param);
+            $param['fields'] = "id,name";
+            $lists = Tickettemplate::api()->store_list($param);
             $list = ApiModel::getLists($lists);
           //  print_r($param);
             //print_r($lists);exit;
@@ -52,7 +53,7 @@ class DepotController extends Controller
             $rs['id'] = $_POST['id'];
             $rs['state'] = 2;
             $rs['or_id'] = YII::app()->user->org_id;
-            $data = TicketTemplate::api()->state($rs);
+            $data = Tickettemplate::api()->state($rs);
             if (ApiModel::isSucc($data)) {
                 $this->_end(0, $data['message']);
             } else {
@@ -67,7 +68,7 @@ class DepotController extends Controller
         if (Yii::app()->request->isPostRequest) {
             $rs['id'] = $_GET['id'];
             $rs['or_id'] = YII::app()->user->org_id;
-            $model = TicketTemplate::api()->delete($rs);
+            $model = Tickettemplate::api()->delete($rs);
         }
     }
     
@@ -87,7 +88,7 @@ class DepotController extends Controller
             $field['id'] = $_POST['id'];
             $field['or_id'] =Yii::app()->user->org_id;
             $field['rule_id'] = $_POST['rid'];
-            $data = TicketTemplate::api()->update($field);
+            $data = Tickettemplate::api()->update($field);
             if (ApiModel::isSucc($data)) {
                 $this->_end(0, $data['message']);
             }else{

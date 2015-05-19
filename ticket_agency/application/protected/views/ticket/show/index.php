@@ -1,5 +1,4 @@
 <?php
-use common\huilian\models\Widgets;
 $this->breadcrumbs = array('门票管理', '门票预订');
 ?>
 
@@ -29,7 +28,7 @@ $this->breadcrumbs = array('门票管理', '门票预订');
                     <table class="table table-bordered mb30">
                         <tr>
                             <th>景区级别</th>
-                            <td><?php echo $landspace['landscape_level_name']?$landspace['landscape_level_name']:'非A'; ?></td>
+                            <td><?php echo $landspace['landscape_level_name']; ?></td>
                         </tr>
                         <tr>
                             <th>开放时间</th>
@@ -110,7 +109,7 @@ $this->breadcrumbs = array('门票管理', '门票预订');
                 .rules:hover > div{
 	                display:block;
                 }
-                
+                .bun {color: #999}
                 .fav-done {color: #269abc}
                 .sub-done {color: #643534}
                 .sub-done:hover {color: #801504}
@@ -120,13 +119,13 @@ $this->breadcrumbs = array('门票管理', '门票预订');
                     <thead>
                         <tr>
                             <th>景区</th>
-                            <th style="width: 22%">门票名称</th>
+                            <th style="width: 26%">门票名称</th>
                             <th>供应商</th>
-                            <th style="text-align: center">产品有效期</th>
+                            <th style="text-align: center">游玩日期</th>
                             <!--th>游玩星期</th-->
-                            <th style="text-align: right">门市挂牌价</th>
-                            <th style="text-align: right">网络销售价</th>
-                            <th style="text-align: right">散客结算价</th>
+                            <th style="text-align: right">销售价</th>
+                            <th style="text-align: right">挂牌价</th>
+                            <th style="text-align: right">散客价</th>
 
                             <th style="text-align: center">类型</th>
                             <th style="text-align: center">操作</th>
@@ -140,11 +139,16 @@ $this->breadcrumbs = array('门票管理', '门票预订');
                                 <td><?php echo $landspace['name']; ?></td>
 	                            <td style="text-align:left">
 		                            <div class="col-md-12">
-                                    	<div class="pull-left"><a href="/ticket/show/product/?price_type=0&id=<?php echo $model['id'] ?>"><strong><?php echo  $model['name'];?></strong></a></div>
+			                            <div class="pull-left"><strong><?php echo  $model['name'];?></strong></div>
+			                            <div class="pull-right" data-id="<?php echo $model['id'] ?>"><?php
+				                            echo isset($model['favor']) && $model['favor'] == 1
+					                            ? '<a class="bun fav fav-done" href="javascript:;" title="取消收藏">已收藏</a>'
+					                            : '<a class="bun fav" href="javascript:;" title="加入收藏">收藏</a>';
+				                            ?></div>
 		                            </div>
 		                            <div class="col-md-12">
 			                            <div class="pull-left">
-				                            <div class="rules"><span>门票说明</span>
+				                            <div class="rules"><span>订票规则</span>
 					                            <div class="table-responsive">
 						                            <table class="table table-bordered mb30">
 							                            <?php echo $model['remark'];?>
@@ -178,6 +182,11 @@ $this->breadcrumbs = array('门票管理', '门票预订');
 						                            ?></div>
 				                            </div>
 			                            </div>
+			                            <div class="pull-right" data-id="<?php echo $model['id'] ?>" data-fat="<?php echo $model['fat_price'] ?>" data-group="<?php echo $model['group_price'] ?>"><?php
+				                            echo isset($model['sub']) && $model['sub'] == 1
+					                            ? '<a class="bun sub sub-done" href="javascript;" title="取消订阅">已订阅</a>'
+					                            : '<a class="bun sub" href="javascript:;" title="加入订阅">订阅</a>';
+				                            ?></div>
 		                            </div>
 	                            </td>
                                 <td>
@@ -208,19 +217,14 @@ $this->breadcrumbs = array('门票管理', '门票预订');
                                     }
                                     ?>
                                 </td-->
-                                <td style="text-align: right"><del><?php echo $model['listed_price']; ?></del></td>
                                 <td style="text-align: right"><del><?php echo $model['sale_price']; ?></del></td>
+                                <td style="text-align: right"><del><?php echo $model['listed_price']; ?></del></td>
                                 <td style="text-align: right" class="text-success"><?php echo $model['fat_price']; ?></td>
 
                                 <td style="text-align: center"><?php echo $model['type'] ? '任务单' : '电子票'; ?></td>
                                 <td style="text-align: center">
-                                    <div class="pull-left"><a class="btn btn-success btn-xs" href=".bs-example-modal-lg" onclick="buy('<?php echo $model['id'] ?>',0);" data-toggle="modal">购买</a><strong style="display:none;"><?php echo  $model['name'];?></strong></div>
-                                    <div class="pull-right" style="margin-right:3px;" data-id="<?= $model['id'] ?>" data-fat="<?= $model['fat_price'] ?>" data-group="<?= $model['group_price']?>"><?php
-			                        echo isset($model['sub']) && $model['sub'] == 1
-			                            ? '<a class="bun fav fav-done" href="javascript:;" title="取消收藏">已收藏</a>'
-				                        : '<a class="bun fav" href="javascript:;" title="加入收藏">收藏</a>';
-		                        ?>
-		                   </div>
+                                    <!--a class="btn btn-success btn-xs" href=".bs-example-modal-lg" data-toggle="modal">购买</a-->
+                                    <a class="btn btn-success btn-xs" href=".bs-example-modal-lg" onclick="buy('<?php echo $model['id'] ?>',0);" data-toggle="modal">购买</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -244,17 +248,17 @@ $this->breadcrumbs = array('门票管理', '门票预订');
                     <thead>
                         <tr>
                             <th>景区</th>
-                            <th style="width: 20%">门票名称</th>
+                            <th style="width: 24%">门票名称</th>
                             <th>供应商</th>
-                            <th style="text-align: center">产品有效期</th>
+                            <th style="text-align: center">游玩日期</th>
                             <!--th>游玩星期</th-->
-                            <th style="text-align: right">门市挂牌价</th>
-                            <th style="text-align: right">网络销售价</th>
-                            <th style="text-align: right">团队结算价</th>
+                            <th style="text-align: right">销售价</th>
+                            <th style="text-align: right">挂牌价</th>
+                            <th style="text-align: right">团队价</th>
                             <th style="text-align: center">最低订购数</th>
 
                             <th style="text-align: center">类型</th>
-                            <th style="text-align: center;width:10%;">操作</th>
+                            <th style="text-align: center">操作</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -265,11 +269,16 @@ $this->breadcrumbs = array('门票管理', '门票预订');
                                 <td><?php echo $landspace['name']; ?></td>
 	                            <td style="text-align:left">
 		                            <div class="col-md-12">
-			                             <div class="pull-left"><a href="/ticket/show/product/?price_type=1&id=<?php echo $model['id'] ?>"><strong><?php echo  $model['name'];?></strong></a></div>
+			                            <div class="pull-left"><strong><?php echo  $model['name'];?></strong></div>
+			                            <div class="pull-right" data-id="<?php echo $model['id'] ?>"><?php
+				                            echo isset($model['favor']) && $model['favor'] == 1
+					                            ? '<a class="bun fav group fav-done" href="javascript:;" title="取消收藏">已收藏</a>'
+					                            : '<a class="bun fav group" href="javascript:;" title="加入收藏">收藏</a>';
+				                            ?></div>
 		                            </div>
 		                            <div class="col-md-12">
 			                            <div class="pull-left">
-				                            <div class="rules"><span>门票说明</span>
+				                            <div class="rules"><span>订票规则</span>
 					                            <div class="table-responsive">
 						                            <table class="table table-bordered mb30">
 							                            <?php echo $model['remark'];?>
@@ -303,6 +312,11 @@ $this->breadcrumbs = array('门票管理', '门票预订');
 						                            ?></div>
 				                            </div>
 			                            </div>
+			                            <div class="pull-right" data-id="<?php echo $model['id'] ?>" data-fat="<?php echo $model['fat_price'] ?>" data-group="<?php echo $model['group_price'] ?>"><?php
+				                            echo isset($model['sub']) && $model['sub'] == 1
+					                            ? '<a class="bun sub group sub-done" href="javascript:;" title="取消订阅">已订阅</a>'
+					                            : '<a class="bun sub group" href="javascript:;" title="加入订阅">订阅</a>';
+				                            ?></div>
 		                            </div>
 	                            </td>
                                 <td>
@@ -333,19 +347,15 @@ $this->breadcrumbs = array('门票管理', '门票预订');
     }
     ?>
                                 </td-->
-                                <td style="text-align: right"><del><?php echo $model['listed_price']; ?></del></td>
                                 <td style="text-align: right"><del><?php echo $model['sale_price']; ?></del></td>
+                                <td style="text-align: right"><del><?php echo $model['listed_price']; ?></del></td>
                                 <td style="text-align: right" class="text-success"><?php echo $model['group_price']; ?></td>
                                 <td style="text-align: center"><?php echo $model['mini_buy']; ?></td>
 
                                 <td style="text-align: center"><?php echo $model['type'] ? '任务单' : '电子票'; ?></td>
                                 <td style="text-align: center">
-                                    <div class="pull-left"><a class="btn btn-success btn-xs" href=".bs-example-modal-lg" onclick="buy('<?php echo $model['id'] ?>',1);" data-toggle="modal">购买</a><strong style="display:none;"><?php echo  $model['name'];?></strong></div>
-                                    <div class="pull-right" data-id="<?php echo $model['id'] ?>" data-fat="<?= $model['fat_price'] ?>" data-group="<?= $model['group_price']?>"><?php
-				                    echo isset($model['sub']) && $model['sub'] == 1
-					                    ? '<a class="bun fav group fav-done" href="javascript:;" title="取消收藏">已收藏</a>'
-					                    : '<a class="bun fav group" href="javascript:;" title="加入收藏">收藏</a>';
-		                                    ?>&nbsp;</div>
+                                    <!--a class="btn btn-success btn-xs" href=".bs-example-modal-lg" data-toggle="modal">购买</a-->
+                                    <a class="btn btn-success btn-xs" href=".bs-example-modal-lg" onclick="buy('<?php echo $model['id'] ?>',1);" data-toggle="modal">购买</a>
                                 </td>
                             </tr>
 <?php endforeach; ?>
@@ -363,8 +373,6 @@ $this->breadcrumbs = array('门票管理', '门票预订');
 <?php echo $landspace['biography']; ?>
         </div>
     </div>
-    
-    <?= Widgets::httpReferer() ?>
 
 </div><!-- contentpanel -->
 

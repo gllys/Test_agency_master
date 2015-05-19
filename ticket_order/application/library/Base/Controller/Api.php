@@ -71,12 +71,30 @@ class Base_Controller_Api extends Base_Controller_Abstract
      *获取排序参数
      * @author ：zhaqinfeng
      */
-    public function getSortRule(){
-        $sort_by = trim(Tools::safeOutput($this->getParam('sort_by')));
-        $sort_by = explode(':',$sort_by);
-        $field = $sort_by[0] ? $sort_by[0] : 'created_at';
-        $dir = $sort_by[1]=='asc'?'asc':'desc';
+    public function getSortRule($field='id',$dir='desc'){
+        $sort_by = trim(Tools::safeOutput($this->body['sort_by']));
+        if($sort_by){
+            $sort_by = explode(':',$sort_by);
+            $field = $sort_by[0] ? $sort_by[0] : 'id';
+            $dir = $sort_by[1]=='asc'?'asc':'desc';
+        }
         return $field." ".$dir; //初始值 也可array('updated_at'=>'desc')
+    }
+
+    /**
+     * 获取字段参数
+     * @author zhaqinfeng
+     * @date 2014-12-11
+     */
+    public function getFields($primaryKey = 'id'){
+        $fields = trim(Tools::safeOutput($this->body['fields']));
+        $fields = $fields ? $fields :"*"; //要获取的字段
+        if($fields!="*"){
+            $fieldArr = explode(',',$fields);
+            !in_array($primaryKey,$fieldArr) && array_unshift($fieldArr,$primaryKey);
+            $fields = implode(',',$fieldArr);
+        }
+        return $fields;
     }
 
     /**

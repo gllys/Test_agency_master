@@ -5,7 +5,7 @@ class NewdetailController extends Controller
 	public function actionIndex()
 	{
 		$data['status_labels'] = array('unpaid'=>'未确认','cancel' => '已取消','paid' => '已确认','finish' => '已结束');
-		$detail = Order::api()->detail(array('id' => $_GET['id'],'distributor_id' => Yii::app()->user->org_id,'show_order_items'=>1));
+		$detail = Order::api()->detail(array('id' => $_GET['id'],'distributor_id' => Yii::app()->user->org_id));
 		if($detail['code'] == 'succ'){
 			$data['detail'] = $detail['body'];
 			$data['ticket'] = $detail['body']['order_items'];

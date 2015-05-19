@@ -1,4 +1,4 @@
-<div class="contentpanel">
+<div class="contentpanel" id="maincontent">
     <div class="row">
         <div class="col-md-12">
             <div class="panel panel-default">
@@ -12,10 +12,8 @@
                 </div>
                 <!-- panel-heading -->
 
-
-
-
             </div>
+            <div id="show_msg"></div>
             <!-- panel -->
             <div class="table-responsive">
                 <table class="table table-bordered mb30">
@@ -35,10 +33,12 @@
                         <td style="text-align: left"><?php echo $item['name'] ?></td>
                         <td style="text-align: left"><?php echo $item['description'] ?></td>
                         <td>
-                            <a href="/system/role/edit/?id=<?php echo $item['id'] ?>" class="btn btn-bordered btn-xs btn-success" style="border-width: 1px">
+                            <a href="/system/role/edit/id/<?php echo $item['id'] ?>" class="btn btn-bordered btn-xs btn-success" style="border-width: 1px">
                                 修改
                             </a>
-                            <a href="/system/role/del/?id=<?php echo $item['id'] ?>" class="btn btn-bordered btn-xs btn-danger del" style="border-width: 1px">删除</a>
+                            <a onclick="delRole(<?php echo $item['id'];?>)" class="btn btn-bordered btn-xs btn-danger del clearPart" style="border-width: 1px">
+								删除
+							</a>
                         </td>
                     </tr>
                     <?php endforeach;?>
@@ -52,20 +52,27 @@
         <!-- col-md-6 -->
     </div>
     <!-- row -->
-
 </div>
 <script type="text/javascript">
-    $(function() {
-        //选择
-        $('a.del').click(function() {
+
+    $(document).ready(function() {
+        //删除角色信息
+		this.delRole = function(id) {
 			PWConfirm('确定要删除?',function(){
-			    $.post($(this).attr('href'), function() {
-                window.location.reload();
-            });
-        });
-           
+				$.post('/system/role/del', {id:id},function(data) {
+					if (data.error == 'fail') {
+                        alert(data.msg);
+					} else if(data.error == 'succ') {
+                        setTimeout(function() {
+                            alert(data.msg, function() {
+                                location.partReload();
+                            });
+                        }, 500);
+					}
+				}, 'json');
+			});
             return false;
-        });
+        }
     });
 
 </script>

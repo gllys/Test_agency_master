@@ -17,6 +17,7 @@ class Db_Mysql
     protected $transCounter = 0;
     protected $listKey;
     public $sql;
+    public $start_time;
     
     /**
      * [factory description]
@@ -47,6 +48,7 @@ class Db_Mysql
      * @param [type] $options [description]
      */
     public function __construct($options) {
+        $this->start_time = time();
         $this->config = new MysqlConfig($options);
     }
     
@@ -77,6 +79,12 @@ class Db_Mysql
      */
     public function connect() {
         try {
+            $now = time();
+            if($now - $this->start_time>3600){
+                $this->db = null;
+                $this->connected = false;
+                $this->start_time = $now;
+            }
             $this->_connect();
             $this->try = 0;
         }
@@ -209,6 +217,10 @@ class Db_Mysql
         $this->connect();
         $params = array();
         foreach ($data as $key => $val) {
+            if (is_numeric($key)) {
+                $data[$key] = $val;
+                continue;
+            }
             $data[$key] = "`$key`=?";
             $params[] = is_array($val) ? json_encode($val) : $val;
         }

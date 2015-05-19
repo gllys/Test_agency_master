@@ -205,7 +205,7 @@ class ApiModel {
     }
 
     public function __destruct() {
-        if ($this->debug||(isset($_GET['_debug_'])&&$_GET['_debug_']=='huilian123456')) {
+        if ($this->debug) {
             print_r($this->debugs);
         }
     }

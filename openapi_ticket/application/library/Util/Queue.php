@@ -107,7 +107,7 @@ class Util_Queue
 		}
 		$queues = array_keys(self::$queues);
 		$st = microtime(true);
-
+        
 		while(true) {
 			$return = self::redis()->brPop($queues, self::$waittime);
 			if(empty($return)){
@@ -138,7 +138,7 @@ class Util_Queue
 			}
 		}
 	}
-
+    
 	/**
 	 * [redis description]
 	 * @return [type] [description]

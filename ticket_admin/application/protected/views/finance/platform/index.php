@@ -315,8 +315,8 @@ $this->breadcrumbs = array('结算管理','平台资产');
  function fetch(){
                   if($('#tixian').validationEngine('validate')==true){
                         $.post('/finance/platform/fetchapply',$('#tixian').serialize(),function(data){
-                            alert(data.msg,function(){location.href = '/finance/platform/index/tab/2' ;});
-                            //location.reload();
+                            alert(data.msg,function(){location.href = '/site/switch/#/finance/platform/index/tab/2' ;});
+                            //location.partReload();
                       },"json");
                     }
         }
@@ -366,7 +366,10 @@ $('#fetch_cash').click(function(){
           if($('#tixianForm').validationEngine('validate')==true){
             var url = "/finance/platform/fetchCashExport"; 
             $("#tixianForm").attr("action", url);
-            $("#tixianForm").submit();
+			$('#tixianForm').addClass('clearPart');
+			$("#tixianForm").submit();
+			$('#tixianForm').removeClass('clearPart');
+            
           }
         });
 

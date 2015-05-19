@@ -21,18 +21,6 @@ $is_limit          = false; //库存限制
 			</form>
 			<?php if (isset($orders) && !empty($orders)): ?>
 				<div class="tab-content">
-					<style>
-						.table-responsive img{
-							max-width:100px
-						}
-						.table-responsive th,.table-responsive td{
-							vertical-align:middle!important
-						}
-						.panel-footer b{
-							font-size:22px;
-							padding:0 5px;
-						}
-					</style>
 					<div class="table-responsive">
 						<table class="table table-striped mb30">
 							<thead>
@@ -42,7 +30,7 @@ $is_limit          = false; //库存限制
 							<tr>
 								<th style="text-align: center">订单号</th>
 								<th style="width: 55%">门票</th>
-								<th style="text-align: left">产品有效期</th>
+								<th style="text-align: left">游玩日期</th>
 								<th style="text-align: left">张数</th>
 								<th style="text-align: right">订单总价</th>
 							</tr>
@@ -52,14 +40,12 @@ $is_limit          = false; //库存限制
 							foreach ($orders as $order) : $amount += $order['amount'];
 								?>
 								<tr>
-									<td style="text-align: center"><?php echo $order['id'] ;
-										//print_r($order);exit;
-										?></td>
+									<td style="text-align: center"><?php echo $order['id'] ?></td>
 									<td><?php echo $order['name'] ?></td>
 									<td style="text-align: left"><?php echo $order['use_day'] ?></td>
 									<td style="text-align: left"><?php
 										echo "<strong style=\"color:black\">{$order['nums']}</strong>";
-										$k = "{$order['product_id']}_{$order['use_day']}";
+										$k = "{$order['ticket_template_id']}_{$order['use_day']}";
 										if (array_key_exists($k, $storage) && isset($storage[$k]['remain_reserve']) && !is_null($storage[$k]['remain_reserve'])) {
 											echo $storage[$k]['remain_reserve'] >= $order['nums'] ? '（库存：' . $storage[$k]['remain_reserve'] . '）' : '<span style="color:darkred">（库存不足！）</span>';
 											$storage[$k]['remain_reserve'] -= $order['nums'];
@@ -89,7 +75,7 @@ $is_limit          = false; //库存限制
 							<tr>
 								<th style="text-align: center">订单号</th>
 								<th style="width: 55%">门票</th>
-								<th style="text-align: center">产品有效期</th>
+								<th style="text-align: center">游玩日期</th>
 								<th style="text-align: center">张数</th>
 								<th style="text-align: right">订单总价</th>
 							</tr>
@@ -102,7 +88,7 @@ $is_limit          = false; //库存限制
 									<td style="text-align: center"><?php echo $renwu['use_day'] ?></td>
 									<td style="text-align: center"><?php
 										echo "<strong style=\"color:black\">{$renwu['nums']}</strong>";
-										$k = "{$renwu['product_id']}_{$renwu['use_day']}";
+										$k = "{$renwu['ticket_template_id']}_{$renwu['use_day']}";
 										if (array_key_exists($k, $storage) && !is_null($storage[$k]['remain_reserve'])) {
 											echo $storage[$k]['remain_reserve'] >= $renwu['nums'] ? '（库存：' . $storage[$k]['remain_reserve'] . '）' : '<span style="color:darkred">（库存不足！）</span>';
 											$storage[$k]['remain_reserve'] -= $renwu['nums'];
@@ -129,23 +115,23 @@ $is_limit          = false; //库存限制
 						$amount = 0;
 					} ?>
 						<div class="panel" style="text-align: right">
-							<div class="form-group" style="width: 100px;"  <?php echo in_array('1',$paytype,true)?"":"style='display:none;'";?>>
-								<input name="method" id="pay1" type="radio" value="alipay" checked="checked"/>
+							<div class="form-group hide">
+								<input name="method" id="pay1" type="radio" value="alipay" disabled="disabled"/>
 								<label for="pay1">支付宝</label>
 							</div>
-							<div class="form-group" <?php echo in_array('1',$paytype,true)?"":"style='display:none;'";?>>
+							<div class="form-group">
 								<input name="method" id="pay2" type="radio"
-								       value="kuaiqian" />
+								       value="kuaiqian" <?php echo $only_one_supplier ? 'checked' : 'checked' ?>/>
 								<label for="pay2" style="max-width:inherit">快钱支付</label>
 							</div>
-							<div class="form-group" <?php echo in_array('4',$paytype,true)?"":"style='display:none;'";?>>
+							<div class="form-group">
 								<input name="method" id="pay3" type="radio" value="union_4"/>
 								<label for="pay3" style="max-width:inherit">平台支付( 剩余资金: <?php  echo $unionmoney ? $unionmoney: '0.00'; ?> )</label>
 							</div>
 							<?php if ($only_one_supplier) :
 								if (isset($credit_money) && !is_null($credit_money)) :
 									?>
-									<div class="form-group" <?php echo in_array('2',$paytype,true)?"":"style='display:none;'";?>>
+									<div class="form-group">
 										<input name="method" id="pay4" type="radio"
 										       value="credit_0" <?php echo $credit_money >= $amount || $credit_money == 'infinite' ? '' : 'disabled="disabled"' ?>/>
 										<label for="pay4" 
@@ -155,7 +141,7 @@ $is_limit          = false; //库存限制
 								<?php endif;
 								if (isset($balance_money) && !is_null($balance_money)) :
 									?>
-									<div class="form-group" <?php echo in_array('3',$paytype,true)?"":"style='display:none;'";?>>
+									<div class="form-group">
 										<input name="method" id="pay5" type="radio"
 										       value="credit_1" <?php echo $balance_money >= $amount || $balance_money == 'infinite' ? '' : 'disabled="disabled"' ?>/>
 										<label for="pay5"
@@ -166,17 +152,10 @@ $is_limit          = false; //库存限制
 							endif;
 							?>
 						</div>
-						<div style="text-align: right" class="panel">
-							<div class="ckbox ckbox-default inline-block" style="vertical-align:middle;text-align:left">
-								<input type="checkbox" value="1" id="vouchers-btn" name="is_activity"><label for="vouchers-btn"></label>
-							</div>
-							<input type="text" id="vouchers" name="activity_paid" onkeyup="validatePices(this);" onafterpaste="validatePices(this);" style="width:120px;display:inline-block;vertical-align:middle;ime-mode:disabled" class="form-control" value="" disabled>
-							使用抵用券（可用抵用券<b><b id="vouchers-total" style="font-weight:normal"><?php  echo $activity ? $activity: '0.00'; ?></b>）
-						</div>
 						<div class="panel">
 							<h5 class="lg-title mb5" style="text-align: right">
 								<strong
-									style="font-size: 1.4em;color: #dd1144">合计：<b id="vouchers-num"><?php echo number_format($amount, 2) ?></b>
+									style="font-size: 1.4em;color: #dd1144">合计：<?php echo number_format($amount, 2) ?>
 									元</strong>
 								<?php if (time() < strtotime('2014-11-01 01:01:01')) : ?>
 									<br/>
@@ -238,65 +217,6 @@ $is_limit          = false; //库存限制
 <script src="/js/bootstrap-wizard.min.js"></script>
 <script>
 	jQuery(document).ready(function () {
-		function changeTwoDecimal_f(x){
-			var f_x = parseFloat(x)
-			var f_x = Math.round(x * 100) / 100
-			var s_x = f_x.toString()
-			var pos_decimal = s_x.indexOf('.')
-			if (pos_decimal < 0) {
-				pos_decimal = s_x.length
-				s_x += '.'
-			}
-			while (s_x.length <= pos_decimal + 2){
-				s_x += '0'
-			}
-			return s_x
-		}
-
-        !function(){
-            var vouchers = $('#vouchers');
-            var vouchersBtn = $('#vouchers-btn');
-            var vouchersNum = $('#vouchers-num');
-            //vouchersTotal = $('#vouchers-total'),
-            var par = <?php echo $amount ?>; //总计金额
-            var total = <?php  echo $activity ? $activity: '0.00'; ?>; //抵用券值
-
-            vouchersBtn.click(function(){
-                if($(this).is(':checked')){
-                    vouchers.prop('disabled', false);
-                    vouchers.focus();
-                }else{
-                    vouchers.prop('disabled', true);
-                    vouchers.val('0');
-                    vouchersNum.text(par);
-                }
-            })
-
-            //vouchers.on('keyup focus',function(){
-            vouchers.on('change keyup',function(){
-                this.value = this.value.replace(/[^0-9\.]/g,'');
-                if((this.value) * 100  > total * 100){
-                    alert("抵用券超额");
-                    vouchers.val('0');
-                }
-                var tip = (Math.floor(par * 100) - Math.floor(vouchers.val() * 100))/100;
-                vouchersNum.text(tip);
-                //var nowNum = vouchersNum.text(changeTwoDecimal_f(parseFloat(par)-vouchers.val()));
-                //alert(parseInt(nowNum[0]['innerHTML']));
-                if(tip < 0){
-                    alert("抵用券已超过订单额了！");
-                    $('#btn_pay').attr('disabled',"true");
-                }else{
-                    $('#btn_pay').removeAttr("disabled");
-                }
-            })
-        }()
-
-
-
-
-
-
 		jQuery('#valWizard').bootstrapWizard({
 			onTabClick: function (tab, navigation, index) {
 				return false;
@@ -310,15 +230,6 @@ $is_limit          = false; //库存限制
 			jQuery('#lock_layer').addClass('locked');
 			jQuery('#lock_layer').show();
 		});
-
-		window.setInterval(function() {
-			if ($('[name=is_fit]').prop('checked')) {
-				$('input[name="fat_price"]').removeAttr("readonly").addClass('validate[required]');
-			} else {
-				$('input[name="fat_price"]').val("");
-				$('input[name="fat_price"]').attr("readonly", "readonly").removeClass('validate[required]');
-			}
-		}, 200);
 
 		jQuery('#unlock').submit(function () {
 			$('.locked').fadeOut(function () {
@@ -342,13 +253,4 @@ $is_limit          = false; //库存限制
 			}, 5000);
 		}, 0);
 	});
-        
-        // 只能真金钱格式
-function validatePices(o) {
-    var pice = o.value.replace(/^([1-9][0-9]{0,5}|[0-9])((\.[0-9]{0,2}){0,1})$/, '');
-    if (pice.length > 0) {
-        o.value = o.value.substring(0, o.value.length - 1);
-        validatePices(o);
-    }
-} 
 </script>

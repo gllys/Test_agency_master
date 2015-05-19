@@ -4,11 +4,29 @@
     <link rel="stylesheet" href="/css/iefix.css" type="text/css" media="screen" />  
     <![endif]-->   
     <style>
-       
+        #title{
+            overflow: hidden; /*自动隐藏文字*/
+            text-overflow: ellipsis;/*文字隐藏后添加省略号*/
+            white-space: nowrap;/*强制不换行*/
+            width: 8em;/*不允许出现半汉字截断*/}
+        /*#pull-right a {position:relative;}
+        #pull-right a:hover:before {position:absolute;top:40px;right:0;content:attr(title);color:#000000;border:1px solid #242424;background-color:#E5E5E5;}
+        */
     </style>
     <div class="headerwrapper">
         <div class="header-left">
-            <a class="logo" href="/ticket/sale" id="title" title="首页"></a>
+            <a class="logo" href="/ticket/sale" id="title" title="<?php
+            $org_name = '汇联分销系统';
+            $info = Organizations::api()->show(array('id' => Yii::app()->user->org_id));
+            if ($info['code'] == 'succ') {
+                $org_name = $info['body']['name'];
+            }
+            echo $org_name;
+            ?>">
+                   <?php
+                   echo $org_name;
+                   ?>
+            </a>
             <div class="pull-right">
                 <a class="menu-collapse" href="#">
                     <i class="fa fa-bars"></i>
@@ -17,83 +35,101 @@
         </div>
 
         <div class="header-right"  id="header_nav">
-            <div class="header-profile">
-                <div><?php echo Yii::app()->user->display_name ?>，欢迎登录!</div>
-                <?php
-                $org_name = '汇联分销系统';
-                $info = Organizations::api()->show(array('id' => Yii::app()->user->org_id,'fields'=>'name'));
-                if ($info['code'] == 'succ') {
-                    $org_name = $info['body']['name'];
-                }
-                echo $org_name;
+            <ul class="nav navbar-nav hidden-xs">
+                <?Php
+                echo CreateUrl::model()->createHeader();
                 ?>
-            </div>
+            </ul>
 
 
             <div class="pull-right" id="pull-right">
-                <!--消息开始-->
                 <?php
                 if (CreateUrl::model()->checkAccess('/system/message/')):
                     ?>
                     <div class="btn-group btn-group-option">
-                        <a href="/system/message" title="消息" class="btn btn-default dropdown-toggle"><i class="fa fa-envelope-o"></i>
+                        <a href="/system/message" title="消息" class="btn btn-default dropdown-toggle"><i class="fa fa-bell"></i>
                             <?php
-                            $result = Message::api()->count(array('receiver_organization' => Yii::app()->user->org_id,
+                            $result = Message::api()->list(array('receiver_organization' => Yii::app()->user->org_id,
                                 'read_time' => 0
-                            ),true,3);
+                            ));
                             if ($result['code'] == 'succ') {
                                 $num = $result['body']['pagination']['count'];
                             }
                             ?>
-                            <?php if (isset($num) && $num > 0): ?><span id="unread_num" class="badge"><?php echo $num ?></span><?php endif; ?>消息</a>
+                            <?php if (isset($num) && $num > 0): ?><span class="badge"><?php echo $num ?></span><?php endif; ?></a>
                     </div>
                 <?php endif ?>
-                <!--消息结束-->
 
-                <!--购物车开始-->
                 <?php
                 if (CreateUrl::model()->checkAccess('/ticket/cart/')):
                     ?>
                     <div class="btn-group btn-group-option">
-                        <a href="/ticket/cart/" title="购物车" class="btn btn-default dropdown-toggle"><i class="fa fa-shopping-cart"></i>
-                            <?php
-                            //购物车
-                            $rs = Cart::api()->count(array('user_id' => Yii::app()->user->uid),true,3);
-                            $num = $rs['body']['pagination']['count'];
-                            ?>
-                            <?php if (isset($num) && $num > 0): ?><span class="badge"><?php echo $num ?></span><?php endif; ?>购物车</a>
+                        <a href="/ticket/cart/" title="购物车" class="btn btn-default dropdown-toggle"><i class="fa fa-shopping-cart"></i></a>
                     </div>
                 <?php endif ?>
-                <!--购物车结束-->
-
-                <!--收藏开始-->
+                <!--div style="display: none" class="btn-group btn-group-list btn-group-notification">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                        <i class="fa fa-bell-o"></i>
+                        <span class="badge"><?php //echo $unread_msg['sys']   ?></span>
+                    </button>
+                    <div class="dropdown-menu pull-right">
+                        <a href="#" class="link-right"><i class="fa fa-times"></i></a>
+                        <h5>系统通知</h5>
+                        <ul class="media-list dropdown-list">
+                <?php //if ($unread_msg['sys'] > 0) : foreach ($unread_msg['sysUnread'] as $sysMsg) :  ?>
+                                    <li class="media">
+                                        <img class="img-circle pull-left noti-thumb" src="/img/user1.png" alt="">
+                                        <div class="media-body">
+                <?php //echo mb_substr(strip_tags($sysMsg['content']), 0, 30, 'UTF-8')  ?>…
+                                            <small class="date"><i class="fa fa-thumbs-up"></i> <?php //echo $sysMsg['created_at']  ?></small>
+                                        </div>
+                                    </li>
                 <?php
-                if (CreateUrl::model()->checkAccess('/ticket/favorites/')):
-                    ?>
-                    <div class="btn-group btn-group-option">
-                        <a href="/ticket/favorites/" title="收藏" class="btn btn-default dropdown-toggle"><i class="fa fa-star-o"></i>
-                            <?php
-                            $all = Subscribes::api()->count(array('organization_id' => Yii::app()->user->org_id), true,3);
-                            $num = $all['body']['pagination']['count'];
-                            ?>
-                            <?php if (isset($num) && $num > 0): ?><span id="favorite" class="badge"><?php echo $num; ?></span><?php endif; ?>收藏</a>
-                    </div>
-                <?php endif ?>
-                <!--收藏结束-->
+                //endforeach;
+                //endif;
+                ?>
+                        </ul>
+                        <div class="dropdown-footer text-center">
+                            <a href="#" class="link">See All Notifications</a>
+                        </div>
+                    </div--><!-- dropdown-menu -->
+                <!--/div--><!-- btn-group -->
 
-                <!--工作台开始-->
+                <!--div style="display: none" class="btn-group btn-group-list btn-group-messages">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                        <i class="fa fa-envelope-o"></i>
+                        <span class="badge"><?php //echo $unread_msg['org']   ?></span>
+                    </button>
+                    <div class="dropdown-menu pull-right">
+                        <a href="#" class="link-right"><i class="fa fa-times"></i></a>
+                        <h5>消息</h5>
+                        <ul class="media-list dropdown-list">
+                <?php //if ($unread_msg['org'] > 0) : foreach ($unread_msg['orgUnread'] as $orgMsg) :  ?>
+                                    <li class="media">
+                                        <span class="badge badge-success">New</span>
+                                        <img class="img-circle pull-left noti-thumb" src="/img/user1.png" alt="">
+                                        <div class="media-body">
+                                            <strong>Nusja Nawancali</strong>
+                                            <p><?php //echo mb_substr(strip_tags($orgMsg['content']), 0, 30, 'UTF-8')   ?>…</p>
+                                            <small class="date"><i class="fa fa-clock-o"></i> <?php //echo $orgMsg['created_at']   ?></small>
+                                        </div>
+                                    </li>
+                <?php
+                // endforeach;
+                //endif;
+                ?>
+                        </ul>
+                        <div class="dropdown-footer text-center">
+                            <a href="#" class="link">See All Messages</a>
+                        </div>
+                    </div--><!-- dropdown-menu -->
+                <!--/div--><!-- btn-group -->
+
+
                 <div class="btn-group btn-group-option">
-                    <a href="/dashboard" class="btn btn-default dropdown-toggle" title="工作台"><i class="fa fa-desktop"></i>工作台</a>
+                    <a href="/dashboard" class="btn btn-default dropdown-toggle" title="工作台"><i class="fa fa-desktop"></i></a>
                 </div>
-                <!--工作台结束-->
 
-                <!--下载开始-->
-                <div class="btn-group btn-group-option">
-                    <a href="http://piaowu-manual.b0.upaiyun.com/%E7%A5%A8%E5%8F%B0%E5%88%86%E9%94%80%E5%95%86%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8C.pdf" target="_blank" class="btn btn-default" title="票台分销商系统操作手册"><i class="fa fa-download"></i>下载</a>
-                </div><!-- btn-group -->
-                <!--下载结束-->
-
-                <!--退出开始-->
                 <div class="btn-group btn-group-option">
                     <!--button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                         <i class="fa fa-caret-down"></i>
@@ -102,59 +138,12 @@
                         <li><a href="/site/logout"><i class="glyphicon glyphicon-log-out"></i>退出</a></li>
                     </ul-->
 
-                    <a href="/site/logout" title="退出" class="btn btn-default dropdown-toggle"><i class="fa fa-sign-out"></i>退出
+                    <a href="/site/logout" title="退出" class="btn btn-default dropdown-toggle"><i class="fa fa-sign-out"></i>
                     </a>
                 </div><!-- btn-group -->
-                <!--退出结束-->
-
 
             </div><!-- pull-right -->
 
-            <!--公告开始-->
-            <?php
-            if (Yii::app()->user->is_super):
-                ?>
-                <?php
-                if (isset(Yii::app()->user->org_id) && !empty(Yii::app()->user->org_id)) {
-                    $org_id = Yii::app()->user->org_id;
-                    $orgRs = Organizations::api()->show(array('id' => $org_id));
-                    if ($orgRs['code'] == 'succ') {
-                        $status = $orgRs['body']['verify_status'];
-                    }
-                }
-                ?>
-                <?php if (isset($status) && $status == 'checked'): ?>
-                    <?php
-                    $advice_field = array(
-                        'receiver_organization' => Yii::app()->user->org_id,
-                        'sys_type' => 0,
-                        'read_time' => 0,
-                        'items' => 5
-                    );
-                    $advice_result = Message::api()->list($advice_field);
-                    if ($advice_result['code'] == 'succ') {
-                        $advice_list = !empty($advice_result['body']['data']) ? $advice_result['body']['data'] : '';
-                    }
-                    ?>
-                    <div id="PT-marquee" class="pull-right">
-                        <ul>
-                            <?php if (isset($advice_list) && !empty($advice_list)): foreach ($advice_list as $value): ?>
-                                    <li><a href="javascript:;" class="readAdvice" id="already<?php echo $value['id'] ?>"
-                                           data-id="<?php echo $value['id'] ?>"
-                                           data-name="<?php echo $value['organization_name'] ?>"
-                                           data-food="<?php echo $value['read_time'] == 0 ? 0 : date('Y年m月d日', $value['read_time']) ?>"
-                                           data-title="<?php echo $value['title'] ?>"
-                                           data-time="<?php echo date('Y年m月d日', $value['created_at']) ?>"
-                                            data-content='<?php echo strip_tags($value['content'],'<a><p><br/><br>'); ?>'>
-                                            【公告】 <?php echo $value['title'] ?>
-                                        </a></li>
-                                <?php endforeach;
-                            endif; ?>
-                        </ul>
-                    </div>
-                <?php endif; ?>
-<?php endif; ?>
-            <!--公告结束-->
         </div><!-- header-right -->
 
     </div><!-- headerwrapper -->

@@ -12,7 +12,7 @@ class Lang_Msg
     public static function getLang($id, $params = array()) {
         if (!isset(self::$_languages[$id])) {
             if ($info = LanguageModel::model()->getById($id)) {
-                self::$_languages[$id] = $info[self::$local];
+                self::$_languages[$id] = empty($info[self::$local])?$id:$info[self::$local];
             } else {
                 self::$_languages[$id] = $id;
             }
@@ -70,7 +70,7 @@ class Lang_Msg
         exit(Pack_Json::encode($data));
     }
 
-    public function device($data, $code=200) {
+    public static function device($data, $code=200) {
         if (!headers_sent()) {
             header("Content-Type: application/json; charset=utf-8");
         }

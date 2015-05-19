@@ -9,15 +9,6 @@
 class PaymentController extends Base_Controller_Api {
 
     public function listsAction(){
-        $fields = trim(Tools::safeOutput($this->body['fields']));
-        $fields = $fields ? $fields :"*"; //要获取的字段
-        $fieldArr = array();
-        if($fields!="*"){
-            $fieldArr = explode(',',$fields);
-            !in_array('id',$fieldArr) && array_unshift($fieldArr,'id');
-            $fields = implode(',',$fieldArr);
-        }
-        $order = $this->getSortRule();
         $where = array('deleted_at'=>0);
 
         $id = $this->body['id'];
@@ -54,32 +45,20 @@ class PaymentController extends Base_Controller_Api {
         $distributor_id && $where['distributor_id'] = $distributor_id;
 
         $PaymentModel = new PaymentModel();
-        $count = $PaymentModel->share($tableYm)->countResult($where);
-        $pagination = Tools::getPagination($this->getParams(),$count);
-        $data = $count>0  ? $PaymentModel->share($tableYm)->search($where,$fields,$order,$pagination['limit']) : array();
+        $this->count = $PaymentModel->share($tableYm)->countResult($where);
+        $this->pagenation();
+        $data = $this->count>0  ? $PaymentModel->share($tableYm)->search($where,$this->getFields(),$this->getSortRule(),$this->limit) : array();
 
         $result = array(
             'data'=>array_values($data),
             'pagination'=>array(
-                'count'=>$count,
-                'current'=>$pagination['current'],
-                'items'=>$pagination['items'],
-                'total'=>$pagination['total'],
+                'count'=>$this->count, 'current'=>$this->current, 'items'=>$this->items, 'total'=>$this->total,
             )
         );
         Lang_Msg::output($result);
     }
 
     public function detailAction(){
-        $fields = trim(Tools::safeOutput($this->body['fields']));
-        $fields = $fields ? $fields :"*"; //要获取的字段
-        $fieldArr = array();
-        if($fields!="*"){
-            $fieldArr = explode(',',$fields);
-            !in_array('id',$fieldArr) && array_unshift($fieldArr,'id');
-            $fields = implode(',',$fieldArr);
-        }
-
         $where = array('deleted_at'=>0);
         $id = trim(Tools::safeOutput($this->body['id']));
         !$id && Lang_Msg::error("ERROR_PAYMENT_1");
@@ -88,7 +67,7 @@ class PaymentController extends Base_Controller_Api {
         $order_id = trim(Tools::safeOutput($this->body['order_id'])); //订单号
         $order_id && $where['order_ids|LIKE'] = array("%{$order_id}%");
 
-        $detail = PaymentModel::model()->setTable($id)->search($where,$fields);
+        $detail = PaymentModel::model()->setTable($id)->search($where,$this->getFields());
         !$detail && Lang_Msg::error("ERROR_PAYMENT_2");
         $detail = $detail[$id];
         Lang_Msg::output($detail);
@@ -105,17 +84,25 @@ class PaymentController extends Base_Controller_Api {
         $params['pay_account'] = trim(Tools::safeOutput($this->body['pay_account']));
         $params['remark'] = trim(Tools::safeOutput($this->body['remark']));
         $params['payment_bn'] = trim(Tools::safeOutput($this->body['payment_bn']));
+        $params['activity_paid'] = doubleval($this->body['activity_paid']); //抵用券金额
 
         $PaymentModel = new PaymentModel();
-        $PaymentModel->begin();
-        $info = $PaymentModel->addPayment($params);
-        if($info['order_ids']){
-            $PaymentModel->commit();
-            Tools::lsJson(true,Lang_Msg::getLang('ERROR_OPERATE_0'), $info);
-        }
-        else{
+        try{
+            $PaymentModel->begin();
+            $info = $PaymentModel->addPayment($params);
+            if($info['order_ids']){
+                $PaymentModel->commit();
+                Tools::lsJson(true,Lang_Msg::getLang('ERROR_OPERATE_0'), $info);
+            }
+            else{
+                $PaymentModel->rollback();
+                Lang_Msg::error("ERROR_OPERATE_1");
+            }
+        } catch(Exception $e) {
+            Log_Base::save('payment', 'error:'.$e->getMessage());
+            Log_Base::save('payment', var_export($this->body,true));
             $PaymentModel->rollback();
-            Lang_Msg::error("ERROR_OPERATE_1");
+            Lang_Msg::error( 'ERROR_GLOBAL_3' );
         }
     }
 
@@ -151,10 +138,20 @@ class PaymentController extends Base_Controller_Api {
             $pay_account=trim(Tools::safeOutput($this->body['pay_account']));
             $remark=trim(Tools::safeOutput($this->body['remark']));
             $payment_bn=trim(Tools::safeOutput($this->body['payment_bn']));
+            $activity_paid = doubleval($this->body['activity_paid']); //抵用券金额
+            $activity_paid<=0 && $activity_paid = $data['activity_paid'];
+            $activity_paid = $activity_paid>=$data['amount']?$data['amount']:$activity_paid;
 
             ($status && !in_array($status,array('succ','fail','cancel','error','invalid','progress','timeout','ready'))) && Lang_Msg::error("ERROR_UPDATE_2"); //状态参数有错
 
             $data['status']=='succ'&& Lang_Msg::error('ERROR_PAYMENT_6',array('payment_id'=>$id));
+
+            if($activity_paid>0){ //检查抵用券是否充足
+                $unionMoneyDetail = ApiUnionMoneyModel::model()->unionMoneyDetail($distributor_id);
+                if(!$unionMoneyDetail || $unionMoneyDetail['code']=="fail" || $unionMoneyDetail['body']['activity_money']<$activity_paid)
+                    Lang_Msg::error('ERR_COUPON_1'); //抵用券金额不足
+                $data['activity_paid'] = $activity_paid;
+            }
 
             isset($_POST['status']) && $data['status'] = $status;  //更改状态
             isset($_POST['pay_type']) && $data['pay_type'] = $pay_type;
@@ -164,6 +161,7 @@ class PaymentController extends Base_Controller_Api {
             isset($_POST['pay_account']) && $data['pay_account'] = $pay_account;
             isset($_POST['remark']) && $data['remark'] = $remark;
             isset($_POST['payment_bn']) && $data['payment_bn'] = $payment_bn;
+
         }
         $nowTime = time();
         if($deleted){
@@ -181,21 +179,25 @@ class PaymentController extends Base_Controller_Api {
             if ($r) {
                 if (!$deleted) {
                     $OrderModel = new OrderModel();
-                    $orderPayInfos = PaymentOrderModel::model()->setTable($id)->search(array('payment_id' => $id), "id,order_id,money");
-                    $upData = array('pay_type' => $pay_type, 'payment' => $payment);
+                    $PaymentOrderModel = new PaymentOrderModel();
+                    $PaymentOrderModel->setTable($id);
+                    $orderPayInfos = $PaymentOrderModel->search(array('payment_id' => $id), "id,order_id,money,activity_paid");
+                    $upData = array('pay_type' => $pay_type, 'payment' => $payment, 'pay_status'=>0);
+                    $orderIds = array();
+                    foreach($orderPayInfos as $order) {
+                        array_push($orderIds,$order['order_id']);
+                    }
+
                     if ($status == 'succ') {
-                        $order_ids = array();
+                        $activityUsed = $data['activity_paid'];
+                        $pay_rate = PayRateModel::model()->getRate($payment); //获取费率
                         $ip = Tools::getIp();
+                        $orderInfos = $OrderModel->getByIds($orderIds);
                         foreach ($orderPayInfos as $v) {
-                            $upData['status'] = 'paid';
-                            $upData['payed'] = $v['money'];
-                            $upData['pay_at'] = $data['updated_at'];
-                            if (!$OrderModel->updateById($v['order_id'], $upData)) {
-                                $PaymentModel->rollback();
-                                Lang_Msg::error('ERROR_OPERATE_1');
+                            $orderInfo = $orderInfos[$v['order_id']];
+                            if($orderInfo['status']=='unaudited') {
+                                Lang_Msg::error('ERROR_PAYMENT_9',array('order_id'=>$v['order_id'])); //订单［{order_id}］正在确认中，请在确认通过后再支付
                             }
-                            $order_ids[] = $v['order_id'];
-                            $orderInfo = $OrderModel->getById($v['order_id']);
                             $transflowParam = array(
                                 'id' => Util_Common::payid(), 'mode' => $payment, 'type' => 1, 'amount' => $v['money'],
                                 'supplier_id' => $orderInfo['supplier_id'], 'agency_id' => $data['distributor_id'],
@@ -212,9 +214,9 @@ class PaymentController extends Base_Controller_Api {
                             if(in_array($payment,array_keys($PaymentModel->pay_types))) {
                                 $unionParams = array(
                                     'org_id'=> $data['distributor_id'],
-                                    'user_id'=> $this->body['user_id']?$this->body['user_id']:1,
-                                    'user_account'=> $this->body['user_account']?$this->body['user_account']:'system',
-                                    'user_name'=> $this->body['user_name']?$this->body['user_name']:'system',
+                                    'user_id'=> $this->body['user_id']?$this->body['user_id']:$orderInfo['user_id'],
+                                    'user_account'=> $this->body['user_account']?$this->body['user_account']:$orderInfo['user_account'],
+                                    'user_name'=> $this->body['user_name']?$this->body['user_name']:$orderInfo['user_name'],
                                     'money'=> $v['money'],
                                     'in_out'=> 0,
                                     'trade_type'=> 1,
@@ -227,16 +229,75 @@ class PaymentController extends Base_Controller_Api {
                                     !empty($r['message']) && Lang_Msg::error($unionRes['message']);
                                 }
                             }
+                            //淘宝订单需回调
+                            if($orderInfo['source']==1 && $orderInfo['local_source']==1) {
+                                $tbRes = TaobaoOrderModel::model()->send($orderInfo);
+                                if(!$tbRes) {
+                                    Lang_Msg::error('淘宝订单'.$orderInfo['id'].'，给淘宝反馈支付状态通知失败！');
+                                }
+                            }
+
+                            if($activity_paid){
+                                if($activityUsed>=$v['money']){
+                                    $upData['payed'] = 0; //扣除抵用券支付金额
+                                    $upData['activity_paid'] = $v['money']; //抵用券支付金额
+                                    $activityUsed -= $v['money'];
+                                }
+                                else{
+                                    $upData['payed'] = $v['money'] - $activityUsed; //扣除抵用券支付金额
+                                    $upData['activity_paid'] = $activityUsed; //抵用券支付金额
+                                    $activityUsed = 0;
+                                }
+                            } else {
+                                $upData['payed'] = $v['money'] - $v['activity_paid']; //扣除抵用券支付金额
+                                $upData['activity_paid'] = $v['activity_paid']; //抵用券支付金额
+                            }
+                            $upData['status'] = 'paid';
+                            $upData['payment_id'] = $id;
+                            $upData['pay_status'] = 2; //已支付
+                            $upData['pay_at'] = $data['updated_at'];
+                            $upData['pay_rate'] = $pay_rate; //费率
+                            if(!$PaymentModel->chgOrderStatusOnSucc($v['order_id'],$upData)){
+                                $PaymentModel->rollback();
+                                Lang_Msg::error('ERROR_OPERATE_1');
+                            }
+                            if ($activity_paid && !$PaymentOrderModel->updateById($v['id'],array('activity_paid'=>$upData['activity_paid']))) {
+                                $PaymentModel->rollback();
+                                Lang_Msg::error('ERROR_OPERATE_1');
+                            }
                         }
-                        if(!TicketTemplateModel::model()->batUpTktDayUsedReserve($order_ids)) {
+                        if(!TicketTemplateModel::model()->batUpTktDayUsedReserve($orderIds)) {
                             $PaymentModel->rollback();
                             Lang_Msg::error('ERROR_OPERATE_1');
                         }
+                        //扣除抵用券操作
+                        if(0<$data['activity_paid']){
+                            $unionParams = array(
+                                'org_id'=> $distributor_id,
+                                'user_id'=> $this->body['user_id']?$this->body['user_id']:$orderInfo['user_id'],
+                                'user_account'=> $this->body['user_account']?$this->body['user_account']:$orderInfo['user_account'],
+                                'user_name'=> $this->body['user_name']?$this->body['user_name']:$orderInfo['user_name'],
+                                'money'=> 0,
+                                'activity_money'=>$data['activity_paid'],
+                                'in_out'=> 0,
+                                'trade_type'=> 1,
+                                'pay_type'=> 0,
+                                'remark'=> $id."（使用抵用券）",
+                            );
+                            $unionRes = ApiUnionMoneyModel::model()->unionInout($unionParams);
+                            if(!$unionRes || $unionRes['code']=='fail'){
+                                return false;
+                            }
+                        }
+
+                        foreach($orderInfos as $order){ //将支付后的订单添加至redis列队，以便定时脚本通知大漠
+                            if($order['partner_type']>0 && $order['partner_product_code']!='') {
+                                OpenApiPartnerModel::model()->orderToRds($order);
+                            }
+                        }
                     } else if ($status == 'fail') {
                         PaymentModel::model()->updateById($id, array('status' => 'fail'));
-                        foreach ($orderPayInfos as $v) {
-                            $OrderModel->updateById($v['order_id'], array('payment_id' => ''));
-                        }
+                        $OrderModel->updateByAttr(array('payment_id' => ''), array('id|in'=>$orderIds));
                     }
                 } else {
                     PaymentOrderModel::model()->setTable($id)->updateByAttr(array('deleted_at' => $data['deleted_at']), array('payment_id' => $id));
@@ -249,7 +310,7 @@ class PaymentController extends Base_Controller_Api {
                 Lang_Msg::error('ERROR_OPERATE_1');
             }
         } catch ( Exception  $e) {
-            Log_Base::save('payment', 'error:'.$e->getMessage());
+            Log_Base::save('payment', '['.date('Y-m-d H:i:s').'] error:'.$e->getMessage());
             Log_Base::save('payment', var_export($this->body,true));
             OrderItemModel::model()->rollback();
             Lang_Msg::error( 'ERROR_GLOBAL_3' );

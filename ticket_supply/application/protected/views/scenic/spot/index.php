@@ -58,7 +58,7 @@ $this->breadcrumbs = array('景区管理', '景点管理');
             <div style="text-align:center" class="panel-footer">
                 <div id="basicTable_paginate" class="pagenumQu">
                     <?php
-                    $this->widget('CLinkPager', array(
+                    $this->widget('common.widgets.pagers.ULinkPager', array(
                         'cssFile' => '',
                         'header' => '',
                         'prevPageLabel' => '上一页',

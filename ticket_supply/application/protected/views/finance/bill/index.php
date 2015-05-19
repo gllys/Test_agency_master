@@ -1,33 +1,49 @@
 <?php
 $this->breadcrumbs = array('结算管理', '应收账款');
 ?>
+<style>
+    .table-bordered th {
+        line-height: 2em !important;
+    }
+    .table-bordered th,
+    .table-bordered td {
+        vertical-align: middle !important;
+    }
+    .table-bordered a:hover {
+        text-decoration: none;
+    }
+    .ui-datepicker { z-index:9999!important }
+</style>
 <div class="contentpanel">
 
 	<div class="panel panel-default">
         <div class="panel-heading">
-            <div class="panel-btns" style="display: none;">
-                <a title="" data-toggle="tooltip" class="panel-minimize tooltips" href="" data-original-title=""><i class="fa fa-minus"></i></a>
-                <a title="" data-toggle="tooltip" class="panel-close tooltips" href="" data-original-title=""><i class="fa fa-times"></i></a>
-            </div><!-- panel-btns -->
             <h4 class="panel-title">应收账款</h4>
         </div>
         <div class="panel-body">
-            <form class="form-inline" method="post">
-				<div class="form-group" style="margin:0">
-					<input style="cursor: pointer;cursor: hand;background-color: #ffffff" class="form-control datepicker" placeholder="账单日期" type="text" name="bill_sd" readonly="readonly" value="<?php echo isset($_REQUEST['bill_sd']) ? $_REQUEST['bill_sd'] : ''?>"> ~
-					<input style="cursor: pointer;cursor: hand;background-color: #ffffff" class="form-control datepicker" placeholder="账单日期" type="text" name="bill_ed" readonly="readonly" value="<?php echo isset($_REQUEST['bill_ed']) ? $_REQUEST['bill_ed'] : ''?>">
+            <form class="form-inline" method="post" action="/finance/bill/">
+				<div class="form-group" style="width: 335px;">
+                                    <label>账单时间:</label>
+					<input style="cursor: pointer;cursor: hand;background-color: #ffffff" class="form-control datepicker" placeholder="账单日期" type="text" name="bill_sd" id="bill_sd"
+						   readonly="readonly" value="<?php echo isset($_REQUEST['bill_sd']) ? $_REQUEST['bill_sd'] : ''?>"> ~
+					<input style="cursor: pointer;cursor: hand;background-color: #ffffff" class="form-control datepicker" placeholder="账单日期" type="text" name="bill_ed" id="bill_ed"
+						   readonly="readonly" value="<?php echo isset($_REQUEST['bill_ed']) ? $_REQUEST['bill_ed'] : ''?>">
 				</div><!-- form-group -->
-				<div class="form-group" style="margin:0">
-					<select class="select2" data-placeholder="Choose One" style="width:150px;padding:0 10px;" name="pay_state">
+				<div class="form-group">
+					<select class="select2" data-placeholder="Choose One" style="width:103px;height:34px;" name="pay_state">
 						<option value="">支付状态</option>
 						<option value="1">已打款</option>
 						<option value="0">未打款</option>
 					</select>
 				</div>
-				<div class="form-group" style="margin: 0 5px 0 0">
-					<input class="form-control" placeholder="请输入分销商名称"type="text" style="width:200px;" name="agency_name">
+				<div class="form-group">
+                                    <input class="form-control" placeholder="请输入分销商名称"type="text" style="width:200px;" name="agency_name" value="<?php echo isset($_REQUEST['agency_name'])?$_REQUEST['agency_name']:""; ?>">
 				</div>
-				<button class="btn btn-primary btn-xs" type="submit">查询</button>
+                                 <div class="form-group">
+									 <input type="hidden" name="is_export" class="is_export" value="0">
+									 <button class="btn btn-primary btn-sm" type="submit">查询</button>
+									 <button class="btn btn-primary btn-sm" type="button" id="export">导出</button>
+                                 </div>
             </form>
         </div><!-- panel-body -->
     </div>
@@ -37,10 +53,10 @@ $this->breadcrumbs = array('结算管理', '应收账款');
 	}
 	
 	</style>
-	  <table class="table table-bordered table1">
+	  <table class="table table-bordered table1 mb30">
 		<thead>
 		  <tr>
-			<th>结算单号</th>
+                      <th style="padding-left:20px;width: 180px;">结算单号</th>
 			<th>打款机构</th>
 			<th>账单生成日期</th>
 			<th>账单类型</th>
@@ -52,11 +68,13 @@ $this->breadcrumbs = array('结算管理', '应收账款');
 		  </tr>
 		</thead>
 		<tbody>
-		<?php if(isset($bill)):?>
-			<?php foreach ($bill as $value):?>
+		<?php
+			if(isset($lists['data'])):
+				foreach ($lists['data'] as  $value):
+				?>
 		  <tr>
-			<td><?php echo $value['id']?></td>
-			<td><?php echo $value['bill_type'] == 1||$value['bill_type'] == 4 ? '汇联' : $value['agency_name']?></td>
+			<td style="padding-left:20px;"><a href="/finance/detail?id=<?php echo $value['id']?>"><?php echo $value['id']?></a></td>
+			<td style="text-align: left;color:gray"><?php echo $value['bill_type'] == 1||$value['bill_type'] == 4 ? '汇联' : $value['agency_name']?></td>
 			<td><?php echo date('Y年m月d日',$value['created_at'])?></td>
 			<td>
 				<?php if($value['bill_type'] == 1){
@@ -69,8 +87,8 @@ $this->breadcrumbs = array('结算管理', '应收账款');
 						echo "储值支付";
 						}?>
 			</td>
-			<td><?php echo $value['bill_amount']?></td>
-			<td ><?php echo $value['bill_num']?>张</td>
+			<td class="text-danger"><?php echo $value['bill_amount']?></td>
+			<td class="text-danger"><?php echo $value['bill_num']?>张</td>
 			<?php if($value['pay_status'] == 1 && $value['bill_amount'] > 0):?>
 				<td class="text-success">已打款</td>
 			<?php elseif($value['bill_amount'] == 0):?>
@@ -85,8 +103,8 @@ $this->breadcrumbs = array('结算管理', '应收账款');
 			<?php else:?>
 				<td class="text-danger">未收款</td>
 			<?php endif;?>
-			<td>
-			    <a class="btn btn-primary btn-xs mr10" href="/finance/detail?id=<?php echo $value['id']?>" data-toggle="modal">查看</a>
+			<td >
+			    <a class="btn btn-success btn-bordered btn-xs" href="/finance/detail?id=<?php echo $value['id']?>" data-toggle="modal">查看</a>
 			</td>
 		  	</tr>
 			<?php endforeach;?>
@@ -98,8 +116,8 @@ $this->breadcrumbs = array('结算管理', '应收账款');
 	</div>
 	<div class="panel-footer pagenumQu" style="padding-top:15px;text-align:right;border:1px solid #ddd;border-top:0">
 		<?php
-		if (isset($bill)) {
-			$this->widget('CLinkPager', array(
+		if (isset($lists['data'])) {
+			$this->widget('common.widgets.pagers.ULinkPager', array(
 				'cssFile' => '',
 				'header' => '',
 				'prevPageLabel' => '上一页',
@@ -116,6 +134,24 @@ $this->breadcrumbs = array('结算管理', '应收账款');
 </div><!-- contentpanel -->
 <script>
 jQuery(document).ready(function() {
+
+	$('#export').click(function() {
+		if ($('#bill_sd').val() == '')
+		{
+			$('#bill_sd').PWShowPrompt('请选择账单开始日期');
+			return false;
+		}
+		if ($('#bill_ed').val() == '')
+		{
+			$('#bill_ed').PWShowPrompt('请选择账单结束日期');
+			return false;
+		}
+		$('.is_export').attr('value', '1');
+		$('form').submit();
+		$('.is_export').attr('value', '0');
+	});
+
+
 
 // Tags Input
 jQuery('#tags').tagsInput({width:'auto'});
@@ -136,7 +172,30 @@ jQuery('#timepicker2').timepicker({showMeridian: false});
 jQuery('#timepicker3').timepicker({minuteStep: 15});
 
 // Date Picker
-jQuery('.datepicker').datepicker({showOtherMonths: true, selectOtherMonths: true});
+$('.datepicker').datepicker({
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: 'yy-mm-dd',
+        monthNamesShort: [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" ],
+        yearRange: "1995:2065",
+		beforeShow: function(d){
+			setTimeout(function(){
+				$('.ui-datepicker-title select').select2({
+					minimumResultsForSearch: -1
+				});
+			},0)
+		},
+		onChangeMonthYear: function(){
+			setTimeout(function(){
+				$('.ui-datepicker-title select').select2({
+					minimumResultsForSearch: -1
+				});
+			},0)
+		},
+        onClose: function(dateText, inst) { 
+            $('.select2-drop').hide(); 
+        }
+    });
 jQuery('#datepicker-inline').datepicker();
 jQuery('#datepicker-multiple').datepicker({
     numberOfMonths: 3,

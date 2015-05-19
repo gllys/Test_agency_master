@@ -41,10 +41,10 @@ class RoleUser extends UActiveRecord
 		return array(
 			array('role_id, uid, updated_at', 'required'),
 			array('role_id, uid, last_updated_source', 'numerical', 'integerOnly'=>true),
-			array('created_at, deleted_at', 'safe'),
+			array('is_delete, created_at, deleted_at', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, role_id, uid, created_at, updated_at, deleted_at, last_updated_source', 'safe', 'on'=>'search'),
+			array('id, role_id, uid, is_delete created_at, updated_at, deleted_at, last_updated_source', 'safe', 'on'=>'search'),
 		);
 	}
 

@@ -19,10 +19,15 @@ class Base_Controller_ApiDispatch extends Base_Controller_Ota{
         $partner = isset($params['partner']) ? empty($params['partner']) : '';
 
         if(isset($params['source'])){
-            if($params['source'] == 1)
+            if($params['source'] == 1){
                 $req->module = 'Taobao';
-            if($params['source'] == 10)
+            }else if($params['source'] == 10){
                 $req->module = 'Qunar';
+            }else if ($params['source'] == 13){
+                $req->module = 'Way';
+            }else{
+                $req->module = 'V1_1';
+            }
         }
 
         //指定动作及其文件类对应的路径
@@ -30,8 +35,11 @@ class Base_Controller_ApiDispatch extends Base_Controller_Ota{
             $req->action => 'modules/'.$req->module.'/actions/'.$partner.'/'.$action.'.php',
         );
 
-        self::echoLog('body', var_export($params, true), 'apidispatch_bee.log');
-        self::echoLog('body', var_export($this->actions, true), 'apidispatch_bee.log');
+//        self::echoLog('body', var_export($params, true), 'apidispatch_bee.log');
+//        self::echoLog('body', var_export($this->actions, true), 'apidispatch_bee.log');
+        Util_Logger::getLogger('common')->info(__METHOD__,
+            array('params' => $params, 'action' => $this->actions), '', 'apidispatch'
+        );
     }
 
 }

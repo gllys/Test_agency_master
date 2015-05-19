@@ -1,0 +1,1 @@
+update process_config set num=2 where `name`='queue';

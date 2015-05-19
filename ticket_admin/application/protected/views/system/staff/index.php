@@ -1,4 +1,4 @@
-<div class="contentpanel">
+<div class="contentpanel" id="maincontent">
     <div class="row">
         <div class="col-md-12">
             <div class="panel panel-default">
@@ -11,10 +11,6 @@
                     <h4 class="panel-title"><a class="btn btn-success btn-sm pull-right" href="/system/staff/add/" style="color: #ffffff">新增</a>员工管理</h4>
                 </div>
                 <!-- panel-heading -->
-
-
-
-
             </div>
             <div id="show_msg"></div>
             <!-- panel -->
@@ -23,7 +19,7 @@
                     <thead>
                     <tr>
                         <th style="width: 20%">姓名</th>
-                        <th style="width: 20%">账号</th>
+                        <th style="width: 20%">用户名</th>
                         <th style="width: 20%">角色</th>
                         <th>手机号码</th>
                         <th>状态</th>
@@ -57,8 +53,8 @@
                             <a title="修改" href="/system/staff/edit/?id=<?php echo $item['id'] ?>">
                                 修改
                             </a>
-                            <?php if (!$item['is_super']): ?>
-                                <a title="删除" style="color:#FF0000" data-name="<?php echo $item['name']?>" data-id="<?php echo $item['id'] ?>" href="javascript:;" class="del">
+                            <?php if (!$item['is_super'] && Yii::app()->user->uid != $item['id']): ?>
+                                <a title="删除" style="color:#FF0000" data-name="<?php echo $item['name']?>" data-id="<?php echo $item['id'] ?>" href="javascript:;" class="del clearPart">
                                     删除
                                 </a>
                             <?php endif ?>
@@ -71,6 +67,25 @@
                     </tbody>
                 </table>
             </div>
+			<div class="panel-footer">
+				<div class="pagenumQu">
+					<?php
+					if ($lists) {
+						$this->widget('common.widgets.pagers.ULinkPager', array(
+							'cssFile' => '',
+							'header' => '',
+							'prevPageLabel' => '上一页',
+							'nextPageLabel' => '下一页',
+							'firstPageLabel' => '',
+							'lastPageLabel' => '',
+							'pages' => $pages,
+							'maxButtonCount' => 5, //分页数量
+						));
+					}
+					?>
+				</div>
+			</div>
+
         </div>
         <!-- col-md-6 -->
     </div>
@@ -86,17 +101,17 @@
 			PWConfirm(name,function(){
 
 			    $.post('/system/staff/del/id/',{id : id}, function (data) {
-                if (data.error) {
-                    var warn_msg = '<div class="alert alert-danger"><button data-dismiss="alert" class="close" type="button">×</button><i class="icon-warning-sign"></i>'+data.msg+'</div>';
-                    $('#show_msg').html(warn_msg);
-                    location.href='#show_msg';
-                } else {
-                    var succss_msg = '<div class="alert alert-success"><strong>删除成功</strong></div>';
-                    $('#show_msg').html(succss_msg);
-                    window.location.reload();
-                }
-			},'json');
-        });
+  					if (data.error == 'fail') {
+                        alert(data.msg);
+					} else if(data.error == 'succ') {
+                        setTimeout(function() {
+                            alert('删除成功!', function() {
+                                window.location.partReload();
+                            });
+                        }, 500);
+					}
+				},'json');
+			});
 			
 			return false;
 		});

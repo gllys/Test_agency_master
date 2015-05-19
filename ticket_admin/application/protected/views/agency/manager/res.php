@@ -174,9 +174,9 @@ $this->breadcrumbs = array('分销商', '查找分销商');
         function add(id){
         	$.post('/agency/manager/addcredit',{'id':id},function(data){
         		if(data.error==0){
-                    alert("添加成功",function(){setTimeout("location.href='/agency/manager/history'", '1000');});
+                    alert("添加成功",function(){setTimeout("location.href='/site/switch/#/agency/manager/history'", '1000');});
                 }else{
-                    alert("添加失败,"+data.msg,function(){location.reload();});
+                    alert("添加失败,"+data.msg,function(){location.partReload();});
                 }
         	},'json')
         }

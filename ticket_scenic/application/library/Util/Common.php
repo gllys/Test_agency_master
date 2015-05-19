@@ -5,7 +5,7 @@
  */
 class Util_Common
 {
-	protected static $code = '0123456789bcdefghijklmnopqrstuvwxyzBCDEFGHIJKLMNOPQRSTUVWXYZ';
+	protected static $code = '012356789';
 	/**
 	 * [escape description]
 	 * @param  [type] $data    [description]
@@ -123,7 +123,7 @@ class Util_Common
 	 * @param  [type] $num [description]
 	 * @return [type]      [description]
 	 */
-    protected static function to60($num) {
+    protected static function to9($num) {
         $rt = array();
         $arr = self::toBase($num, strlen(self::$code));
         foreach ($arr as $k => $v) $rt[] = self::$code[$v];
@@ -136,12 +136,12 @@ class Util_Common
      * @param  integer $base [description]
      * @return [type]        [description]
      */
-    protected static function from60($num, $base = 60) {
-        $rt = 0;
+    public static function from9($num, $base = 9) {
+        $rt = '0';
         $code = array_flip(str_split(self::$code));
         $arr = array_reverse(str_split($num));
-        foreach ($arr as $k => $v) $rt+= $code[$v] * pow($base, $k);
-        return $rt;
+        foreach ($arr as $k => $v) $rt = bcadd($rt, bcmul($code[$v], bcpow("$base", "$k")));
+        return $rt+0;
     }
     
     /**
@@ -151,35 +151,62 @@ class Util_Common
      * @return [type]        [description]
      */
     protected static function toBase($num, $base = 2) {
-        
         $rt = array();
-        while ($num >= $base) {
-            $rt[] = $num % $base;
-            $num = intval($num / $base);
+        while ($num+0 >= $base) {
+            $rt[] = bcmod("$num", "$base");
+            $num = bcdiv("$num", "$base");
         }
-        if ($num > 0) $rt[] = $num;
-        
+        if ($num+0 > 0) $rt[] = $num;
         return array_reverse($rt);
     }
 
     /**
-     * [makeId description]
-     * @param  [type] $channel [description]
-     * @param  [type] $oid     [description]
-     * @param  [type] $uid     [description]
-     * @return [type]          [description]
+     * 生成唯一ID 15位纯数字 用于订单号、票号
+     * @param  integer $channel 1订单号 2票号
+     * @return [type]           [description]
      */
-    public static function makeId($channel, $oid, $uid) {
-        $remote = $_SERVER['FX_REMOTE'] == 1 ? 'A' : 'B';
-        $channel = self::to60($channel);
-        $oid = self::to60($oid);
-        $uid = self::to60($uid);
-
-        list($usec, $sec) = explode(' ', microtime());
-        $sec = self::to60($sec);
-        $usec = self::to60(intval($usec * 1000000));
-        
-        return "{$remote}{$channel}a{$oid}a{$uid}a{$sec}{$usec}";
+    public static function uniqid($channel = 1) {
+    	$lang = LanguageModel::model();
+    	do {
+    		$us = microtime();
+    		$mt = substr($us, 11) . substr($us, 2, 4);
+    		$key = 'uniqid|'.$channel.'|'.$mt;
+    	} while(!$lang->memcache->add($key,1,5));
+    	$nid = $channel.self::to9($mt);
+    	// echo $mt . '<br/>';
+    	// echo $nid . '<br/>';
+    	// echo self::from9($nid);
+        return $nid;
     }
-    
+
+    /**
+     * Util_Common::uniqid2date($id);
+     * @param  [type] $id     [description]
+     * @param  string $format [description]
+     * @return [type]         [description]
+     */
+    public static function uniqid2date($id, $format = 'Ym') {
+    	$mt = self::from9(substr("$id", 1));
+    	return date($format, substr("$mt", 0, 10));
+    }
+
+    /**
+     * 生成流水号 18位纯数字含日期时间
+     * @return [type] [description]
+     */
+    public static function payid() {
+    	$lang = LanguageModel::model();
+    	do {
+    		$us = microtime();
+    		$mt = date('YmdHis') . substr($us, 2, 4);
+    		$key = 'payid|'.$mt;
+    	} while(!$lang->memcache->add($key,1,5));
+    	// echo $mt . '<br/>';
+        return $mt;
+    }
+
+    public static function payid2date($id, $format = 'Ym') {
+    	$mt = strtotime(substr("$id", 0, 8));
+    	return date($format, $mt);
+    }
 }

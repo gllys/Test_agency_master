@@ -1,0 +1,1 @@
+ALTER TABLE `equipment` ADD `fell_status` INT NOT NULL COMMENT '自动落杆 0:未落杆 1:自动落杆' AFTER `status`;

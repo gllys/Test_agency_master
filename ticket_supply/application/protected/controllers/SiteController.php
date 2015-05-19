@@ -13,13 +13,13 @@ class SiteController extends Controller {
         return array(// captcha action renders the CAPTCHA image displayed on the contact page
             'captcha' => array(
                 'class' => 'CCaptchaAction',
-                'height' => 36,
-                'width' => 70,
+                'height' => 23,
+                'width' => 50,
                 'padding' => 0,
-                'transparent' => true,
-                'offset' => -2,
+                'transparent' => false,
                 'minLength' => 4,
-                'maxLength' => 4
+                'maxLength' => 4,
+				'testLimit'=> 30,
             ), // page action renders "static" pages stored under 'protected/views/site/pages'
             // They can be accessed via: index.php?r=site/page&view=FileName
             'page' => array('class' => 'CViewAction')
@@ -75,89 +75,124 @@ class SiteController extends Controller {
         $this->render('contact', array('model' => $model));
     }
 
-    public function actionRegister() {
-        header("Content-type: text/html; charset=utf-8");
-        $user = null;
-        $error = "";
-        if (isset($_POST['RegisterForm'])) {
+	public function actionRegister() {
+		$this->renderPartial('reg_user');
+	}
+	
+	// 验证手机短信
+	private function mobileCode($userCode, $mobile) {
+		$returnArr = array();
+		$mobileCodeAndMobile = Yii::app()->redis->get('code_for_register:' . Yii::app()->getSession()->getSessionId());
+		$mobileCodeAndMobile = explode(',', $mobileCodeAndMobile);
+		if($userCode != $mobileCodeAndMobile[0]) {
+			$returnArr[1] = false;
+			$returnArr[2] = "验证码输入错误";
+		} else if($userCode == $mobileCodeAndMobile[0] && $mobile != $mobileCodeAndMobile[1]) {
+			$returnArr[1] = false;
+			$returnArr[2] = "验证码与手机号不对应，请重新接受验证码或更改手机号";
+		} else {
+			$returnArr[1] = true;
+		}
+		return $returnArr;
+	}
+	// ajax验证用户信息和注册
+	public function actionValidatereg() {
+		
+		$returnArr = array();
+		if(isset($_POST["fieldValue"]) && isset($_POST["fieldId"])) {
+			$attribute = $_POST["fieldId"];
+			$returnArr[0] = $attribute;
+			// 如果attributes是code，说明验证手机验证码，同时验证手机号和对应的手机验证码
+			if($attribute == "code") {	//验证短信
+				$userCode = $_POST["fieldValue"];
+				$mobile = $_POST["mobile"];
+				$returnArr = array_merge($returnArr, $this->mobileCode($userCode, $mobile));
+			} else {
+				Users::$verifycodeAllowEmpty = false;
+				$users = new Users();
+				$users->$attribute = $_POST["fieldValue"];
+
+				if($users->validate(array($attribute))) {
+					$returnArr[1] = true;
+				} else {
+					$returnArr[1] = false;
+				}
+			}
+		} else if (isset($_POST['RegisterForm'])){	// 提交时验证注册信息同时进行登录
             $attributes = $_POST['RegisterForm'];
-            if ($attributes['code'] == Yii::app()->redis->get('code_for_register:' . Yii::app()->getSession()->getSessionId())) {
-                unset($attributes['code']);
+			$identity = new UserIdentity($attributes['account'], $attributes['password']);
+			Users::$verifycodeAllowEmpty = false;
+			$user = new Users();
+            $attributes = $_POST['RegisterForm'];
+			$user['password'] = $identity->getHashedPassword($attributes['password']);
+			$user['repassword'] = $identity->getHashedPassword($attributes['repassword']);
+			$user['account'] = $attributes['account'];
+			$user['mobile'] = $attributes['mobile'];
+			$user['verifycode'] = $attributes['verifycode'];
+			$user['created_at'] = date('Y-m-d H:i:s');
+			$user['updated_at'] = date('Y-m-d H:i:s');
+			$user['is_super'] = 1;
+			
+			$errors = $user->getErrors();
+			$attributekeys = array_keys($attributes);
+			$noError = $user->validate($attributekeys);
+			foreach($attributekeys as $attributekey) {
+				$ret = array();
+				if(array_key_exists($attributekey, $errors)) {
+					$ret[0] = $attributekey;
+					$ret[1] = false;
+					$noError = false;
+					$ret[2] = isset($errors[$attributekey][0]) ? $errors[$attributekey][0] : "";
+				} else {
+					$ret[0] = $attributekey;
+					if($attributekey == "code") {
+						$userCode = $attributes["code"];
+						$mobile = $attributes["mobile"];
+						$ret = array_merge($ret, $this->mobileCode($userCode, $mobile));
+						$noError = $ret[1];	// 验证码是否错误
+					} else {
+						$ret[1] = true;
+					}
+				}
+				$returnArr[] = $ret;
+			}
+			// 验证是否有错误
+			if ($noError && $user->insert()) {
+				Yii::import("common.models.ULoginForm");
+				$model = new ULoginForm;
+				$model->attributes = array(
+					'username' => $attributes['account'],
+					'password' => $attributes['password']
+				);
+				$model->validate() && $model->login();
+			} else {
 
-                if ($attributes['account'] == null) {
-                    $error = "用户名不得为空！";
-                    //echo '<script type="text/javascript">alert("用户名不得为空！");</script>';
-                } else {
-                    $identity = new UserIdentity($attributes['account'], $attributes['password']);
-                    $user = new Users();
-
-                    $user['password'] = $identity->getHashedPassword($attributes['password']);
-                    $user['account'] = $attributes['account'];
-                    $user['mobile'] = $attributes['mobile'];
-                    $user['created_at'] = date('Y-m-d H:i:s');
-                    $user['updated_at'] = date('Y-m-d H:i:s');
-                    $user['is_super'] = 1;
-
-                    //try {
-                    if ($user->save()) {
-                        Yii::import("common.models.ULoginForm");
-                        $model = new ULoginForm;
-                        $model->attributes = array(
-                            'username' => $attributes['account'],
-                            'password' => $attributes['password']
-                        );
-                        $this->validate_and_login($model);
-                        Yii::app()->end();
-                    }
-                    //} catch (Exception $e) {
-                    //    echo '<script type="text/javascript">alert("注册失败");location.href="/site/register/";</script>';
-                    //    Yii::app()->end();
-                    //}
-                }
-            } else {
-                $error = "验证码不正确！";
-                //echo '<script type="text/javascript">alert("验证码不正确！");</script>';
-            }
-        }
-        $this->renderPartial('reg_user', array('user' => $user, 'error' => $error));
-    }
-
+			}
+		}
+		echo json_encode($returnArr);
+	}
+	
     public function actionSmsCode() {
         $mobile = Yii::app()->request->getParam('mobile');
         $type = Yii::app()->request->getParam('type');
         $code = mt_rand(100000, 999999);
-        if($type=='1') { 
+        if($type=='1') {
+            $types = 4;
             $str_type = '提现验证码 '; 
             $str_name = 'fetchcash';
-        }else{ 
+        }else{
+            $types = 2;
             $str_type = '注册验证码 ';
             $str_name = 'register';
         }
         $SmsHandler = new SMS();
-         if ($SmsHandler->sendSMS($mobile, '【景旅通票台】'.$str_type . $code)) {
-            Yii::app()->redis->setEx('code_for_'.$str_name.':' . Yii::app()->getSession()->getSessionId(), 600, $code);
-            echo 1; //$code;
+       //var_dump($SmsHandler->sendSMS($mobile, $str_type . $code));die;
+         if ($SmsHandler->sendSMS($mobile, $str_type . $code,$types)) {
+            Yii::app()->redis->setEx('code_for_'.$str_name.':' . Yii::app()->getSession()->getSessionId(), 600, $code.','.$mobile);
+            echo json_encode(array("code"=>"succ", "message"=>"发送信息成功"));
         } else {
-            echo 0;
+            echo json_encode(array("code"=>"fail", "message"=>"发送信息失败"));
         }
-    }
-
-    public function actionPre() {
-        $chk = Yii::app()->request->getParam('chk');
-        $chk = substr($chk, 4);
-        $user = new Users();
-        $val = Yii::app()->request->getParam('val');
-        $val = trim($val);
-        if ($chk == 'code') {
-            if (strlen($val) != 6 || $val != Yii::app()->redis->get('code_for_register:' . Yii::app()->getSession()->getSessionId())) {
-                echo '短信验证码输入错误';
-                Yii::app()->end();
-            }
-        } else {
-            $user[$chk] = $val;
-            $user->validate();
-        }
-        echo isset($user->errors[$chk]) ? $user->errors[$chk][0] : 'ok';
     }
 
     /**
@@ -167,6 +202,10 @@ class SiteController extends Controller {
         if (!Yii::app()->user->isGuest) {
             $this->redirect('/');
         }
+        
+        $rec = Recommend::api()->lists(array('pos_id'=>1,'expire_time'=>'true','status'=>1,'items'=>10000),true,30);
+        $rec = $rec['body']['data'];
+        
         Yii::import("common.models.ULoginForm");
         $model = new ULoginForm;
         // if it is ajax validation request
@@ -198,27 +237,10 @@ class SiteController extends Controller {
         }
 
         // display the login form
-        $this->renderPartial('login', array('model' => $model));
-    }
-
-    private function validate_and_login(&$model) {
-        // validate user input and redirect to the previous page if valid
-        if ($model->validate() && $model->login()) {
-//            $fields = array('id', 'account', 'name', 'organization_id', 'is_super', 'created_at');
-//            $result = Users::model()->find(array(
-//                'select' => $fields,
-//                'condition' => 'account=:account AND deleted_at IS NULL',
-//                'params' => array(':account' => Yii::app()->getUser()->account),
-//            ));
-//            $u = Yii::app()->user->account;
-//            foreach ($fields as $field) {
-//                $info[$field] = $result->$field;
-//            }
-//            $session_id = Yii::app()->getSession()->getSessionId();
-//            Yii::app()->redis->hMset('session_' . $session_id, $info);
-//            Yii::app()->redis->expire('session_' . $session_id, 3600 * 24);
-            $this->redirect('/');
-        }
+        if (isset($_GET['return_url']))
+        	$this->renderPartial('rlogin', array('model' => $model,'rec'=>$rec,'count'=>count($rec)));
+        else 
+        	$this->renderPartial('login', array('model' => $model,'rec'=>$rec,'count'=>count($rec)));
     }
 
     /**
@@ -244,13 +266,15 @@ class SiteController extends Controller {
                 'params' => array(':account' => trim($account)),
             ));
             if ($action == 'code') {
+				$errFlag = false;
                 if (is_null($user)) {
                     echo json_encode(array(
                         'code' => -1,
                         'msg' => '用户名不存在！'
                         ), JSON_UNESCAPED_UNICODE);
                     Yii::app()->end();
-                }
+                }				
+				
                 $code = mt_rand(1000000, 9999999);
                 $SmsHandler = new SMS();
                 if (strlen($user['mobile']) != 11) {
@@ -259,7 +283,7 @@ class SiteController extends Controller {
                         'msg' => '注册时手机号填写不正确！'
                         ), JSON_UNESCAPED_UNICODE);
                     Yii::app()->end();
-                } else if ($SmsHandler->sendSMS($user['mobile'], '【景旅通票台】重设密码验证码 ' . $code)) {
+                } else if ($SmsHandler->sendSMS($user['mobile'], '重设密码验证码 ' . $code)) {
                     Yii::app()->redis->setEx('code_for_reset:' . $account, 600, $code);
                     echo json_encode(array(
                         'code' => 1,
@@ -295,18 +319,23 @@ class SiteController extends Controller {
 //                Yii::app()->end();
             }
             $code_err = null;
-            if ($code != '' && $code == Yii::app()->redis->get('code_for_reset:' . $account)) {
-                $user['password'] = $password;
-                if ($user->validate()) {
-                    $user['password'] = password_hash($password, PASSWORD_BCRYPT, array('cost' => 8));
-                    if ($user->save()) {
-                        $this->redirect('/site/login');
-                    }
-                }
-            } else {
-                $code_err = '验证码不正确';
-            }
-            $this->renderPartial('reset', array('user' => $user, 'code_err' => $code_err));
+			$password_err = null;
+			if(strlen($password) != 6) {
+                $password_err = '密码必须为6位';
+			} else {            
+				if ($code != '' && $code == Yii::app()->redis->get('code_for_reset:' . $account)) {
+					$user['password'] = $password;
+					if ($user->validate()) {
+						$user['password'] = password_hash($password, PASSWORD_BCRYPT, array('cost' => 8));
+						if ($user->save()) {
+							$this->redirect('/site/login');
+						}
+					}
+				} else {
+					$code_err = '验证码不正确';
+				}
+			}
+            $this->renderPartial('reset', array('user' => $user, 'code_err' => $code_err, 'password_err'=>$password_err));
             Yii::app()->end();
         } else {
             $this->renderPartial('reset');
@@ -340,15 +369,22 @@ class SiteController extends Controller {
 
     public function actionUpyunAgent() {
         $model = array('code', 'message', 'url', 'time', 'image-width', 'image-height', 'image-frames', 'image-type');
-        foreach ($model as $val)
+        foreach ($model as $val){
             if (!isset($_GET[$val])) {
                 echo '<script type="text/javascript">parent.upload_callback({status:1,msg:"参数不全上传失败"});</script>';
                 Yii::app()->end();
             }
-        if (md5("{$_GET['code']}&{$_GET['message']}&{$_GET['url']}&{$_GET['time']}&" . Yii::app()->upyun->formApiSecret) != $_GET['sign']) {
-            echo '<script type="text/javascript">parent.upload_callback({status:1,msg:"密钥不正确上传失败"});</script>';
-            Yii::app()->end();
         }
+        
+        if($_GET['code']!=200){
+             echo '<script type="text/javascript">parent.upload_callback({status:1,msg:"'.$_GET['message'].'"});</script>';
+            Yii::app()->end();
+        }    
+        
+//        if (md5("{$_GET['code']}&{$_GET['message']}&{$_GET['url']}&{$_GET['time']}&" . Yii::app()->upyun->formApiSecret) != $_GET['sign']) {
+//            echo '<script type="text/javascript">parent.upload_callback({status:1,msg:"密钥不正确上传失败"});</script>';
+//            Yii::app()->end();
+//        }
 
         echo '<script type="text/javascript">parent.upload_callback({status:200,msg:"' . Yii::app()->upyun->host . $_GET['url'] . '"});</script>';
         Yii::app()->end();

@@ -96,10 +96,12 @@ var storageCal = {
                 g_price = rules[date]['g_price'];
                 g_priceT = g_price !== "" ? "团队价 " + g_price + '</br>' : "";
                 storage = rules[date]['storage'];
-                storageT = storage !== "" && storage != 0 ? "库存 " + storage : "";
-                if ((s_priceT + g_priceT + storageT) != "") {
-                    no_data = false;
-                }
+                storageT = storage !== "" && storage != 0 ? "库存 " + storage : "";                
+                (function(){
+                    if ((s_priceT + g_priceT + storageT) != "") {
+                        no_data = false;
+                    }
+                })()
                 j++;
             }
 
@@ -156,17 +158,18 @@ var storageCal = {
                     })
                 }
             });
-            $('.rule-remove-btn').click(function(){
-                var date = $(this).parent().parent().attr('date');
-                if (!confirm("确认要删除"+date+"的规则设定吗？")) return;
-                var pid = $("#pid").val();
-                $.get('/ticket/strategy/delete', {id: pid, date: date}, function(result){
-                    if (result == 1) {
-                        location.href = '/ticket/strategy/amend/id/'+pid;
-                    }
-                });
-
-            });
+            //因url写死，改放在调用页面处理
+//            $('.rule-remove-btn').click(function(){
+//                var date = $(this).parent().parent().attr('date');
+//                if (!confirm("确认要删除"+date+"的规则设定吗？")) return;
+//                var pid = $("#pid").val();
+//                $.get('/ticket/strategy/delete', {id: pid, date: date}, function(result){
+//                    if (result == 1) {
+//                        location.href = '/ticket/strategy/amend/id/'+pid;
+//                    }
+//                });
+//
+//            });
             //$("#storageCalContent div.detail input[type='checkbox']").click(function () {
             //    var g_price = $(this).parent().parent().attr("g_price");
             //    var s_price = $(this).parent().parent().attr("s_price");

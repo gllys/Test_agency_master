@@ -114,7 +114,7 @@ jQuery(document).ready(function() {
 		$('bill_finish').attr('disabled',true);
 		$.post('/finance/detail/finish',{ id: $('input[type=hidden]').val()},function(data){
 			if(data.error===0){
-                    alert(data.msg,function(){window.location.href = '/finance/bill';});
+                    alert(data.msg,function(){window.location.href = '/site/switch/#/finance/bill';});
                 }else{
                     alert(data.msg);
                 }

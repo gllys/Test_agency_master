@@ -7,18 +7,16 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>智慧旅游票务平台-供应商</title>
        
-        <link href="/css/style.default.css" rel="stylesheet">
-        <link href="/css/jquery.tagsinput.css" rel="stylesheet">
-        <link href="/css/toggles.css" rel="stylesheet">
-        <link href="/css/bootstrap-timepicker.min.css" rel="stylesheet">
-        <link href="/css/select2.css" rel="stylesheet">
-        <link href="/css/colorpicker.css" rel="stylesheet">
-        <link href="/css/dropzone.css" rel="stylesheet">
-        <link href="/css/yiipager.css" rel="stylesheet">
-        <link href="/css/bootstrap-override.css" rel="stylesheet">
-        <link href="/css/bootstrap-wysihtml5.css" rel="stylesheet">
-        <script src="/js/jquery-1.11.1.min.js"></script>
-        
+        <link href="<?php echo Yii::app()->versionUrl->changeUrl('/css/style.default.css') ?>" rel="stylesheet">
+        <link href="<?php echo Yii::app()->versionUrl->changeUrl('/css/toggles.css') ?>" rel="stylesheet">
+        <link href="<?php echo Yii::app()->versionUrl->changeUrl('/css/bootstrap-timepicker.min.css') ?>" rel="stylesheet">
+        <link href="<?php echo Yii::app()->versionUrl->changeUrl('/css/select2.css') ?>" rel="stylesheet">
+        <link href="<?php echo Yii::app()->versionUrl->changeUrl('/css/colorpicker.css') ?>" rel="stylesheet">
+        <link href="<?php echo Yii::app()->versionUrl->changeUrl('/css/dropzone.css') ?>" rel="stylesheet">
+        <link href="<?php echo Yii::app()->versionUrl->changeUrl('/css/bootstrap-override.css') ?>" rel="stylesheet">
+        <link href="<?php echo Yii::app()->versionUrl->changeUrl('/css/bootstrap-wysihtml5.css') ?>" rel="stylesheet">
+        <link href="<?php echo Yii::app()->versionUrl->changeUrl('/css/marquee.css') ?>" rel="stylesheet">
+        <script src="<?php echo Yii::app()->versionUrl->changeUrl('/js/jquery-1.11.1.min.js') ?>"></script>
 
 
         
@@ -26,7 +24,7 @@
         <!--[if lt IE 9]>
         <script src="/js/html5shiv.js"></script>
         <script src="/js/respond.min.js"></script>
-        <link href="/css/ie.css" rel="stylesheet">
+        <link href="<?php echo Yii::app()->versionUrl->changeUrl('/css/ie.css') ?>" rel="stylesheet">
         <![endif]-->
     </head>
 
@@ -45,29 +43,7 @@
                 $this->endContent();
                 ?>
                 <div class="mainpanel">
-                    <div class="pageheader">
-                        <div class="media">
-                            <div class="pageicon pull-left">
-                                <i class="fa fa-home"></i>
-                            </div>
-                            <?php
-                            if (!empty($this->breadcrumbs)):
-                                ?>
-                                <div class="media-body">
-                                    <ul class="breadcrumb">
-                                        <li><a href="/"><i class="glyphicon glyphicon-home"></i></a></li>
-                                        <li><?php echo $this->breadcrumbs[0] ?></li>
-                                        <li><?php echo $this->breadcrumbs[1] ?></li>
-                                    </ul> 
-                                </div>
-                                <?php
-                            endif;
-                            ?>
-                        </div>
-                        <!-- media -->
-                    </div>
-                    <!-- pageheader -->
-
+                    
                     <?php echo $content; ?>
 
                 </div>

@@ -12,37 +12,15 @@ class Util_Common
 	 * @param  string $charset [description]
 	 * @return [type]          [description]
 	 */
-	public static function escape(&$data, $charset = 'UTF-8') { 
+	public static function escape(&$data, $charset = 'UTF-8') {
 		if (preg_match_all("/[\x80-\xff].|[\x01-\x7f]+/Usi", $data, $matches)) {
 			$s = $r = array();
-			foreach ($matches[0] as $v) { 
+			foreach ($matches[0] as $v) {
 				$s[] = $v;
 				if (ord($v[0]) < 128) {
-					$r[] = rawurlencode($v); 
-				} else { 
-					$r[] = "%u".bin2hex(iconv($charset, "UCS-2", $v)); 
-				} 
-			}
-			if ($s) {
-				$data = str_replace($s, $r, $data);
-			}
-		}
-	} 
-	
-	/**
-	 * [unescape description]
-	 * @param  [type] $data    [description]
-	 * @param  string $charset [description]
-	 * @return [type]          [description]
-	 */
-	public static function unescape(&$data, $charset = 'UTF-8') { 
-		$data = rawurldecode($data); 
-		if (preg_match_all("/(?:%u.{4})/Usi", $data, $matches)) {
-			$s = $r = array();
-			foreach ($matches[0] as $k => $v) { 
-				if(substr($v,0,2) == "%u" && strlen($v) == 6) {
-					$s[] = $v;
-					$r[] = iconv("UCS-2", $charset, pack("H4", substr($v,-4))); 
+					$r[] = rawurlencode($v);
+				} else {
+					$r[] = "%u".bin2hex(iconv($charset, "UCS-2", $v));
 				}
 			}
 			if ($s) {
@@ -50,7 +28,29 @@ class Util_Common
 			}
 		}
 	}
-	
+
+	/**
+	 * [unescape description]
+	 * @param  [type] $data    [description]
+	 * @param  string $charset [description]
+	 * @return [type]          [description]
+	 */
+	public static function unescape(&$data, $charset = 'UTF-8') {
+		$data = rawurldecode($data);
+		if (preg_match_all("/(?:%u.{4})/Usi", $data, $matches)) {
+			$s = $r = array();
+			foreach ($matches[0] as $k => $v) {
+				if(substr($v,0,2) == "%u" && strlen($v) == 6) {
+					$s[] = $v;
+					$r[] = iconv("UCS-2", $charset, pack("H4", substr($v,-4)));
+				}
+			}
+			if ($s) {
+				$data = str_replace($s, $r, $data);
+			}
+		}
+	}
+
 	/**
 	 * [json_encode description]
 	 * @param  [type] $arr [description]
@@ -59,7 +59,7 @@ class Util_Common
 	public static function json_encode($arr) {
 		return urldecode(json_encode(self::url_encode($arr)));
 	}
-	
+
 	/**
 	 * [url_encode description]
 	 * @param  [type] $arr [description]
@@ -78,7 +78,7 @@ class Util_Common
 		}
 		return $arr;
 	}
-	
+
 	/**
 	 * [zip_encode description]
 	 * @param  [type] $str [description]
@@ -87,7 +87,7 @@ class Util_Common
 	public static function zip_encode($str) {
 	    return base64_encode(gzdeflate($str));
 	}
-	
+
 	/**
 	 * [zip_decode description]
 	 * @param  [type] $str [description]
@@ -129,7 +129,7 @@ class Util_Common
         foreach ($arr as $k => $v) @$rt[] = self::$code[$v];
         return join($rt);
     }
-    
+
     /**
      * [from60 description]
      * @param  [type]  $num  [description]
@@ -143,7 +143,7 @@ class Util_Common
         foreach ($arr as $k => $v) $rt = bcadd($rt, bcmul($code[$v], bcpow("$base", "$k")));
         return $rt+0;
     }
-    
+
     /**
      * [toBase description]
      * @param  [type]  $num  [description]
@@ -162,7 +162,7 @@ class Util_Common
 
     /**
      * 生成唯一ID 15位纯数字 用于订单号、票号
-     * @param  integer $channel 1订单号 2票号 3申请退单号 4bill_items
+     * @param  integer $channel 1订单号 2票号 3申请退单号 4bill_items 5code
      * @return [type]           [description]
      */
     public static function uniqid($channel = 1) {
@@ -191,11 +191,21 @@ class Util_Common
     }
 
     /**
+     * Util_Common::format_uniqid($id);
+     * @param  [type] $id [description]
+     * @return [type]     [description]
+     */
+    public static function format_uniqid($id) {
+    	$mt = self::from9(substr("$id", 1));
+    	return date('Ymd', substr("$mt", 0, 10)).substr("$mt", 10);
+    }
+
+    /**
      * 生成流水号 18位纯数字含日期时间
      * Util_Common::payid();
      * @return [type] [description]
      */
-    public static function payid($channel = 0) {
+    public static function payid($channel = 0, $prefix='') {
     	$lang = LanguageModel::model();
     	do {
     		$us = microtime();
@@ -203,6 +213,10 @@ class Util_Common
     		$key = 'payid|'.$channel.'|'.$mt;
     	} while(!$lang->memcache->add($key,1,5));
     	// echo $mt . '<br/>';
+    	// $day = date('Ymd');
+    	// $key = 'UNIQID|'.$day;
+    	// $id = $lang->redis->hincrby($key,$channel,1);
+    	// $id = str_pad($id, 6, '0', STR_PAD_LEFT);
         return $mt;
     }
 
@@ -213,9 +227,25 @@ class Util_Common
      * @param  string $format [description]
      * @return [type]         [description]
      */
-    public static function payid2date($id, $format = 'Ym') {
-    	$mt = strtotime(substr("$id", 0, 8));
+    public static function payid2date($id, $format = 'Ym', $prefix='') {
+    	$mt = strtotime(substr("$id", strlen($prefix), 8));
     	return date($format, $mt);
     }
-    
+
+    /*
+     * 获取原数组和字符串分解的数组的交集
+     * Util_Common::intersectExplode($str,$original=array(),$split=',');
+     * @author zqf
+     * @date  2015-04-08
+     * @param [string] $str
+     * @param [array]  $original
+     * @param [string]  $split
+     * @return [array]
+     * */
+    public static function intersectExplode($str,$original=array(),$split=',') {
+        if($str==='' || $str===null) return array();
+        $arr = explode($split,$str);
+        return (is_array($original) && count($original)>0 )? array_intersect($arr,$original):$arr;
+    }
+
 }

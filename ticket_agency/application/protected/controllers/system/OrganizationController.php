@@ -10,17 +10,6 @@ class OrganizationController extends Controller
         	$info = Organizations::api()->show(array('id' => $org_id),0);
         	if($info['code'] == 'succ'){
         		$data['info'] = $info['body'];
-                /*
-                 * 老数据遗留问题，省市区三联动无法达成，导致部分机构只保留了其中一些数值，故删除
-                 */
-                if(empty($info['body']['province_id'])){
-                    unset($data['info']['city_id']);
-                    unset($data['info']['district_id']);
-                }
-                if(empty($info['body']['city_id'])){
-                    unset($data['info']['district_id']);
-                }
-
         		$this->render('index', $data);
         	}else{
 		        $this->redirect('/system/organization/compile');
@@ -42,7 +31,7 @@ class OrganizationController extends Controller
 			$_POST['business_license'] = addslashes($_POST['business_license']);
 			$_POST['tax_license'] = addslashes($_POST['tax_license']);
 			$_POST['certificate_license'] = addslashes($_POST['certificate_license']);
-			if(!isset($_POST['province_id']) || empty($_POST['province_id']) || $_POST['province_id'] == '__NULL__'){
+			if(!isset($_POST['province_id']) || empty($_POST['province_id'])){
 				echo json_encode(array('errors' => '省市区至少选择一项'));
 				exit;
 			}

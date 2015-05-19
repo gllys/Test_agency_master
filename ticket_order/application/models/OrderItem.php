@@ -14,10 +14,10 @@ class OrderItemModel extends Base_Model_Abstract
     protected $pkKey = 'id';
     //protected $preCacheKey = 'cache|OrderItemModel|';
     protected $autoShare = 1;
-    protected $ticketTemplateFields = array(
-        'ticket_template_base_id','name','fat_price','group_price','sale_price','listed_price',
-        'valid','max_buy','mini_buy','payment','view_point','week_time','refund','remark','date_available',
-        'price_type','price','expire_start','expire_end','user_id','user_account','user_name'
+    protected $productFields = array(
+        'name','fat_price','group_price','sale_price','listed_price',
+        'valid','max_buy','mini_buy','view_point','week_time','refund','remark','date_available',
+        'price_type','price','user_id','user_account','user_name'
     );
 
     public function getTable() {
@@ -25,72 +25,241 @@ class OrderItemModel extends Base_Model_Abstract
     }
 
     public function setTable($id = 0) {
-        if (!$id) $this->tblname = $this->basename . date('Ym');
-        else  $this->tblname = $this->basename . Util_Common::uniqid2date($id);
+        // if (!$id) $this->tblname = $this->basename . date('Ym');
+        // else  $this->tblname = $this->basename . Util_Common::uniqid2date($id);
         return $this;
     }
 
     public function share($ts = 0) {
-        if (!$ts) $ts = time();
-        $this->tblname = $this->basename . date('Ym', $ts);
+        // if (!$ts) $ts = time();
+        // $this->tblname = $this->basename . date('Ym', $ts);
         return $this;
     }
 
-    //票明细添加，用于单个票生产单个订单操作
-    public function addNew($orderInfo,$itemInfo){
+    //票明细添加，按产品票数生成记录
+    public function addNew($order,$productInfo,$visitors=array()){
         $data = array();
-        $data['id'] = Util_Common::uniqid(3); //参数3，订单详情
-        $data['order_id'] = $orderInfo['id'];
-        $data['ticket_type'] = $itemInfo['type'];
-        $data['kind'] = $itemInfo['is_union']==0?1:2; //种类:1单票2联票3套票
-        $data['ticket_template_id'] = $itemInfo['id'];
-        $data['use_day'] = $orderInfo['use_day'];
-        $data['nums'] = $orderInfo['nums'];
-        $data['distributor_id'] = $orderInfo['distributor_id'];
-        $data['supplier_id'] = $orderInfo['supplier_id'];
-        $data['landscape_ids'] = $itemInfo['scenic_id'];
-        $data['created_at'] = $orderInfo['created_at'];
-        $data['updated_at'] = $orderInfo['updated_at'];
-
-        foreach ($itemInfo as $key=>$v) {
-            in_array($key,$this->ticketTemplateFields) && $data[$key] = $v;
-        }
-        return $this->add($data) ? $data :false;
-    }
-
-    public function addBatch($orders,$ticketTemplateInfos){
-        $items = $fields = array();
-        foreach($ticketTemplateInfos as $ticket){
-            $data = array();
-            $data['id'] = Util_Common::uniqid(3); //参数3，订单详情
-            $data['order_id'] = $ticket['order_id'];
-            $data['ticket_type'] = $ticket['type'];
-            $data['kind'] = $ticket['is_union']==0?1:2; //种类:1单票2联票3套票
-            $data['ticket_template_id'] = $ticket['id'];
-            $data['use_day'] = $orders[$ticket['order_id']]['use_day'];
-            $data['nums'] = $orders[$ticket['order_id']]['nums'];
-            $data['distributor_id'] = $orders[$ticket['order_id']]['distributor_id'];
-            $data['supplier_id'] = $orders[$ticket['order_id']]['supplier_id'];
-            $data['landscape_ids'] = $ticket['scenic_id'];
-            $data['created_at'] = $orders[$ticket['order_id']]['created_at'];
-            $data['updated_at'] = $orders[$ticket['order_id']]['updated_at'];
-            foreach ($ticket as $key=>$v) {
-                in_array($key,$this->ticketTemplateFields) && $data[$key] = $v;
+        for ($i = 0; $i < $order['nums']; $i++) {
+            $idx = $i+1;
+            $id = '3'.substr("{$productInfo['order_id']}", 1)."$idx";
+            $item = array();
+            $item['id'] = $id; //参数3，订单详情
+            $item['order_id'] = $productInfo['order_id'];
+            $item['ticket_type'] = $productInfo['type']; //票类型:0电子票1任务单
+            $item['kind'] = $productInfo['is_union'] == 0 ? 1 : 2; //种类:1单票2联票3套票
+            $item['product_id'] = $productInfo['id'];
+            $item['use_day'] = $order['use_day'];
+            $item['nums'] = 0;
+            $item['distributor_id'] = $order['distributor_id'];
+            $item['supplier_id'] = $order['supplier_id'];
+            $item['landscape_ids'] = $order['landscape_ids'];
+            $item['payment'] = $order['payment'];
+            $item['created_at'] = $order['created_at'];
+            $item['updated_at'] = $order['updated_at'];
+            $item['expire_start'] = $order['expire_start'];
+            $item['expire_end'] = $order['expire_end'];
+            if($visitors && $visitors[$i]){
+                $item['visitor_name'] = $visitors[$i]['visitor_name'];
+                $item['visitor_mobile'] = $visitors[$i]['visitor_mobile'];
+                $item['visitor_card'] = $visitors[$i]['visitor_card'];
             }
-            if(!$fields)
-                $fields = array_keys($data);
-            $items[] = $data;
+            foreach ($productInfo['items'] as $piv) {
+                $item['nums'] += $piv['num'];
+            }
+            foreach ($productInfo as $key=>$v) {
+                in_array($key,$this->productFields) && $item[$key] = $v;
+            }
+            $data[] = $item;
         }
-        array_unshift($items,$fields);
-        $r = $this->add($items);
-        if(!$r)
-            return false;
-        else{
-            array_shift($items);
-            return $items;
+        array_unshift($data,array_keys(reset($data)));
+        $r = $this->add($data);
+        if($r){
+            //添加票
+            array_shift($data);
+            $r = TicketModel::model()->addNew($productInfo,$data);
+            if($r) return $data;
         }
+        return false;
     }
 
+    public function addBatch($orders,$productInfos){
+        $items = array();
+        foreach($productInfos as $order_id=>$product){
+            for ($i = 0; $i < $orders[$order_id]['nums']; $i++) {
+                $idx = $i+1;
+                $id = '3'.substr("{$order_id}", 1)."$idx";
+                $data = array();
+                $data['id'] = $id; //参数3，订单详情
+                $data['order_id'] = $order_id;
+                $data['ticket_type'] = $product['type'];
+                $data['kind'] = $product['is_union'] == 0 ? 1 : 2; //种类:1单票2联票3套票
+                $data['product_id'] = $product['id'];
+                $data['use_day'] = $orders[$order_id]['use_day'];
+                $data['nums'] = 0;
+                $data['distributor_id'] = $orders[$order_id]['distributor_id'];
+                $data['supplier_id'] = $orders[$order_id]['supplier_id'];
+                $data['landscape_ids'] = $orders[$order_id]['landscape_ids'];
+                $data['created_at'] = $orders[$order_id]['created_at'];
+                $data['updated_at'] = $orders[$order_id]['updated_at'];
+                $data['expire_start'] = $orders[$order_id]['expire_start'];
+                $data['expire_end'] = $orders[$order_id]['expire_end'];
+                foreach ($product['items'] as $piv) {
+                    $data['nums'] += $piv['num'];
+                }
 
+                foreach ($product as $key => $v) {
+                    in_array($key, $this->productFields) && $data[$key] = $v;
+                }
+                $items[] = $data;
+            }
+        }
+        array_unshift($items,array_keys(reset($items)));
+        $r = $this->add($items);
+        if($r){
+            //添加票
+            array_shift($items);
+            $r = TicketModel::model()->addBatch($productInfos,$items);
+            if($r) return $items;
+        }
+        return false;
+    }
+
+    /*
+    private $insertPageSize=1000; //批量插入每次插入最大条数
+    private $insertPageNum=1; //批量插入当前第几次
+    private $insertPageTotal=0; //批量插入总次数
+
+    public function getTable() {
+        return $this->tblname;
+    }
+
+    public function setTable($id = 0) {
+        // if (!$id) $this->tblname = $this->basename . date('Ym');
+        // else  $this->tblname = $this->basename . Util_Common::uniqid2date($id);
+        return $this;
+    }
+
+    public function share($ts = 0) {
+        // if (!$ts) $ts = time();
+        // $this->tblname = $this->basename . date('Ym', $ts);
+        return $this;
+    }
+
+    //票明细添加，按产品票数生成记录
+    public function addNew($order,$productInfo,$visitors=array()){
+        $this->insertPageTotal = ceil($order['nums']/$this->insertPageSize);
+        $insertNums = $this->insertPageSize; //每次可插入数据量
+        $orderItems=array();
+
+        for ($this->insertPageNum = 1; $this->insertPageNum <= $this->insertPageTotal; $this->insertPageNum++) {
+            $offset = ($this->insertPageNum - 1) * $this->insertPageSize;
+
+            if ($order['nums'] < $this->insertPageNum * $this->insertPageSize) {
+                $insertNums = $order['nums'] - $offset;
+            }
+
+            $data = array();
+            for ($i = 0; $i < $insertNums; $i++) {
+                $idx = $i + 1 + $offset;
+                $id = '3' . substr("{$productInfo['order_id']}", 1) . "$idx";
+                $item = array();
+                $item['id'] = $id; //参数3，订单详情
+                $item['order_id'] = $productInfo['order_id'];
+                $item['ticket_type'] = $productInfo['type']; //票类型:0电子票1任务单
+                $item['kind'] = $productInfo['is_union'] == 0 ? 1 : 2; //种类:1单票2联票3套票
+                $item['product_id'] = $productInfo['id'];
+                $item['use_day'] = $order['use_day'];
+                $item['nums'] = 0;
+                $item['distributor_id'] = $order['distributor_id'];
+                $item['supplier_id'] = $order['supplier_id'];
+                $item['landscape_ids'] = $order['landscape_ids'];
+                $item['payment'] = $order['payment'];
+                $item['created_at'] = $order['created_at'];
+                $item['updated_at'] = $order['updated_at'];
+                $item['expire_start'] = $order['expire_start'];
+                $item['expire_end'] = $order['expire_end'];
+                if ($visitors && $visitors[$i + $offset]) {
+                    $item['visitor_name'] = $visitors[$i + $offset]['visitor_name'];
+                    $item['visitor_mobile'] = $visitors[$i + $offset]['visitor_mobile'];
+                    $item['visitor_card'] = $visitors[$i + $offset]['visitor_card'];
+                }
+                foreach ($productInfo['items'] as $piv) {
+                    $item['nums'] += $piv['num'];
+                }
+                foreach ($productInfo as $key => $v) {
+                    in_array($key, $this->productFields) && $item[$key] = $v;
+                }
+                $data[] = $item;
+            }
+
+            array_unshift($data, array_keys(reset($data)));
+            $r = $this->add($data);
+            if (empty($r)) return false;
+            //添加票
+            array_shift($data);
+            $orderItems = array_merge($orderItems,$data);
+            unset($data);
+        }
+        $r = TicketModel::model()->addNew($productInfo, $orderItems);
+        if (empty($r)) return false;
+        return true;
+    }
+
+    public function addBatch($orders,$productInfos){
+        $orderItems = array();
+        foreach($productInfos as $order_id=>$product) {
+
+            $this->insertPageTotal = ceil($orders[$order_id]['nums'] / $this->insertPageSize);
+            $insertNums = $this->insertPageSize; //每次可插入数据量
+
+            for ($this->insertPageNum = 1; $this->insertPageNum <= $this->insertPageTotal; $this->insertPageNum++) {
+                $offset = ($this->insertPageNum - 1) * $this->insertPageSize;
+
+                if ($orders[$order_id]['nums'] < $this->insertPageNum * $this->insertPageSize) {
+                    $insertNums = $orders[$order_id]['nums'] - $offset;
+                }
+
+                $items = array();
+                for ($i = 0; $i < $insertNums; $i++) {
+                    $idx = $i + 1 + $offset;
+                    $id = '3' . substr("{$order_id}", 1) . "$idx";
+                    $data = array();
+                    $data['id'] = $id; //参数3，订单详情
+                    $data['order_id'] = $order_id;
+                    $data['ticket_type'] = $product['type'];
+                    $data['kind'] = $product['is_union'] == 0 ? 1 : 2; //种类:1单票2联票3套票
+                    $data['product_id'] = $product['id'];
+                    $data['use_day'] = $orders[$order_id]['use_day'];
+                    $data['nums'] = 0;
+                    $data['distributor_id'] = $orders[$order_id]['distributor_id'];
+                    $data['supplier_id'] = $orders[$order_id]['supplier_id'];
+                    $data['landscape_ids'] = $orders[$order_id]['landscape_ids'];
+                    $data['created_at'] = $orders[$order_id]['created_at'];
+                    $data['updated_at'] = $orders[$order_id]['updated_at'];
+                    $data['expire_start'] = $orders[$order_id]['expire_start'];
+                    $data['expire_end'] = $orders[$order_id]['expire_end'];
+                    foreach ($product['items'] as $piv) {
+                        $data['nums'] += $piv['num'];
+                    }
+
+                    foreach ($product as $key => $v) {
+                        in_array($key, $this->productFields) && $data[$key] = $v;
+                    }
+                    $items[] = $data;
+                }
+                array_unshift($items, array_keys(reset($items)));
+                $r = $this->add($items);
+                if (empty($r)) return false;
+                //添加票
+                array_shift($items);
+                $orderItems = array_merge($orderItems,$items);
+                unset($items);
+            }
+        }
+        $r = TicketModel::model()->addBatch($productInfos,$orderItems);
+        if (empty($r)) return false;
+        return true;
+    }
+     * */
 }
 

@@ -284,7 +284,7 @@ $this->breadcrumbs = array('结算管理', '收款账号');
                     if (data.error === 0) {
 
                         setTimeout(function(){
-                            alert('添加银行卡成功',function(){window.location.reload();});
+                            alert('添加银行卡成功',function(){window.location.partReload();});
                         },500)
                     } else {
 
@@ -304,7 +304,7 @@ $this->breadcrumbs = array('结算管理', '收款账号');
                 if (data.error === 0) {
 
                     setTimeout(function(){
-                        alert('删除成功',function(){window.location.reload();});
+                        alert('删除成功',function(){window.location.partReload();});
                     },500)
                 } else {
 
@@ -323,18 +323,18 @@ $this->breadcrumbs = array('结算管理', '收款账号');
 			    $.post(_this.attr('href'), function(data) {
                 if (data.error == 0) {
                     //console.log(123);
-                    //alert('设置成功',function(){window.location.reload();});
+                    //alert('设置成功',function(){window.location.partReload();});
 
                     setTimeout(function(){
-                        alert('设置成功',function(){window.location.reload();});
+                        alert('设置成功',function(){window.location.partReload();});
                     },500)
 
                     //console.log(456);
-                    //window.location.reload();
+                    //window.location.partReload();
                 } else {
 
                     setTimeout(function(){
-                        //alert('设置成功',function(){window.location.reload();});
+                        //alert('设置成功',function(){window.location.partReload();});
                         alert(data.msg);
                     },500)
 

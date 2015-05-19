@@ -22,6 +22,11 @@ class TicketpolicyController extends Base_Controller_Api
         $params['other_blackname_flag'] = intval($this->body['other_blackname_flag'])?1:0; //不合作分销商黑名单开关：0关闭 1开启
         $params['other_credit_flag'] = intval($this->body['other_credit_flag'])?1:0; //不合作分销商信用支付开关：0关闭 1开启
         $params['other_advance_flag'] = intval($this->body['other_advance_flag'])?1:0; //不合作分销商储值支付开关：0关闭 1开启
+        $params['new_fat_price']= doubleval($this->body['new_fat_price']); //新合作散客价
+        $params['new_group_price']= doubleval($this->body['new_group_price']); //新合作团客价
+        $params['new_blackname_flag'] = intval($this->body['new_blackname_flag'])?1:0; //新合作分销商黑名单开关：0关闭 1开启
+        $params['new_credit_flag'] = intval($this->body['new_credit_flag'])?1:0; //新合作分销商信用支付开关：0关闭 1开启
+        $params['new_advance_flag'] = intval($this->body['new_advance_flag'])?1:0; //新合作分销商储值支付开关：0关闭 1开启
         $policy_items = json_decode($this->body['policy_items'],true);
 
         !$params['supplier_id'] && Lang_Msg::error('ERROR_SUPPLIER_1');
@@ -80,6 +85,11 @@ class TicketpolicyController extends Base_Controller_Api
         $params['other_blackname_flag'] = intval($this->body['other_blackname_flag'])?1:0; //不合作分销商黑名单开关：0关闭 1开启
         $params['other_credit_flag'] = intval($this->body['other_credit_flag'])?1:0; //不合作分销商信用支付开关：0关闭 1开启
         $params['other_advance_flag'] = intval($this->body['other_advance_flag'])?1:0; //不合作分销商储值支付开关：0关闭 1开启
+        $params['new_fat_price']= doubleval($this->body['new_fat_price']); //新合作散客价
+        $params['new_group_price']= doubleval($this->body['new_group_price']); //新合作团客价
+        $params['new_blackname_flag'] = intval($this->body['new_blackname_flag'])?1:0; //新合作分销商黑名单开关：0关闭 1开启
+        $params['new_credit_flag'] = intval($this->body['new_credit_flag'])?1:0; //新合作分销商信用支付开关：0关闭 1开启
+        $params['new_advance_flag'] = intval($this->body['new_advance_flag'])?1:0; //新合作分销商储值支付开关：0关闭 1开启
         $policy_items = json_decode($this->body['policy_items'],true);
 
         !$policy_items && Lang_Msg::error('ERR_TKT_POLICY_2'); //请设置分销策略明细
@@ -96,6 +106,11 @@ class TicketpolicyController extends Base_Controller_Api
         isset($_POST['other_blackname_flag']) && $data['other_blackname_flag'] = $params['other_blackname_flag'];
         isset($_POST['other_credit_flag']) && $data['other_credit_flag'] = $params['other_credit_flag'];
         isset($_POST['other_advance_flag']) && $data['other_advance_flag'] = $params['other_advance_flag'];
+        isset($_POST['new_fat_price']) && $data['new_fat_price'] = $params['new_fat_price'];
+        isset($_POST['new_group_price']) && $data['new_group_price'] = $params['new_group_price'];
+        isset($_POST['new_blackname_flag']) && $data['new_blackname_flag'] = $params['new_blackname_flag'];
+        isset($_POST['new_credit_flag']) && $data['new_credit_flag'] = $params['new_credit_flag'];
+        isset($_POST['new_advance_flag']) && $data['new_advance_flag'] = $params['new_advance_flag'];
 
         !$data['name'] && Lang_Msg::error('ERR_TKT_POLICY_1');
 
@@ -231,5 +246,26 @@ class TicketpolicyController extends Base_Controller_Api
             $TicketPolicyModel->rollback();
             Lang_Msg::error("ERROR_OPERATE_1");
         }
+    }
+
+	/**
+	 * 解绑分销商-删除策略绑定数据
+	 */
+    public function unbindDistributorAction(){
+        $distributor_id = intval($this->body['distributor_id']);
+        !$distributor_id && Lang_Msg::error("缺少分销商ID");
+        $supply_id = intval($this->body['supply_id']);
+        !$supply_id && Lang_Msg::error("缺少供应商ID");
+		
+		$list = TicketPolicyModel::model()->search([
+			'supplier_id' => $supply_id
+		]);
+
+		empty($list) && $list = [0=>0];
+		TicketPolicyItemModel::model()->delete([
+			'distributor_id' => $distributor_id,
+			'policy_id|in'    => array_keys($list)
+		]);
+		Lang_Msg::output(true);
     }
 }

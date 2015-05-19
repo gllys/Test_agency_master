@@ -1,3 +1,6 @@
+<style>
+.ui-datepicker { z-index:9999!important }
+</style>
 <div class="pageheader">
     <div class="media">
         <div class="pageicon pull-left">
@@ -89,31 +92,31 @@
                         </div><!-- form-group -->
 
                         <div class="form-group">
-                            <label class="col-sm-2 control-label"><input name="is_fit" type="checkbox" value="1" style=" position: relative;top: 2px;" />&nbsp;散客价</label>
+                            <label class="col-sm-2 control-label"><input name="is_fit" type="checkbox" value="1" style=" position: relative;top: 2px;" />&nbsp;散客结算价</label>
                             <div class="col-sm-10">
-                                <div class="col-sm-3"><input type="text" placeholder="散客价" readonly class=" form-control validate[custom[number]]" name="fat_price"/></div>
+                                <div class="col-sm-3"><input type="text" placeholder="散客结算价" readonly class=" form-control validate[custom[number]]" name="fat_price"/></div>
                             </div>
                         </div><!-- form-group -->
                         <div class="form-group">
-                            <label class="col-sm-2 control-label"><input name="is_full" type="checkbox" value="1"  style="position: relative; top: 2px;" />&nbsp;团队价</label>
+                            <label class="col-sm-2 control-label"><input name="is_full" type="checkbox" value="1"  style="position: relative; top: 2px;" />&nbsp;团队结算价</label>
                             <div class="col-sm-10">
-                                <div class="col-sm-3"><input type="text" placeholder="团队价" readonly class=" form-control validate[custom[number]]" name="group_price"/></div>
+                                <div class="col-sm-3"><input type="text" placeholder="团队结算价" readonly class=" form-control validate[custom[number]]" name="group_price"/></div>
                                 <div class="col-sm-3">
                                     最少订票 <input type="text" id="spinner-min" name="mini_buy"> 张
                                 </div>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-sm-2 control-label"> 销售价</label>
+                            <label class="col-sm-2 control-label"> 门市挂牌价</label>
                             <div class="col-sm-10">
-                                <div class="col-sm-3"><input type="text" placeholder="销售价" class="validate[custom[number]] form-control" name="sale_price"/></div>
+                                <div class="col-sm-3"><input type="text" placeholder="门市挂牌价" class="validate[custom[number]] form-control" name="sale_price"/></div>
                             </div>
                         </div><!-- form-group -->
 
                         <div class="form-group">
-                            <label class="col-sm-2 control-label"> 挂牌价</label>
+                            <label class="col-sm-2 control-label"> 网络销售价</label>
                             <div class="col-sm-10">
-                                <div class="col-sm-3"><input type="text" placeholder="挂牌价" class="validate[custom[number]] form-control" name="listed_price"/></div>
+                                <div class="col-sm-3"><input type="text" placeholder="网络销售价" class="validate[custom[number]] form-control" name="listed_price"/></div>
                             </div>
                         </div><!-- form-group -->
                         <div class="form-group">
@@ -152,7 +155,7 @@
                         </div><!-- form-group -->
 
                         <div class="form-group">
-                            <label class="col-sm-2 control-label"><span class="text-danger">*</span> 可用时间段</label>
+                            <label class="col-sm-2 control-label"><span class="text-danger">*</span> 产品有效期</label>
                             <div class="col-sm-10">
                                 <input type="text" placeholder="" class="validate[required] form-control datepicker" style="width:120px;display:inline-block;cursor: pointer;cursor: hand;background-color: #ffffff" name="date_available[1]" readonly="readonly"> ~
                                 <input type="text" placeholder="" class="validate[required] form-control datepicker" style="width:120px;display:inline-block;cursor: pointer;cursor: hand;background-color: #ffffff" name="date_available[2]" readonly="readonly">
@@ -306,7 +309,7 @@ jQuery(document).ready(function() {
                 //$('#show_msg').empty();
                 var obj = $('#repass-form');
                 if (!$('[name=is_fit]').prop('checked')&& !$('[name=is_full]').prop('checked')) {
-                    alert('团队价和散客价至少选一个');
+                    alert('团队结算价和散客结算价至少选一个');
                     return false;
                 }
                 //联票必须选择一个子景点开始
@@ -401,7 +404,30 @@ jQuery(document).ready(function() {
         jQuery('#timepicker3').timepicker({minuteStep: 15});
 
         // Date Picker
-        jQuery('.datepicker').datepicker();
+        $('.datepicker').datepicker({
+            changeMonth: true,
+            changeYear: true,
+            dateFormat: 'yy-mm-dd',
+            monthNamesShort: [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" ],
+            yearRange: "1995:2065",
+            beforeShow: function(d){
+                setTimeout(function(){
+                    $('.ui-datepicker-title select').select2({
+                        minimumResultsForSearch: -1
+                    });
+                },0)
+            },
+            onChangeMonthYear: function(){
+                setTimeout(function(){
+                    $('.ui-datepicker-title select').select2({
+                        minimumResultsForSearch: -1
+                    });
+                },0)
+            },
+            onClose: function(dateText, inst) { 
+                $('.select2-drop').hide(); 
+            }
+        });
         jQuery('#datepicker-inline').datepicker();
         jQuery('#datepicker-multiple').datepicker({
             numberOfMonths: 3,

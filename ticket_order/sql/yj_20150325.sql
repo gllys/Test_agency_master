@@ -1,0 +1,1 @@
+UPDATE orders SET refunded_nums = nums-refunding_nums-used_nums WHERE created_at>0 AND refunded_nums>nums-refunding_nums-used_nums;

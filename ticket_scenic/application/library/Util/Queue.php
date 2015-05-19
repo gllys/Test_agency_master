@@ -8,6 +8,7 @@ class Util_Queue
 	protected static $waittime = 10;
 	protected static $queues = array();
 	protected static $callBacks = array();
+	protected static $prefix = 'TICKET_SCENIC|';
 	protected static $group = 'queue';
 	
 	/**
@@ -19,8 +20,8 @@ class Util_Queue
 	 */
 	public static function reg($queue, $callBack=null, $ts=0) {
 		if(is_array($callBack) && method_exists($callBack[0], $callBack[1])) {
-			self::$queues[$queue] = $ts;
-			self::$callBacks[$queue] = $callBack;
+			self::$queues[self::$prefix.$queue] = $ts;
+			self::$callBacks[self::$prefix.$queue] = $callBack;
 		}
 	}
 	
@@ -31,7 +32,7 @@ class Util_Queue
 	 * @return [type]        [description]
 	 */
 	public static function publish($queue, $msg=''){
-		return self::redis()->publish($queue, $msg);
+		return self::redis()->publish(self::$prefix.$queue, $msg);
 	}
 	
 	/**
@@ -50,8 +51,8 @@ class Util_Queue
 	 * @return [type]        [description]
 	 */
 	public static function dispatch($redis, $queue, $msg){
-		if(isset(self::$callBacks[$queue])){
-			call_user_func_array(self::$callBacks[$queue], array($msg));
+		if(isset(self::$callBacks[self::$prefix.$queue])){
+			call_user_func_array(self::$callBacks[self::$prefix.$queue], array($msg));
 		}
 	}
 	
@@ -71,7 +72,7 @@ class Util_Queue
 	 * @return [type]        [description]
 	 */
 	public static function send($queue, $msg=''){
-		return self::redis()->lPush($queue, $msg);
+		return self::redis()->lPush(self::$prefix.$queue, $msg);
 	}
 	
 	/**
@@ -81,7 +82,7 @@ class Util_Queue
 	 * @return [type]            [description]
 	 */
 	public static function receive($queue, $waittime=0){
-		$return = self::redis()->brPop(array($queue), $waittime);
+		$return = self::redis()->brPop(array(self::$prefix.$queue), $waittime);
 		return empty($return) ? false : $return[1];
 	}
 	
@@ -91,7 +92,7 @@ class Util_Queue
 	 * @return [type]        [description]
 	 */
 	public static function receiveByRpop($queue){
-		$return = self::redis()->rPop($queue);
+		$return = self::redis()->rPop(self::$prefix.$queue);
 		return empty($return) ? false : $return;
 	}
 	

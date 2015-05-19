@@ -7,6 +7,8 @@
  */
 class ConsumeAction extends Yaf_Action_Abstract{
 
+    const CONSUME_TIME = 2;
+
     /**
      * 核销申请回调接口，提供给内部系统调用
      */
@@ -22,38 +24,40 @@ class ConsumeAction extends Yaf_Action_Abstract{
         $req->setConsumeNum($ctrl->body['consume_num']);
         $req->setToken($ctrl->body['token']);
         $req->setCodemerchantId($taobao->merchantId);
-        $req->setPosid($ctrl->body['posid']);
+        $req->setPosid($ctrl->body['posid']); //landscape_id
         $req->setSerialNum($ctrl->body['serial_num']);
 //        $req->setQrImages($qrImages);
-        $resp = $taobao->topc->execute($req, $taobao->sessionKey);
 
-        //日志输出
-        $ctrl->echoLog('body', json_encode($ctrl->body), 'consume_bee.log');
-        $ctrl->echoLog('resp', json_encode($resp), 'consume_bee.log');
+        for($i = 0; $i < self::CONSUME_TIME; $i++){
+            $resp = $taobao->topc->execute($req, $taobao->sessionKey);
 
-        //正确示例：
-//        $r = '{
-//                "code_left_num": 2,
-//                "consume_secial_num": "111",
-//                "item_title": "欢乐谷 -- 935",
-//                "left_num": 1,
-//                "print_tpl": "商品名称：欢乐谷 -- 935  数量：2  合计：0.02元  本次提取的数量：1.",
-//                "ret_code": 1,
-//                "sms_tpl": "您在ihuilian111购买的欢乐谷 -- 935,验证码$code于2015-02-02 14:08已验证成功.如有疑问,请联系卖家."
-//            }';
+            //日志输出
+    //        $ctrl->echoLog('body', json_encode($ctrl->body), 'consume_bee.log');
+    //        $ctrl->echoLog('resp', json_encode($resp), 'consume_bee.log');
+            Util_Logger::getLogger('taobao')->info(__METHOD__,
+                array('body' => $ctrl->body, 'resp' => $resp), '', '核销请求数据和淘宝回传数据',
+                $ctrl->body['order_id']
+            );
 
-        if(isset($resp->ret_code) && $resp->ret_code == 1){
-            //todo 调用淘宝接口成功后，向内部API返回200，让内部API正式核销
-            Lang_Msg::output(array(
-                'code' => 200,
-                'code_msg' => '核销成功',
-                'taobao_msg' => json_encode($resp),
-            ));
-        }else if(isset($resp->sub_code) && $resp->sub_code == 'isp.top-remote-connection-timeout'){
-            //todo 如果调用淘宝接口没有响应，或者sub_code=isp.top-remote-connection-timeout，则调用淘宝冲正接口直至成功
+            if(isset($resp->ret_code) && $resp->ret_code == 1){
+                //todo 调用淘宝接口成功后，向内部API返回200，让内部API正式核销
+                Lang_Msg::output(array(
+                    'code' => 200,
+                    'code_msg' => '核销成功',
+                    'taobao_msg' => json_encode($resp),
+                ));
 
+            }else if(isset($resp->sub_code)
+                && ($resp->sub_code == 'isv.eticket-invalid-parameter:invalid-posid'
+                    || $resp->sub_code == 'isv.eticket-invalid-posid:invalid-pos-for-codemerchant')){
+                //todo 如果核销机具id错误，则使用统一机具id
+                $req->setPosid('common');
+            }
         }
-
+        Util_Logger::getLogger('taobao')->error(__METHOD__,
+            array('body' => $ctrl->body, 'resp' => $resp), '', '淘宝核销错误',
+            $ctrl->body['order_id'] . ',' . $ctrl->body['verify_code']
+        );
         Lang_Msg::error(json_encode($resp));
     }
 }

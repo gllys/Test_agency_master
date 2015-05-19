@@ -30,13 +30,17 @@ class ReverseAction extends Yaf_Action_Abstract{
         $req->setPosid($ctrl->body['posid']);
 
         //日志输出
-        $ctrl->echoLog('body', json_encode($ctrl->body), 'reverse_bee.log');
+//        $ctrl->echoLog('body', json_encode($ctrl->body), 'reverse_bee.log');
 
         for($i=0; $i<self::REVERSE_TIME; $i++){
             $resp = $taobao->topc->execute($req, $taobao->sessionKey);
 
             //日志输出
-            $ctrl->echoLog('resp'.$i, json_encode($resp), 'reverse_bee.log');
+//            $ctrl->echoLog('resp'.$i, json_encode($resp), 'reverse_bee.log');
+            Util_Logger::getLogger('taobao')->info(__METHOD__,
+                array('body' => $ctrl->body, 'resp' => $resp), '', '冲正请求数据和淘宝回传数据',
+                $ctrl->body['order_id']
+            );
 
             //todo 如果成功，则执行自己的冲正，否则重试多次
             if(isset($resp->ret_code) && $resp->ret_code == 1){

@@ -68,6 +68,7 @@ body {
 }
 
 a {
+	cursor:pointer;
     outline: none !important;
 }
 
@@ -233,14 +234,15 @@ html{
 .headerwrapper .header-right .btn-group .btn .badge {
 	position:absolute;
 	top:10px;
-	right:10px;
+	right:6px;
     -moz-box-shadow: none;
     -webkit-box-shadow: none;
     box-shadow:none;
     background-color:#fc3232;
     color:#fff;
-	font-size:14px;
+	font-size:12px;
 	font-weight:100;
+	padding:3px 5px;
 }
 
 .btn-group-notification > .btn {
@@ -792,7 +794,7 @@ html{
 
 .contentpanel {
     position: relative;
-    padding:16px 32px 0;
+    padding:16px 16px 0;
 }
 
 .bg-light {
@@ -3780,7 +3782,6 @@ body.signin {
 .formError .formErrorContent{margin-top:-5px;position:relative;width:100%;min-width:120px;padding:4px 10px;border-radius:2px;background-color:#f3d5d5;color:#c22e29;font:12px/18px "\5b8b\4f53",Tahoma;border:1px solid #c22e29;}
 .formError.inline .formErrorContent{border:0;border-radius:0;box-shadow:none;}
 .greenPopup .formErrorContent{background-color:#33be40;}
-.blackPopup .formErrorContent{background-color:#393939;color:#fff;}
 .formError .formErrorArrow{position:relative;margin:-2px 0 0 13px;width:15px;visibility:hidden}
 
 .formError .formErrorContent:after{
@@ -4038,10 +4039,13 @@ body .pagenumQu .yiiPager{
 	position:absolute;
 	bottom:0;
 	width:100%;
-	z-index:9999;
 	height:48px;
 	line-height:48px;
 	color:#fff;
 	text-align:center;
 	background-color:#2b84d1
+	}
+	
+.confirmation-modal .close{
+	display:none
 	}

@@ -38,7 +38,6 @@ Version: 3.5.0 Timestamp: Mon Jun 16 19:29:44 EDT 2014
     display: block;
     padding: 5px 15px 3px 8px;
 	height:33px;
-    overflow: hidden;
     position: relative;
     font-size: 13px;
 

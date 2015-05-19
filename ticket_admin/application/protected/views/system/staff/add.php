@@ -1,4 +1,4 @@
-<div class="contentpanel">
+<div class="contentpanel" id="maincontent">
     <div class="row">
         <div class="col-md-12">
             <div class="panel panel-default">
@@ -18,9 +18,10 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <label class="col-sm-2 control-label"><span class="text-danger">*</span> 账号</label>
+                                    <label class="col-sm-2 control-label"><span class="text-danger">*</span> 用户名</label>
                                     <div class="col-sm-6">
-                                        <input type="text" placeholder="" tag="账号" data-validation-engine="validate[required] form-control" class="validate[required] form-control" id="account" name="account" />
+                                        <input type="text" placeholder=""  tag="用户名" data-validation-engine="validate[required,custom[onlyLetterNumber]]" class="validate[required] form-control" id="account" name="account" autocomplete="off" value=""/>
+                                        <input type="text" style="display:none;" id="account"/>
                                     </div>
                                 </div>
                                 <!-- form-group -->
@@ -28,7 +29,7 @@
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label"><span class="text-danger">*</span>密码</label>
                                     <div class="col-sm-6">
-                                        <input type="password" placeholder="" tag="密码" data-validation-engine="form-control  validate[required,minSize[6],maxSize[16]]" class="form-control  validate[required,minSize[6],maxSize[16]]" name="password" />
+                                        <input type="password" placeholder="" tag="密码" data-validation-engine="validate[required,minSize[6],maxSize[16],custom[onlyLetterNumber]]" class="form-control  validate[required,minSize[6],maxSize[16]]" onkeypress="return IsOnlyNumLetter(event)" onblur="this.name='password'" autocomplete="off"/>
                                     </div>
                                 </div>
                                 <!-- form-group -->
@@ -103,6 +104,7 @@
 <script>
 
     jQuery(document).ready(function() {
+				
         jQuery('.select2').select2({
             minimumResultsForSearch: -1
         });
@@ -115,27 +117,39 @@
             $('#buttomsub').attr('disabled', 'disabled');
             $('#repass-form').validationEngine({
                 promptPosition: 'topRight',
-                autoHideDelay: 3000
+                addFailureCssClassToField: 'error',
+                autoHidePrompt: true,
+                autoHideDelay: 3000,
+	            maxErrorsPerField: 1
             });
 
-            if($('#role_id').val() == ''){
-                $('#role_id').validationEngine('showPrompt','请选择角色权限','error');
-                return false;
-            }
 
             if ($('#repass-form').validationEngine('validate') === true) {
-                $.post('/system/staff/saveStaff/', $('#repass-form').serialize(), function (data) {
-                    if (data.error) {
-                        var warn_msg = '<div class="alert alert-danger"><button data-dismiss="alert" class="close" type="button">×</button><i class="icon-warning-sign"></i>'+data.msg+'</div>';
-                        $('#show_msg').html(warn_msg);
-                        location.href='#show_msg';
-                        $('#buttomsub').removeAttr('disabled');
-                    } else {
-                        var succss_msg = '<div class="alert alert-success"><strong>添加成功！</strong></div>';
-                        $('#show_msg').html(succss_msg);
-                        location.href='/system/staff/';
-                    }
-                }, 'json');
+
+				if($('#role_id').val() == ''){
+					$('#role_id').PWShowPrompt('请选择角色权限！');
+					return false;
+				} else {
+					$.post('/system/staff/saveStaff/', $('#repass-form').serialize(), function (data) {
+						if (data.error) {
+							var tmp_errors = '';
+							if(typeof data.msg === "object") {
+								for(k in data.msg) {
+                                    tmp_errors += data.msg[k];
+								}
+							} else {
+                                tmp_errors += data.msg;
+							}
+                            alert(tmp_errors, function() {
+                                $('#buttomsub').removeAttr('disabled');
+                            });
+						} else {
+							alert('添加成功！', function() {
+                                location.href='/site/switch/#/system/staff/';
+                            });
+						}
+					}, 'json');
+				}
             } else {
                 $('#buttomsub').removeAttr('disabled');
             }

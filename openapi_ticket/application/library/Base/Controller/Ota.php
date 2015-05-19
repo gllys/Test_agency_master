@@ -73,7 +73,7 @@ class Base_Controller_Ota extends Base_Controller_Abstract
 
     public function userAuth($sign) {
         $account = $this->body['client_id'];
-        $secret = trim(Tools::safeOutput($this->body['client_secret']));
+        $pwd = isset($this->body['client_secret']) ? trim(Tools::safeOutput($this->body['client_secret'])) : trim(Tools::safeOutput($this->body['password']));
         $token = $this->body['token'];
         if ($token) {
             session_id($token);
@@ -84,8 +84,8 @@ class Base_Controller_Ota extends Base_Controller_Abstract
             $this->userinfo = $this->sess->userinfo;
         }
         if (empty($this->userinfo)) {
-            if(!$account || !$secret) Lang_Msg::error("ERROR_SIGN_3");
-            $this->userinfo = OtaAccountModel::model()->verify($account,$secret);
+            if(!$account || !$pwd) Lang_Msg::error("ERROR_SIGN_3");
+            $this->userinfo = OtaAccountModel::model()->verify($account,$pwd);
         }
     }
 

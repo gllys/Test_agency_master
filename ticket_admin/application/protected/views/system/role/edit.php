@@ -1,4 +1,4 @@
-<div class="contentpanel">
+<div class="contentpanel" id="maincontent">
 
     <div class="row">
         <div class="col-md-12">
@@ -17,19 +17,17 @@
                         <div class="form-group">
                             <label class="col-sm-1 control-label"><span class="text-danger">*</span> 角色名称</label>
                             <div class="col-sm-4">
-                                <input name="name" type="text" maxlength="15" tag="角色名称" class="form-control validate[required]" placeholder="" value="<?php echo $model->name; ?>">
-                                <input name="id" type="hidden"  value="<?php echo $model->id; ?>">
+                                <input name="name" id="name" type="text" maxlength="15" tag="角色名称" class="form-control validate[required]" placeholder="" value="<?php echo $model->name; ?>">
+                                <input name="id" id="id" type="hidden"  value="<?php echo $model->id; ?>">
                             </div>
                         </div><!-- form-group -->
 
                         <div class="form-group">
                             <label class="col-sm-1 control-label"><span class="text-danger">*</span> 角色说明</label>
                             <div class="col-sm-4">
-                                <textarea name="description" tag="角色说明" class="form-control validate[required,maxSize[50]]" rows="5"><?php echo $model->description; ?></textarea>
+                                <textarea id="description" name="description" tag="角色说明" class="form-control validate[required]" rows="5"><?php echo $model->description; ?></textarea>
                             </div>
                         </div><!-- form-group -->
-
-
 
                         <div class="panel panel-default">
                             <div class="panel-heading">
@@ -55,12 +53,12 @@
                                                 </td>
                                                 <td style="text-align:left">
                                                     <?php
-                                                    $_lists = $lists[$key];
+                                                    $_lists = is_array($lists[$key]) ? $lists[$key] : array();
                                                     foreach ($_lists as $item):
                                                         $i++;
                                                         ?>
                                                        <div class="ckbox ckbox-success" style=" margin-right: 15px;">
-                                                            <input id="checkboxPrimary<?php echo $i ?>" type="checkbox" name="permissions[]" value="<?php echo $item['params']['href'] ?>" id="checkboxPrimary3" <?php if (in_array($item['params']['href'], $permissions)): ?>checked="checked"<?php endif; ?>>
+														   <input id="checkboxPrimary<?php echo $i ?>" type="checkbox" name="permissions[]" value="<?php echo $item['params']['href'] ?>" id="checkboxPrimary3" <?php  echo (isset($item['params']['href']) && $item['params']['href'] != null && isset($permissions) && $permissions != null && in_array($item['params']['href'], $permissions)) ? "checked='checked'": ""; ?>>
 
                                                             <label for="checkboxPrimary<?php echo $i ?>"><?php echo $item['content'] ?></label>
                                                         </div> 
@@ -76,6 +74,7 @@
 
                             <div class="panel-footer">
                                 <button class="btn btn-primary mr5" type="button" id="save_role">保存</button>
+	                            <a class="btn btn-default" href="/system/role/">取消</a>
                             </div>
                         </div>
                     </form>          
@@ -127,19 +126,35 @@
             });
 
             if ($('#form').validationEngine('validate') === true) {
-                $.post('/system/role/saverole/',$('#form').serialize(),function(data){
-                    if (data.error) {
-                        var warn_msg = '<div class="alert alert-danger"><button data-dismiss="alert" class="close" type="button">×</button><i class="icon-warning-sign"></i>'+data.msg+'</div>';
-                        $('#show_msg').html(warn_msg);
-                        location.href='#show_msg';
-                    } else {
-                        var succss_msg = '<div class="alert alert-success"><strong>'+ data.msg +'</strong></div>';
-                        $('#show_msg').html(succss_msg);
-                        location.href = '/system/role/';
-                    }
-                },'json');
+				var id = $('#id').val();
+				var name = $('#name').val();
+			    $.post('/system/role/nameExist', {name:name, id:id}, function (data) {
+				    if (data.error == 'fail') {
+					    $('#name').PWShowPrompt(data.msg);
+						return false;
+					}  else if($('#description').val().length > 50) {
+						$('#description').PWShowPrompt('角色描述最大50字符！');
+					}  else {
+						submitForm();
+						return true
+					}
+				}, 'json');
+
             }
             return false;
         });
+		
+		window.submitForm = function() {
+			$.post('/system/role/saverole/',$('#form').serialize(),function(data){
+				if (data.error) {
+					alert(data.msg);
+				} else {
+                    alert(data.msg, function() {
+                        location.href = '/site/switch/#/system/role/';
+                    });
+				}
+			},'json');
+		}
+
     });
 </script>

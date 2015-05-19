@@ -21,22 +21,22 @@ class PaymentOrderModel extends Base_Model_Abstract
     }
 
     public function setTable($id = 0) {
-        if (!$id) $this->tblname = $this->basename . date('Ym');
-        else  $this->tblname = $this->basename . Util_Common::payid2date($id);
+        // if (!$id) $this->tblname = $this->basename . date('Ym');
+        // else  $this->tblname = $this->basename . Util_Common::payid2date($id);
         return $this;
     }
 
     public function share($ts = 0) {
-        if (!$ts) $ts = time();
-        $this->tblname = $this->basename . date('Ym', $ts);
+        // if (!$ts) $ts = time();
+        // $this->tblname = $this->basename . date('Ym', $ts);
         return $this;
     }
 
     public function addBatch($paymentInfo,$orders){
         $this->setTable($paymentInfo['id']);
-        $data = array(array('id','payment_id','order_id','money','created_at','updated_at'));
+        $data = array(array('id','payment_id','order_id','money','activity_paid','created_at','updated_at'));
         foreach($orders as $v){
-            $data[] = array(Util_Common::payid(),  $paymentInfo['id'],  $v['id'], $v['amount'],  $paymentInfo['created_at'], $paymentInfo['updated_at']);
+            $data[] = array(Util_Common::payid(),  $paymentInfo['id'],  $v['id'], $v['amount'],$v['activity_paid'], $paymentInfo['created_at'], $paymentInfo['updated_at']);
         }
         return $this->replace($data);
     }

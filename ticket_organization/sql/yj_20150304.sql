@@ -1,0 +1,1 @@
+UPDATE `ticket_organization`.`process_config` SET `run_type` = '1' WHERE `process_config`.`name` = "message";

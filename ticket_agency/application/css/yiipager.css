@@ -14,7 +14,7 @@
     margin: 0 9px 0 8px;
     padding: 4px 8px 3px;
 }
-.pagenumQu .page, .pagenumQu .first, .pagenumQu .previous, .pagenumQu .next, .pagenumQu .last{
+.pagenumQu .page, .pagenumQu .first, .pagenumQu .previous, .pagenumQu .next, .pagenumQu .last {
     background: none repeat scroll 0 0 #fff;
     border: 1px solid #d6d6d6;
     display: inline;
@@ -23,17 +23,8 @@
     position: relative;
 }
 .pagenumQu .first,.pagenumQu .last{
-    display: none;
+    display: none ;
 }
-
-.pagenumQu .break{
-    display: inline;
-    margin: 0 0px;
-    padding: 8px 0 10px;
-    position: relative;
-    width: 30px;
-}
-
 .pagenumQu .selected {
     background: none repeat scroll 0 0 #428bca;
     border: 1px solid #428bca;

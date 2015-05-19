@@ -1,0 +1,1 @@
+ALTER TABLE `day_report` ADD product_num int(10) unsigned NOT NULL DEFAULT 0 COMMENT '产品数';

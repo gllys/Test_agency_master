@@ -7,11 +7,8 @@ require_once($yiic);
 $app = Yii::createConsoleApplication($config);
 // adding PHPExcel autoloader
 Yii::import('application.vendors.*');
-$excel = dirname(__FILE__).'PHPExcel/PHPExcel.php';
-if (file_exists($excel)) {
-	require_once "PHPExcel/PHPExcel.php";
-	require_once "PHPExcel/PHPExcel/Autoloader.php";
-	Yii::registerAutoloader(array('PHPExcel_Autoloader','Load'), true);
-}
+require_once "PHPExcel/PHPExcel.php";
+require_once "PHPExcel/PHPExcel/Autoloader.php";
+Yii::registerAutoloader(array('PHPExcel_Autoloader','Load'), true);
 $app->run();
 

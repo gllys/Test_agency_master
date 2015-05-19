@@ -45,14 +45,13 @@ class UserIdentity extends CUserIdentity {
                     $result->organization_id = 0;
                 }
                 $this->setState('uid', $result->id);
-                $this->setState('display_name', $result->name . ' ');
+                $this->setState('display_name', isset($result->name) ? $result->name : $result->account);
                 $this->setState('account', $result->account);
                 $this->setState('org_id', $result->organization_id);
                 $this->setState('lan_id', $result->landscape_id);
                 $this->setState('is_super', $result->is_super);
                 //$this->setState('created_at', $result->created_at);
                 $this->setState('sell_role', $result->sell_role);
-                $this->setState('msg_rdy', $result->msg_rdy);
             }
         }
         return !$this->errorCode;

@@ -42,4 +42,12 @@ class ApiProductModel extends Base_Model_Api
         $r = json_decode($this->request(),true);
         return $r;
     }
+
+    //获取日库存设置
+    public function getTicketRule($params){
+        $this->url = '/v1/ticketrule/detail';
+        $this->params = $params;
+        $r = json_decode($this->request(),true);
+        return $r;
+    }
 }

@@ -47,7 +47,7 @@ $this->breadcrumbs = array('产品', '优惠规则');
         <div style="text-align:center" class="panel-footer">
             <div id="basicTable_paginate" class="pagenumQu">
                 <?php
-                $this->widget('CLinkPager', array(
+                $this->widget('common.widgets.pagers.ULinkPager', array(
                         'cssFile' => '',
                         'header' => '',
                         'prevPageLabel' => '上一页',
@@ -66,15 +66,14 @@ $this->breadcrumbs = array('产品', '优惠规则');
 </div><!-- contentpanel -->
 <script>
     function delDiscount(id){
-        if(window.confirm("确定要删除该优惠规则?")){
-            $.post('/ticket/discount/del',{id:id},function(data){
+		 PWConfirm('确定要删除该优惠规则?',function(){
+			      $.post('/ticket/discount/del',{id:id},function(data){
                 if(data.error==0){
-                    alert("删除成功");
-                    location.reload();
+                    alert("删除成功",function(){ location.reload();});
                 }else{
                     alert("删除失败,"+data.msg);
                 }
             },'json');
-        }
+            });
     }
 </script>

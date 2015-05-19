@@ -38,16 +38,26 @@ class Crontab_AgencyTkStat extends Process_Base
         $OrderItemModel = new OrderItemModel();
         $OrderModel = new OrderModel();
 
-        $fields = "i.distributor_id,'{$end_time}' AS created_at,SUM(i.`nums`-i.`refunded_nums`) AS ticket_nums,SUM(i.`price`*(i.`nums`-i.`refunded_nums`)) AS money_amount";
+        /*$fields = "i.distributor_id,'{$end_time}' AS created_at,SUM(i.`nums`-i.`refunded_nums`) AS ticket_nums,SUM(i.`price`*(i.`nums`-i.`refunded_nums`)) AS money_amount";
         $from = $OrderItemModel->share($ym2Time)->getTable()."` `i` JOIN `".$OrderModel->share($ym2Time)->getTable()."` `o";
         $where = " i.order_id=o.id AND i.created_at >= ".$start_time." AND i.created_at<=".$end_time." ";
         $where.=" AND o.status='billed' AND  0<i.`nums`-i.`refunded_nums` ";
         $where.=" GROUP BY i.`distributor_id` ";
         $orderby = "i.`distributor_id` ASC";
 
-        $result = $OrderItemModel->getDb()->select($from,$where,$fields,$orderby);
+        $result = $OrderItemModel->getDb()->select($from,$where,$fields,$orderby);*/
+
+        $fields = "distributor_id,'{$end_time}' AS created_at,SUM(nums-refunded_nums) AS ticket_nums,SUM(price*(nums-refunded_nums)) AS money_amount";
+        $where = array(
+            'created_at|>='=>$start_time,'created_at|<='=>$end_time,
+            'status'=> 'billed','nums|exp'=>'>refunded_nums','product_id'>0
+        );
+        $groupby = 'distributor_id';
+        $orderby = "distributor_id ASC";
+        $result = $OrderModel->setGroupBy($groupby)->search($where,$fields,$orderby);
+
         if($result){
-            array_unshift($result,array_keys($result[0]));
+            array_unshift($result,array_keys(reset($result)));
             AgencyTkStatModel::model()->replace($result);
         }
     }

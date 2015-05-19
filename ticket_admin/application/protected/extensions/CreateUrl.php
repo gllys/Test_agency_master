@@ -56,9 +56,9 @@ class CreateUrl {
      * @param Array $params 根据此参数 创建HTML 节点
      * 	example: 创建 <li class="current"><a href="http://cdns.uuzuonline.com" class="url">CDNS管理系统</a></li>
      * 	$params = array(
-      array('name'=>'li', 'params'=>array('class'=>'current')),
-      array('name'=>'li', 'params'=>array('class'=>'url', 'href'=>'http://cdns.uuzuonline.com'), 'content'=>'CDNS管理系统'),
-      );
+     * array('name'=>'li', 'params'=>array('class'=>'current')),
+     * array('name'=>'li', 'params'=>array('class'=>'url', 'href'=>'http://cdns.uuzuonline.com'), 'content'=>'CDNS管理系统'),
+     * );
      *
      * return String 返回生产好的HTML， 没有权限时  返回null
      */
@@ -133,7 +133,11 @@ class CreateUrl {
                 continue;
             $html .= '<li><a';
             foreach ($item['params'] as $key => $value) {
-                $html .= sprintf(' %s="%s"', $key, $value);
+                if ($key == 'href') {
+                    $html .= sprintf(' %s="/site/switch/#%s"', $key, $value);
+                } else {
+                    $html .= sprintf(' %s="%s"', $key, $value);
+                }
             }
             $html .= sprintf('>%s</a></li>', $item['content']);
         }
@@ -205,13 +209,11 @@ class CreateUrl {
 
     public $TitleIndexs = array(
         'index' => 0,
-        'system' => 1,
-        'scenic' => 2,
+        'scenic' => 1,
+        'agency' => 2,
         'ticket' => 3,
-        'order' => 4,
-        'check' => 5,
-        'finance' => 6,
-        'agency' => 7,
+        'finance' => 4,
+        'system' => 5,
     );
 
     public function getIndex($nav) {
@@ -220,62 +222,63 @@ class CreateUrl {
 
     public $titles = array(
         array('params' => array('class' => 'fa fa-fw fa-home'), 'content' => ''),
-        array('params' => array('class' => 'fa fa-cog'), 'content' => '系统'),
-        array('params' => array('class' => 'fa fa-barcode'), 'content' => '景区'),
-        array('params' => array('class' => 'fa fa-fw fa-th-list'), 'content' => '产品'),
-        array('params' => array('class' => 'fa fa-list-ol'), 'content' => '订单'),
-       // array('params' => array('class' => 'fa fa-envelope'), 'content' => '验票'),
-        array('params' => array('class' => 'fa fa-credit-card'), 'content' => '结算'),
-        array('params' => array('class' => 'fa fa-sitemap'), 'content' => '分销商'),
-        array('params' => array('class' => 'fa fa-bell'), 'content' => '消息查看'),
+        array('params' => array('class' => 'fa fa-picture-o'), 'content' => '景区管理'),
+        array('params' => array('class' => 'fa fa-code-fork'), 'content' => '分销系统'),
+        array('params' => array('class' => 'fa fa-ticket'), 'content' => '电子票务'),
+        array('params' => array('class' => 'fa fa-credit-card'), 'content' => '机构管理'),
+        array('params' => array('class' => 'fa fa-credit-card'), 'content' => '财务管理'),
+        array('params' => array('class' => 'fa fa-exchange'), 'content' => '渠道对接'),
+        array('params' => array('class' => 'fa fa-cogs'), 'content' => '系统管理'),
+        array('params' => array('class' => 'fa fa-picture-o'), 'content' => '消息管理'),
     );
     public $lists = array(
         array(
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-home"), 'params' => array('href' => '/dashboard'), 'content' => '工作台'),
+            array('params' => array('href' => '/dashboard'), 'content' => '工作台'),
         ),
         array(
-//            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/system/organization/'), 'content' => '用户信息'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-group"), 'params' => array('href' => '/system/staff/'), 'content' => '员工管理'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-edit"), 'params' => array('href' => '/system/role/'), 'content' => '角色权限'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-lock"), 'params' => array('href' => '/system/account/'), 'content' => '密码修改'),
+            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('class'=>'part','href' => '/scenic/scenic/'), 'content' => '景区列表'),
+            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('class'=>'part','href' => '/scenic/addequip/'), 'content' => '添加设备'),
+            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('class'=>'part','href' => '/scenic/managequip/'), 'content' => '设备管理'),
         ),
         array(
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/scenic/scenic/'), 'content' => '景区列表'),
+            array('params' => array('class'=>'part','href' => '/agency/orders/'), 'content' => '订单管理'),
+            array('params' => array('class'=>'part','href' => '/agency/sms/'), 'content' => '短信日志'),
+            array('params' => array('class'=>'part','href' => '/agency/product/'), 'content' => '供应商产品'),
+            array('params' => array('class'=>'part','href' => '/supply/sales/'), 'content' => '供应商销量'),
         ),
         array(
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/ticket/goods/'), 'content' => '门票管理'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/ticket/single/'), 'content' => '产品管理'),
-//            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/ticket/limitagency/'), 'content' => '限制分销商'),
-//            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/ticket/discount/'), 'content' => '优惠规则'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/ticket/policy/'), 'content' => '分销策略'),
+            array('params' => array('class'=>'part','href' => '/ticket/ticket/'), 'content' => '景区门票'),
+            array('params' => array('class'=>'part','href' => '/ticket/stats/'), 'content' => '景区统计'),
+            array('params' => array('class'=>'part','href' => '/ticket/template/'), 'content' => '打印模板')
         ),
         array(
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/order/history/'), 'content' => '订单管理'),
-            //array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/order/renwu/'), 'content' => '任务单管理'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/order/refund/'), 'content' => '退款管理'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/check/check/orderCheck/'), 'content' => '验票记录'),
-        ),
-        /*array(
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/check/used/'), 'content' => '验票'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/check/check/'), 'content' => '验票记录'),
-        ),*/
-        array(
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/finance/account/'), 'content' => '收款账号'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/finance/bill/'), 'content' => '应收账款'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-home"), 'params' => array('href' => '/finance/platform/'), 'content' => '平台资产'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-home"), 'params' => array('href' => '/finance/blotter/'), 'content' => '交易流水'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-home"), 'params' => array('href' => '/finance/stat/'), 'content' => '图表统计'),
+            array('params' => array('class'=>'part','href' => '/org/supply/'), 'content' => '供应商管理'),
+            array('params' => array('class'=>'part','href' => '/org/agency/'), 'content' => '分销商管理'),
+            array('params' => array('class'=>'part','href' => '/org/ownagency/'), 'content' => '分销商归属'),
+            array('params' => array('class'=>'part','href' => '/org/regsupply/'), 'content' => '注册供应商'),
+            array('params' => array('class'=>'part','href' => '/org/regagency/'), 'content' => '注册分销商'),
         ),
         array(
-        		array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/agency/account/addagency'), 'content' => '注册添加分销商'),
-        		array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/agency/account/res'), 'content' => '查询添加分销商'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/agency/manager/'), 'content' => '分销商管理'),
+            array('params' => array('class'=>'part','href' => '/finance/payrate/'), 'content' => '费率设置'),
+            array('params' => array('class'=>'part','href' => '/finance/payable/'), 'content' => '应付账款'),
+            array('params' => array('class'=>'part','href' => '/finance/receivable/'), 'content' => '供应商应收账款查询'),
+            array('params' => array('class'=>'part','href' => '/finance/config/'), 'content' => '结算配置'),
+            array('params' => array('class'=>'part','href' => '/finance/report/'), 'content' => '交易报表'),
+            array('params' => array('class'=>'part','href' => '/finance/rebate/'), 'content' => '充值优惠'),
+            array('params' => array('class'=>'part','href' => '/finance/fund/'), 'content' => '资产管理'),
         ),
         array(
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-envelope-o"), 'params' => array('href' => '/system/message/view/type/order/'), 'content' => '订单提醒'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-envelope-o"), 'params' => array('href' => '/system/message/view/type/refund/'), 'content' => '退款提醒'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-envelope-o"), 'params' => array('href' => '/system/message/view/type/due/'), 'content' => '到期提醒'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-envelope-o"), 'params' => array('href' => '/system/message/view/type/advice/'), 'content' => '公告信息'),
+            array('params' => array('class'=>'part','href' => '/channel/account/'), 'content' => '渠道对接'),
+        ),
+        array(
+            array('params' => array('class'=>'part','href' => '/system/staff/'), 'content' => '员工管理'),
+            array('params' => array('class'=>'part','href' => '/system/role/'), 'content' => '角色权限'),
+            array('params' => array('class'=>'part','href' => '/system/account/'), 'content' => '密码修改'),
+            array('params' => array('class'=>'part','href' => '/system/homerec/'), 'content' => '首页推荐'),
+            array('params' => array('class'=>'part','href' => '/system/notice/'), 'content' => '公告管理'),
+        ),
+        array(
+            array('params' => array('class'=>'part','href' => '/message/notice/'), 'content' => '用户提醒'),
         ),
     );
 
@@ -295,9 +298,8 @@ class CreateUrl {
 
     public function getChildNav($controllerId) {
         $setting = array(
-            '/order/newdetail/' => '/order/renwu/',
-            '/order/detail/' => '/order/history/',
             '/finance/detail/' => '/finance/bill/',
+            '/supply/detail/' => '/supply/sales/',
         );
 
 

@@ -5,7 +5,7 @@
  */
 class Log_Import
 {
-	protected static $dbname = 'itourism';
+	protected static $dbname = 'log';
 	protected static $db;
 
 	public static function getDb() {

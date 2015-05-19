@@ -61,7 +61,7 @@ class ApiModel {
     public function __call($name, $arguments) {
         $serverUrl = rtrim($this->apiUrl, '/') . '/' . trim($this->c, '/') . '/' . $name . '/';
         //user_name和user_id必传
-        $arguments[0] = isset($arguments[0]) ? $arguments[0] : array();
+        $oldParams = $arguments[0] = isset($arguments[0]) ? $arguments[0] : array();
         if(!Yii::app()->user->isGuest){
             $arguments[0]['user_type'] = 2 ;
             $arguments[0]['user_id'] = Yii::app()->user->uid ;
@@ -70,10 +70,10 @@ class ApiModel {
         }        
         self::$inParam = $params = $arguments[0];
         $cache = isset($arguments[1]) ? $arguments[1] : false;
-        $cacheTime = isset($arguments[2]) ? $arguments[2] : 5 * 60;
+        $cacheTime = isset($arguments[2]) ? $arguments[2] : 60;
 
         if ($cache && $this->cacheId !== null) {
-            $key = $serverUrl . ':' . http_build_query($params);
+            $key = $serverUrl . ':' . http_build_query($oldParams);
             $rs = $this->getCache()->get($key);
             if (empty($rs)) {
                 $params['sign'] = $this->sign($params, $this->sign);
@@ -205,7 +205,7 @@ class ApiModel {
     }
 
     public function __destruct() {
-        if ($this->debug) {
+         if ($this->debug||(isset($_GET['_debug_'])&&$_GET['_debug_']=='huilian123456')) {
             print_r($this->debugs);
         }
     }

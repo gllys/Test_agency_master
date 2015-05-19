@@ -137,9 +137,10 @@ class AjaxServerController extends CController {
             $items = substr_count($ids, ',') + 1;
             $result = Poi::api()->lists(array(
                 'ids' => $ids,
-                'organization_id' => Yii::app()->user->org_id,
+//                'organization_id' => Yii::app()->user->org_id,
                 'fields' => 'name',
-                'items' => $items
+                'items' => $items,
+                'show_deleted'=>1
             ));
             if ($result['code'] == 'succ') {
                 echo json_encode(array(
@@ -159,7 +160,7 @@ class AjaxServerController extends CController {
             $items = substr_count($ids, ',') + 1;
             $result = Landscape::api()->lists(array(
                 'ids' => $ids,
-                'organization_id' => Yii::app()->user->org_id,
+//                'organization_id' => Yii::app()->user->org_id,
                 'fields' => 'name',
                 'items' => $items,
                 'status' => 1

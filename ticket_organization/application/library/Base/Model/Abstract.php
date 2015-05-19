@@ -9,8 +9,8 @@ abstract class Base_Model_Abstract
     protected $dbname;
     protected $tblname = '';
     protected $pkKey;
-    protected $memSrvKey;
-    protected $rdsSrvKey;
+    protected $memSrvKey = 'default';
+    protected $rdsSrvKey = 'default';
     protected $preCacheKey = 'cache|';
     protected $cacheKey;
     protected $cd = 3600;
@@ -26,6 +26,10 @@ abstract class Base_Model_Abstract
     
     public function getTable() {
         return $this->tblname;
+    }
+
+    public function setTable($id = 0) {
+        return $this;
     }
     
     /**
@@ -130,18 +134,15 @@ abstract class Base_Model_Abstract
         if ($preCacheKey === null) $preCacheKey = $this->preCacheKey;
         
         if (is_array($cacheKey)) {
-            foreach ($cacheKey as $key => $val) {
-                if (is_array($val)) $val = md5(serialize($val));
-                $cacheKey[$key] = "{$key}={$val}";
-            }
-            return $preCacheKey . implode('|', $cacheKey);
+            return $preCacheKey . md5(serialize($cacheKey));
         }
         // echo $preCacheKey . $cacheKey." ";
         return $preCacheKey . $cacheKey;
     }
     
     public function setCacheKey($key = null) {
-        $this->cacheKey = $key;
+        if ($this->preCacheKey)
+            $this->cacheKey = $key;
         return $this;
     }
     
@@ -154,7 +155,9 @@ abstract class Base_Model_Abstract
     }
     
     public function addCache($cacheKey, $data, $cd, $preCacheKey = null) {
-        return $this->memcache->set($this->getCacheKey($cacheKey, $preCacheKey), $data, $cd);
+		if ($cd > 0) {
+			return $this->memcache->set($this->getCacheKey($cacheKey, $preCacheKey), $data, $cd);
+		}
     }
     
     public function delCache($cacheKey, $preCacheKey = null) {
@@ -278,7 +281,7 @@ abstract class Base_Model_Abstract
     public function update($data, $where = null) {
         $rt = $this->db->update($this->getTable(), $data, $where);
         if ($rt && $this->cacheKey) {
-            $rt = $this->delCache($this->cacheKey);
+            $this->delCache($this->cacheKey);
             $this->cacheKey = null;
         }
         return $rt && $this->setCacheNS();
@@ -296,7 +299,7 @@ abstract class Base_Model_Abstract
     public function delete($where) {
         $rt = $this->db->delete($this->getTable(), $where);
         if ($rt && $this->cacheKey) {
-            $rt = $this->delCache($this->cacheKey);
+            $this->delCache($this->cacheKey);
             $this->cacheKey = null;
         }
         return $rt && $this->setCacheNS();
@@ -315,11 +318,13 @@ abstract class Base_Model_Abstract
     }
 
     public function getById($id) {
+        $this->setTable($id);
         $this->setCacheKey(array($this->pkKey => $id));
         return $this->get(array($this->pkKey=>$id));
     }
     
     public function getByIds($ids) {
+        $this->setTable(reset($ids));
         $this->setCacheKey($ids);
         return $this->getList(array($this->pkKey.'|in'=>$ids));
     }
@@ -330,16 +335,47 @@ abstract class Base_Model_Abstract
     }
     
     public function add($data) {
+        $this->setTable();
         return $this->insert($data);
     }
     
     public function updateById($id, $data) {
+        $this->setTable($id);
         $this->setCacheKey(array($this->pkKey => $id));
         return $this->update($data, array($this->pkKey=>$id));
     }
     
     public function deleteById($id) {
+        $this->setTable($id);
         $this->setCacheKey(array($this->pkKey => $id));
         return $this->delete(array($this->pkKey=>$id));
+    }
+
+    public function countResult($where){
+        $r = $this->search($where,"count(*) as count");
+        if(is_array($r) && count($r)>0) {
+            $r=reset($r);
+        } else {
+            return 0;
+        }
+        if(is_array($r) && count($r)>0) {
+            $r=reset($r);
+            return intval($r);
+        } else {
+            return 0;
+        }
+    }
+
+    public function exec($sql) {
+        $rt = $this->db->exec($sql);
+        if ($rt > 0) {
+            $this->setCacheNS();
+        }
+        return $rt;
+    }
+
+    public function setCd($sec = 3600){
+        $this->cd = $sec;
+        return $this;
     }
 }

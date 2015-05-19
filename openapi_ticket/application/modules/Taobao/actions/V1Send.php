@@ -13,7 +13,6 @@ class SendAction extends Yaf_Action_Abstract{
         //获取本动作对应的控制器实例
         $ctrl = $this->getController();
         $taobao = Taobao_TopClientFactory::create();
-        //var_dump($ctrl->topc);
 
         $verifyCodes = $ctrl->body['id'] . ':' . $ctrl->body['nums'];
 
@@ -26,8 +25,12 @@ class SendAction extends Yaf_Action_Abstract{
         $resp = $taobao->topc->execute($req, $taobao->sessionKey);
 
         //日志输出
-        $ctrl->echoLog('body', json_encode($ctrl->body), 'send_taobao.log');
-        $ctrl->echoLog('resp', json_encode($resp), 'send_taobao.log');
+//        $ctrl->echoLog('body', json_encode($ctrl->body), 'send_taobao.log');
+//        $ctrl->echoLog('resp', json_encode($resp), 'send_taobao.log');
+        Util_Logger::getLogger('taobao')->info(__METHOD__,
+            array('body' => $ctrl->body, 'resp' => $resp), '', '发码请求数据和淘宝回传数据',
+            $ctrl->body['orderId']
+        );
 
         if(isset($resp->ret_code) && $resp->ret_code == 1){
             //todo 调用淘宝接口成功后，向内部API返回200，让内部API正式核销

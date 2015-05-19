@@ -152,14 +152,10 @@
   display: block;
 }
 .dropzone {
-  border: 1px solid #ccc;
-width:150px;
-height:150px;
-  -moz-border-radius: 2px;
-  -webkit-border-radius: 2px;
-  border-radius: 2px;
-  background: #E4E7EA;
-  overflow:hidden
+	width:320px;
+	height:190px;
+	background:#e0e4e7;
+	overflow:hidden
 }
 .dropzone .dz-default.dz-message {
   opacity: 1;
@@ -403,7 +399,7 @@ height:150px;
 	width: auto!important;
     left: 0;
     margin: auto;
-    max-width: 148px!important;
+    max-width: 310px!important;
     position: absolute;
     right: 0;
     top: 0;

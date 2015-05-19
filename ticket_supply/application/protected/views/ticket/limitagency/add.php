@@ -234,8 +234,7 @@ $action = isset($action)?$action:$this->getAction()->getId();
                 if($('#pwd').validationEngine('validate') === true){
                     $.post('/ticket/limitagency/save',$('#pwd').serialize(),function(data){
                         if(data.error==0){
-                            alert("保存成功！");
-                            location.href = "/ticket/limitagency";
+                            alert("保存成功！",function(){location.href = "/ticket/limitagency";});
                         }else{
                             alert("保存失败,"+data.msg);
                         }

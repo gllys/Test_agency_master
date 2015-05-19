@@ -1,245 +1,206 @@
+<?php 
+
+use common\huilian\utils\Format;
+
+?>
+
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-<?php $this->breadcrumbs = array('产品', '货架管理');?>
+<?php $this->breadcrumbs = array('产品', '产品列表'); ?>
+<style>
+.rules {
+	position: relative;
+	display: inline-block;
+}
+
+.rules+.rules {
+	margin-left: 20px;
+}
+
+.rules>span {
+	color: #999;
+	font-size: 12px;
+	cursor: pointer
+}
+
+.rules>div>span {
+	margin: 0 10px
+}
+
+.rules>div {
+	display: none;
+	position: absolute;
+	top: 15px;
+	left: 50px;
+	z-index: 999;
+	width: 500px;
+	padding: 10px;
+	background-color: #fbf8e9;
+	border: 1px solid #fed202;
+	border-radius: 2px;
+	box-shadow: 0 0 10px rgba(0, 0, 0, .2);
+	word-wrap: break-word;
+}
+
+.rules>div .table {
+	background: none;
+}
+
+.rules>div .table tr>* {
+	border: 1px solid #e0d9b6
+}
+
+.rules:hover>div {
+	display: block;
+}
+</style>
 <div class="contentpanel">
-    <div id="verify_return"></div>   
-    <ul class="nav nav-tabs">
-         <?php
-        foreach ($data['type_labels'] as $type => $label) :
-                ?>
-                <li class="<?php echo isset($param['type']) && $type == $param['type'] ? 'active' : '' ?>">
-                        <a href="/ticket/single/index/type/<?php echo $type ?>"><strong><?php echo $label ?></strong></a>
-                </li>
-        <?php endforeach;
-        unset($type, $label); ?>
-    </ul>
-    
-    <div class="tab-content mb30">
-        <style>
-            .tab-content .table tr>*{
-                text-align:center
-            }
-            .tab-content .ckbox{
-                display:inline-block;
-                width:30px;
-                text-align:left
-            }
-     
-		.rules{
-			position:relative;
-			display:inline-block;
-		}
-		.rules+.rules{
-			margin-left:20px;
-			}
-		.rules > span{
-			color:#999;
-			font-size:12px;
-			cursor:pointer
-		}
-		.rules > div >span{
-			margin:0 10px
-			}
-		.rules > div{
-			display:none;
-			position:absolute;
-			top:15px;
-			left:50px;
-			z-index:999;
-			width:300px;
-			padding:10px;
-			background-color:#fbf8e9;
-			border:1px solid #fed202;
-			border-radius:2px;
-			box-shadow:0 0 10px rgba(0,0,0,.2);
-		}
-		.rules > div .table{
-			background:none;
-		}
-		.rules > div .table tr > *{
-			border:1px solid #e0d9b6
-		}
-		.rules:hover > div{
-			display:block;
-		}
-		
-        </style>
-        <div id="t1" class="tab-pane active">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <form class="form-inline" action="" method="get">
-                         <div class="form-group" style='margin: 0 5px 0 0;<?php if($param["type"] != 2){ echo "display:none;";}?>'>
-                            <input class="form-control" placeholder="请输入联票名称" type="text" style="width:200px;" name="name" <?php
-                                    if (isset($param['name']) && !empty($param['name'])) {
-                                        echo 'value = '.$param["name"];
-                                    }
-                                    ?>>
-                        </div>                       
-                        <div class="form-group">
-                            <select data-placeholder="Choose One" style="width:300px;padding:0 10px;" id="distributor-select" name="scenic_id">
-                                <option value="">请输入景区名称</option>
-                                <?php
-                                $param['status'] = 1;
-                                $param['organization_id'] = YII::app()->user->org_id;
-                                $rs = Landscape::api()->lists($param);
-                                $data = ApiModel::getLists($rs);
-                                foreach ($data as $item) {
-                                    ?>
-                                    <option value="<?php echo $item['id']; ?>"  <?php
-                                    if (isset($param['scenic_id']) && !empty($param['scenic_id'])) {
-                                        echo $item['id'] == $param['scenic_id'] ? "selected" : '';
-                                    }
-                                    ?>><?php echo $item['name']; ?></option>
-                                        <?php }
-                                        ?>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary mr5 btn-sm">查询</button>
-                    </form>
-                </div><!-- panel-body -->
-            </div>
-            <?php
-            foreach ($lists as $lanId => $tickets):?>
-                <div class="panel panel-default">
-                    <div class="panel-heading"><h4 class="panel-title">
-                            <?php
-                            if($param['type'] != 2){
-	                            //todo optimize
-                                $rs = Landscape::api()->detail(array('id' => $lanId));
-                                $data = ApiModel::api()->getData($rs);
-                                echo empty($data['name']) ? '' : $data['name'];
-                            }
-                            ?>
-                        </h4></div>
-                    <table class="table table-bordered mb30">
-                        <thead>
-                            <tr>
-                                <th>门票名称</th>
-                                <th>团队价格</th>
-                                <?php if($param["type"] != 1){ ?>
-                                <th>散客价格</th>
-                                <th>价格库存规则</th><?php  }  ?>
-                                <th>限制分销商</th>
-                                <th>优惠规则</th>
-                                <th>状态</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            foreach ($tickets as $item):
-                                ?> 
-                                <tr>
-                                    <td style="text-align: left">
-                                        <?php
-                                        echo "<span style='float:left;padding-top:5px;'>" . $item['name'] . "</span>";
-                                       
-                                        ?>
-                                    </td>
-                                    <td><?php echo $item['group_price']; ?></td>
-                                   <?php if($param["type"] != 1){ ?>
-                                    <td><?php echo $item['fat_price']; ?></td>
-                                    <td>
-                                         <div class="rules"><span><?php 
-                                           if(isset($item['rule_id']) && !empty($item['rule_id'])){
-                                               $fied['id'] =  $item['rule_id'];
-                                               $fied['supplier_id'] = Yii::app()->user->org_id;
-	                                           //todo optimize
-                                               $lists = Ticketrule::api()->detail($fied);
-                                                echo isset($lists['body']['name'])?$lists['body']['name']:'请选择价格库存规则';
-                                             }else{
-                                                 echo '请选择价格库存规则';
-                                             }
-                                           ?></span>
-                                                <div class="table-responsive">
-                                                    <table class="table table-bordered mb30">
-                                                        <?php echo "请将该产品返仓，才可设置“价格库存规则”！";?>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                       </td>
-                                           <?php  }  ?>
-                                   <?php if($item['state'] == 1){ //已上架?>
-                                        <td><a style="color:#ccc">
-                                       <?php
-                                       if(isset($item['namelist_id']) && !empty($item['namelist_id'])){
-	                                       //todo optimize
-                                          $lists =  Ticketorgnamelist::api()->detail(array('id'=>$item['namelist_id']));
-                                          echo isset($lists['body']['name'])?$lists['body']['name']:'请选择限制分销商';
-                                       }else{
-                                           echo '请选择限制分销商';
-                                       }
-                                       ?> 
-                                        </a></td>
-                                    <td><a style="color:#ccc">
-                                         <?php
-                                       if(isset($item['discount_id']) && !empty($item['discount_id'])){
-	                                       //todo optimize
-                                          $lists =  Ticketdiscountrule::api()->detail(array('id'=>$item['discount_id']));
-                                          echo isset($lists['body']['name'])?$lists['body']['name']:'请选择活动规则';
-                                       }else{
-                                           echo '请选择活动规则';
-                                       }
-                                       ?> 
-                                        </a></td>
-                                 <?php  }else{ //待上架?>
-                                        <td><a href="#limit-modal" data-toggle="modal" onclick="limitrule('<?php echo $item['id']?>');">
-                                       <?php
-                                       if(isset($item['namelist_id']) && !empty($item['namelist_id'])){
-	                                       //todo optimize
-                                          $lists =  Ticketorgnamelist::api()->detail(array('id'=>$item['namelist_id']));
-                                          echo isset($lists['body']['name'])?$lists['body']['name']:'请选择限制分销商';
-                                       }else{
-                                           echo '请选择限制分销商';
-                                       }
-                                       ?> 
-                                        </a></td>
-                                    <td><a href="#rule-modal" data-toggle="modal"  onclick="addrule('<?php echo $item['id']?>')">
-                                         <?php
-                                       if(isset($item['discount_id']) && !empty($item['discount_id'])){
-	                                       //todo optimize
-                                          $lists =  Ticketdiscountrule::api()->detail(array('id'=>$item['discount_id']));
-                                          echo isset($lists['body']['name'])?$lists['body']['name']:'请选择活动规则';
-                                       }else{
-                                           echo '请选择活动规则';
-                                       }
-                                       ?> 
-                                        </a></td>
-                                       
-                               <?php  }?>
-                                   
-                                        
-                                    <td>
-                                    <?php
-                                     if ($item['state']==1)
-                                            echo "<span style='float:right' class='btn btn-success btn-bordered btn-xs'>已上架</span>";
-                                        else
-                                            echo "<span style='float:right' class='btn btn-danger btn-bordered btn-xs'>已下架</span>";
-                                    ?>
-                                    </td>
-                                    <td>
-                                        <?php
-                                        if ($item['state'] == 1) {
-                                            echo " <a onclick='downUp(" . $item['id'] . ",1);'><i class='glyphicon glyphicon-arrow-down'  style='cursor:pointer'></i></a>";
-                                        } else {
-                                            echo "<a onclick='downUp(" . $item['id'] . ",2)'><i class='glyphicon glyphicon-arrow-up'  style='cursor:pointer'></i></a>";
-                                        }
-                                        ?>
-                                       <?php if($item['state'] == 2){?>
-                                        <a title="返仓" href="javascript:void(0);" style="margin-left: 10px;" onclick='getback("<?php echo $item['id']?>")'>
-                                            <span class="glyphicon glyphicon-retweet"></span>
-                                        </a>
-                                        <?php  }  ?>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            <?php endforeach; ?>  
-            <div style="text-align:center" class="panel-footer">
-                <div id="basicTable_paginate" class="pagenumQu">
-                    <?php
-                    $this->widget('CLinkPager', array(
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h4 class="panel-title">
+				<button class="btn btn-primary btn-sm pull-right" onclick="modal_jump_add();" data-target=".modal-bank" data-toggle="modal">新建产品</button>
+				产品管理
+			</h4>
+		</div>
+		<div class="panel-body">
+			<form action="/ticket/single/" class="form-inline">
+				<div class="form-group"  style="width: 200px;">
+					<select data-placeholder="Choose One"  style="width:200px;height:32px;" id="distributor-select-search" name="scenic_id">
+						<option value="">请输入景区名称</option>
+						<?php
+                                                $supplylanIds = PublicFunHelper::arrayKey($supplyLans, 'landscape_id');
+                                                $lanLists = Landscape::api()->getSimpleByIds($supplylanIds);
+                                                ?>
+                                                <?php foreach ($supplyLans as $item): ?>
+                                                    <option value="<?php echo $item['landscape_id'] ?>" <?php if (!empty($_GET['scenic_id']) && $_GET['scenic_id'] == $item['landscape_id']): ?>selected="selected"<?php endif; ?>><?php
+                                                        //todo optimize
+                                                        if (isset($lanLists[$item['landscape_id']])) {
+                                                            echo $lanLists[$item['landscape_id']]['name'];
+                                                        }
+                                                        ?></option>  
+                                                <?php endforeach; ?>
+					</select>
+				</div>
+				<div class="form-group">
+					<div class="ckbox ckbox-primary pull-left mr20">
+						<input type="checkbox" name="down" value="1" id="checkboxPrimary1" <?php if (!isset($_GET['scenic_id']) || !empty($_GET['down'])): ?>checked="checked"<?php endif ?>> <label for="checkboxPrimary1">下架产品</label>
+					</div>
+					<div class="ckbox ckbox-primary pull-left">
+						<input type="checkbox" name="up" value="1" id="checkboxPrimary" <?php if (!isset($_GET['scenic_id']) || !empty($_GET['up'])): ?>checked="checked"<?php endif ?>> <label for="checkboxPrimary">上架产品</label>
+					</div>
+				</div>
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm pull-left">搜索景区产品</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div class="table-responsive">
+        <table class="table table-bordered mb30" style="min-width: 1006px;">
+			<thead>
+				<tr>
+					<th style="widht:7%">
+						<div class="ckbox ckbox-primary" style="margin-left: 17px;">
+							<input type="checkbox" class="ids" id="checkbox-allcheck" value="">
+							<label for="checkbox-allcheck" class="allcheck">全选</label>
+						</div>
+					</th>
+					<th style="width:11%;">景区</th>
+                    <th style="width:15%;">产品名称</th>
+                    <th style="width:5%;">状态</th>
+					<th style="width:5%;">散客价</th>
+					<th style="width:5%;">团队价</th>
+					<th style="width:9%;">销售起始</th>
+					<th style="width:9%;">销售结束</th>
+					<th style="width:11%;">日库存设置</th>
+					<th style="width:15%;">分销策略</th>
+					<th style="width:8%;">操作</th>
+				</tr>
+			</thead>
+			<tbody id="staff-body">
+				<?php 
+					foreach($lists as $key => $item) {
+					
+				?>
+				<tr>
+					<td style="width:7%;">
+						<div class="ckbox ckbox-primary" style="margin-left: 17px;">
+							<input type="checkbox" class="ids" id="checkbox<?= $key ?>" value="<?= $item['id'] ?>">
+							<label for="checkbox<?= $key ?>"></label>
+						</div>
+					</td>
+					<td style="width:11%;">
+						<?php if(mb_strlen($item['lan_name'],'UTF8') > 6):?>
+                            <a style="color: #636e7b;cursor: pointer;cursor: hand;" title="<?php echo $item['lan_name']?>"><?php echo mb_substr($item['lan_name'],0,6,'UTF8') . '...'?></a>
+                        <?php else:?>
+                            <a style="color: #636e7b;cursor: pointer;cursor: hand;" title="<?php echo $item['lan_name']?>"><?php echo $item['lan_name']?></a>
+                        <?php endif;?>
+                    </td>
+					<td style="width:15%;">
+						<div class="rules">
+							<span class="pull-left" style="margin-top: 5px"><?= mb_strlen($item['name'],'utf8')>15?mb_substr($item['name'], 0, 15,'utf8').'...':$item['name'] ?></span>
+						</div>
+					</td>
+					<td style="width:5%;">
+						<?php if($item['force_out'] == 1) { ?>
+						<span style="cursor:auto;color:red;">强制下架</span>
+						<?php } else if ($item['state'] == 1) { ?>
+						<span style="cursor:auto;color:green;">已上架</span>
+						<?php } else { ?>
+						<span style="cursor:auto;color:red;">已下架</span>
+						<?php } ?>
+					</td>
+					<td style="width:5%;"> <?= $item['fat_price'] ?></td>
+					<td style="width:5%;"><?= $item['group_price'] ?></td>
+					<td style="width:9%;"><?= $item['sale_start_time'] ? Format::date($item['sale_start_time']) : '不限制' ?></td>
+					<td style="width:9%;"><?= $item['sale_end_time'] ? Format::date($item['sale_end_time']) : '不限制' ?></td>
+					<td style="width:11%;">
+						<a style="cursor: pointer; cursor: hand;" data-target=".modal-bank" data-toggle="modal" href_delay="/ticket/single/inventory/?id=<?= $item['id']?>&rid=<?= $item['rule_id']?>&name=<?= $item['name']; ?>" onclick="modal_jump_delay(this);"><?= empty($item['rule_id']) ? '' : '已' ?>设置</a>
+						<?php if(!empty($item['rule_id'])) { ?>
+						<a style="cursor: pointer;cursor: hand;color:black;" class="pull-center" href="#" onclick="clearDailyStock(<?= $item['id'] ?>)">[清空]</a>
+						<?php } ?>
+					</td>
+					<td style="width:15%;">
+						<a style="cursor: pointer;cursor: hand;"  data-target=".modal-bank" data-toggle="modal" href_delay="/ticket/single/policy/?id=<?= $item['id'] ?>&policy_id=<?= $item['policy_id'] ?>" onclick="modal_jump_delay(this);"><?= empty($item['policy_name']) ? '设置分销商策略' : $item['policy_name'] ?></a>
+						<?php if(!empty($item['policy_name'])) {?>
+						<a style="cursor: pointer;cursor: hand;color:black;" class="pull-center" href="#" onclick="clearPoli(<?php echo $item['id']?>);">[清空]</a>
+						<?php }?>
+					</td>
+					<td style="white-space:nowrap;">						
+						<?php if ($item['state'] == 1): ?>
+							<a  onclick="down(<?php echo $item['id'] ?>);
+								return false;" style="cursor: pointer;cursor: hand;">下架</a>
+						<?php else: ?>
+							<?php if($item['force_out'] != 1) { ?>
+							<a onclick="up(<?php echo $item['id'] ?>);return false;" style="cursor: pointer;cursor: hand;">上架</a>
+							<?php } ?>
+							<a style="cursor: pointer;cursor: hand;" style="margin-left: 10px;" href="/ticket/single/edit/?ticket_id=<?php echo $item['id'] ?>" onclick="modal_jump(this);"  data-target=".modal-bank" data-toggle="modal">修改
+							</a>
+							<a style="cursor: pointer;cursor: hand;" style="margin-left: 10px;" href="#" onclick="del(<?php echo $item['id'] ?>); return false;" class="del">删除</a>
+						<?php endif; ?>
+					</td>
+				</tr>
+				<?php } ?>
+			</tbody>
+		</table>
+	</div>
+	<div class="panel-footer">
+		<div class="pull-left">
+<!--			<div class="ckbox ckbox-primary" style="display: inline-block; margin: 0 17px; vertical-align: middle;">-->
+<!--				<input type="checkbox" class="ids" id="checkbox-allcheck1" value=""> <label for="checkbox-allcheck1" class="allcheck">全选</label>-->
+<!--			</div>-->
+			<a href="#" onclick="delAll();return false;" class="btn btn-default btn-bordered btn-sm">全部删除</a> 
+			<a href="#" onclick="upAll();return false;" class="btn btn-default btn-bordered btn-sm">全部上架</a> 
+			<a href="#" onclick="downAll();return false;" class="btn btn-default btn-bordered btn-sm">全部下架</a>
+		</div>
+		<div class="pull-right">
+			
+		</div>
+	</div>
+	<div class="panel-footer">
+		<div class="pagenumQu">
+				<?php
+                if (!empty($lists)) {
+                    $this->widget('common.widgets.pagers.ULinkPager', array(
                         'cssFile' => '',
                         'header' => '',
                         'prevPageLabel' => '上一页',
@@ -248,303 +209,315 @@
                         'lastPageLabel' => '',
                         'pages' => $pages,
                         'maxButtonCount' => 5, //分页数量
-                            )
+                        )
                     );
-                    ?>
-                </div>
-            </div>
-        </div><!-- tab-pane -->
-
-        <div id="t2" class="tab-pane"></div><!-- tab-pane -->
-      
-    </div>
-      <div role="dialog" tabindex="-1" class="modal fade" id='rule-modal'></div>
-     <div  role="dialog" tabindex="-1" class="modal fade" id='limit-modal'></div>
-  
-</div><!-- contentpanel -->
-
-
-
-<script>
-    function getback(id){
-      $.post('/ticket/single/getback/',{'id':id}, function(data) {
-            if (data.error) {
-                var warn_msg = '<div class="alert alert-error"><button data-dismiss="alert" class="close" type="button">×</button><i class="icon-warning-sign"></i>' +data.msg+ '</div>';
-                $('#verify_return').html(warn_msg);
-                } else{
-                    var succss_msg = '<div class="alert alert-success"><button data-dismiss="alert" class="close" type="button">×</button><strong>返仓成功！</strong></div>';
-                    $('#verify_return').html(succss_msg);
-
-                    setTimeout("location.href='"+window.location.pathname+"'", '500');
                 }
-        });  
-    }
-       function addrule(id){
-       $('#rule-modal').html("");
-        $.get('/ticket/single/rule/id/'+id+'', function(data) {
-            $('#rule-modal').html(data);
+                ?>
+			</div>
+	</div>
+	<script type="text/javascript">
+
+
+                    $(function() {
+                        $("#distributor-select-search").select2(); //景区查询下拉框
+
+                        $('.allcheck').click(function() {
+                            if ($(this).text() == '全选') {
+                                $('#staff-body').find('input').prop('checked', true)
+                                $(this).text('反选')
+                            } else {
+                                $('#staff-body').find('input').prop('checked', false)
+                                $(this).text('全选')
+                            };
+
+                        });
+                    });
+
+
+ 	</script>
+</div>
+<div id='verify-modal' class="modal fade modal-bank" tabindex="-1" role="dialog"></div>
+<script type="text/javascript">
+    function modal_jump_add() {
+        $('#verify-modal').html('');
+        $.get('/ticket/single/add/', function(data) {
+            $('#verify-modal').html(data);
+
         });
     }
+
+    function modal_jump(obj) {
+        $('#verify-modal').html('');
+        $.get($(obj).attr('href'), function(data) {
+            $('#verify-modal').html(data);
+        });
+    }
+
+    function modal_jump_delay(obj) {
+        $('#verify-modal').html('');
+        $.get($(obj).attr('href_delay'), function(data) {
+            $('#verify-modal').html(data);
+        });
+    }
+
+    function del(id) {
         
-     function limitrule(id){
-         $('#limit-modal').html("");
-        $.get('/ticket/single/limitrule/id/'+id+'', function(data) {
-            $('#limit-modal').html(data);
-            
-        });
-    }   
-    
-    
-    jQuery(document).ready(function() {
-        !function() {
-            $('#distributor-select').change(function() {
-                var obj = $(this),
-                        val = obj.val()
-                b(obj, val)
-            })
-        }()
-        // Select2
-        jQuery("#distributor-select, #select-multi, #through-tickets-select").select2();
-        jQuery('.select2').select2({
-            minimumResultsForSearch: -1
-        });
 
-        jQuery('select option:first-child').text('');
+        var ids = id ;
+        if (!ids) {
+            alert('请选择删除项');
+            return false;
+        }
 
-    });
-
-    $(function() {
-        //选择
-        $('a.del').click(function() {
-            if (!window.confirm("确定要删除?")) {
-                return false;
+		PWConfirm('确定要删除此门票吗？',function(){
+			     $.post('/ticket/single/del/', {id: ids, state: 0}, function(data) {
+            if (data.error) {
+                
+                setTimeout(function(){
+                    alert(data.msg);
+                },500);
+            } else {
+                
+                setTimeout(function(){
+                    alert('产品删除成功',function(){window.location.reload();});
+                },500);
             }
-            $.post($(this).attr('href'), function() {
-                window.location.reload();
+        }, 'json');
             });
+    }
+
+    function down(id) {
+        var ids = id ;
+        if (!ids) {
+            alert('请选择下架项');
+            return false;
+        }
+        
+        $.post('/ticket/single/state/', {id: ids, state: 2}, function(data) {
+            if (data.error) {
+                alert(data.msg);
+            } else {
+                alert('产品下架成功',function(){window.location.reload();});
+            }
+        }, 'json');
+    }
+
+    function up(id) {
+
+        var ids = id ;
+        if (!ids) {
+            alert('请选择上架项');
+            return false;
+        }
+        
+        $.post('/ticket/single/state/', {id: ids, state: 1}, function(data) {
+            if (data.error) {
+                alert(data.msg);
+            } else {
+                alert('产品上架成功',function(){window.location.reload();});
+            }
+        }, 'json');
+    }
+
+    function delAll() {
+        
+        var $checkbox = [];
+        $('.ids:checked').each(function() {
+            if ($(this).val() != '') {
+                $checkbox.push($(this).val());
+            }
+        });
+
+        var ids = $checkbox.join(',');
+        if (!ids) {
+            alert('请选择删除项');
+            return false;
+        }
+		PWConfirm('确定要全部删除?',function(){
+			    $.post('/ticket/single/del/', {id: ids, state: 0}, function(data) {
+
+            if (data.error) {
+            	setTimeout(function() {
+               	 alert(data.msg);
+            	}, 2000);
+            } else {
+            	setTimeout(function() {
+                	alert(data.msg,function(){window.location.reload();});
+            	}, 2000);
+            }
+        }, 'json');
+        });
+       
+    }
+
+    function downAll() {
+        var $checkbox = [];
+        $('.ids:checked').each(function() {
+            if ($(this).val() != '') {
+                $checkbox.push($(this).val());
+            }
+        });
+        var ids = $checkbox.join(',');
+        if (!ids) {
+            alert('请选择下架项');
+            return false;
+        }
+        
+        $.post('/ticket/single/state/', {id: ids, state: 2}, function(data) {
+            if (data.error) {
+                alert(data.msg);
+            } else {
+                alert(data.msg,function(){window.location.reload();});
+            }
+        }, 'json');
+    }
+
+    function upAll() {
+        var $checkbox = [];
+        $('.ids:checked').each(function() {
+             if ($(this).val() != '') {
+                $checkbox.push($(this).val());
+            }
+        });
+        var ids = $checkbox.join(',');
+        if (!ids) {
+            alert('请选择上架项');
+            return false;
+        }
+        
+        $.post('/ticket/single/state/', {id: ids, state: 1}, function(data) {
+            if (data.error) {
+                alert(data.msg);
+            } else {
+                alert(data.msg,function(){window.location.reload();});
+            }
+        }, 'json');
+    }
+    
+    $(function() {
+        $("#distributor-select-search").select2(); //景区查询下拉框     
+
+        $('#allcheck').click(function() {
+            if ($(this).text() == '全选') {
+                $('#staff-body').find('input').prop('checked', true)
+                $(this).text('反选')
+            } else {
+                $('#staff-body').find('input').prop('checked', false)
+                $(this).text('全选')
+            }
+            ;
             return false;
         });
-    });
-//上下架
-    function downUp(id, state) {
-        var id = id;
-        var state = state;
-        $.post('/ticket/single/DownUP/', {id: id, state: state}, function(data) {
-            if (data.errors) {
-                var tmp_errors = '';
-                $.each(data.errors, function(i, n) {
-                    tmp_errors += n;
-                });
-                var warn_msg = '<div class="alert alert-error"><button data-dismiss="alert" class="close" type="button">×</button><i class="icon-warning-sign"></i>' + tmp_errors + '</div>';
-                $('#verify_return').html(warn_msg);
+    }); 
+    
+    //取消库存设置
+    function clearInve(id,rid){
+        $.post('/ticket/single/delInvetory/', {id: id, rid: rid}, function(data) {
+            if (data.error) {
+                alert(data.message);
             } else {
-                var succss_msg = '<div class="alert alert-success"><button data-dismiss="alert" class="close" type="button">×</button><strong>操作成功!</strong></div>';
-                $('#verify_return').html(succss_msg);
-                setTimeout("location.reload();", '2000');
+                alert(data.message,function(){window.location.reload();});
             }
-        }, "json");
-        return false;
+        }, 'json');
     }
-</script>
-
-<script>
-    var json = {"pricelists": [{"date": "2014-10-23", "sprice": 111, "lprice": 333, "uid": "17232", "storage": "2", "sale": "0", "remain": 2}, {"date": "2014-10-24", "sprice": 1, "lprice": 2, "uid": "17269", "storage": "3", "sale": "0", "remain": 3}, {"date": "2014-10-31", "sprice": 1, "lprice": 2, "uid": "17270", "storage": "3", "sale": "0", "remain": 3}], "about": {"mintime": 1413993600, "maxtime": 1419955200, "lcode": 0, "totalStorage": -1}}
-
-
-
-    jQuery(document).ready(function() {
-        (function() {
-            //storageCal.init.calDiv = $("#storageCal").get(0);
-            //storageCal.init.totalStorage = $("#total_storage").val();
-            //storageCal.init.totalStorageBegintime = $("#storage_open").val();
-            ////storageCal.init.salesStorage = $("#sales").html();
-            var pid = parseInt($("#pid").val());
-            //var yearmonth = $("#begintime").val().substr(0, 7);
-            //storageCal.show(yearmonth, pid, $("#begintime").val());
-        })();
-
-        $(".delete").click(function() {
-            $(this).parent().parent().parent().find("input[type='text']").val("");
-
-        });
-
-
-        $("#configBtn").click(function() {
-            var daystorage = $("input#daystorage").val();
-            if (daystorage === "")
-                daystorage = "-1";
-            var sprice = $("#sprice").val();
-            var lprice = $("#lprice").val();
-            if ($("#sprice").size() > 0 && (isNaN(sprice) || sprice <= 0)) {
-                alert("供货价请填写大于0的数字");
+    //取消分销商策略设置
+    function clearPoli(id){
+        $.post('/ticket/single/savePolicy/', {ptid: id, selpol: 0}, function(data) {
+            if (data.error) {
+                alert(data.msg);
+            } else {
+                alert(data.msg,function(){window.location.reload();});
+            }
+        }, 'json');
+    }
+    $(document).on('click','#setinvBtn',function() {
+            var s_price = $("#s_price").val();
+            var g_price = $("#g_price").val();
+            var day_storage = $("#day_storage").val();
+            if ((isNaN(s_price) || s_price <= 0)
+                    && (isNaN(g_price) || g_price <= 0)
+                    && (isNaN(day_storage) || day_storage <= 0)) {
+                $("#day_storage").val('');
+                $('.show_prompt').PWShowPrompt('请设置一个有效的加减价或库存限制'); 
                 return false;
             }
-            if ($("#lprice").size() > 0 && (isNaN(lprice) || lprice <= 0)) {
-                alert("零售价请填写大于0的数字");
-                return false;
-            }
+
+            var json1 = {};
             var hasChecked = 0;
-            var data = [];
-            var json = {};
             $("#storageCal tbody td input").each(function() {
                 if (this.checked == false)
                     return;
                 hasChecked = 1;
-                var record = {};
                 var detail = $(this).parent().parent();
-                record['st'] = detail.attr("date");
-                record['et'] = detail.attr("date");
-                record['rid'] = detail.attr("uid");
-                if ($("#sprice").size() > 0) {
-                    record['p1'] = sprice;
-                    record['p2'] = lprice;
-                } else {
-                    record['p1'] = -1;
-                }
-                record['ptype'] = 1;
-                record['storage'] = daystorage;
-                data.push(record);
-            })
+                dateSelected.push(detail.attr("date"));
+            });
             if (hasChecked == 0) {
-                alert("请选择配置日期");
+                $('#checkAll').PWShowPrompt('请选择日期');
                 return false;
             }
-            json['params'] = JSON.stringify(data)
-            json['pid'] = $("#pid").val();
+            var json1 = {};
+            json1['params'] = dateSelected;
+            if (!isNaN(s_price) && s_price > 0) {
+                json1['s_type'] = $('#s_type').val();
+                json1['s_price'] = s_price;
+            }
+            if (!isNaN(g_price) && g_price > 0) {
+                json1['g_type'] = $('#g_type').val();
+                json1['g_price'] = g_price;
+            }
+            if (!isNaN(day_storage) && day_storage > 0) {
+                json1['storage'] = day_storage;
+            }
+            json1['ptid'] = $("#ptid").val();
+            json1['rid'] = $("#pid").val();
+            json1['name'] = $('#name').val();
+            json1['desc'] = $('#desc').val();
+            var wrap = $('#configWrap').html();
             $.ajax({
-                url: "/d/daily_storage.php",
+                url: "/ticket/single/commit",
                 type: "POST",
                 dataType: "json",
-                data: json,
-                success: function(json) {
-                    if (json.errcode == 100) {
-                        var yearmonth = $("#storageCalContent input.yearmonth").first().val();
-                        delete(storageCal.data[yearmonth])
+                data: json1,
+                beforeSend: function() {
+                    $('#configWrap').html('<img alt="" src="/img/loaders/loader1.gif">');
+                },
+                success: function(result) {
+                    if (result.code == 200) {
                         alert("设置成功");
-                        storageCal.show(yearmonth, $("#pid").val(), $("#begintime").val());
+                        $("#ptid").val(result.id);
+                        $("#pid").val(result.rid);
+                        $("#name").val(result.name);
+                        $("#s_price").val(result.s_price);
+                        $("#g_price").val(result.g_price);
+                        json.rules = result.dateSelected;
+                        storageCal.init.calDiv = $("#storageCal").get(0);
+                        storageCal.init.totalStorage = $("#total_storage").val();
+                        storageCal.init.totalStorageBegintime = $("#storage_open").val();
+                        storageCal.init.salesStorage = $("#sales").html();
+                        var ptid = parseInt($("#ptid").val());
+                        var year_month = $(".year_month").val().substr(0, 7);
+                        storageCal.show(year_month, ptid, $("#begintime").val());
                     } else {
-                        alert(json.msg);
+                        alert(result.message);
                     }
-                }
-            })
-            return false;
-        })
-
-
-
-        !function() {
-            var orderCount = $('#order-count').val(),
-                    spinner = $('#order-count').spinner(),
-                    takeTicketObj = $('#take-ticket'),
-                    takeTicketFooter = $('#take-ticket-footer'),
-                    takeTicketNum,
-                    order = 1,
-                    tickets,
-                    pay = 98.00,
-                    tpl = '<tr><th>取票人姓名</th><td><input type="text" class="form-control" placeholder=""></td><th>取票人手机号码</th><td><input type="text" class="form-control" placeholder=""></td><th>取票人身份证号码</th><td><input type="text" class="form-control" placeholder=""></td><td><a class="btn btn-success btn-xs take-ticket-del" href="javascript:void(0)">删除</a></td></tr>'
-
-            spinner.spinner({
-                'value': 1,
-                'min': 1,
-                'spin': function(event, ui) {
-                    orderCount = ui.value
-                    total()
-                }
-            })
-
-            $('#take-ticket-add').click(function() {
-                takeTicketObj.append(tpl)
-                total()
-            })
-
-            takeTicketObj.on('click', '.take-ticket-del', function() {
-                $(this).parents('tr').remove()
-                total()
-            })
-
-
-            function total() {
-                order = takeTicketObj.find('tr:not(:first-child)').length
-                tickets = orderCount * order
-                takeTicketFooter.html('<span>合计取票人:<b class="text-danger">' + order + '</b>位</span><span style="margin-left:30px">合计订单:<b class="text-danger">' + order + '</b>张</span><span style="margin-left:30px">合计票数:<b class="text-danger">' + tickets + '</b>张</span><span style="margin-left:30px">合计支付金额:<b class="text-danger">' + tickets * pay + '</b>元</span>')
-            }
-
-
-        }()
-
-        // Tags Input
-        jQuery('#tags').tagsInput({width: 'auto'});
-
-        // Textarea Autogrow
-        jQuery('#autoResizeTA').autogrow();
-
-
-
-        // Form Toggles
-        jQuery('.toggle').toggles({on: true});
-
-
-        // Date Picker
-        jQuery('#datepicker').datepicker();
-        jQuery('#datepicker-inline').datepicker();
-        jQuery('#datepicker-multiple').datepicker({
-            numberOfMonths: 3,
-            showButtonPanel: true
-        });
-
-        // Input Masks
-        jQuery("#date").mask("99/99/9999");
-        jQuery("#phone").mask("(999) 999-9999");
-        jQuery("#ssn").mask("999-99-9999");
-
-        // Select2
-        jQuery("#select-basic, #select-multi").select2();
-        jQuery('.select2').select2({
-            minimumResultsForSearch: -1
-        });
-
-        function format(item) {
-            return '<i class="fa ' + ((item.element[0].getAttribute('rel') === undefined) ? "" : item.element[0].getAttribute('rel')) + ' mr10"></i>' + item.text;
-        }
-
-        // This will empty first option in select to enable placeholder
-        jQuery('select option:first-child').text('');
-
-        jQuery("#select-templating").select2({
-            formatResult: format,
-            formatSelection: format,
-            escapeMarkup: function(m) {
-                return m;
-            }
-        });
-
-        // Color Picker
-        if (jQuery('#colorpicker').length > 0) {
-            jQuery('#colorSelector').ColorPicker({
-                onShow: function(colpkr) {
-                    jQuery(colpkr).fadeIn(500);
-                    return false;
-                },
-                onHide: function(colpkr) {
-                    jQuery(colpkr).fadeOut(500);
-                    return false;
-                },
-                onChange: function(hsb, hex, rgb) {
-                    jQuery('#colorSelector span').css('backgroundColor', '#' + hex);
-                    jQuery('#colorpicker').val('#' + hex);
+                    $('#configWrap').html(wrap);
                 }
             });
-        }
-
-        // Color Picker Flat Mode
-        jQuery('#colorpickerholder').ColorPicker({
-            flat: true,
-            onChange: function(hsb, hex, rgb) {
-                jQuery('#colorpicker3').val('#' + hex);
-            }
+            return false;
         });
 
-
-    });
-
+    // 清空日库存
+	function clearDailyStock(id) {
+		 $.post('/ticket/single/clearDailyStock', {id:id}, function(data) {
+			   if (data.error) {
+	               alert(data.msg);
+	           } else {
+	               alert('已清空日库存',function(){window.location.reload();});
+	           }
+         }, 'json');
+	}
+	
+    $('body').on('click','.confirmation-modal .close',function(){
+		$('#saveBtn').css('display', 'none');
+    })
 </script>

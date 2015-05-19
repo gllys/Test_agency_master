@@ -1,6 +1,9 @@
 <?php
 $this->breadcrumbs = array('门票管理', '发布电子票');
 ?>
+<style>
+.ui-datepicker { z-index:9999!important }
+</style>
 <section>
     <div id="show_msg"></div>
     <div class="contentpanel">
@@ -54,17 +57,17 @@ $this->breadcrumbs = array('门票管理', '发布电子票');
                                 <input type="hidden" value="<?php echo $landscape['district_id'] ?>" name="district_id"/>
                             <?php endif; ?>
                             <div class="form-group">
-                                <label class="col-sm-2 control-label"><span class="text-danger">*</span> 散客价</label>
+                                <label class="col-sm-2 control-label"><span class="text-danger">*</span> 散客结算价</label>
 
                                 <div class="col-sm-10">
-                                    <div class="col-sm-3"><input type="text" placeholder="散客价" class="form-control validate[custom[number],required]"
+                                    <div class="col-sm-3"><input type="text" placeholder="散客结算价" class="form-control validate[custom[number],required]"
                                                                  name="fat_price"/></div>               
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-2 control-label"><span class="text-danger">*</span> 团队价</label>
+                                <label class="col-sm-2 control-label"><span class="text-danger">*</span> 团队结算价</label>
                                 <div class="col-sm-10">    
-                                    <div class="col-sm-3"><input type="text" placeholder="团队价" class="form-control validate[custom[number],required]"
+                                    <div class="col-sm-3"><input type="text" placeholder="团队结算价" class="form-control validate[custom[number],required]"
                                                                  name="group_price"/></div>
                                     <div class="col-sm-5">
                                         <span class="text-danger">*</span> 最少订票 <input type="text" id="spinner-min"
@@ -74,17 +77,17 @@ $this->breadcrumbs = array('门票管理', '发布电子票');
                             </div>
                             <!-- form-group -->
                             <div class="form-group">
-                                <label class="col-sm-2 control-label">销售价</label>
+                                <label class="col-sm-2 control-label">门市挂牌价</label>
 
                                 <div class="col-sm-10">
-                                    <div class="col-sm-3"><input type="text" placeholder="销售价" class="form-control validate[number]"
+                                    <div class="col-sm-3"><input type="text" placeholder="门市挂牌价" class="form-control validate[number]"
                                                                  name="sale_price"/></div>
                                 </div>   
                             </div>    
                             <div class="form-group">
-                                <label class="col-sm-2 control-label">挂牌价</label>
+                                <label class="col-sm-2 control-label">网络销售价</label>
                                 <div class="col-sm-10">                              
-                                    <div class="col-sm-3"><input type="text" placeholder="挂牌价" class="form-control validate[number]"
+                                    <div class="col-sm-3"><input type="text" placeholder="网络销售价" class="form-control validate[number]"
                                                                  name="listed_price"/></div>
                                 </div>
                             </div>
@@ -130,7 +133,7 @@ $this->breadcrumbs = array('门票管理', '发布电子票');
                             <!-- form-group -->
 
                             <div class="form-group">
-                                <label class="col-sm-2 control-label"><span class="text-danger">*</span> 可用时间段</label>
+                                <label class="col-sm-2 control-label"><span class="text-danger">*</span> 产品有效期</label>
                                 <div class="col-sm-10">
                                     <input type="text" placeholder="" class="form-control datepicker"
                                            style="width:120px;display:inline-block" name="from_to_time[0]"> ~
@@ -538,7 +541,30 @@ $this->breadcrumbs = array('门票管理', '发布电子票');
         jQuery('#timepicker3').timepicker({minuteStep: 15});
 
         // Date Picker
-        jQuery('.datepicker').datepicker({showOtherMonths: true, selectOtherMonths: true});
+        $('.datepicker').datepicker({
+            changeMonth: true,
+            changeYear: true,
+            dateFormat: 'yy-mm-dd',
+            monthNamesShort: [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" ],
+            yearRange: "1995:2065",
+            beforeShow: function(d){
+                setTimeout(function(){
+                    $('.ui-datepicker-title select').select2({
+                        minimumResultsForSearch: -1
+                    });
+                },0)
+            },
+            onChangeMonthYear: function(){
+                setTimeout(function(){
+                    $('.ui-datepicker-title select').select2({
+                        minimumResultsForSearch: -1
+                    });
+                },0)
+            },
+            onClose: function(dateText, inst) { 
+                $('.select2-drop').hide(); 
+            }
+        });
         jQuery('#datepicker-inline').datepicker();
         jQuery('#datepicker-multiple').datepicker({
             numberOfMonths: 3,

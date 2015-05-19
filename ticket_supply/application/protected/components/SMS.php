@@ -41,7 +41,7 @@ class SMS extends CComponent
 	 */
 	public function _getCreateOrderContent($orderInfo)
 	{
-		$str = '【景旅通票台】';
+		$str = '';
 		$str .= '您已成功预订 '.$orderInfo['order_item'][0]['name']." ".$orderInfo['nums'].' 张，订单号：'.$orderInfo['id'].'，可于：'.$orderInfo['order_item'][0]['useday'].'当日游玩，';
 		if($orderInfo['owner_card']){
 			$str .='通过身份证 '.$orderInfo['owner_card'].' 换取入园门票或';
@@ -123,18 +123,13 @@ class SMS extends CComponent
 	 * @param string $content
 	 *  * @return String
 	 */
-	public function sendSMS($mobile, $content)
-	{
-		$request = $this->_host.':'.$this->_port.'/sdkproxy/sendsms.action';
-
-		$request.="?cdkey=".$this->_cdkey."&password=".$this->_password."&phone=".$mobile."&message=".urlencode($content);
-		$curl    = new CURL();
-		$result  = $curl->simple_get($request);
-		$result  = simplexml_load_string(trim($result));
-		if($result && $result->error == '0') {
-			return true;
-		} else {
-			return false;
-		}
-	}
+     public function sendSMS($mobile, $content,$types) {
+	$result = SendMessage::api()->send(array('mobile'=>$mobile, 'content'=>$content,'type'=>$types));
+        // var_dump($result);die;
+        if ($result && $result['code'] == 'succ') {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

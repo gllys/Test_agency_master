@@ -1,98 +1,176 @@
 <?php
 $this->breadcrumbs = array('分销商', '分销商管理');
 ?>
+<style>
+.ui-datepicker { z-index:9999!important }
+</style>
 <div class="contentpanel">
-    <style>
-        .table tr>*{
-            text-align:center
-        }
-    </style>
-    <div class="panel panel-default">
-        
-        <div id="show_msg"></div>
-        <div class="panel-body">
-            <div class="row">
-            	<div class="col-sm-12" style="padding-bottom:10px">
-            		<a href="/agency/manager/res" class="btn btn-warning">查找分销商</a>
-            	</div>
-            </div>
-            <form id="manage-form" method="get" class="form-horizontal">
-                <div class="row">
-                    <div class="col-lg-2">
-                        <input type="text" placeholder="分销商名称" class="form-control" value="<?php echo isset($_GET['name'])?$_GET['name']:""; ?>" name="name">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-btns">
+                        <a href="" class="panel-minimize tooltips" data-toggle="tooltip" title="折叠"><i class="fa fa-minus"></i></a>
+                        <a href="" class="panel-close tooltips" data-toggle="tooltip" title="隐藏面板"><i class="fa fa-times"></i></a>
                     </div>
-                    <div class="col-sm-1">
-                        <button type="submit" class="btn btn-white btn-sm">查询</button>
-                    </div>
+                    <!-- panel-btns -->
+                    <h4 class="panel-title">分销商管理</h4>
                 </div>
-            </form>
-            <div class="row">
-                <div style="padding-top:10px" class="col-sm-12">
-                    <!--a href="partner_apply.html"><button class="btn btn-success">申请审核 <b class="badge">0</b></button></a-->
-                    <a href="/agency/manager/history" class="btn btn-info">查看合作记录</a>
-                    <!--a href="partner_blacklist.html"><button style="margin-left:10px" class="btn btn-info">查看 黑名单</button></a-->
-                </div>
-            </div>
-        </div>
+                <!-- panel-heading -->
+                <form id="manage-form" method="get" action="/agency/manager/index" class="form-horizontal">
+                <div class="panel-body nopadding">
+                    <div class="form-inline">
+<div class="form-group " style="width: 350px;">
+    <label>合作日期：</label>
+    <input style="cursor: pointer;cursor: hand;background-color: #ffffff" name="start_date" id="start_date" class="form-control datepicker" type="text" readonly="readonly" value="<?php echo isset($get['start_date']) ? $get['start_date'] : ""; ?>" placeholder="开始日期"> ~
+    <input style="cursor: pointer;cursor: hand;background-color: #ffffff" name="end_date" id="end_date" class="form-control datepicker"  type="text" readonly="readonly" value="<?php echo isset($get['end_date']) ? $get['end_date'] : date('Y-m-d', time()); ?>" placeholder="结束日期">
+</div>
+
+                        <!--订单查询开始-->
+                        <div class="form-group">
+                            <div class="input-group input-group-sm" style=" position: relative; top: -2px;">
+                                <div class="input-group-btn">
+                                    <button id="search_label" type="button" class="btn btn-default" tabindex="-1">
+                                        <?php
+                                        //左边显示的名称
+                                        $_querys = array('name' => '分销商名称', 'agency_name' => '分销商账号');
+                                        //当前选择的name
+                                        $_queryName = 'name';
+                                        foreach ($_querys as $key => $val) {
+                                            if (isset($get[$key])) {
+                                                $_queryName =  $key;
+                                                break;
+                                            }
+                                        }
+                                        echo $_querys[$_queryName] ;
+                                        ?>
+                                    </button>
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                                            tabindex="-1">
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <?php
+                                        //下拉列表
+                                        foreach ($_querys as $key => $val) :
+                                            ?>
+                                            <li><a class="sec-btn" href="javascript:;" data-id="<?php echo $key ?>" id="" aria-labelledby="search_label"><?php echo $val; ?></a></li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                    <script>
+                                        $('.sec-btn').click(function() {
+                                            $('#search_label').text($(this).text());
+                                            $('#search_field').attr('name', $(this).attr('data-id'));
+                                        });
+                                    </script>
+                                </div>
+                                <input id="search_field" name="<?php echo $_queryName ?>" value="<?php echo empty($get[$_queryName])?'':$get[$_queryName] ?>" type="text" class="form-control" style="z-index: 0"/>
+                            </div>
+                        </div>
+                        <!--订单查询结束-->
 
 
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th style="width:20%">分销商名称</th>
-                    <th style="width:20%">结算周期</th>
-                    <th style="width:20%">信用余额</th>
-                    <th style="width:20%">储值余额</th>
-                    <th style="width:20%">操作</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if(empty($lists)): ?>
-                    <tr><td colspan="4">暂无数据</td></tr>
-                <?php else: ?>
-                    <?php foreach($lists as $item): ?>
-                        <tr>
-                            <td><!--a href="javascript:alert('please wait..');"--><?php echo $item['distributor_name'] ?><!--/a--></td>
-                            <td>
-                                <?php
-                                if(isset($orgInfo['is_credit'])&&$orgInfo['is_credit']==1):
+                        <div class="form-group">
+                            <button class="btn btn-primary btn-sm" type="submit" id="selectall">查询</button>
+                        </div>
+                        <div class="form-group">
+                            <a class="btn btn-success btn-sm" href="/agency/manager/history">查看合作记录</a>
+                        </div>
+                    </div>
+                </div>
+                </form>
+                <!-- panel-body -->
+
+
+
+            </div>
+
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="/agency/manager/index" class="now1"><strong>我的合作分销商</strong></a></li>
+                <li class=""><a href="/agency/manager/index2" class="now2"><strong>平台合作分销商</strong></a></li>
+            </ul>
+            <!-- panel -->
+            <div class="tab-content mb30">
+                <div id="t1" class="tab-pane active">
+                    <div class="table-responsive">
+                        <table class="table table-bordered mb30">
+                    <thead>
+                    <tr>
+                        <th>分销商名称</th>
+                        <th>联系人</th>
+                        <th>手机</th>
+                        <th>电话</th>
+                        <th>结算周期</th>
+                        <th>信用余额</th>
+                        <th>储值余额</th>
+                        <th>合作日期</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php if(empty($lists)): ?>
+                        <tr><td colspan="9">暂无相关数据</td></tr>
+                    <?php else: ?>
+                    <?php
+                    foreach($lists as $item):
+                    ?>
+                    <tr>
+                        <td><a href="/agency/manager/look?id=<?php echo $item['distributor_id'];?>&source=1"><?php echo $item['distributor_name'] ?></a>
+                        </td>
+                        <?php if(isset($list_ids)){
+                            ?>
+                            <td><?php  echo isset($list_ids[$item['distributor_id']]['contact'])?$list_ids[$item['distributor_id']]['contact']:"";?></td>
+                            <td><?php  echo  isset($list_ids[$item['distributor_id']]['mobile'])?$list_ids[$item['distributor_id']]['mobile']:"";?></td>
+                            <td><?php  echo  isset($list_ids[$item['distributor_id']]['telephone'])?$list_ids[$item['distributor_id']]['telephone']:"";?></td>
+                        <?php
+                        }else{ ?>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        <?php    }   ?>
+                        <td>
+                            <?php
+                            if(isset($orgInfo['is_credit'])&&$orgInfo['is_credit']==1):
                                 ?>
                                 <a href="#modal2" onclick="settle_setting('<?php echo $item['id']; ?>','<?php echo $item['distributor_name']; ?>','<?php echo $item['checkout_type']; ?>','<?php echo $item['checkout_date']; ?>')"
                                    data-toggle="modal">
-                                       <?php if($item['checkout_type'] == '1'){echo '月结 '.$item['checkout_date'].'日';}elseif($item['checkout_type'] == '0'){echo '周结 '.Credit::getWeekDay($item['checkout_date']);}else{echo '未设置';}?>
+                                    <?php if($item['checkout_type'] == '1'){echo '月结 '.$item['checkout_date'].'日';}elseif($item['checkout_type'] == '0'){echo '周结 '.Credit::getWeekDay($item['checkout_date']);}else{echo '未设置';}?>
                                 </a>
-                                <?php else:?>
-                                      <?php if($item['checkout_type'] == '1'){echo '月结 '.$item['checkout_date'].'日';}elseif($item['checkout_type'] == '0'){echo '周结 '.Credit::getWeekDay($item['checkout_date']);}else{echo '--';}?>
-                                <?php endif ;?>
-                            </td>
-                            <td> <?php
-                                if(isset($orgInfo['is_credit'])&&$orgInfo['is_credit']==1):
+                            <?php else:?>
+                                <?php if($item['checkout_type'] == '1'){echo '月结 '.$item['checkout_date'].'日';}elseif($item['checkout_type'] == '0'){echo '周结 '.Credit::getWeekDay($item['checkout_date']);}else{echo '--';}?>
+                            <?php endif ;?>
+                        </td>
+                        <td> <?php
+                            if(isset($orgInfo['is_credit'])&&$orgInfo['is_credit']==1):
                                 ?>
                                 <a href="/agency/manager/credit?id=<?php echo $item['id']; ?>"><?php echo $item['credit_infinite']?"无限":$item['credit_money'] ?></a>
-                                <?php else:?>
+                            <?php else:?>
                                 <?php echo $item['credit_infinite']?"无限":$item['credit_money'] ?>
-                                <?php endif ;?>
-                            </td>
-                            <td>
-                                <?php
-                                if(isset($orgInfo['is_balance'])&&$orgInfo['is_balance']==1):
+                            <?php endif ;?>
+                        </td>
+                        <td>
+                            <?php
+                            if(isset($orgInfo['is_balance'])&&$orgInfo['is_balance']==1):
                                 ?>
                                 <a href="/agency/manager/advance?id=<?php echo $item['id']; ?>"><?php echo $item['balance_money'] ?></a>
-                                 <?php else:?>
+                            <?php else:?>
                                 <?php echo $item['balance_money'] ?>
-                                <?php endif ;?>
-                            </td>
-                            <td><a href="/agency/manager/delcredit?id=<?php echo $item['id'];?>" class="del">解除合作</a></td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php endif;?>
-            </tbody>
-        </table>
-        <div style="text-align:center" class="panel-footer">
-            <div id="basicTable_paginate" class="pagenumQu">
-                <?php
+                            <?php endif ;?>
+                        </td>
+                        <td> <?php echo date('Y-m-d',$item['add_time']); ?></td>
+                        <!--data-id="<?php echo $item['id'];?>" href="/agency/manager/delcredit?id=<?php echo $item['id'];?>"-->
+                        <td data-names="<?php echo $item['distributor_name'] ?>" ><a  data-id="<?php echo $item['id'];?>" href="javascript:;" class="del">解除合作</a></td>
+                    </tr>
+                    <?php endforeach;?>
+                    <?php endif;?>
+                    </tbody>
+                </table>
+                    </div>
+                     <div style="text-align:center" class="panel-footer">
+                <div id="basicTable_paginate" class="pagenumQu">
+                    <?php
 
-                    $this->widget('CLinkPager', array(
+                    $this->widget('common.widgets.pagers.ULinkPager', array(
                             'cssFile' => '',
                             'header' => '',
                             'prevPageLabel' => '上一页',
@@ -104,12 +182,18 @@ $this->breadcrumbs = array('分销商', '分销商管理');
                         )
                     );
 
-                ?>
+                    ?>
+                </div>
+            </div>
+                </div>
+                <div id="t2" class="tab-pane "></div>
             </div>
         </div>
-
+        <!-- col-md-6 -->
     </div>
-</div><!-- contentpanel -->
+    <!-- row -->
+
+</div>
 
 <div class="modal fade in" id="modal2">
     <form class="m-b-none" id="settle-form">
@@ -124,14 +208,14 @@ $this->breadcrumbs = array('分销商', '分销商管理');
                     <div class="block">
                         <label class="control-label"></label>
                         <div class="col-lg-4">
-                            <select class="form-control" id="account_cycle" name="account_cycle"  onchange="changeDayShow(this.value)">
+                            <select class="form-control select2" id="account_cycle" name="account_cycle"  onchange="changeDayShow(this.value)">
                                 <option value="">请选择结算周期</option>
                                 <option value="1">月结算</option>
                                 <option value="0">周结算</option>
                             </select>
                         </div>
                         <div class="col-lg-4">
-                            <select class="form-control" name="account_cycle_day" id="account_cycle_day">
+                            <select class="form-control select2" name="account_cycle_day" id="account_cycle_day">
                                 <option value="">请选择结算日</option>
                             </select>
                         </div>
@@ -197,13 +281,25 @@ $this->breadcrumbs = array('分销商', '分销商管理');
 
 
     function common_post(){
-        if($('#account_cycle_day').val()=="" || $('#account_cycle').val()==""){
-            alert("请选择结算信息！");return false;
+        $('#settle-form').validationEngine({
+            promptPosition: 'topRight',
+            autoHideDelay: 3000
+        });
+
+        //非空判断
+        if($('#account_cycle').val()==""){
+            $('#account_cycle').validationEngine('showPrompt','请选择结算周期','error');
+            return false;
         }
+
+        if($('#account_cycle_day').val()==""){
+            $('#account_cycle_day').validationEngine('showPrompt','请选择结算日','error');
+            return false;
+        }
+
         $.post('/agency/manager/setCycle',$('#settle-form').serialize(),function(data){
             if(data.error==0){
-                alert("保存成功");
-                location.href = '/agency/manager';
+                alert("保存成功",function(){window.location.reload();});
             }else{
                 alert("保存失败,"+data.msg);
             }
@@ -213,6 +309,7 @@ $this->breadcrumbs = array('分销商', '分销商管理');
 </script>
 <script>
     jQuery(document).ready(function() {
+
         $("#genbill").click(function(){
 //            if (!window.confirm("确定要立刻结算?")) {
 //                return false;
@@ -220,11 +317,9 @@ $this->breadcrumbs = array('分销商', '分销商管理');
             $.post('/agency/manager/genbill',{'id':$('#agency-credit-id').val()}, function(data){
 	            data = JSON.parse(data);
                 if(data.error){
-                   alert("结算失败");
-                   top.location.reload();
+                   alert("结算失败",function(){top.location.reload();});
                 }else{
-                    alert("结算成功");
-                   location.href = '/agency/manager';
+                    alert("结算成功",function(){window.location.reload();});
                 }
             });
             return false;
@@ -243,13 +338,29 @@ $this->breadcrumbs = array('分销商', '分销商管理');
         })
 
         $('a.del').click(function() {
-            if (!window.confirm("确定要解除合作?")) {
-                return false;
-            }
-            $.post($(this).attr('href'), function() {
-            	alert('解除合作成功');
-                window.location.reload();
+            var oagencyName = $(this).parent().data("names");
+            var userid=$(this).data("id");
+            //console.log(userid);
+            PWConfirm('确认要解除与'+oagencyName+'分销商的合作么？',function(){
+			    $.get("/agency/manager/delcredit?id="+userid+"&tt="+Math.random(),function(datamsg) {
+            	  // alert(datamsg);
+                   if(datamsg.error==0){
+                       //setTimeout(alert("解除合作成功"),100);
+                       //setTimeout(window.location.reload(),110);
+                       setTimeout(function(){
+                           alert('解除合作成功',function(){window.location.reload();});
+                       },500)
+                   }else{
+                       setTimeout(function(){
+                           alert('解除合作失败',function(){window.location.reload();});
+                       },500)
+                        //setTimeout(alert("解除合作失败"),100);
+                        //setTimeout(window.location.reload(),110);
+                   }
+                   
+				}, " json ");  
             });
+           // return 123;
             return false;
         });
         // Tags Input
@@ -271,11 +382,29 @@ $this->breadcrumbs = array('分销商', '分销商管理');
         jQuery('#timepicker3').timepicker({minuteStep: 15});
 
         // Date Picker
-        jQuery('.datepicker').datepicker();
-        jQuery('#datepicker-inline').datepicker();
-        jQuery('#datepicker-multiple').datepicker({
-            numberOfMonths: 3,
-            showButtonPanel: true
+        $('.datepicker').datepicker({
+            changeMonth: true,
+            changeYear: true,
+            dateFormat: 'yy-mm-dd',
+            monthNamesShort: [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" ],
+            yearRange: "1995:2065",
+            beforeShow: function(d){
+                setTimeout(function(){
+                    $('.ui-datepicker-title select').select2({
+                        minimumResultsForSearch: -1
+                    });
+                },0)
+            },
+            onChangeMonthYear: function(){
+                setTimeout(function(){
+                    $('.ui-datepicker-title select').select2({
+                        minimumResultsForSearch: -1
+                    });
+                },0)
+            },
+            onClose: function(dateText, inst) { 
+                $('.select2-drop').hide(); 
+            }
         });
 
         // Input Masks

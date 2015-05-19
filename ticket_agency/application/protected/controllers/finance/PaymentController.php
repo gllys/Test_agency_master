@@ -7,8 +7,6 @@ class PaymentController extends Controller
 		$org_id = Yii::app()->user->org_id;
 		if(!empty($org_id) && intval($org_id) > 0){
 			$param = $_REQUEST;
-            $data = array();
-			$data['get'] = $_REQUEST;
 			$param['agency_id'] = $org_id;
 			//日期查询 update 2014.12.09 by ccq
 			if(isset($_REQUEST['bill_sd']) && !empty($_REQUEST['bill_sd'])){
@@ -28,14 +26,9 @@ class PaymentController extends Controller
 			}
 			$param['current'] = isset($param['page']) ? $param['page'] : 1;
 			$bill = Bill::api()->lists($param);
-			if($bill['code'] == 'succ'){
-                $data['bill'] = isset($bill['body']) && !empty($bill['body']) ? $bill['body']['data'] : array();
-                $data['pages'] = new CPagination($bill['body']['pagination']['count']);
-                $data['pages']->pageSize = 15;
-            }
-			
-            $data['ids'] = empty($param['ids']) ? null : $param['ids'];
-            $data['supply_name'] = empty($param['supply_name']) ? null : $param['supply_name'];
+			$data['bill'] = $bill['body']['data'];
+			$data['pages'] = new CPagination($bill['body']['pagination']['count']);
+			$data['pages']->pageSize = 15;
 		}
 		
 		$this->render('index',$data);

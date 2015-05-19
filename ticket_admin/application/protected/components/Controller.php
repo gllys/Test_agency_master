@@ -51,6 +51,10 @@ class Controller extends CController {
             Filter::htmls($_POST);
         }
 
+         if (isset($_REQUEST) && $_REQUEST) {
+            $_REQUEST = $_GET + $_POST + $_COOKIE ;
+        }
+        
         #得到主导航菜单
         if (!$this->nav) {
             $this->nav = substr($this->id, 0, strpos($this->id, '/'));
@@ -67,6 +71,7 @@ class Controller extends CController {
 
     //  检测权限
     protected function beforeAction($action) {
+        
         $access = $this->getAccess();
         $controllerAccess = $this->getControllerAccess();
         if (!($this->allowedAccess($access) || $this->allowedControllerAccess($controllerAccess)) &&
@@ -178,5 +183,20 @@ class Controller extends CController {
         $this->render('/tips', array('content' => $content, 'url' => $url, 'infotitle' => $style));
         Yii::app()->end();
     }
-
+    //解决Html 太多加载问题bug
+    public function _htmlEnd($error, $msg, $params = array()) {
+        $json = new Services_JSON();
+        echo $json->encode(array('error' => $error, 'msg' => $msg, 'params' => $params));
+        Yii::app()->end();
+    }
+    
+    public function render($view, $data = null, $return = false) {
+        if(!empty($_GET['mod'])&&$_GET['mod']=='part'){
+            PublicFunHelper::forbidCache();
+            $data = $this->renderPartial($view, $data, true);
+            $this->_htmlEnd(0, $data,'/site/switch/#'.$this->childNav) ;
+        }else{
+            parent::render($view, $data, $return);
+        }
+    }
 }

@@ -1,20 +1,46 @@
-<?php
-$this->breadcrumbs = array('景区管理', '景区列表');
-?>
+<link rel="stylesheet" href="/css/jquery-ui-1.11.2.min.css"/>
+<style>
+    a{
+        cursor: pointer;cursor: hand;
+    }
+
+    .ui-widget-content {
+        background: #fff;
+    }
+
+    .ui-widget-content .ui-state-focus {
+        background: #F6FAFD;
+        border: 1px solid #ddd;
+        color: #666;
+        font-weight: normal;
+    }
+
+</style>
 <div class="contentpanel">
 	<div class="panel panel-default">
 		<div class="panel-heading">
 			<h4 class="panel-title">
-				景区查询
+				景区列表
 			</h4>
 		</div>
-
+ 
 		<div class="panel-body">
-			<form action="/scenic/scenic/" class="form-inline">
+			<form action="/scenic/scenic/" id="searchForm" class="form-inline">
 					<div class="form-group">
-						<input class="form-control" placeholder="请输入景区名称" type="text" name="keyword" style="width:318px;" value="<?php if (isset($_REQUEST['keyword'])) echo $_REQUEST['keyword']; ?>">
+						<input class="form-control" placeholder="请输入景区名称" type="text" name="keyword" id="keyword" maxlength="100" style="width:318px;" value="<?php if (isset($_REQUEST['keyword'])) echo $_REQUEST['keyword']; ?>">
 					</div>
-
+                            
+                                <div class="form-group" style="width: 105px; margin-right: 0px;">
+					<label>是否绑定供应商:</label>
+				</div>
+				<div class="form-group">
+					<select class="select2" name="has_bind_org" style="width: 150px; padding: 0 10px;">
+						<option value="3" >全部</option>
+						<option value="1" <?php echo isset($_REQUEST['has_bind_org'])&&$_REQUEST['has_bind_org']==1?'selected':'';?>>是</option>
+						<option value="0" <?php echo isset($_REQUEST['has_bind_org'])&&$_REQUEST['has_bind_org']==0?'selected':'';?>>否</option>
+					</select>
+				</div>
+                            
 					<div class="form-group">
 						<button class="btn btn-primary btn-sm" type="submit">查询</button>
 					</div>
@@ -49,23 +75,23 @@ $this->breadcrumbs = array('景区管理', '景区列表');
 			<tr>
 				<th>景区编号</th>
 				<th>景区名称</th>
-				<th>密码/账号</th>
+				<th>景区级别</th>
 				<th>所属地区</th>
+                                <th>是否已绑定供应商</th>
+                <th>验票账号</th>
+                <th>操作</th>
 			</tr>
 			</thead>
 			<tbody>
 			<?PHP foreach ($lists as $item): ?>
 			<tr>
-				<td style="text-align: center"><?php echo $item['id'] ?></td>
-				<td><a href="/scenic/scenic/view/id/<?php echo $item['id'] ?>"><?php echo $item['name'];?></a>
-				</td>
+				<td><?php echo $item['id'] ?></td>
 				<td>
-				<?php
-					$_rs =Users::model()->findByAttributes(array('organization_id'=>Yii::app()->user->org_id,'landscape_id'=>$item['id']));
-					if($_rs){
-						echo $_rs['account'].'/'.$_rs['password_str'] ;
-					}
-				?>
+<!--                    <a style="" data-toggle="modal" data-target=".bs-example-modal-static" onclick="bind(<?php //echo $item['id'];?>);"><?php //echo $item['name'];?><!--</a>-->
+                    <a class="text-primary" href="/scenic/scenic/edit/id/<?php echo $item['id']?>"><?php echo $item['name'];?></a>
+                </td>
+				<td>
+                    <?php echo $level[$item['landscape_level_id']]?>
 				</td>
 				<td>
 				<?php
@@ -76,11 +102,27 @@ $this->breadcrumbs = array('景区管理', '景区列表');
 					} else {
 						$params['id'] = $item['province_id'];
 					}
-					echo count($item['district']) == 0 ? '' : implode(' ', $item['district']);
-					// $rs = Districts::model()->findByPk($params['id']);
-					// echo isset($rs['name']) ? $rs['name'] : '';
-				?>
+                                        if(isset($item['district'])){
+                                            echo count($item['district']) == 0 ? '' : implode(' ', $item['district']);
+                                        }				
+                                ?>
 				</td>
+                                <td><?php
+                                if(isset($item['has_bind_org'])){
+                                    if($item['has_bind_org']==1){
+                                        echo '是';  
+                                    }else if($item['has_bind_org']==0){
+                                        echo '否'; 
+                                    }                                    
+                                }                               
+                                ?></td>
+                <td>
+                    <a style="" data-toggle="modal" data-target=".bs-example-modal-static" onclick="bind(<?php echo $item['id'];?>);">账号管理</a>
+                </td>
+                <td>
+                    <a class="text-primary" href="/scenic/scenic/edit/id/<?php echo $item['id']?>">编辑</a>&nbsp;&nbsp;&nbsp;
+                    <a class="text-success" href="/scenic/scenic/supply/id/<?php echo $item['id']?>">查看或绑定供应商</a>
+                </td>
 			</tr>
 			<?php endforeach; ?>
 			</tbody>
@@ -107,52 +149,61 @@ $this->breadcrumbs = array('景区管理', '景区列表');
 			?>
 		</div>
 	</div>
-	<div id='verify-modal' class="modal fade modal-bank" tabindex="-1" role="dialog"></div>
+<div id='verify-modal' data-backdrop="static" role="dialog" tabindex="-1" class="modal fade bs-example-modal-static">
 	<script type="text/javascript">
 
+        $(function() {
 
-		$(function() {
-			$("#distributor-select-search").select2(); //景区查询下拉框
+            function focusEnd(obj) {
+                var value = obj.val();
+                obj.val('').focus().val(value);
+            }
+            // 默认选中搜索框focus
+            var $keyword = $('#keyword');
+            focusEnd($keyword);
 
-			$('.allcheck').click(function() {
-				if ($(this).text() == '全选') {
-					$('#staff-body').find('input').prop('checked', true)
-					$(this).text('反选')
-				} else {
-					$('#staff-body').find('input').prop('checked', false)
-					$(this).text('全选')
-				};
+            // 搜索框模糊查询自动补全
+            $keyword.autocomplete({
+                source: function(request, response) {
+                    $.ajax({
+                        url:'/scenic/scenic/index',
+                        dataType: 'json',
+                        data: {
+                            keyword: request.term,
+                            items: 8,
+                            search: 1
+                        },
+                        success: function(data) {
+                            response($.map(data, function(item) {
+                                return {
+                                    value: item.name,
+                                    data: 'name'
+                                }
+                            }));
+                        },
+                        minLenght: 1
+                    });
+                },
+                select: function() {
+                    setTimeout(function() {
+                        $('#searchForm').submit();
+                    }, 300);
+                }
+            });
+        });
 
-			});
-		});
-
+        
+        $(function(){
+             jQuery('.select2').select2({
+                minimumResultsForSearch: -1
+            });
+            window.bind = function(id){
+                document.getElementById('verify-modal').innerHTML = '';
+                $.get('/scenic/scenic/reset/landscape_id/' +id, function(data) {
+                    $('#verify-modal').html(data);
+                });
+            }
+        });
 
 	</script>
 </div>
-<script type="text/javascript">
-jQuery(document).ready(function() {
-        //城市更多
-//        if ($.cookie('city_more')) {
-//            $('#more-wrap div.form-group:gt(5)').show();
-//        } else {
-//            $('#more-wrap div.form-group:gt(5)').hide();
-//        }
-//        $('#more-btn').click(function() {
-//            if ($(this).attr('flag') == 0) {
-//                $('#more-wrap div.form-group:gt(5)').show();
-//                $(this).attr('flag', 1);
-//                $.cookie('city_more', 1);
-//            } else {
-//                $('#more-wrap div.form-group:gt(5)').hide();
-//                $(this).attr('flag', 0);
-//                $.cookie('city_more', null);
-//            }
-//        });
-        
-        $('#more-wrap input:checkbox').click(function(){
-            if($('#form').submit()){
-                children.location.reload();
-            };
-        });
-    });
-</script>

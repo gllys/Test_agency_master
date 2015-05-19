@@ -250,7 +250,7 @@ $this->childNav = '/agency/account/addagency';
 								$('#agencyadd [name=agencyname]').PWShowPrompt(data.msg); 
 							} else {
                                 alert('保存成功');
-                                location.href = '/agency/manager/';
+                                location.href = '/site/switch/#/agency/manager/';
                             }
                         }, 'json');
 

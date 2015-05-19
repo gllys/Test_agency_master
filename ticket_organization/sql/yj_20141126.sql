@@ -1,0 +1,1 @@
+INSERT INTO `ticket_organization`.`process_config` (`name`, `path`, `num`, `state`) VALUES ('message', 'Message.php', '1', '1');

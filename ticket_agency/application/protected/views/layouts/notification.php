@@ -22,12 +22,12 @@ $sc = array(
 
     <meta http-equiv="refresh" content="3; url=<?php echo $next_url?>" />
 
-	<link href="/css/style.default.css" rel="stylesheet">
+	<link href="../../../css/style.default.css" rel="stylesheet">
 
 	<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!--[if lt IE 9]>
-	<script src="/js/html5shiv.js"></script>
-	<script src="/js/respond.min.js"></script>
+	<script src="js/html5shiv.js"></script>
+	<script src="js/respond.min.js"></script>
 	<![endif]-->
 </head>
 
@@ -42,15 +42,15 @@ $sc = array(
 </section>
 
 
-<script src="/js/jquery-1.11.1.min.js"></script>
-<script src="/js/jquery-migrate-1.2.1.min.js"></script>
-<script src="/js/bootstrap.min.js"></script>
-<script src="/js/modernizr.min.js"></script>
-<script src="/js/pace.min.js"></script>
-<script src="/js/retina.min.js"></script>
-<script src="/js/jquery.cookies.js"></script>
+<script src="js/jquery-1.11.1.min.js"></script>
+<script src="js/jquery-migrate-1.2.1.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/modernizr.min.js"></script>
+<script src="js/pace.min.js"></script>
+<script src="js/retina.min.js"></script>
+<script src="js/jquery.cookies.js"></script>
 
-<script src="/js/custom.js"></script>
+<script src="js/custom.js"></script>
 
 </body>
 </html>

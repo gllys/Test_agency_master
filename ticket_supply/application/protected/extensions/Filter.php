@@ -34,7 +34,7 @@ class Filter{
 	  }
 	  
 	  protected static function maxLength($value){
-	         return   mb_substr($value,0,5000);
+	         return   mb_substr($value,0,50000);
 	  }
 }
 /*

@@ -1393,7 +1393,10 @@ class Tools {
 			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 		}
-
+		if ($header && $header['username']) {
+			curl_setopt($ch, CURLOPT_USERPWD, $header['username'] . ':' . $header['password']);
+			unset($header['username'], $header['password']);
+		}
 		switch ($method)
 		{
 			case 'POST':
@@ -1592,6 +1595,17 @@ class Tools {
         return md5($serialno.'|'.$platform.microtime().$randval);
     }
 
+    public static function getPagination($params,$count=0){
+        $pagination = array('count'=>$count);
+        $pagination['current'] = isset($params['current']) ? intval($params['current']):1; //当前页
+        $pagination['items'] = isset($params['items']) ? intval($params['items']):15; //每页记录数
+        $pagination['current']<=0 && $pagination['current']=1;
+        $pagination['items']<=0 && $pagination['items']=15;
+        $pagination['total'] = ceil($count/$pagination['items']); //总页数
+        $pagination['current'] = $pagination['current']>$pagination['total'] ? $pagination['total'] : $pagination['current'];
+        $pagination['limit'] = ($pagination['items']*($pagination['current']-1)).",".$pagination['items']; //初始值
+        return $pagination;
+    }
 }
 
 ?>

@@ -217,13 +217,11 @@ $this->childNav = '/agency/account/res';
         function add(id){
         	$.post('/agency/manager/addcredit',{'id':id},function(data){
         		if(data.error==0){
-                    var succss_msg = '<div class="alert alert-success"><strong>保存成功!</strong></div>';
-                    $('#show_msg').html(succss_msg);
-                    setTimeout("location.href='/agency/manager/'", '1000');
+				 	alert('保存成功',function(){
+                        setTimeout("location.href='/site/switch/#/agency/manager/'", '1000');
+                    });
                 }else{
-                    var warn_msg = '<div class="alert alert-danger"><button data-dismiss="alert" class="close" type="button">×</button><i class="icon-warning-sign"></i>'+data.msg+'</div>';
-                    $('#show_msg').html(warn_msg);
-                    location.href='#show_msg';
+					alert(data.msg);
                 }
         	},'json')
         }

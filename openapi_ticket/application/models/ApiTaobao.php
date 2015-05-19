@@ -14,8 +14,8 @@ class ApiTaobaoModel extends Base_Model_Api{
     public static function sendByAsync($params){
         $topc = self::_getTopClient();
 
-        echo "you had run sendByAsync!!\n";
-        var_dump($params);
+//        echo "you had run sendByAsync!!\n";
+//        var_dump($params);
 
         //todo 发码处理 获取响应验证码及二维码 将码发至用户手机
         $api = self::_getModelApi();
@@ -24,13 +24,17 @@ class ApiTaobaoModel extends Base_Model_Api{
         $api->url = '/v1/order/addPay';
         $r = json_decode($api->request(),true);
 
-        echo "r::::!!\n";
-        var_dump($r);
+//        echo "r::::!!\n";
+//        var_dump($r);
+        Util_Logger::getLogger('taobao')->info(__METHOD__,
+            array('params' => json_encode($params), 'resp' => $r), '', 'order/addPay的请求数据和回传数据',
+            $params['orderId']
+        );
 
         if($r['code'] == 'succ'){
             $order = $r['body'];
             $verifyCodes = $order['id'] . ':' . $order['nums'];
-            $qrImages = 'image1.png,image2.png';
+//            $verifyCodes = time().'100:'.$params['num'];
 
             //todo 若法码成功，则调用淘宝send接口
             $req = new Taobao_Request_VmarketEticketSendRequest;
@@ -41,8 +45,9 @@ class ApiTaobaoModel extends Base_Model_Api{
             //        $req->setQrImages($qrImages); //码商需要开通二维码权限
             $resp = $topc->execute($req, $params['sessionKey']);
 
-            echo "resp\n";
-            var_dump($resp);
+//            echo "resp\n";
+//            var_dump($resp);
+            Util_Logger::getLogger('taobao')->info(__METHOD__, $resp, '', '淘宝发码通知回传数据', $params['orderId'] . ',' . $verifyCodes);
         }
     }
 
@@ -53,35 +58,48 @@ class ApiTaobaoModel extends Base_Model_Api{
     public static function resendByAsync($params){
         $topc = self::_getTopClient();
 
-        echo "you had run resendByAsync!!\n";
-        var_dump($params);
+//        echo "you had run resendByAsync!!\n";
+//        var_dump($params);
 
         //todo 重新发码，准备好重发的码
         //todo 回调成功后，将码发至用户手机
-        $api = self::_getModelApi();
-        $api->params = array(
-            'source_id' => $params['orderId'],
+        if($params['type'] == 0){
+            $api = self::_getModelApi();
+            $api->params = array(
+                'source_id' => $params['orderId'],
+            );
+            $api->url = '/v1/order/sms';
+            $r = json_decode($api->request(),true);
+        }else {
+            $api = self::_getModelApi('ticket_organization');
+            $api->params = array(
+                'source'    =>1,
+                'account'   => $params['seller_nick'],
+            );
+            $api->url = '/v1/organizations/orgDetail';
+            $distributor = json_decode($api->request(),true);
+
+            $api = self::_getModelApi();
+            $api->params = array(
+                'source_id' => $params['orderId'],
+                'source'    => 1,
+                'distributor_id'    => $distributor['body']['organization_id'],
+                'show_order_items'  => 1,
+                'show_tickets'      => 0,
+                'show_ticket_items' => 0,
+            );
+            $api->url = '/v1/order/detail';
+            $r = json_decode($api->request(),true);
+            $r['body']['order_id'] =  $r['body']['id'];
+            $r['body']['unuse_num'] = $r['body']['order_items']['unuse_num'];
+        }
+//        echo "r::::!!\n";
+//        var_dump($r);
+        Util_Logger::getLogger('taobao')->info(__METHOD__,
+            array('params' => $params, 'resp' => $r), '', '重发码数据',
+            $params['orderId']
         );
-        $api->url = '/v1/order/sms';
-        $r = json_decode($api->request(),true);
-        echo "r::::!!\n";
-        var_dump($r);
-        //示例
-        $str = 'array(3) {
-                  ["code"]=>
-                  string(4) "succ"
-                  ["message"]=>
-                  string(0) ""
-                  ["body"]=>
-                  array(2) {
-                    ["order_id"]=>
-                    string(15) "166337811313613"
-                    ["unuse_num"]=>
-                    string(1) "8"
-                    ["url"]=>
-                    string(41) "http://www.piaotai.com/qr/166337811313613"
-                  }
-                }';
+
         $verifyCodes = $r['body']['order_id'] . ':' . $r['body']['unuse_num'];
         $qrImages = 'image1.png,image2.png';
 
@@ -95,8 +113,9 @@ class ApiTaobaoModel extends Base_Model_Api{
             //        $req->setQrImages($qrImages);
             $resp = $topc->execute($req, $params['sessionKey']);
 
-            echo "resp\n";
-            var_dump($resp);
+//            echo "resp\n";
+//            var_dump($resp);
+            Util_Logger::getLogger('taobao')->info(__METHOD__, $resp, '', '重发码淘宝回传数据', $params['orderId'] . ',' . $r['body']['order_id']);
         }
     }
 
@@ -129,24 +148,30 @@ class ApiTaobaoModel extends Base_Model_Api{
 
         //todo 回调成功后，将码发至用户新手机
         if(isset($resp->ret_code) && $resp->ret_code == 1){
-            $api->params = array(
-                'source_id' => $params['orderId'],
-            );
-            $api->url = '/v1/order/sms';
-            $sms_r = json_decode($api->request(),true);
+            if($params['type'] == 0){
+                $api->params = array(
+                    'source_id' => $params['orderId'],
+                );
+                $api->url = '/v1/order/sms';
+                $sms_r = json_decode($api->request(),true);
+            }
         }
 
+        Util_Logger::getLogger('taobao')->info(__METHOD__,
+            array('update_r' => $update_r, 'sms_r' => $sms_r, 'params' => $params, 'resp' => $resp), '', '修改手机号各种数据',
+            $params['orderId']
+        );
 
-        echo "update r::::!!\n";
-        var_dump($update_r);
-
-        echo "sms r::::!!\n";
-        var_dump($sms_r);
-
-        echo "you had run modifiedByAsync!!\n";
-        var_dump($params);
-        echo "resp\n";
-        var_dump($resp);
+//        echo "update r::::!!\n";
+//        var_dump($update_r);
+//
+//        echo "sms r::::!!\n";
+//        var_dump($sms_r);
+//
+//        echo "you had run modifiedByAsync!!\n";
+//        var_dump($params);
+//        echo "resp\n";
+//        var_dump($resp);
     }
 
     /**
@@ -212,11 +237,6 @@ class ApiTaobaoModel extends Base_Model_Api{
 
         //取淘宝卖家对应的分销商信息
         $api = self::_getModelApi('ticket_organization');
-//        $api->params = array(
-//            'account_taobao' => $params['seller_nick'],
-//        );
-//        $api->url = '/v1/organizations/show';
-//        $distributor = json_decode($api->request(),true);
         $api->params = array(
             'source'=>1,
             'account' => $params['seller_nick'],
@@ -224,15 +244,14 @@ class ApiTaobaoModel extends Base_Model_Api{
         $api->url = '/v1/organizations/orgDetail';
         $distributor = json_decode($api->request(),true);
 
-        echo "distributor:\n";
-        var_dump($distributor);
+//        echo "distributor:\n";
+//        var_dump($distributor);
 
         //取sub_outer_iid（在我们的库中是ota_code）对应的product_id
         $api = self::_getModelApi('ticket_info');
         $api->params = array(
             'code' => $params['sub_outer_iid'],
         );
-//        $api->url = '/v1/TicketTemplate/ticketinfo';
         $api->url = '/v1/AgencyProduct/detail';
         $pro = json_decode($api->request(),true);
         //如果获取产品不成功，则给分销商发送站内信
@@ -263,8 +282,8 @@ class ApiTaobaoModel extends Base_Model_Api{
             3=> 'advance',
             4=> 'union',
         );
-        echo "pro:\n";
-        var_dump($pro);
+//        echo "pro:\n";
+//        var_dump($pro);
 
         $res['product_id']      = $pro['body']['product_id'];
         $res['source']          = 1;
@@ -291,8 +310,16 @@ class ApiTaobaoModel extends Base_Model_Api{
         $res['ota_name']        = 'test';//$this->userinfo['name'];
         $res['ota_code']        = $params['sub_outer_iid'];
 
-        echo "params:\n";
-        var_dump($res);
+        //当淘宝type字段为1，内部api不发码
+        if($params['type'] == 1) $res['is_sms'] = 0;
+
+//        echo "params:\n";
+//        var_dump($res);
+
+        Util_Logger::getLogger('taobao')->info(__METHOD__,
+            array('distributor' => $distributor, 'pro' => $pro, 'params' => $res), '', '构造order/addPay数据',
+            $params['orderId']
+        );
 
         return $res;
     }

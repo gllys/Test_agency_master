@@ -35,7 +35,7 @@ class TransflowController extends  Base_Controller_Api
         if(isset($this->body['id']) && $this->body['id']) $where['id'] = trim($this->body['id']);
         $this->count = TransactionFlowModel::model()->countResult($where);
         $this->pagenation();
-        $data['data'] = TransactionFlowModel::model()->search($where,'*',$this->getSortRule(),$this->limit);
+        $data['data'] = TransactionFlowModel::model()->search($where,'*',$this->getSortRule('created_at desc,id'),$this->limit);
         $data['pagination'] = array(
             'count'=>$this->count,
             'current'=>$this->current,

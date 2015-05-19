@@ -1,6 +1,18 @@
 <?php
 $this->breadcrumbs = array('结算管理', '收款账号');
 ?>
+<style>
+                .table-bordered th {
+                    line-height: 2em !important;
+                }
+                .table-bordered th,
+                .table-bordered td {
+                    vertical-align: middle !important;
+                }
+                .table-bordered a:hover {
+                    text-decoration: none;
+                }
+                </style>
 <div class="contentpanel">
     <style>
         .table tr>*{
@@ -10,13 +22,13 @@ $this->breadcrumbs = array('结算管理', '收款账号');
     <link rel="stylesheet" href="/css/validationEngine.jquery.css">
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h4 class="panel-title">我的银行卡</h4>
+            <h4 class="panel-title">
+                  <button id="add_card" class="btn btn-primary btn-xs pull-right" data-target=".modal-bank" data-toggle="modal">添加银行卡</button>我的银行卡</h4>
         </div>
-        <div class="table-responsive">
-            <table class="table table-bordered">
+            <table class="table table-bordered table1">
                 <thead>
                     <tr>
-                        <th>银行名称</th>
+                        <th style="padding-left:20px;">银行名称</th>
                         <th>开户行</th>
                         <th>账号/卡号</th>
                         <th>账户名</th>
@@ -28,38 +40,33 @@ $this->breadcrumbs = array('结算管理', '收款账号');
                     <?php if ($list): ?>	
                         <?php foreach ($list as $bank_list): ?>
                             <tr>
-                                <td><?php echo $bank_list['bank_name'] ?></td>
+                                <td style="padding-left:20px;"><?php echo $bank_list['bank_name'] ?></td>
                                 <td><?php echo $bank_list['open_bank'] ?></td>
                                 <td><?php echo $bank_list['account'] ?></td>
                                 <td><?php echo $bank_list['account_name'] ?></td>
                                 <td>
                                     <?php if ($bank_list['status'] == 'normal'): ?>默认账户
                                     <?php else: ?>
-                                        <a class="update_status" title="" href="/finance/account/updateBank/?id=<?php echo $bank_list['id'] ?>"><button class='btn btn-default btn-xs'>设为默认</button></a>
+                                        <a class="update_status" title="" href="/finance/account/updateBank/?id=<?php echo $bank_list['id'] ?>"><button class='btn  btn-success btn-xs'>设为默认</button></a>
                                     <?php endif; ?>	
                                 </td>
                                 <td>
-                                    <a href=".bs-example-modal-lg"  onclick="edit('<?php echo $bank_list['id'] ?>')" data-toggle="modal"><i class="fa fa-pencil-square-o"></i></a>
-                                    <a class="del" title="删除" href="/finance/account/delBank/?id=<?php echo $bank_list['id'] ?>&account=<?php echo $bank_list['account'] ?>&account_name=<?php echo $bank_list['account_name'] ?>"><i class="fa fa-trash-o"></i></a>
+                                    <a href=".bs-example-modal-lg"  onclick="edit('<?php echo $bank_list['id'] ?>')" data-toggle="modal" class="btn btn-success btn-bordered btn-xs" >修改</a>
+                                    <a title="删除" href="/finance/account/delBank/?id=<?php echo $bank_list['id'] ?>&account=<?php echo $bank_list['account'] ?>&account_name=<?php echo $bank_list['account_name'] ?>" class="del btn btn-xs btn-danger btn-bordered">删除</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </tbody>
             </table>
-        </div>
+       
 
-        <div class="panel-footer">
-            <!-- button class="btn btn-success btn-xs mr10" data-target=".modal-alipay" data-toggle="modal">添加支付宝</button -->
-            <button id="add_card" class="btn btn-primary btn-xs" data-target=".modal-bank" data-toggle="modal">添加银行卡</button>
-
-        </div>
 
     </div>
     <div style="text-align:center" class="panel-footer">
         <div id="basicTable_paginate" class="pagenumQu">
             <?php
-            $this->widget('CLinkPager', array(
+            $this->widget('common.widgets.pagers.ULinkPager', array(
                 'cssFile' => '',
                 'header' => '',
                 'prevPageLabel' => '上一页',
@@ -111,12 +118,12 @@ $this->breadcrumbs = array('结算管理', '收款账号');
                         <h4 class="modal-title">添加银行卡</h4>
                     </div>
                     <div class="modal-body">
-                        <div class="form-group">
+                        <div class="form-group"  style="overflow: inherit;">
                             <label class="col-sm-2 control-label">收款银行:</label>
                             <?php if ($bank): ?>
-                                <div class="col-sm-10" style="position:static">					  					  	
-                                    <select data-placeholder="Choose One" style="width:300px;padding:0 10px;" id="select-basic" name="bank_id">
-                                        <option selected='selected'>请选择银行</option>
+                                <div class="col-sm-7" style="position: static;">
+                                    <select  data-placeholder="Choose One" style="width:300px;padding:0 10px;" id="select-basic" name="bank_id">
+                                        <option  value="" selected='selected'>请选择银行</option>
                                         <?php foreach ($bank as $value): ?>
                                             <option value="<?php echo $value['id'] ?>" ><?php echo $value['name'] ?></option>
                                         <?php endforeach; ?>		
@@ -124,22 +131,22 @@ $this->breadcrumbs = array('结算管理', '收款账号');
                                 </div>
                             <?php endif; ?>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" style="clear:both">
                             <label class="col-sm-2 control-label">开户行:</label>
                             <div class="col-sm-10" style="position:static">
-                                <input type="text" data-prompt-position="topLeft" class="form-control validate[required]" name="open_bank">
+                                <input type="text" data-prompt-position="topLeft" class="form-control validate[required]" tag="开户行" name="open_bank">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-sm-2 control-label">卡号:</label>
                             <div class="col-sm-10" style="position:static">
-                                <input type="text" class="form-control validate[required,custom[onlyNumberSp],minSize[15],maxSize[20]]" name="account">
+                                <input type="text" class="form-control validate[required,custom[onlyNumberSp],minSize[15],maxSize[20]]" tag="卡号" name="account">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-sm-2 control-label">账户名:</label>
                             <div class="col-sm-10" style="position:static">
-                                <input type="text" class="form-control validate[required]" name="account_name">
+                                <input type="text" class="form-control validate[required]" tag="账户名" name="account_name">
                             </div>
                         </div>
                     </div>
@@ -265,13 +272,29 @@ $this->breadcrumbs = array('结算管理', '收款账号');
         });
         
         $('#add_bank_card').click(function() {
+           // return false;
+            if($('#bank_card [name=bank_id]').val()==''){
+                $('#bank_card [name=bank_id]').parent().PWShowPrompt('请选择收款银行');
+                return false;
+            }
             if ($('#bank_card').validationEngine('validate') == true) {
+               // alert(123);
+				//if($('#bank_card [name=bank_id]').val()==''){
+				//	$('#bank_card [name=bank_id]').parent().PWShowPrompt('请选择收款银行');
+				//	return false;
+                //}
+				
                 $.post('/finance/account/saveBank', $('#bank_card').serialize(), function(data) {
                     if (data.error === 0) {
-                        alert('添加银行卡成功');
-                        window.location.reload();
+
+                        setTimeout(function(){
+                            alert('添加银行卡成功',function(){window.location.reload();});
+                        },500)
                     } else {
-                        alert(data.msg);
+
+                        setTimeout(function(){
+                            alert(data.msg);
+                        },500)
                     }
                 }, "json");
             }
@@ -279,32 +302,49 @@ $this->breadcrumbs = array('结算管理', '收款账号');
         });
 
         $('a.del').click(function() {
-            if (!window.confirm("确定要删除?")) {
-                return false;
-            }
-            $.post($(this).attr('href'), function(data) {
+            var _this = $(this)
+			PWConfirm('确认要删除此条银行卡记录吗？',function(){
+			  $.post(_this.attr('href'), function(data) {
                 if (data.error === 0) {
-                    alert('删除银行卡成功');
-                    window.location.reload();
+
+                    setTimeout(function(){
+                        alert('删除成功',function(){window.location.reload();});
+                    },500)
                 } else {
-                    alert(data.msg);
+
+                    setTimeout(function(){
+                        alert(data.msg);
+                    },500)
                 }
-            }, "json");
+              }, "json");
+        	});
             return false;
         });
 
         $('a.update_status').click(function() {
-            if (!window.confirm("确定要设置为默认账户?")) {
-                return false;
-            }
-            $.post($(this).attr('href'), function(data) {
-                if (data.error === 0) {
-                    alert('设置为默认账户成功');
-                    window.location.reload();
+            var _this = $(this)
+			 PWConfirm('确认要设置此银行卡为默认账户吗？',function(){
+			    $.post(_this.attr('href'), function(data) {
+                if (data.error == 0) {
+                    //console.log(123);
+                    //alert('设置成功',function(){window.location.reload();});
+
+                    setTimeout(function(){
+                        alert('设置成功',function(){window.location.reload();});
+                    },500)
+
+                    //console.log(456);
+                    //window.location.reload();
                 } else {
-                    alert(data.msg);
+
+                    setTimeout(function(){
+                        //alert('设置成功',function(){window.location.reload();});
+                        alert(data.msg);
+                    },500)
+
                 }
-            }, "json");
+            	}, " json ");
+            });
             return false;
         });
 

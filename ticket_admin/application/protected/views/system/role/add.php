@@ -1,4 +1,4 @@
-<div class="contentpanel">
+<div class="contentpanel" id="maincontent">
 
     <div class="row">
         <div class="col-md-12">
@@ -17,13 +17,13 @@
                         <div class="form-group">
                             <label class="col-sm-2 control-label"><span class="text-danger">*</span>角色名称:</label>
                             <div class="col-sm-4">					  					  	
-                                <input name="name" tag="角色名称" type="text" maxlength="15"  class="form-control validate[required]" placeholder="">		
+                                <input name="name" id="name" tag="角色名称" type="text" maxlength="15"  class="form-control validate[required]" placeholder="">		
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-sm-2 control-label"><span class="text-danger">*</span>角色说明:</label>
                             <div class="col-sm-4">					  					  	
-                                <textarea name="description" tag="角色说明" class="form-control validate[required,maxSize[50]]" rows="5"></textarea>		
+                                <textarea id="description" name="description" tag="角色说明" class="form-control validate[required]" rows="5"></textarea>		
                             </div>
                         </div>
 
@@ -50,7 +50,7 @@
                                                 </td>
                                                 <td style="text-align:left">
                                                     <?php
-                                                    $_lists = $lists[$key];
+                                                    $_lists = is_array($lists[$key]) ? $lists[$key] : array();
                                                     foreach ($_lists as $item):
                                                         $i++;
                                                         ?>
@@ -70,6 +70,7 @@
                             </div>
                             <div class="panel-footer">
                                 <button class="btn btn-primary mr5" type="button" id="save_role">保存</button>
+	                            <a class="btn btn-default" href="/system/role/">取消</a>
                             </div>
                         </div>
                     </form>    
@@ -85,8 +86,6 @@
 </div>
 <script type="text/javascript">
     $(document).ready(function() {
-
-
 
 //权限设置
         $('td:nth-child(1) input').click(function() {
@@ -121,21 +120,42 @@
                 autoHidePrompt: true,
                 autoHideDelay: 3000
             });
-
+			
+			/**
+			 * 检查是否重复权限名
+			 */
             if ($('#form').validationEngine('validate') === true) {
-                $.post('/system/role/saverole/',$('#form').serialize(),function(data){
-                    if (data.error) {
-                        var warn_msg = '<div class="alert alert-danger"><button data-dismiss="alert" class="close" type="button">×</button><i class="icon-warning-sign"></i>'+data.msg+'</div>';
-                        $('#show_msg').html(warn_msg);
-                        location.href='#show_msg';
-                    } else {
-                        var succss_msg = '<div class="alert alert-success"><strong>'+ data.msg +'</strong></div>';
-                        $('#show_msg').html(succss_msg);
-                        location.href = '/system/role/';
-                    }
-                },'json');
+				var name = $('#name').val();
+			    $.post('/system/role/nameExist', {name:name, id:0}, function (data) {
+				    if (data.error == 'fail') {
+					    $('#name').PWShowPrompt(data.msg);
+						return false;
+					} else if($('#description').val().length > 50) {
+						$('#description').PWShowPrompt('角色描述最大50字符！');
+					}  else {
+						submitForm();
+						return true
+					}
+				}, 'json');
+
             }
             return false;
         });
+		
+		/**
+		 * 提交表单
+		 */
+		window.submitForm = function() {
+			$.post('/system/role/saverole/',$('#form').serialize(),function(data){
+				if (data.error) {
+                    alert(data.msg);
+				} else {
+                    alert(data.msg, function() {
+                        location.href = '/site/switch/#/system/role/';
+                    });
+				}
+			},'json');
+		}
+		
     });
 </script>

@@ -1,0 +1,1 @@
+ALTER TABLE `union_money_log` CHANGE `pay_type` `pay_type` TINYINT(1) NULL DEFAULT '0' COMMENT '支付方式：0平台1块钱2支付宝3抵用券';

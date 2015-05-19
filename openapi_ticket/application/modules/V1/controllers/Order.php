@@ -229,7 +229,7 @@ class OrderController extends Base_Controller_Ota
             $params['user_id'] = $this->userinfo['id'];
             $params['user_account'] = $this->userinfo['id'];
             $params['user_name'] = $this->userinfo['name'];
-            $params['nums'] = intval($this->body['nums']);
+            $params['nums'] = isset($this->body['nums']) ? intval($this->body['nums']) : $this->body['count'];
             !$params['order_id'] && Lang_Msg::error('参数错误');
             $r = ApiOrderModel::model()->detail(array('id'=>$params['order_id']));
 

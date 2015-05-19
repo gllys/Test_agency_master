@@ -96,7 +96,7 @@
                 <!-- panel-body -->
 
                 <div class="panel-footer">
-	                <a href="/site/login/" class="btn btn-primary btn-block">返回登录</a>
+	                <a href="/site/login/" class="btn btn-default">返回登录</a>
                 </div>
                 <!-- panel-footer -->
 

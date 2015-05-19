@@ -51,26 +51,17 @@ $this->breadcrumbs = array('结算管理','平台资产');
             <form id="tixian" class="form-horizontal form-bordered">
               <input type="hidden" name="type" value="single">
               <div class="panel-body nopadding">
+
                 <div class="form-group">
-                  <label class="col-sm-2 control-label" style="text-align:left;">申请金额</label>
-                  <!-- <div class="col-sm-4 pull-right">
-                    <button type="button" data-toggle="modal" data-target=".modal-bank" class="btn btn-primary btn-xs" id="cash_record">提现申请单查询</button>
-                  </div> -->
-                </div>
-                <div class="form-group">
-                  <label class="col-sm-2 control-label">提现金额：</label>
+                  <label class="col-sm-1 control-label">提现金额：</label>
                   <div class="col-sm-2">
-                    <input type="text" name="amount" class="form-control validate[required,min[0.01],max[9999999999],custom[number]]" placeholder="">
+                    <input type="text" name="amount" tag="提现金额" class="form-control validate[required,min[0.01],max[9999999999],custom[number]]" placeholder="">
                   </div>
                   <div class="col-sm-4" style="margin-top:5px;">备注：提现申请成功后，我们会在3个工作日内打款。</div>
                 </div>
-                <!-- form-group -->
-                <div class="form-group">
-                  <label style="text-align:left;" class="col-sm-2 control-label">申请金额</label>
-                </div>
-                <!-- form-group -->
+
                 <div class="form-group tab-radio">
-                  <label class="col-sm-2 control-label">提现银行：</label>
+                  <label class="col-sm-1 control-label">提现银行：</label>
                   <div class="col-sm-6">
                     <div class="rdio rdio-default inline-block">
                       <input type="radio" checked="checked" value="0" id="radioDefault9" name="bank_type">
@@ -83,114 +74,117 @@ $this->breadcrumbs = array('结算管理','平台资产');
                   </div>
                 </div>
                 <!-- form-group -->
-
-                        <div class="form-group banks">
-                            <label class="col-sm-2 control-label">提现银行：</label>
-                            <div class="col-sm-4">
-						   <select data-placeholder="Choose One"  data-validation-engine="form-control validate[required]" style="width:300px;padding:0 10px; margin-left:-10px;" id="distributor-select" name="bank_own">
-                                    <option value=""  >请选择提现银行</option>                                     
-                                    <?php if($bank_own):?>  
-                                    <?php foreach ($bank_own as $bank_list):?>
-                                    <option value="<?php echo $bank_list['id'].' _ '.$bank_list['bank_name'].' _ '.$bank_list['account'].' _ '.$bank_list['open_bank'].' _ '.$bank_list['account_name'];?>" <?php if($bank_list['status'] == 'normal'): ?> selected <?php endif;?>   ><?php echo $bank_list['bank_name'].'( '.$bank_list['account'].' )'; ?></option>
-                                    <?php endforeach;?>
-                                    <?php endif;?>
-                                </select>
-                            </div>
-                        </div>    
+                
+                  <div class="form-group banks">
+                    <label class="col-sm-1 control-label">提现银行：</label>
+                    <div class="col-sm-4">
+                        <select data-placeholder="Choose One" data-validation-engine="form-control validate[required]" style="width:300px;height:34px; margin-left:-10px;" id="distributor-select" class="bank-select"  name="bank_own">
+                            <option value="">请选择提现银行</option>                                     
+                            <?php if($bank_own):?>  
+                            <?php foreach ($bank_own as $bank_list):?>
+                            <option value="<?php echo $bank_list['id'].' _ '.$bank_list['bank_name'].' _ '.$bank_list['account'].' _ '.$bank_list['open_bank'].' _ '.$bank_list['account_name'];?>" <?php if($bank_list['status'] == 'normal'): ?> selected <?php endif;?>   ><?php echo $bank_list['bank_name'].'( '.$bank_list['account'].' )'; ?></option>
+                            <?php endforeach;?>
+                            <?php endif;?>
+                        </select>
+                    </div>
+                </div>
+                
+                
+                
+                
                 <div class="change" style="display:none">
                       <div class="form-group">
-                            <label class="col-sm-2 control-label">收款银行：</label>
+                            <label class="col-sm-1 control-label">收款银行：</label>
                             <div class="col-sm-4">
-                              <select data-placeholder="Choose One" data-validation-engine="form-control validate[required]" style="width:300px;padding:0 10px; margin-left:-10px;" id="distributor-select" name="bank_addid">
-                                    <option value=""  >请选择银行</option>                                     
-                                    <?php if($bank):?>  
+                              <select data-placeholder="Choose One" class="select_bank"  tag="收款银行" data-validation-engine="form-control validate[required]" style="width:300px;padding:0 10px; margin-left:-10px;" id="distributor-select" name="bank_addid">
+                                    <option value=""  >请选择银行</option>
+                                    <?php if($bank):?>
                                     <?php foreach ($bank as $bank_item):?>
                                     <option value="<?php echo $bank_item['id'].' _ '.$bank_item['name'];?>" ><?php echo $bank_item['name']; ?></option>
                                     <?php endforeach;?>
                                     <?php endif;?>
                                 </select>
                             </div>
-                        </div>    
+                        </div>
                 <!-- form-group -->
                     <div class="form-group">
-                        <label class="col-sm-2 control-label">开户银行：</label>
+                        <label class="col-sm-1 control-label">开户银行：</label>
                         <div class="col-sm-4">
-                          <input type="text" name="bank_open" class="form-control validate[required,minSize[10],maxSize[80]]" placeholder="">
+                          <input type="text" name="bank_open" tag="开户银行" class="form-control validate[required,minSize[4],maxSize[80]]" placeholder="">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-sm-2 control-label">银行卡号：</label>
+                        <label class="col-sm-1 control-label">银行卡号：</label>
                         <div class="col-sm-4">
-                          <input type="text" name="bank_account" class="form-control validate[required,custom[number],minSize[15],maxSize[20]]" placeholder="">
+                          <input type="text" name="bank_account" tag="银行卡号" class="form-control validate[required,custom[number],minSize[15],maxSize[20]]" placeholder="">
                         </div>
                     </div>
                       <div class="form-group">
-                        <label class="col-sm-2 control-label">户主姓名：</label>
+                        <label class="col-sm-1 control-label">户主姓名：</label>
                         <div class="col-sm-4">
-                          <input type="text" name="account_name" class="form-control validate[required,custom[chinese],minSize[4],maxSize[20]]" placeholder="">
+                          <input type="text" name="account_name" tag="户主姓名" class="form-control validate[required,custom[chinese],minSize[1],maxSize[20]]" placeholder="">
                         </div>
                     </div>
                 </div>
+
                 <div class="form-group">
-                  <label class="col-sm-2 control-label" style="text-align:left;">安全校验</label>
-                </div>
-                <div class="form-group">
-                  <label class="col-sm-2 control-label">提现申请人：</label>
+                  <label class="col-sm-1 control-label">提现申请人：</label>
                   <div class="col-sm-2" style="margin-top:5px;"><span><?php echo $user_name?$user_name:$user_account;?></span></div>
                   <div></div>
                 </div>
                 <div class="form-group">
-                  <label class="col-sm-2 control-label">校验手机号码：</label>
+                  <label class="col-sm-1 control-label">校验手机号码：</label>
                   <div class="col-sm-2" style="margin-top:5px;"><span id="reg_mobile"><?php echo $user_mobile;?></span></div>
                 </div>
+
                 <div class="form-group">
-                    <label class="col-sm-2 control-label">手机校验码：</label>
-                    
-                    <div class="col-sm-2">
-                        <input type="text" name="code" id="code"  placeholder="手机验证码" class="form-control validate[required,custom[number]]">
+                    <label class="col-sm-1 control-label">手机校验码：</label>
+                    <div class="col-sm-2" style="min-width: 300px;">
+                        <div class="input-group">
+                            <input type="text" tag="验证码" name="code" id="code" placeholder="请输入验证码" class="form-control validate[required,custom[number]]">
+                            <span class="input-group-btn">
+                                <button type="button" id="sendCode" class="checkcode btn btn-success" style="padding:5px;">发送校验码</button>
+                        </span>
+                        </div>
                     </div>
-                    
-                    <div class="col-sm-2">
-                           <button type="button" id="sendCode"  class="checkcode btn btn-success" style="padding:5px;">发送校验码</button>
-                    </div>
-                    <div class="col-sm-4">
-                        <div class="input-group mb15 text-danger">
-                            如没有收到短信请于<span class="checkcode-num">60</span>秒后点击重新发送 
-                        </div><!-- input-group --> 
-                    </div>
+                    <span class="form-note">如没有收到短信请于<span class="checkcode-num">60</span>秒后点击重新发送</span>
+
                 </div>
-                 <div class="panel-footer" style="padding-left:300px;">
+
+
+                 <div class="panel-footer">
                   <input type="hidden" name="trade_type" value="4" />
                   <input type="hidden" name="frozen_type" value="1" />
                   <input id="yan" type="hidden" name="yan" value="1" />
-                	<button type="button"  data-toggle="modal"  class="btn btn-primary btn-xs" data-target=".modal-bank"  href=".modal-bank" id="fetch_cash">提交提现</button>
-                </div>                <!-- form-group -->
+                	<button type="button"  data-toggle="modal"  class="btn btn-primary mr20" data-target=".modal-bank"  href=".modal-bank" id="fetch_cash">提交提现</button>
+                        <button class="btn btn-default" type="button" onclick="history.back()">取消返回</button>
+                </div>
               </div>
             </form>
           </div>
-          <!-- tab-pane --> 
+          <!-- tab-pane -->
           <div id="t2" class="tab-pane">
-            <form class="form-horizontal form-bordered" id="tixianForm" >
+            <form class="form-horizontal form-bordered" id="tixianForm" actiono="/finance/platform/index/tab/2">
               <div class="form-group">
                 <label class="col-sm-1 control-label">选择月份：</label>
                 <div class="btn-group" style="margin:0">
-                  <button class="btn btn-xs btn-white date-prev" type="button"><i class="fa fa-chevron-left"></i>
+                  <button class="btn btn-sm btn-white date-prev" type="button"><i class="fa fa-chevron-left"></i>
                   </button>
-                  <input type="text" class="form-control form-date" readonly="readonly" value="<?php echo date('Y-m',time()); ?>" style="float:left;width:80px;height:29px;border-radius:0;margin:0 -1px;text-align:center;">
-                  <button class="btn btn-xs btn-white date-next" type="button"><i class="fa fa-chevron-right"></i>
+                  <input type="text" class="form-control form-date" readonly="readonly" name="time" value="<?php echo isset($get['time'])?$get['time']:date('Y-m',time());?>" style="float:left;width:80px;height:33px;border-radius:0;margin:0 -1px;text-align:center;">
+                  <button class="btn btn-sm btn-white date-next" type="button"><i class="fa fa-chevron-right"></i>
                   </button>
                 </div>
-              
+
               <select name="status" id="type_link" id="status_link2" class="select2" data-placeholder="Choose One" style="width:150px;padding:0 10px;">
               <option value="">提现状态</option>
               <?php foreach ($status_labels as $type => $label) :?>
                 <option <?php echo isset($get['status']) && $type == $get['status'] ? 'selected="selectd"' : ''?> value="<?php echo $type?>"><?php echo $label?></option>
               <?php endforeach; unset($type, $label)?>
             </select>
-                
-                <button type="button" id="query" class="btn btn-primary btn-xs" style="margin-right:20px;">查询</button>
+
+                <button type="button" id="query" class="btn btn-primary btn-sm" style="margin-right:20px;">查询</button>
                 <?php if($lists['pagination']['count'] > 0) {?>
-                <button type="button" id="export" class="btn btn-primary btn-xs">导出记录</button>
+                <button type="button" id="export" class="btn btn-primary btn-sm">导出记录</button>
                 <?php } ?>
               </div></form>
               <table class="table table-bordered mb30">
@@ -202,7 +196,7 @@ $this->breadcrumbs = array('结算管理','平台资产');
           <th>金额</th>
           <th>交易类型</th>
           <th>交易状态</th>
-          <th>账户总余额</th>
+          <th>可用余额</th>
 				</tr>
                <?php if (isset($lists['data']) && !empty($lists['data'])) : foreach ($lists['data'] as $blotter) :?>
         <tr>
@@ -213,7 +207,7 @@ $this->breadcrumbs = array('结算管理','平台资产');
           <td class="text-<?php echo $status_class[$blotter['status']];?>"><?php if($blotter['status']=='1') echo "-"; ?><?php echo number_format($blotter['money'],2)?></td>
           <td class="text-<?php echo $status_class[$blotter['status']];?>"><?php echo $trade_type['4']?></td>
           <td class="text-success cur"  title="<?php echo $blotter['remark'];?>"><?php echo  $status_labels[$blotter['status']];?></td>
-          <td><?php echo  number_format($blotter['union_money'],2);?></td>
+          <td><?php echo  number_format($blotter['union_money'] - $blotter['money'],2);?></td>
         </tr>
         <?php endforeach; ?>
       <?php else:?>
@@ -225,7 +219,7 @@ $this->breadcrumbs = array('结算管理','平台资产');
       <div class="panel-footer pagenumQu" style="padding-top:15px;text-align:right;border:1px solid #ddd;border-top:0">
         <?php
         if (isset($lists['data']) && !empty($lists['data'])) {
-          $this->widget('CLinkPager', array(
+          $this->widget('common.widgets.pagers.ULinkPager', array(
             'cssFile' => '',
             'header' => '',
             'prevPageLabel' => '上一页',
@@ -238,13 +232,13 @@ $this->breadcrumbs = array('结算管理','平台资产');
         }
         ?>
       </div>
-            
+
           </div>
           <!-- tab-pane -->
-          
+
         </div>
       </div>
-      <!-- contentpanel --> 
+      <!-- contentpanel -->
 <div id="lock_layer" class="unlocked" style="display: none">
   <div class="lockedpanel">
     <div class="loginuser">
@@ -278,46 +272,64 @@ $this->breadcrumbs = array('结算管理','平台资产');
 <?php endif; ?>
 
 <script type="text/javascript">
-  $(function() {
-       
+    $(document).ready(function (){
+
         $('#sendCode').click(function() {
+          $('#sendCode').validationEngine('hide');
           $.get('/site/smsCode/mobile/' + $('#reg_mobile').text()+'/type/1', function(result) {
-            if (result == 1) {
+            if (result.code == 'succ') {
               $('#sendCode').attr('disabled', 'disabled');
+              $('#getcode').show();
               var time_limit = 60;
               var handle = setInterval(function() {
                 $('#sendCode').text('获取验证码('+(time_limit)+')');
                 if (time_limit == 0) {
                   clearInterval(handle);
                   $('#sendCode').removeAttr('disabled');
+                  $('#getcode').hide();
                   $('#sendCode').text('获取验证码');
                 }
                 time_limit -= 1;
               }, 1000);
-            } else if (result > 1) {
-              alert(result);
+            } else if (result.code == 'fail') {
+              alert(result.message);
+            }else{
+              alert(result.message);
             }
-          });
+          },'json');
         });
 
+    $('.bank-select').change(function(){
+          var bank_name = $('.bank-select option:selected').val();
+          if(bank_name == ''){
+              $('.bank-select').validationEngine('showPrompt','请选择提现银行','load');
+          }else{
+              $('.bank-select').validationEngine('hide');
+          }
 
+      })
 
  /*提现*/
  function fetch(){
                   if($('#tixian').validationEngine('validate')==true){
                         $.post('/finance/platform/fetchapply',$('#tixian').serialize(),function(data){
-                            alert(data.msg);
-                            location.href = '/finance/platform/index/tab/2' ;
-                            //location.reload();
+                           // alert(data.msg,function(){location.href = '/finance/platform/index/tab/2' ;});
+                            if(data.error==0) alert('error',function(){location.href = '/finance/platform/index/tab/2' ;});
+                            else alert(data.msg,function(){location.href = '/finance/platform/index/tab/2' ;});
                       },"json");
                     }
         }
+
 $('#fetch_cash').click(function(){
             var codes = $('#code').val();
             var yan = $('#yan').val();
-            // if(yan=='1'){
-            //   fetch();
-            // }else
+
+            var bank_name = $('.select_bank option:selected').val();
+            if(bank_name == ''&& $('input[name=bank_type]:radio:checked').val()==1){
+                $('.select_bank').validationEngine('showPrompt','请选择提现银行','load');
+                return false;
+            }
+    
              if(codes){
                 $.post('/finance/platform/pre',{chk:"code",code:codes},function(data){
                     if(data.error===0){
@@ -334,8 +346,8 @@ $('#fetch_cash').click(function(){
                   fetch();
               }
               return false;
-            
-         }); 
+
+         });
 /*提现记录*/
         $('#query').click(function(){
           if($('#tixianForm').validationEngine('validate')==true){

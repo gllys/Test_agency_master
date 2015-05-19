@@ -75,18 +75,32 @@
                         <!-- input-group -->
 	                    <div class="input-group mb15">
 		                    <div class="col-sm-12">
-                                <span id="chk_password" class="<?php echo ($_POST && isset($user->errors['password'][0])) ? 'chk-fail' : '';?>">
+                                <span id="chk_password" class="<?php echo ($_POST && isset($password_err)) ? 'chk-fail' : '';?>">
 	                                <?php
-	                                echo ($_POST && isset($user->errors['password'][0])) ? '<i class="glyphicon glyphicon-remove"></i>新' . $user->errors['password'][0] : '';
+	                                echo ($_POST && isset($password_err)) ? '<i class="glyphicon glyphicon-remove"></i>'.$password_err : '';
 	                                ?>
                                 </span>
 		                    </div>
 	                    </div>
 	                    <!-- input-group -->
 
+                        确认密码 <br/>
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                            <input type="password" class="form-control" id="reset_password_again"
+                                   autocomplete="off"/>
+                        </div>
+                        <!-- input-group -->
+                        <div class="input-group mb15">
+                            <div class="col-sm-12">
+                                <span id="password_message" class="chk-fail">
+                                </span>
+                            </div>
+                        </div>
+
                         <div class="clearfix">
                             <div class="pull-right btn-list">
-                                <button type="submit" class="btn btn-success">重设密码 <i
+                                <button type="button" id="reset_pwd" class="btn btn-success">重设密码 <i
                                         class="fa fa-angle-right ml5"></i></button>
                             </div>
                         </div>
@@ -96,7 +110,7 @@
                 <!-- panel-body -->
 
                 <div class="panel-footer">
-	                <a href="/site/login/" class="btn btn-primary btn-block">返回登录</a>
+	                <a href="/site/login/" class="btn btn-default btn-block">返回登录</a>
                 </div>
                 <!-- panel-footer -->
 
@@ -110,19 +124,36 @@
         <script src="/js/jquery-migrate-1.2.1.min.js"></script>
         <script src="/js/pace.min.js"></script>
         <!--script src="/js/retina.min.js"></script-->
+        <script>
 
+            jQuery(document).ready(function() {
+                $('#reset_pwd').click(function(){
+                    //判断密码重复是否正确
+                    var once_pwd = $('#reset_password').val();
+                    var twice_pwd = $('#reset_password_again').val();
+                    if(once_pwd != twice_pwd){
+                        var html = '<i class="glyphicon glyphicon-remove"></i> 两次密码输入不一致';
+                        $('#password_message').html(html);
+                        return false;
+                    }
+                    $('#login-form').submit();
+                })
+            });
+
+        </script>
 
         <script>
 	        $(function() {
 		        $('#sendCode').click(function() {
 			        var account = $('#reset_account').val();
-			        if (account == '') {
+			        var password = $('#reset_password').val();
+					if (account == '') {
 				        return false;
 			        }
 			        $.ajax({
 				        type: 'POST',
 				        url: '/site/reset/act/code/',
-				        data: {account: account},
+				        data: {account: account, password: password},
 				        dataType: 'json',
 				        beforeSend: function () {
 					        $('#chk_code').html('<img alt="" src="/img/loaders/loader1.gif">');
@@ -134,6 +165,8 @@
 						        $('#chk_account').html('<i class="glyphicon glyphicon-ok"></i>');
 						        $('#chk_code').removeClass('chk-fail');
 						        $('#chk_code').addClass('chk-ok');
+						        $('#chk_password').removeClass('chk-fail');
+						        $('#chk_password').addClass('chk-ok');
 						        $('#chk_code').html('<i class="glyphicon glyphicon-ok"></i>' + result.msg);
 						        $('#sendCode').attr('disabled', 'disabled');
 						        var time_limit = 60;
@@ -147,14 +180,24 @@
 							        time_limit -= 1;
 						        }, 1000);
 					        } else if (result.code == 0) {
+						        $('#chk_account').html('');
+						        $('#chk_password').html('');
 						        $('#chk_code').removeClass('chk-ok');
 						        $('#chk_code').addClass('chk-fail');
 						        $('#chk_code').html('<i class="glyphicon glyphicon-remove"></i>' + result.msg);
 					        } else if (result.code == -1) {
 						        $('#chk_code').html('');
+						        $('#chk_password').html('');
 						        $('#chk_account').removeClass('chk-ok');
 						        $('#chk_account').addClass('chk-fail');
 						        $('#chk_account').html('<i class="glyphicon glyphicon-remove"></i>' + result.msg);
+
+					        }else if (result.code == -2) {
+						        $('#chk_code').html('');
+						        $('#chk_account').html('');
+						        $('#chk_password').removeClass('chk-ok');
+						        $('#chk_password').addClass('chk-fail');
+						        $('#chk_password').html('<i class="glyphicon glyphicon-remove"></i>' + result.msg);
 
 					        }
 				        }

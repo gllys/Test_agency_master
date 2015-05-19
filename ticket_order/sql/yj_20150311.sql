@@ -1,0 +1,1 @@
+INSERT INTO `ticket_order`.`process_config` (`id`, `name`, `path`, `num`, `state`, `run_type`) VALUES (NULL, 'statPlatform', 'StatPlatform.php', '1', '1', '1');

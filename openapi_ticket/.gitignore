@@ -4,5 +4,6 @@
 /tags
 /vendor
 public/templates_c
-/nbproject/private/
+/nbproject
 .DS_Store
+nbproject/

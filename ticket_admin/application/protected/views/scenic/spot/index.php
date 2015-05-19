@@ -107,13 +107,12 @@ $this->breadcrumbs = array('景区管理', '景点管理');
                 $.each(data.errors, function(i, n) {
                     tmp_errors += n;
                 });
-                var warn_msg = '<div class="alert alert-error"><button data-dismiss="alert" class="close" type="button">×</button><i class="icon-warning-sign"></i>' + tmp_errors + '</div>';
-                $('#verify_return').html(warn_msg);
+                alert(tmp_errors);
             } else{
                 //alert(data.msg);
-                var succss_msg = '<div class="alert alert-success"><button data-dismiss="alert" class="close" type="button">×</button><strong>'+data.msg+'</strong></div>';
-                $('#verify_return').html(succss_msg);
-                setTimeout("location.href='/scenic/Spot/?id="+$('#landscape_id').val()+"'", '2000');
+                alert(data.msg, function() {
+                    location.href='/site/switch/#/scenic/Spot/?id='+$('#landscape_id').val();
+                });
             }
         }, "json");
         return false;  

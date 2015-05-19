@@ -21,13 +21,15 @@ class V1Controller extends Base_Controller_ApiDispatch{
 
         $this->taobao = Taobao_TopClientFactory::create();
 
-        self::echoLog('body', json_encode($this->body), 'errors_bee.log');
+//        self::echoLog('body', json_encode($this->body), 'errors_bee.log');
     }
 
     /**
      * 接口入口方法
      */
     public function restAction(){
+        Util_Logger::getLogger('taobao')->info(__METHOD__, json_encode($this->body), '', $this->body['method']);
+
         //签名验证
         $this->signValidate();
 
@@ -40,7 +42,7 @@ class V1Controller extends Base_Controller_ApiDispatch{
 
         $resp = $this->$method();
 
-        self::echoLog('body', json_encode($this->body), 'rest_bee.log');
+//        self::echoLog('body', json_encode($this->body), 'rest_bee.log');
     }
 
     /**
@@ -54,7 +56,10 @@ class V1Controller extends Base_Controller_ApiDispatch{
             'token'             => $this->body['token'],
             'taobao_sid'        => $this->body['taobao_sid'],//淘宝卖家ID
             'seller_nick'       => $this->body['seller_nick'],//淘宝卖家用户名（旺旺号）
-            'mobile'            => $this->body['mobile'],   //买家的手机号码
+            'type'              => isset($this->body['type']) ? $this->body['type'] : 0,   //当TYPE为1时候码商不需要给用户下发短信，淘宝平台会在接口调用后把验证码下发给用户。
+            'mobile'            => isset($this->body['mobile']) ? $this->body['mobile'] : $this->body['encrypt_mobile'],   //买家的手机号码
+            'encrypt_mobile'    => isset($this->body['type']) && $this->body['type'] == 1 ? $this->body['encrypt_mobile'] : '',   //买家手机号中间四位隐藏  例： 131****5678
+            'md5_mobile'        => isset($this->body['type']) && $this->body['type'] == 1 ? $this->body['md5_mobile'] : '',   //买家手机号MD5值
             'id_card'           => $this->body['id_card'],  //买家md5加密的身份证号，
             'num'               => $this->body['num'],      //购买的商品数量
             'outer_iid'         => $this->body['outer_iid'],//商家发布商品时填的商品编码 -- 相当于我们的产品编号
@@ -76,8 +81,14 @@ class V1Controller extends Base_Controller_ApiDispatch{
 
         //todo 异步回调淘宝接口：重新发码成功回调接口
         Process_Async::send(array('ApiTaobaoModel','resendByAsync'),array(array(
+            'type'              => isset($this->body['type']) ? $this->body['type'] : 0,   //当TYPE为1时候码商不需要给用户下发短信，淘宝平台会在接口调用后把验证码下发给用户。
+            'mobile'            => isset($this->body['type']) && $this->body['type'] == 0 ? $this->body['mobile'] : '',   //买家的手机号码
+            'encrypt_mobile'    => isset($this->body['type']) && $this->body['type'] == 1 ? $this->body['encrypt_mobile'] : '',   //买家手机号中间四位隐藏  例： 131****5678
+            'md5_mobile'        => isset($this->body['type']) && $this->body['type'] == 1 ? $this->body['md5_mobile'] : '',   //买家手机号MD5值
             'orderId'           => $this->body['order_id'],
             'token'             => $this->body['token'],
+            'taobao_sid'        => $this->body['taobao_sid'],//淘宝卖家ID
+            'seller_nick'       => $this->body['seller_nick'],//淘宝卖家用户名（旺旺号）
             'codemerchantId'    => $this->taobao->merchantId,
             'sessionKey'        => $this->taobao->sessionKey,
         )));
@@ -92,9 +103,12 @@ class V1Controller extends Base_Controller_ApiDispatch{
 
         //todo 异步回调淘宝接口：更改接收码的手机号，并重新发码
         Process_Async::send(array('ApiTaobaoModel','modifiedByAsync'),array(array(
+            'type'              => isset($this->body['type']) ? $this->body['type'] : 0,   //当TYPE为1时候码商不需要给用户下发短信，淘宝平台会在接口调用后把验证码下发给用户。
+            'mobile'            => isset($this->body['mobile']) ? $this->body['mobile'] :  $this->body['encrypt_mobile'],   //买家的手机号码
+            'encrypt_mobile'    => isset($this->body['type']) && $this->body['type'] == 1 ? $this->body['encrypt_mobile'] : '',   //买家手机号中间四位隐藏  例： 131****5678
+            'md5_mobile'        => isset($this->body['type']) && $this->body['type'] == 1 ? $this->body['md5_mobile'] : '',   //买家手机号MD5值
             'orderId'           => $this->body['order_id'],
             'token'             => $this->body['token'],
-            'mobile'            => $this->body['mobile'],   //买家的手机号码（修改后的手机号）
             'codemerchantId'    => $this->taobao->merchantId,
             'sessionKey'        => $this->taobao->sessionKey,
         )));
@@ -115,9 +129,9 @@ class V1Controller extends Base_Controller_ApiDispatch{
             'user_account'  => $this->body['seller_nick'],
         );
         $r = ApiTaobaoModel::model()->cancel($params);
-        //返回示例：{"code":"succ","message":"ok","body":{"id":"201502031806537040"}}
 
-        self::echoLog('body', json_encode($r), 'cancel_bee.log');
+//        self::echoLog('body', json_encode($r), 'cancel_bee.log');
+        Util_Logger::getLogger('taobao')->info(__METHOD__, $r, '', 'refund/applycheck回传数据', $this->body['order_id']);
 
         if($r['code'] == 'succ') echo self::MSG200;
         else echo self::MSG500;
@@ -171,9 +185,9 @@ class V1Controller extends Base_Controller_ApiDispatch{
 //        $m = strtoupper(md5(mb_convert_encoding($str, "GBK")));
         $m = strtoupper(md5($str));
 
-        self::echoLog('body', json_encode($req), 'sign_bee.log');
-        self::echoLog('str', $str, 'sign_bee.log');
-        self::echoLog('sign', $sign . '||'  .$m, 'sign_bee.log');
+//        self::echoLog('body', json_encode($req), 'sign_bee.log');
+//        self::echoLog('str', $str, 'sign_bee.log');
+//        self::echoLog('sign', $sign . '||'  .$m, 'sign_bee.log');
 
         //验证不成功，返回501，并退出
         if($m != $sign){

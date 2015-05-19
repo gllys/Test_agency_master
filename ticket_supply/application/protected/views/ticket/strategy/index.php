@@ -51,7 +51,7 @@ $this->breadcrumbs = array('产品', '价格、库存规则库');
 		<div class="panel-footer pagenumQu" style="padding-top:15px;text-align:right;border:1px solid #ddd;border-top:0">
 			<?php
 			if (isset($lists['data'])) {
-				$this->widget('CLinkPager', array(
+				$this->widget('common.widgets.pagers.ULinkPager', array(
 					'cssFile' => '',
 					'header' => '',
 					'prevPageLabel' => '上一页',
@@ -69,15 +69,15 @@ $this->breadcrumbs = array('产品', '价格、库存规则库');
 <script>
 	function del(id){
 		if(id){
-			if (confirm("确认删除此条规则？")) {
-				$.post('/ticket/strategy/del',{id:id},function(data){
+			 PWConfirm('确认删除此条规则？',function(){
+			      $.post('/ticket/strategy/del',{id:id},function(data){
 					if(data.error==0){
 						location.href = "/ticket/strategy";
 					}else{
 						alert("删除失败,"+data.message);
 					}
 				},'json');
-			}
+            });
 			return false;
 		}
 	}

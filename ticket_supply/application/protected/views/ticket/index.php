@@ -25,6 +25,7 @@ $this->breadcrumbs = array('门票管理','发布门票');
                                 <option value="">请输入景区名称</option>
                                 <?php
                                 $param['status'] = 1;
+								$param['fields'] = "id,name";
                                 $param['organization_id'] = YII::app()->user->org_id;
                                 $rs = Landscape::api()->lists($param);
                                 $data = ApiModel::getLists($rs);

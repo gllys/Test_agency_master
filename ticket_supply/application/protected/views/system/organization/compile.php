@@ -1,16 +1,4 @@
-<?php
-/**
- * Created by PhpStorm.
- * User: grg
- * Date: 10/15/14
- * Time: 1:50 PM
- */
-$this->breadcrumbs = array('系统管理', '注册供应商');
-?>
-<link rel="stylesheet" href="/css/validationEngine.jquery.css">
-<link rel="stylesheet" href="/css/jquery.nailthumb.1.1.css">
-<div id="show_msg"></div>
-<div class="contentpanel">
+<div class="contentpanel" id="contentpanel">
 
     <div class="row">
         <div class="col-md-12">
@@ -22,175 +10,245 @@ $this->breadcrumbs = array('系统管理', '注册供应商');
                     </div><!-- panel-btns -->
                     <h4 class="panel-title">供应商管理</h4>
                 </div><!-- panel-heading -->
+                <div id="show_msg"></div>
                 <div class="panel-body nopadding">
 
                     <form class="form-horizontal form-bordered" id="form-data-supply">
-                        <?php if ($organizations): //已有机构信息显示编辑?>
-                            <div style="color:#aaaa00;">我们会尽快审核您的信息，请耐心等待！</div>
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label"><span class="text-danger">*</span>机构名称</label>
-                                <div class="col-sm-4">
-                                    <input type="text" placeholder="" class="form-control validate[required,minSize[4],maxSize[20]]" name="name" value="<?php echo $organizations['name'] ?>"/>
-                                </div>
-                                <label class="col-sm-2 control-label">公司传真</label>
-                                <div class="col-sm-4">
-                                    <input type="text" placeholder="" class="form-control validate[custom[phone],maxSize[20]]" name="fax" value="<?php echo $organizations['fax'] ?>"/>
-                                </div>
-                            </div><!-- form-group -->
+						<?php if ($organizations): //已有机构信息显示编辑?>
+							<div style="color:#aaaa00;">我们会尽快审核您的信息，请耐心等待！</div>
+							<div class="row">
+								<div class="col-sm-6">
+									<div class="form-group">
+										<label class="col-sm-2 control-label"><span class="text-danger">*</span> 机构名称</label>
+										<div class="col-sm-6">
+											<input type="text" placeholder="" tag="机构名称" class="form-control validate[required,custom[chinese],minSize[4],maxSize[40]]" maxlength="40" name="name" value="<?php echo $organizations['name'] ?>" />
+											<input type="hidden" name="id" value="<?php echo $organizations['id'] ?>" />
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-2 control-label"><span class="text-danger">*</span>联系人</label>
+										<div class="col-sm-6">
+											<input type="text" placeholder="" tag="联系人" class="form-control  validate[required, custom[chinese],minSize[4],maxSize[20]]" maxlength="20" name="contact" value="<?php echo $organizations['contact'] ?>" />
+										</div>
+									</div>
+									<!-- form-group -->
 
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label"><span class="text-danger" >*</span> 联系人</label>
-                                <div class="col-sm-4">
-                                    <input type="text" placeholder="" class="form-control validate[required,custom[chinese],custom[NoSp],minSize[1],maxSize[20]]" name="contact" value="<?php echo $organizations['contact'] ?>"/>
-                                </div>
-                                <label class="col-sm-2 control-label">固定电话</label>
-                                <div class="col-sm-4">
-                                    <input type="text" placeholder="" class="form-control validate[custom[phone],maxSize[20]]" name="telephone" value="<?php echo $organizations['telephone'] ?>"/>
-                                </div>
-                            </div><!-- form-group -->
+									<div class="form-group">
+										<label class="col-sm-2 control-label"><span class="text-danger">*</span>手机号码</label>
+										<div class="col-sm-6">
+											<input type="text" maxlength="11" tag="手机号码" placeholder="" class="form-control validate[required,custom[mobile]]" name="mobile" readonly value="<?php echo $organizations['mobile'] ?>" />
+										</div>
+									</div>
+									<!-- form-group -->
 
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label"><span class="text-danger">*</span>手机号码</label>
-                                <div class="col-sm-4">
-                                    <input type="text" placeholder="" class="form-control  validate[required,custom[mobile]]" name="mobile" value="<?php echo $organizations['mobile'] ?>"/>
-                                </div>
-                                <label class="col-sm-2 control-label">审核状态</label>
-                                <div class="col-sm-4">
-                                    <?php if ($organizations['verify_status'] == 'checked'): ?><button class="btn btn-success btn-sm btn-bordered" disabled>已审核</button><?php elseif ($organizations['verify_status'] == 'reject'): ?><button class="btn btn-sm btn-bordered" style=" border-color: #ff0000; color: #ff0000;" disabled>拒绝</button><?php else: ?><button class="btn btn-sm btn-bordered" disabled style=" border-color: #ff0000; color: #ff0000;">未审核</button><?php endif; ?>
-                                </div>
-                            </div><!-- form-group -->
+									<div class="form-group">
+										<label class="col-sm-2 control-label">公司传真</label>
+										<div class="col-sm-6">
+											<input type="text" placeholder="" tag="公司传真" class="form-control validate[custom[fax]]" name="fax" value="<?php echo $organizations['fax'] ?>" />
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-2 control-label">固定电话</label>
+										<div class="col-sm-6">
+											<input type="text" placeholder="" tag="固定电话" class="form-control validate[custom[phone]]" name="telephone" value="<?php echo $organizations['telephone'] ?>" />
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-2 control-label">审核状态</label>
+										<div class="col-sm-6">
+											<button class="btn btn-<?php echo $organizations['verify_status'] == 'checked' ? 'success' : 'danger' ?> btn-bordered btn-sm " disabled>
+												<?php echo $organizations['verify_status'] == 'checked' ? '已审核' : '未审核' ?>
+											</button>
+										</div>
+									</div>
 
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label"><span class="text-danger">*</span> 所在地区</label>
-                                <div class="col-sm-4">
-                                    <select class="select2 col-sm-4" data-placeholder="Choose One" id="province" name="province_id">
-                                        <?php $pro = Districts::model()->findByPk($organizations['province_id']); ?>
-                                        <option value="<?php echo $pro['id'] ?>" selected="selected" ><?php echo $pro['id'] == 0 ? "省" : $pro['name'] ?></option>
-                                        <?php
-                                        $province = Districts::model()->findAllByAttributes(array("parent_id" => 0));
-                                        foreach ($province as $model) {
-                                            if ($model->id == 0) {
-                                                continue;
-                                            } echo " <option value='" . $model->id . "'>" . $model->name . "</option>";
-                                        }
-                                        ?> 
-                                    </select>
-                                    <select class="select2 col-sm-4" data-placeholder="Choose One" id="city" name="city_id">
-                                        <?php $city = Districts::model()->findByPk($organizations['city_id']); ?>
-                                        <option value="<?php echo $city['id'] ?>" selected="selected" ><?php echo $city['id'] == 0 ? "市" : $city['name'] ?></option>
-                                    </select>
-                                    <select class="select2 col-sm-4" data-placeholder="Choose One" id="area" name="district_id">
-                                        <?php $district = Districts::model()->findByPk($organizations['district_id']); ?>
-                                        <option value="<?php echo $district['id'] ?>" selected="selected" ><?php echo $district['id'] == 0 ? "县" : $district['name'] ?></option>
-                                    </select>
-                                </div>
-                                <label class="col-sm-2 control-label">启用状态</label>
-                                <div class="col-sm-4">
-                                    <?php if ($organizations['status'] == 1): ?><button class="btn btn-success btn-sm btn-bordered" disabled>已启用</button><?php else: ?><button class="btn btn-sm btn-bordered" disabled style=" border-color: #ff0000; color: #ff0000;">未启用</button><?php endif; ?>
-                                </div>
-                            </div><!-- form-group -->
+									<div class="form-group">
+										<label class="col-sm-2 control-label">启用状态</label>
+										<div class="col-sm-6">
+											<button class="btn btn-<?php echo $organizations['status'] == 1 ? 'success' : 'danger' ?> btn-sm btn-bordered" disabled>
+												<?php echo $organizations['status'] == 1 ? '已启用' : '未启用' ?>
+											</button>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-2 control-label"><span class="text-danger">*</span>所在地区</label>
+										<div class="col-sm-9">
+											<div class="row">
+												<div class="col-sm-4">
+													<select class="select2" data-validation-engine="form-control validate[required]" data-placeholder="Choose One" id="province" name="province_id">
+														<option value="__NULL__">省</option>
+														<?php
+														$province = Districts::model()->findAllByAttributes(array("parent_id" => 0));
+														foreach ($province as $model) {
+															if ($model->id == 0) {
+																continue;
+															} echo " <option value='" . $model->id . "'>" . $model->name . "</option>";
+														}
+														?>
+													</select>
+												</div>
+												<div class="col-sm-4">
+													<select class="select2" data-placeholder="Choose One" id="city" name="city_id">
+														<option value="__NULL__">市</option>
+														<?php
+														if (isset($organizations['province_id'])) {
+															$city_value = $organizations['province_id'];
+															$city = Districts::model()->findAllByAttributes(array("parent_id" => $city_value));
+															foreach ($city as $model) {
+																if ($model->id == 0) {
+																	continue;
+																} echo " <option value='" . $model->id . "'>" . $model->name . "</option>";
+															}
+														}
+														?>
+													</select>
+												</div>
 
+												<div class="col-sm-4">
+													<select class="select2 col-sm-4" data-placeholder="Choose One" id="area" name="district_id">
+														<option value="__NULL__">县</option>
+														<?php
+														if (isset($organizations['city_id'])) {
+															$area_value = $organizations['city_id'];
+															$area = Districts::model()->findAllByAttributes(array("parent_id" => $area_value));
+															foreach ($area as $model) {
+																if ($model->id == 0) {
+																	continue;
+																} echo " <option value='" . $model->id . "'>" . $model->name . "</option>";
+															}
+														}
+														?>
+													</select>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-2 control-label"><span class="text-danger">*</span>详细地址</label>
+										<div class="col-sm-6">
+											<input type="text" placeholder="" tag="详细地址" class="form-control validate[required,custom[NoSp],minSize[4]]" maxlength="100" name="address"  value="<?php echo $organizations['address'] ?>" />
+										</div>
+									</div>
+									<!-- form-group -->
 
+								</div>
 
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label"><span class="text-danger">*</span> 详细地址</label>
-                                <div class="col-sm-4">
-                                    <input type="text" placeholder="" class="form-control validate[required,minSize[4],maxSize[20]]" name="address" value="<?php echo $organizations['address'] ?>"/>
-                                    <input type="hidden" name="organization_id" value="<?php echo $organizations['id'] ?>" />
-                                </div>
-                            </div><!-- form-group -->
+								<div class="col-sm-6">
+									<div class="form-group">
+										<label class="col-sm-2 control-label">营业执照</label>
+										<div class="col-sm-6">
+											<div class="dropzone" id="business_license">
+												<div class="fallback nailthumb-container square-thumb">
+													<img id="business_license_img" src="<?php echo!empty($organizations['business_license']) ? $organizations['business_license'] : '/img/uploadfile.png'; ?>" style="width:150px;height:150px;position:absolute;left:0px;top:0px">
+													<input type="hidden" class="sp_sxming" name="business_license" value="<?php echo $organizations['business_license'] ?>"/>
+												</div>
+											</div>
+										</div>
+									</div>
 
-                            <div class="form-group">
-                                <div class="col-sm-12">
-                                    <h5 class="lg-title mb10"><span class="text-danger">*</span>营业执照</h5>
-                                    <div class="dropzone" id="business_license">
-                                        <div class="fallback">
-                                            <img id="business_license_img"  src="<?php
-                                            if (!empty($organizations['business_license'])) {
-                                                echo $organizations['business_license'];
-                                            } else {
-                                                echo '/img/uploadfile.png';
-                                            }
-                                            ?>" style="max-width:150px;height:150px;position:absolute;left:0px;top:0px">
-                                            <input type="hidden" class="sp_sxming" name="business_license" value="<?php echo $organizations['business_license'] ?>"/>
-                                            <input type="hidden" name="id" value="<?php echo $organizations['id'] ?>" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div><!-- form-group -->
-<?php else:;  //没有机构信息显示编辑 ?>
+								</div>
+							</div>
+						<?php else:;  //没有机构信息显示编辑 ?>
 
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label"><span class="text-danger">*</span>机构名称</label>
-                                <div class="col-sm-4">
-                                    <input type="text" placeholder="" class="form-control validate[required,minSize[4],maxSize[20]]" name="name"/>
-                                </div>
-                                <label class="col-sm-2 control-label">公司传真</label>
-                                <div class="col-sm-4">
-                                    <input type="text" placeholder="" class="form-control validate[maxSize[20]]" name="fax"/>
-                                </div>
-                            </div><!-- form-group -->
+							<div class="row">
+								<div class="col-sm-6">
+									<div class="form-group">
+										<label class="col-sm-2 control-label"><span class="text-danger">*</span> 机构名称</label>
+										<div class="col-sm-6">
+											<input type="text" placeholder=""  tag="机构名称" class="form-control validate[required,custom[chinese],minSize[4],maxSize[40]]" maxlength="40" name="name"  />
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-2 control-label"><span class="text-danger">*</span>联系人</label>
+										<div class="col-sm-6">
+											<input type="text" placeholder="" tag="联系人" class="form-control  validate[required, custom[chinese],minSize[4],maxSize[20]]" maxlength="20" name="contact" />
+										</div>
+									</div>
+									<!-- form-group -->
 
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label"><span class="text-danger" >*</span> 联系人</label>
-                                <div class="col-sm-4">
-                                    <input type="text" placeholder="" class="form-control validate[required,custom[chinese],custom[NoSp],minSize[1],maxSize[20]]" name="contact"/>
-                                </div>
-                                <label class="col-sm-2 control-label">固定电话</label>
-                                <div class="col-sm-4">
-                                    <input type="text" placeholder="" class="form-control validate[maxSize[20]]" name="telephone"/>
-                                </div>
-                            </div><!-- form-group -->
+									<div class="form-group">
+										<label class="col-sm-2 control-label"><span class="text-danger">*</span>手机号码</label>
+										<div class="col-sm-6">
+											<?php $user = Users::model()->findByPk(Yii::app()->user->uid);?>
+											<input type="text" maxlength="11" tag="手机号码" placeholder="" class="form-control validate[required,custom[mobile]]" name="mobile" readonly value="<?php echo isset($user) ? $user->mobile : "";?>"/>
+										</div>
+									</div>
+									<!-- form-group -->
 
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label"><span class="text-danger">*</span>手机号码</label>
-                                <div class="col-sm-4">
-                                    <input type="text" placeholder="" class="form-control validate[required,custom[mobile]]" name="mobile"/>
-                                </div>
-                                <label class="col-sm-2 control-label"><span class="text-danger">*</span> 详细地址</label>
-                                <div class="col-sm-4">
-                                    <input type="text" placeholder="" class="form-control validate[required,minSize[4],maxSize[20]]" name="address"/>
-                                </div>
-                            </div><!-- form-group -->
+									<div class="form-group">
+										<label class="col-sm-2 control-label">公司传真</label>
+										<div class="col-sm-6">
+											<input type="text" placeholder="" tag="公司传真" class="form-control validate[custom[fax]]" name="fax"  />
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-2 control-label">固定电话</label>
+										<div class="col-sm-6">
+											<input type="text" placeholder="" tag="固定电话"  class="form-control validate[custom[phone]]" name="telephone"  />
+										</div>
+									</div>
 
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label"><span class="text-danger">*</span> 所在地区</label>
-                                <div class="col-sm-4">
-                                    <select class="select2 col-sm-4" data-placeholder="Choose One" id="province" name="province_id">								
-                                        <option value="__NULL__" selected="selected" >省</option>
-                                        <?php
-                                        $province = Districts::model()->findAllByAttributes(array("parent_id" => 0));
-                                        foreach ($province as $model) {
-                                            if ($model->id == 0) {
-                                                continue;
-                                            } echo " <option value='" . $model->id . "'>" . $model->name . "</option>";
-                                        }
-                                        ?> 
-                                    </select>
-                                    <select class="select2 col-sm-4" data-placeholder="Choose One" id="city" name="city_id">
-                                        <option value="__NULL__" selected="selected" >市</option>
-                                    </select>
-                                    <select class="select2 col-sm-4" data-placeholder="Choose One" id="area" name="district_id">
-                                        <option value="__NULL__" selected="selected" >县</option>
-                                    </select>
-                                </div>
-                            </div><!-- form-group -->
+									<div class="form-group">
+										<label class="col-sm-2 control-label"><span class="text-danger">*</span>所在地区</label>
+										<div class="col-sm-9">
+											<div class="row">
+												<div class="col-sm-4">
+													<select class="select2" data-validation-engine="form-control validate[required]" data-placeholder="Choose One" id="province" name="province_id">
+														<option value="__NULL__">省</option>
+														<?php
+														$province = Districts::model()->findAllByAttributes(array("parent_id" => 0));
+														foreach ($province as $model) {
+															if ($model->id == 0) {
+																continue;
+															} echo " <option value='" . $model->id . "'>" . $model->name . "</option>";
+														}
+														?>
+													</select>
+												</div>
+												<div class="col-sm-4">
+													<select class="select2" data-placeholder="Choose One" id="city" name="city_id">
+														<option value="__NULL__">市</option>
+													</select>
+												</div>
 
-                            <div class="form-group">
-                                <div class="col-sm-12">
-                                    <h5 class="lg-title mb10"><span class="text-danger">*</span>营业执照</h5>
-                                    <div class="dropzone" id="business_license">
-                                        <div class="fallback">
-                                            <img id="business_license_img"  src="/img/uploadfile.png" style="max-width:150px;height:150px;position:absolute;left:0px;top:0px">
-                                            <input type="hidden" class="sp_sxming" name="business_license" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div><!-- form-group -->
-<?php endif; ?>
+												<div class="col-sm-4">
+													<select class="select2 col-sm-4" data-placeholder="Choose One" id="area" name="district_id">
+														<option value="__NULL__">县</option>
+													</select>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-2 control-label"><span class="text-danger">*</span>详细地址</label>
+										<div class="col-sm-6">
+											<input type="text" placeholder="" tag="详细地址" class="form-control validate[required,custom[NoSp],minSize[4]]" maxlength="100" name="address"/>
+										</div>
+									</div>
+									<!-- form-group -->
 
-                        <div class="panel-footer">
-                            <button class="btn btn-primary mr5 submit" id="putform" >保存</button>
+								</div>
+
+								<div class="col-sm-6">
+									<div class="form-group">
+										<label class="col-sm-2 control-label">营业执照</label>
+										<div class="col-sm-6">
+											<div class="dropzone" id="business_license">
+												<div class="fallback nailthumb-container square-thumb">
+													<img id="business_license_img" src="/img/uploadfile.png" style="width:150px;height:150px;position:absolute;left:0px;top:0px">
+													<input type="hidden" class="sp_sxming" name="business_license" value="<?php echo $organizations['business_license'] ?>"/>
+												</div>
+											</div>
+										</div>
+									</div>
+
+								</div>
+							</div>
+						<?php endif; ?>
+
+                        <div class="panel-footer" style="padding-left:5%">
+                            <img src="/img/select2-spinner.gif" id="load" style="display: none" >
+                            <button class="btn btn-primary mr20" id="putform">保存</button>
                         </div>
 
                     </form>          
@@ -204,106 +262,41 @@ $this->breadcrumbs = array('系统管理', '注册供应商');
     </div><!-- row -->
 </div><!-- contentpanel -->
 <script>
-    jQuery(document).ready(function() {
-
-        // Tags Input
-        jQuery('#tags').tagsInput({width: 'auto'});
-
-        // Textarea Autogrow
-        jQuery('#autoResizeTA').autogrow();
-
-        // Spinner
-        var spinner = jQuery('#spinner').spinner();
-        spinner.spinner('value', 0);
-
-        // Form Toggles
-        jQuery('.toggle').toggles({on: true});
-
-        // Time Picker
-        jQuery('#timepicker').timepicker({defaultTIme: false});
-        jQuery('#timepicker2').timepicker({showMeridian: false});
-        jQuery('#timepicker3').timepicker({minuteStep: 15});
-
-        // Date Picker
-        jQuery('#datepicker').datepicker();
-        jQuery('#datepicker-inline').datepicker();
-        jQuery('#datepicker-multiple').datepicker({
-            numberOfMonths: 3,
-            showButtonPanel: true
-        });
-
-        // Input Masks
-        jQuery("#date").mask("99/99/9999");
-        jQuery("#phone").mask("(999) 999-9999");
-        jQuery("#ssn").mask("999-99-9999");
-
-        // Select2
-        jQuery("#select-basic, #select-multi").select2();
+    jQuery(document).ready(function () {
         jQuery('.select2').select2({
             minimumResultsForSearch: -1
         });
-
-        function format(item) {
-            return '<i class="fa ' + ((item.element[0].getAttribute('rel') === undefined) ? "" : item.element[0].getAttribute('rel')) + ' mr10"></i>' + item.text;
-        }
-
-        // This will empty first option in select to enable placeholder
-        jQuery('select option:first-child').text('');
-        $('#province option:first-child').html('省').val("__NULL__");
-        $('#city option:first-child').html('市').val("__NULL__");
-        $('#area option:first-child').html('县').val("__NULL__");
-
-        jQuery("#select-templating").select2({
-            formatResult: format,
-            formatSelection: format,
-            escapeMarkup: function(m) {
-                return m;
-            }
-        });
-
-        // Color Picker
-        if (jQuery('#colorpicker').length > 0) {
-            jQuery('#colorSelector').ColorPicker({
-                onShow: function(colpkr) {
-                    jQuery(colpkr).fadeIn(500);
-                    return false;
-                },
-                onHide: function(colpkr) {
-                    jQuery(colpkr).fadeOut(500);
-                    return false;
-                },
-                onChange: function(hsb, hex, rgb) {
-                    jQuery('#colorSelector span').css('backgroundColor', '#' + hex);
-                    jQuery('#colorpicker').val('#' + hex);
-                }
-            });
-        }
-
-        // Color Picker Flat Mode
-        jQuery('#colorpickerholder').ColorPicker({
-            flat: true,
-            onChange: function(hsb, hex, rgb) {
-                jQuery('#colorpicker3').val('#' + hex);
-            }
-        });
-
+        /*
+         省市县显示问题重置 create by ccq
+         */
+<?php if ($organizations): ?>
+	        $('#province').select2("val", "<?php echo isset($organizations['province_id']) && !empty($organizations['province_id']) ? $organizations['province_id'] : '__NULL__' ?>");
+	        $('#city').select2("val", "<?php echo isset($organizations['city_id']) && !empty($organizations['city_id']) ? $organizations['city_id'] : '__NULL__' ?>");
+	        $('#area').select2("val", "<?php echo isset($organizations['district_id']) && !empty($organizations['district_id']) ? $organizations['district_id'] : '__NULL__' ?>");
+<?php endif; ?>
 
         $('#child_nav').hide();
         $('.navbar-nav').hide();
 
         //省联动
-        $('#province').change(function() {
+        $('#province').change(function () {
 
             var code = $(this).val();
 
             $('#city').html('<option value="__NULL__">市</option>');
             $('#area').html('<option value="__NULL__">县</option>');
             if (code == '__NULL__') {
+                /*
+                 需要重置页面上的显示
+                 */
+                $('#city').select2('val', '__NULL__');
+                $('#area').select2('val', '__NULL__');
                 $('#city').html('<option value="__NULL__">市</option>');
+                $('#area').html('<option value="__NULL__">县</option>');
             } else {
                 $('#city').html('<option value="__NULL__">市</option>');
                 var html = new Array();
-                $.post('/ajaxServer/GetChildern', {id:code}, function(data) {
+                $.post('/ajaxServer/GetChildern', {id: code}, function (data) {
                     for (i in data) {
                         html.push("<option value='" + data[i]['id'] + "'>" + data[i]['name'] + "</option>");
                     }
@@ -316,15 +309,15 @@ $this->breadcrumbs = array('系统管理', '注册供应商');
 
 
 //市切换
-        $('#city').change(function() {
+        $('#city').change(function () {
             var code = $(this).val();
-            //$('#uniform-area span:first-child').html('县');
             if (code == '__NULL__') {
+                $('#area').select2('val', '__NULL__');
                 $('#area').html('<option value="__NULL__">县</option>');
             } else {
                 $('#area').html('<option value="__NULL__">县</option>');
                 var html = new Array();
-                $.post('/ajaxServer/GetChildern',{id : code},function(data) {
+                $.post('/ajaxServer/GetChildern', {id: code}, function (data) {
                     for (i in data) {
                         html.push("<option value='" + data[i]['id'] + "'>" + data[i]['name'] + "</option>");
                     }
@@ -334,9 +327,6 @@ $this->breadcrumbs = array('系统管理', '注册供应商');
             }
             return false;
         });
-
-
-
     });
 
 </script>
@@ -349,7 +339,7 @@ $this->breadcrumbs = array('系统管理', '注册供应商');
     new AjaxUpload('#business_license', {
         action: 'http://v0.api.upyun.com/<?php echo Yii::app()->upyun->bucket ?>/',
         name: 'file',
-        onSubmit: function(file, ext) {
+        onSubmit: function (file, ext) {
             //上传文件格式限制
             if (!ext || !/^(jpg|png|jpeg|gif)$/i.test(ext)) {
                 alert('上传格式不正确');
@@ -358,11 +348,11 @@ $this->breadcrumbs = array('系统管理', '注册供应商');
             this.setData(<?php echo Yii::app()->upyun->getCode() ?>);
             window.imgField = 'business_license';
         },
-        onComplete: function(file, data) {
+        onComplete: function (file, data) {
         }
     });
 
-    window.upload_callback = function(data) {
+    window.upload_callback = function (data) {
         if (data.status != 200) {
             alert('上传失败！');
             return false;
@@ -371,21 +361,35 @@ $this->breadcrumbs = array('系统管理', '注册供应商');
         $('#' + window.imgField + '_img').attr('src', data.msg);
     }
 
-    $('#putform').click(function() {
-        var license = $('input[name="business_license"]').val();  
-        if ($('#form-data-supply').validationEngine('validate') == true && license.length > 0) { 
-            $.post('/system/organization/saveSupply', $('#form-data-supply').serialize(), function(data) { 
+
+    $('#putform').click(function () {
+        
+        $(this).hide();
+        $('#load').show();
+        var license = $('input[name="business_license"]').val();
+        if ($('#form-data-supply').validationEngine('validate') == true && license.length > 0) {
+            $.post('/system/organization/saveSupply', $('#form-data-supply').serialize(), function (data) {
                 if (data.errors) {
                     var tmp_errors = data.errors;
                     alert(tmp_errors);
+                    $('#load').hide();
+                    $('#putform').show();
                 } else if (data.succ) {
-                    alert('保存成功，请耐心等待审核通过');
-                   // location.href = "";
+                    var succss_msg = '<div class="alert alert-success"><strong>' + data.succ + '</strong></div>';
+                    $('#show_msg').html(succss_msg);
+					location.href="#contentpanel";
+                    setTimeout(function(){window.location.reload();}, 1000);
                 }
-            }, "json")
-        }else if(license.length == 0){ 
-            alert('请上传营业执照');
+            }, "json");
+        } else if (license.length <= 0) {
+            $('#business_license').validationEngine('showPrompt', '请上传营业执照', 'error');
+            $('#load').hide();
+            $('#putform').show();
+        } else {
+            $('#load').hide();
+            $('#putform').show();
         }
+
         return false;
     })
 

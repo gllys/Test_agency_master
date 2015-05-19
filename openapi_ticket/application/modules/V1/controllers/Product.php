@@ -82,4 +82,54 @@ class ProductController extends Base_Controller_Ota
 
     }
 
+    /**
+     * 产品详情接口
+     */
+    public function detailAction(){
+        $params = $this->body;
+        if(!array_key_exists('id', $params) || empty($params['id']))  Lang_Msg::error('缺少参数id');
+
+        try{
+            $req = array(
+                'ticket_id' => $params['id'],
+                'price_type'=>0,
+                'distributor_id' => $this->userinfo['distributor_id'],
+            );
+            $product = ApiProductModel::model()->detail($req);
+            if($product['code'] == 'succ'){
+                $product = $product['body'];
+
+                $data['id']             = $product['id'];
+                $data['name']           = $product['name'];
+                $data['price']          = floatval($product['fat_price']);        //结算单价
+                $data['market_price']   = floatval($product['listed_price']);//市场价（门市挂牌价）
+                $data['payment']        = strpos($product['payment'], '2') === false ? '0' : '0,1';      //可支持的支付方式
+                $data['valid']          = $product['valid_flag'] == 1 ? 9999 : intval($product['valid']);     //预订后多少天有效 0 表示当前有效
+                $data['scenic_id']      = $product['scenic_id']; //景区ids
+                $data['week_time']      = $product['week_time']; //星期几有效 1,2,3,4,5,6,0 其中0表示星期日
+
+                $date_available = explode(',', $product['date_available']);
+                $data['date_available']     = date("Y-m-d H:i:s",$date_available[0]) .','. date("Y-m-d H:i:s",$date_available[1]);  //可玩日期  int(11),int(11) 表示一个时间段 ，逗号分隔
+                $data['sale_start_time']    = date("Y-m-d H:i:s",$product['sale_start_time']); //销售起始日
+                $data['sale_end_time']      = date("Y-m-d H:i:s",$product['sale_start_time']);     //销售结束日
+
+                $data['scenic'] = array();
+                foreach($product['items'] as $items){
+                    $data['scenic'][] =  array(
+                        'scenic_id' => $items['scenic_id'],      //景区id
+                        'sceinc_name' => $items['sceinc_name'],  //景区名称
+                    );
+                }
+
+                Lang_Msg::output($data);
+
+            }
+
+            Lang_Msg::error($product['message']);
+        }catch (Exception $ee){
+            Lang_Msg::error($ee->getMessage());
+        }
+
+    }
+
 }

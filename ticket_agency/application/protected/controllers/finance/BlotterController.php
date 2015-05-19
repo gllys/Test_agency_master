@@ -13,7 +13,7 @@ class BlotterController extends Controller
 		$data['status_labels'] = array('1' => '支付', '2' => '退款', '3' => '充值', '4' => '提现');
         $data['status_class'] = array('1' => 'success', '2' => 'danger', '3' => 'warnning', '4' => 'info');
         //$data['mode_type'] = array('cash' => '现金','offline' => '线下','credit'=>'信用支付','advance' =>'储值支付','union'=>'平台支付','alipay'=>'支付宝','kuaiqian'=>'快钱');
-        $data['mode_type'] = array('union'=>'平台支付','credit'=>'信用支付','advance' =>'储值支付','kuaiqian'=>'快钱','union'=>'平台支付','alipay'=>'支付宝',);
+        $data['mode_type'] = array('union'=>'平台支付','credit'=>'信用支付','advance' =>'储值支付','kuaiqian'=>'快钱','union'=>'平台支付');
 		$data['type'] = array_keys($data['status_labels']);
 		$data['mode'] = array_keys($data['mode_type']);
         if (!empty($params)) {

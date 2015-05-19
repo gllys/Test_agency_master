@@ -31,7 +31,7 @@ $this->breadcrumbs = array('产品', '仓库管理');
       
             <div class="panel panel-default">
                 <div class="panel-body">
-                    <form class="form-inline" method="get" action="">   
+                    <form class="form-inline" method="get" action="/ticket/depot/index">
                         <div class="form-group" style='margin: 0 5px 0 0;<?php if($param["type"] != 2){ echo "display:none;";}?>'>
                             <input class="form-control" placeholder="请输入联票名称" type="text" style="width:200px;" name="name" <?php
                                     if (isset($param['name']) && !empty($param['name'])) {
@@ -43,10 +43,18 @@ $this->breadcrumbs = array('产品', '仓库管理');
                             <select data-placeholder="Choose One" style="width:300px;padding:0 10px;" id="distributor-select" name="scenic_id">
                                 <option value="">请输入景区名称</option>
                                 <?php
-                                $param['status'] = 1;
-                                $param['organization_id'] = YII::app()->user->org_id;
-                                $rs = Landscape::api()->lists($param);
+                                $lan=array();
+                                $lan['status'] = 1;
+                                $lan['organization_id'] = YII::app()->user->org_id;
+                                if(isset($lan['page'])) {
+                                    unset($lan['page']);
+                                }
+                                $lan['current'] = 1;
+                                $lan['fields'] = "id,name";
+                                $lan['items'] = 100000;
+                                $rs = Landscape::api()->lists($lan);
                                 $data = ApiModel::getLists($rs);
+
                                 foreach ($data as $item) {
                                     ?>
                                     <option value="<?php echo $item['id']; ?>"  <?php
@@ -62,7 +70,6 @@ $this->breadcrumbs = array('产品', '仓库管理');
                     </form>
                 </div><!-- panel-body -->
             </div>
-
             <!---如果是联票 就是单数组 这样就要做判断了--->
             <?php if($param['type'] != 2){ // 单票和任务单 ?> 
             <!----非联票--->
@@ -83,9 +90,9 @@ $this->breadcrumbs = array('产品', '仓库管理');
                     <thead>
                         <tr>
                             <th>单票名称</th>
-                            <th>团队价格</th>
+                            <th>团队结算价格</th>
                        <?php if($param['type'] != 1):?>  
-                            <th>散客价格</th>
+                            <th>散客结算价格</th>
                             <th>价格/库存变动规则</th>
                         <?php endif;?>       
                             <th>操作</th>
@@ -137,8 +144,8 @@ $this->breadcrumbs = array('产品', '仓库管理');
                            <thead>
                              <tr>
                                    <th>联票名称</th>
-                                   <th>团队价格</th>
-                                   <th>散客价格</th>
+                                   <th>团队结算价格</th>
+                                   <th>散客结算价格</th>
                                    <th>价格/库存变动规则</th>
                                    <th>操作</th>
                              </tr>
@@ -185,7 +192,7 @@ $this->breadcrumbs = array('产品', '仓库管理');
             <div style="text-align:center" class="panel-footer">
                 <div id="basicTable_paginate" class="pagenumQu">
                     <?php
-                    $this->widget('CLinkPager', array(
+                    $this->widget('common.widgets.pagers.ULinkPager', array(
                         'cssFile' => '',
                         'header' => '',
                         'prevPageLabel' => '上一页',
@@ -251,12 +258,12 @@ $this->breadcrumbs = array('产品', '仓库管理');
     $(function() {
         //选择
         $('a.del').click(function() {
-            if (!window.confirm("确定要删除?")) {
-                return false;
-            }
-            $.post($(this).attr('href'), function() {
+			 PWConfirm('确定要删除?',function(){
+			     $.post($(this).attr('href'), function() {
                 window.location.reload();
             });
+            });
+           
             return false;
         });
     });

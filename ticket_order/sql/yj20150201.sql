@@ -1,0 +1,1 @@
+DELETE FROM `ticket_order`.`process_config` WHERE `process_config`.`name` = "refund";

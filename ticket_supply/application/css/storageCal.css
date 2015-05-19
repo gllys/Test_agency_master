@@ -18,7 +18,7 @@
 .storageCal table th.weeken{color:#5cb85c}
 .storageCal table td{ border:1px solid #ddd; width:100px; }
 .storageCal table td.valid{}
-.storageCal table td div.detail{ height:75px;background:#f9f9f9;padding:5px;}
+.storageCal table td div.detail{ height:85px;background:#f9f9f9;padding:5px;}
 .storageCal table td div.detail.valid{background:#fff; color:#5cb85c}
 .storageCal table td div.detail.valid:hover{background:#fcf8e3}
 .storageCal table td div.detail.valid span{color:#008fc2}

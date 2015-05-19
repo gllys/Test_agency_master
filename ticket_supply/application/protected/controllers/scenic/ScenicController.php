@@ -7,177 +7,94 @@ class ScenicController extends Controller {
     }
     public function actionIndex() {
         //景点查询
-        //Landscape::api()->debug = true ;
         $param = $_REQUEST;
+        $param['items'] = isset($_REQUEST['items']) ? $_REQUEST['items'] : 15;
         $param['status'] = 1;
-        $param['current'] = isset($param['page']) ? $param['page'] : 1;
+        $param['take_from_poi'] = 0;
+        //用景区名搜索的时候忽略分页
+        $param['keyword'] = isset($param['keyword'])?trim($param['keyword']):'';
+        if(!empty($param['keyword'])){
+            $param['current'] = 1;
+        }else{
+            $param['current'] = isset($param['page']) ? $param['page'] : 1;
+        }
         if (isset($param['province_ids'])) {
             $param['province_ids'] = join(',', $param['province_ids']);
         }
-        if (intval(YII::app()->user->org_id) > 0) {
-            $param['organization_id'] = YII::app()->user->org_id;
-            $data = Landscape::api()->lists($param);
-            $lists = ApiModel::getLists($data);
-           
+            //使用产品管理》新建产品 中的获取景区列表逻辑，删除了ArrayByUniqueKey代码 
+        $params = array();
+        $params['organization_id'] = YII::app()->user->org_id;
+        $params['items'] = 100000;
+        $data = Landorg::api()->lists($params,true,10);
+        $supplyLans = ApiModel::getLists($data);
+        $supplylanIds = PublicFunHelper::arrayKey($supplyLans, 'landscape_id');
 
-            //分页
-            $pagination = ApiModel::getPagination($data);
-            $pages = new CPagination($pagination['count']);
-            $pages->pageSize = 15; #每页显示的数目
+        if (!empty($supplylanIds)) {
+            $param['ids'] = join(',', $supplylanIds);
+            // 是否是ajaxkuaiji
+            if(isset($_REQUEST['search']) && $_REQUEST['search'] == 1) {
+                $param['fields'] = "name";
+                $data = Landscape::api()->lists($param, true);  // 搜索添加缓存
+                $lists = ApiModel::getLists($data);
+                echo json_encode($lists);
+                Yii::app()->end();
+            } else {
+                $data = Landscape::api()->lists($param);
+                $lists = ApiModel::getLists($data);
+                //分页
+                $pagination = ApiModel::getPagination($data);
+                $pages = new CPagination($pagination['count']);
+                $pages->pageSize = 15; #每页显示的数目
+            }
         } else {
             $lists = $pages = array();
         }
 
-
-
         $this->render('index', compact('lists', 'pages'));
     }
 
+    /**
+     * 更新信息
+     */
+    public function actionUpdate()
+    {
+        $data = array(
+            'id' => $_REQUEST['landscape_id'],
+            'biography' => $_REQUEST['biography']
+        );
+        $update = Landscape::api()->update($data);
+        echo json_encode($update );
+    }
   
-    
-    
+    /**
+     * 备注：
+     * - 需返回所有景点，不对用户进行organization_id筛选，
+     * 即$param['organization_ids'] = YII::app()->user->org_id;
+     */
     public function actionView() {
         $param = array();
         $param['id'] = Yii::app()->request->getParam('id');
-        $param['organization_id'] = YII::app()->user->org_id ;
+        //$param['organization_id'] = YII::app()->user->org_id ;
         $rs = Landscape::api()->detail($param);
-        $data = ApiModel::getData($rs); //景区基本信息
-       
-        $param['organization_ids'] = Yii::app()->user->org_id; //机构id
-        $param['landscape_ids'] = $param['id'];
-
-        $param['current'] = isset($param['page']) ? $param['page'] : 1;
-        $param['items'] = 100;
-        $datas = Poi::api()->lists($param); 
-        $lists = $datas['body']['data']; //景点的基本信息
-        
-        
-       // $field['or_id']  =   Yii::app()->user->org_id; //机构id  
-        $field['scenic_id'] = $param['id'];
-        $field['p'] = isset($param['page']) ? $param['page'] : 1;
-        $field['items'] = 100; //获票列表
-        $tickets = Tickettemplatebase::api()->lists($field);
-        $ticket = ApiModel::getLists($tickets);
-        if(empty($ticket)){
-            $data['ticket'] = array();
+        $data = ApiModel::getData($rs);
+        /*只读权限只能看见上架的景点*/
+        if($data['organization_id'] == Yii::app()->user->org_id){
+            $data['yes'] = 1;
         }else{
-            $data['ticket'] =  $ticket[$param['id']];
+            $param['status'] = 1;
         }
 
+        $param['landscape_ids'] = $param['id'];
+        $param['current'] = isset($param['page']) ? $param['page'] : 1;
+        $param['items'] = 1000;
+        $datas = Poi::api()->lists($param);
+        $lists = $datas['body']['data'];
         //分页
         $pagination = ApiModel::getPagination($datas);
         $pages = new CPagination($pagination['count']);
         $pages->pageSize = 100; #每页显示的数目
-        
+
         $this->render('view', compact('data','lists','pages'));
-    }
-    
-        //编辑景区信息
-    public function actionEditinfo(){ 
-        $param = $_POST;
-        $param['user_id'] = Yii::app()->user->uid;
-        $param['user_name'] = Yii::app()->user->account;
-        $update = Landscape::api()->update($param);
-        echo json_encode($update );
-    }
-    
-    
-    //新增票种
-    public function actionTicket(){
-        $id = $_GET['scenic_id']; 
-
-        //下方景点
-        $param['landscape_ids'] = $id;
-        $param['organization_ids'] = Yii::app()->user->org_id;
-        $param['status'] = 1;
-        $data = Poi::api()->lists($param);
-        $list = ApiModel::getLists($data);
-        
-        $this->render('ticket',  compact('id','list'));
-    }
-
-    //发布票
-    public function actionAddticket(){
-         if (Yii::app()->request->isPostRequest) {
-            $field = $_REQUEST;       
-            //通过景区 获取省市区
-            $param['id'] = $field['scenic_id'];
-            $param['organization_id'] = $field['organization_id'] = Yii::app()->user->org_id;
-            $detail = Landscape::api()->detail($param);
-            $val = ApiModel::getData($detail);
-
-            $field['province_id'] = $val['province_id'];
-            $field['city_id']     = $val['city_id'];
-            $field['district_id'] = $val['district_id'];
-            
-            $field['user_id']     = Yii::app()->user->uid;
-            $field['user_account']     = Yii::app()->user->account;
-            $field['user_name']     = Yii::app()->user->display_name;
-
-            $field['fat_price'] = 0 ;
-            $field['group_price'] = 0 ;
-            $field['refund'] = 0 ;
-            $field['scheduled_time'] = 0 ;
-            $field['mini_buy'] = 1 ;
-            $field['max_buy'] = 100 ;
-                
-            if (!empty($_REQUEST['view_point'][0]) && isset($_REQUEST['view_point'][0])) {
-                $field['view_point'] = implode(',', $_REQUEST['view_point']);
-            } else {
-                $this->_end(1, '景点不可以为空！');
-            }
-             
-            if (isset($field['all_available']) && $field['all_available'] == 1) {
-              //  $field['date_available'] = 1;
-                $field['is_infinite'] = 1;
-                $field['date_available'] = '0,9999999999';
-                unset($field['all_available']);
-            }else {
-                $a_time = strtotime($_REQUEST['date_available'][0] . ' 00:00:00');
-                $b_time = strtotime($_REQUEST['date_available'][1] . ' 23:59:59');
-                if ($b_time < $a_time) {
-                    //交换
-                    $t_time = $a_time + 86399;//23:59:59
-                    $a_time = $b_time - 86399;
-                    $b_time = $t_time;
-                }
-                $field['date_available'] = $a_time . ',' . $b_time;
-            }
-            if (count($_REQUEST['week_time']) > 0) {
-                $field['week_time'] = implode(',', $_REQUEST['week_time']);
-            } else {
-                $this->_end(1, '适用日期不可为空！');
-            }
-            
-            if(isset($_REQUEST['type']) && $_REQUEST['type'] == 'edit'){
-               $field['or_id'] = Yii::app()->user->org_id;
-             //  Tickettemplatebase::api()->debug = true;
-                $list = Tickettemplatebase::api()->update($field);
-            }else{
-                $list = Tickettemplatebase::api()->addGenerate($field);
-            }
-            if ($list['code'] == 'succ') {
-                $this->_end(0, $list['message']);
-            } else {
-                $this->_end(1, $list['message']);
-            }
-         }
-    }
-    
-    //编辑门票
-    public function actionTicketedit(){
-        //票基本信息
-        $ticketinfo = Tickettemplatebase::api()->ticketinfo(array('ticket_id'=>$_GET['id']));
-        $info = ApiModel::getData($ticketinfo);
-        $id = $info['scenic_id'];
-        
-        //景点
-        $param['landscape_ids'] = $id;
-        $param['organization_ids'] = Yii::app()->user->org_id;
-        $param['status'] = 1;
-        $data = Poi::api()->lists($param);
-        $list = ApiModel::getLists($data);
-        $this->render('ticket',  compact('id','list','info'));
     }
 
     //新建景点
@@ -217,7 +134,7 @@ class ScenicController extends Controller {
         $this->renderPartial('edit', array('data' => $data));
     }
 
-    //景点上下架  
+    //景点上下架  该景点还有上架门票 不可下架
     public function actionDownUP() {
 
         if (Yii::app()->request->isPostRequest) {
@@ -225,15 +142,42 @@ class ScenicController extends Controller {
             $param['organization_id'] = Yii::app()->user->org_id; //机构id
             $param['landscape_id'] = $_POST['landscape_id'];
             $param['status'] = $_POST['status'] ? 0 : 1;
-            //print_r($_POST);
-            $data = Poi::api()->update($param);
-            //print_r($data);
-            //print_r($data);exit;
-            if ($data['code'] == 'succ') {
-                $this->_end(0, $data['message']);
-            } else {
-                $this->_end(1, $data['message']);
+
+
+            if($param['status'] == 0){
+                //下架
+                $t_request_data = array(
+                    'view_point'=>$_POST['id'],
+                    'state'  => 1,
+                    'items' => 10000
+                );
+                $data = Tickettemplatebase::api()->lists($t_request_data);
+                //判断是否有上架门票
+                if ($data['code'] == 'succ' && empty($data['body']['data'])) {
+                    $data = Poi::api()->update($param);
+                    if ($data['code'] == 'succ') {
+                        $this->_end(0, $data['message']);
+                    } else {
+                        $this->_end(1, $data['message']);
+                    }
+                }
+
+                if(!empty($data['body']['data'])){
+                    $this->_end(1,'该景点还有未下架门票');
+                }
+
+
+            }else{
+                 //上架
+                $data = Poi::api()->update($param);
+                if ($data['code'] == 'succ') {
+                    $this->_end(0, $data['message']);
+                } else {
+                    $this->_end(1, $data['message']);
+                }
             }
+
+
         }
         $this->renderPartial('downUp');
     }

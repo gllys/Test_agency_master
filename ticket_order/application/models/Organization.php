@@ -10,13 +10,24 @@ class OrganizationModel extends Base_Model_Api
     protected $method = 'POST';
 
     public function getInfo($org_id){
-        if(!$org_id)
+        if(!$org_id) {
             return false;
-        $this->method = 'GET';
+        }
+        $this->method = 'POST';
+        $this-> url= '/v1/organizations/show';
         $this->params = array('id'=>$org_id);
-        $orgInfo = json_decode($this->request(),true);
-        if(!$orgInfo || empty($orgInfo['body']))
+        $cacheKey = 'organizationInfo_'.$org_id;
+        $mc = Cache_Memcache::factory();
+        $orgInfo = $mc->get($cacheKey);
+        if(empty($orgInfo)) {
+            $orgInfo = json_decode($this->request(),true);
+            if(!empty($orgInfo) || !empty($orgInfo['body'])) {
+                $mc->set($cacheKey,$orgInfo,10);
+            }
+        }
+        if(empty($orgInfo) || empty($orgInfo['body'])) {
             return false;
+        }
         return $orgInfo['body'];
     }
 
@@ -24,24 +35,41 @@ class OrganizationModel extends Base_Model_Api
     {
         $this->url = '/v1/organizations/list';
         $this->params = $attr;
-        $orgInfo = json_decode($this->request(),true);
-        if(!$orgInfo || empty($orgInfo['body']))
-            return false;
-        return $orgInfo['body']['data'];
+        $orgKey = 'orgList_'.md5(json_encode($this->params));
+        $mc = Cache_Memcache::factory();
+        $orgList = $mc->get($orgKey);
+        if(!$orgList) {
+            $orgInfo = json_decode($this->request(), true);
+            if(!$orgInfo || empty($orgInfo['body']))
+                return false;
+            $orgList = $orgInfo['body']['data'];
+            $mc->set($orgKey,$orgList,300); //缓存5分钟
+        }
+        return $orgList;
     }
 
-    public function getList($org_ids){
+    public function getList($org_ids,$fields=""){
         if(!$org_ids)
             return false;
         if(is_array($org_ids))
             $org_ids = implode(',',$org_ids);
-        $this->method = 'GET';
-        $this->url = '/v1/organizations/list';
-        $this->params = array('id'=>$org_ids);
-        $orgInfo = json_decode($this->request(),true);
-        if(!$orgInfo || empty($orgInfo['body']))
-            return false;
-        return $orgInfo['body'];
+
+        $orgKey = 'orgList_'.$org_ids.'_'.$fields;
+        $mc = Cache_Memcache::factory();
+        $orgList = $mc->get($orgKey);
+        if(!$orgList){
+            $this->method = 'POST';
+            $this->url = '/v1/organizations/list';
+            $this->params = array('id'=>$org_ids);
+            if($fields)
+                $this->params['fields']=$fields;
+            $orgInfo = json_decode($this->request(),true);
+            if(!$orgInfo || empty($orgInfo['body']))
+                return false;
+            $orgList = $orgInfo['body'];
+            $mc->set($orgKey,$orgList,300); //缓存5分钟
+        }
+        return $orgList;
     }
 
     public function addRefund($info,$action_type=2){
@@ -49,12 +77,12 @@ class OrganizationModel extends Base_Model_Api
         $this->url = '/v1/Credit/update';
         $this->params = array(
             'action_type'=>$action_type,
-            'distributor_id'=>$info['distributor_id'],
-            'supplier_id' => $info['supplier_id'],
+            'distributor_id'=>intval($info['distributor_id']),
+            'supplier_id' => intval($info['supplier_id']),
             'num'=>$info['money'],
             'type'=>$info['type'],
             'remark'=>$info['remark'],
-            'user_id'=>$info['op_id']
+            'user_id'=>intval($info['op_id'])
         );
         $r = $this->request();
         $res = json_decode($r,true);
@@ -77,10 +105,13 @@ class OrganizationModel extends Base_Model_Api
         return isset($res['code']) && $res['code']=='succ';
     }
 
-    public  function bySupplier($supplier_ids){
+    public  function bySupplier($supplier_ids,$fields=''){
         $this->method = 'POST';
         $this->url = '/v1/organizations/bysupplier';
         $this->params = array('supplier_ids'=>$supplier_ids);
+        if($fields!='' && $fields!='*') {
+            $this->params['fields'] = $fields;
+        }
         $res = json_decode($this->request(),true);
         return (isset($res['code']) && $res['code']=='succ') ? $res['body'] : false;
     }
@@ -102,5 +133,17 @@ class OrganizationModel extends Base_Model_Api
         $r = $this->request();
         $res = json_decode($r,true);
         return $res;
+    }
+
+    public function getIdsByName($name,$type='supply'){
+        if(!$name)
+            return false;
+        $this->url = '/v1/organizations/listByName';
+        $this->params = array('type'=>$type,'name'=>$name,'fields'=>'id');
+        $r = $this->request();
+        $r = json_decode($r, true);
+        if(!$r || empty($r['body']))
+            return false;
+        return array_keys($r['body']);
     }
 }

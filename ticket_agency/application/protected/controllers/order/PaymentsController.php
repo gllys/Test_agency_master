@@ -22,7 +22,6 @@ class PaymentsController extends Controller {
     }
 
     public function actionMethod() {
-
         $order_ids = Yii::app()->request->getParam('combine');
         if (is_scalar($order_ids)) {
             $order_ids = explode(',', $order_ids);
@@ -32,7 +31,7 @@ class PaymentsController extends Controller {
             if ((int) $pid > 0) {
                 $result = Payment::api()->lists(array(
                     'id' => $pid,
-                ), 0);
+                    ), 0);
                 if ($result['code'] == 'succ') {
                     $order_ids = $result['body']['data'][0]['order_ids'];
                     if ($result['body']['data'][0]['status'] == 'paid' || $result['body']['data'][0]['status'] == 'succ') {
@@ -57,21 +56,18 @@ class PaymentsController extends Controller {
             $order_ids = implode(',', $order_ids);
         }
         if ($order_ids == '') {
-            $this->fail('订单不能为空', '/order/history/', '下一步：跳转到订单管理页面');
+            $this->redirect('/order/history/');
         }
 
-
-        $result = Order::api()->lists( array(
+        $result = Order::api()->lists(array(
             'with_store' => 1,
             'items' => 50,
             'distributor_id' => Yii::app()->user->org_id,
             'ids' => $order_ids,
-            'fields' => 'id,name,product_payment,product_id,type,nums,amount,use_day,supplier_id,status,payment_id,nums,price_type,distributor_id',
-        )
-    );
+            'fields' => 'id,type,nums,amount,use_day,supplier_id,status,payment_id',
+            ), 0);
         $data['only_one_supplier'] = false;
         $e_order_ids = array();
-
         if ($result['code'] == 'succ') {
             $orders = $result['body']['data'];
             if (!$orders) {
@@ -90,17 +86,8 @@ class PaymentsController extends Controller {
             }
             $data['storage'] = $result['body']['with_store'];
             $supplier_ids = array();
-            $data['paymenttype'] = '';
-            $data['orders'] = $data['renwus'] =$arr_payment = array();
-
-            foreach ($orders as $k => $order) {
-                //合并支付时，支付方式应为同一支付方式 array_intersect()
-                if($k == 0){
-                    $arr_payment = explode(",",$order['product_payment']);
-                }else{
-                    $arr_payment = array_intersect($arr_payment,explode(",",$order['product_payment']));
-                }
-                $data['paymenttype'] = implode(",",$arr_payment);
+            $data['orders'] = $data['renwus'] = array();
+            foreach ($orders as $order) {
                 if ($order['type'] == 1) {
                     $data['renwus'][] = $order;
                 } else {
@@ -109,12 +96,10 @@ class PaymentsController extends Controller {
                     $supplier_ids[$order['supplier_id']] = $order['supplier_id'];
                 }
             }
-            //判断订单中的支付方式
-            $data['paytype'] = array_filter(array_unique(explode(',',$data['paymenttype'])));
             //合并支付，订单源于同一家供应商时方可信用偖值支付
             $data['only_one_supplier'] = count($supplier_ids) === 1;
         } else {
-            $this->fail($result['message'], '/order/history/', '下一步：跳转到订单管理页面');
+            $this->redirect('/order/history/');
         }
 
         $data['order_ids'] = $order_ids;
@@ -129,14 +114,12 @@ class PaymentsController extends Controller {
             }
         }
 
-        /* 平台金额  抵用券金额*/
+        /* 平台金额 */
         $data['unionmoney'] = 0;
-        $data['activity'] = 0;
         $org_id = Yii::app()->user->org_id;
-        $rs = Unionmoney::api()->total(array('org_ids'=>$org_id));
+        $rs = Unionmoney::api()->total(['org_ids' => $org_id], 0); //var_dump($money);
         if (isset($rs['code']) && $rs['code'] == 'succ') {
             $data['unionmoney'] = $rs['body']['total_union_money'];
-            $data['activity']   = $rs['body']['total_activity_money'];
         }
         $this->render('method', $data);
     }
@@ -156,48 +139,40 @@ class PaymentsController extends Controller {
             exit;
         }
         $method = Yii::app()->request->getParam('method');
-        if ($method == '' || !in_array($method, array('alipay','kuaiqian', 'credit_0', 'credit_1', 'union_4'))) {
+        if ($method == '' || !in_array($method, array('kuaiqian', 'credit_0', 'credit_1', 'union_4'))) {
             $this->redirect('/order/payments/method/combine/' . $order_ids);
         }
         $ext = null;
         if (strpos($method, '_')) {
             list($method, $ext) = explode('_', $method);
         }
-        $activity_money = 0;
-        if(isset($_REQUEST['is_activity']) && $_REQUEST['is_activity'] == 1){
-            $activity_money = isset($_REQUEST['activity_paid'])?$_REQUEST['activity_paid']:'0';
-        }
-        $condition = array(
+        $result = Payment::api()->add(array(
             'payment' => isset($ext) && $ext == 1 ? 'advance' : $method,
             'order_ids' => $order_ids,
-            'activity_paid' => $activity_money,
             'user_id' => Yii::app()->user->uid,
             'user_name' => Yii::app()->user->account,
             'distributor_id' => Yii::app()->user->org_id
-        );
+            ), 0);
 
-        $result = Payment::api()->add($condition, 0);
         if ($result['code'] == 'succ' && $result['body']['status'] == 'ready') {
             $p_method = isset($ext) && $ext == 1 ? 'advance' : $method;
-            if ($p_method != $result['body']['payment']  ||  $activity_money > 0) {
+            if ($p_method != $result['body']['payment']) {
                 Payment::api()->update(array(
                     'id' => $result['body']['id'],
                     'distributor_id' => Yii::app()->user->org_id,
                     'payment' => $p_method,
-                    'activity_paid' => $activity_money,
                     'user_id' => Yii::app()->user->uid,
                     'user_name' => Yii::app()->user->account
                     ), 0);
             }
             $params = $result['body'];
-            $params['amount'] = intval(100 * $params['amount'] - 100 * $activity_money) / 100;
             $params['payment'] = $p_method;
             $result = Order::api()->lists(array(
                 'with_store' => 1,
                 'items' => 50,
                 'distributor_id' => Yii::app()->user->org_id,
                 'ids' => $order_ids,
-                'fields' => 'id,nums,name,amount,activity_paid,use_day,product_id,type,supplier_id,status,payment_id,price_type,distributor_id',
+                'fields' => 'id,nums,amount,use_day',
                 'status' => 'unpaid'
                 ), 0);
             if ($result['code'] == 'succ') {
@@ -208,12 +183,12 @@ class PaymentsController extends Controller {
                 $is_limit = false; // 库存受限
                 $store = $result['body']['with_store']; //var_dump($result['body']);exit;
                 foreach ($orders as $order) {
-                    $k = "{$order['product_id']}_{$order['use_day']}";
+                    $k = "{$order['ticket_template_id']}_{$order['use_day']}";
                     if (array_key_exists($k, $store) && isset($store[$k]['remain_reserve']) && !is_null($store[$k]['remain_reserve'])) {
                         $store[$k]['remain_reserve'] -= $order['nums'];
                         $is_limit |= $store[$k]['remain_reserve'] < 0;
                     }
-                }
+                } //
                 unset($order);
                 if ($is_limit) {
                     $this->fail('库存不足支付出错啦！', '/order/payments/method/combine/' . $order_ids, '下一步：跳转到支付页面');
@@ -221,8 +196,8 @@ class PaymentsController extends Controller {
             } else {
                 $this->fail('支付出错啦！', '/order/payments/method/combine/' . $order_ids, '下一步：跳转到支付页面');
             }
-            $last_num = intval($params['amount'] * 100);
-            if ($last_num === 0) {
+
+            if (intval($params['amount'] * 100) === 0) {
                 $rs = Payment::api()->update(array(
                     'id' => $params['id'],
                     'distributor_id' => Yii::app()->user->org_id,
@@ -231,18 +206,16 @@ class PaymentsController extends Controller {
                     'user_id' => Yii::app()->user->uid,
                     'user_name' => Yii::app()->user->account
                 ));
-                if ($result['code'] != 'succ') {
+                if ($result['code'] == 'succ') {
                     $this->fail($result['message'], '/order/payments/method/combine/' . $order_ids, '下一步：跳转到支付页面');
                     Yii::app()->end();
-                }
-                $SmsHandler = new SMS();
-                $SmsHandler->sendPaymentMsg($params['id']);
+                }   
                 $this->redirect('/order/payments/completed/id/' . $params['id']);
             }
             if ($params['amount'] < 0) {
                 $params['amount'] = 0;
             }
-            echo $class = 'Payments' . ucfirst($method);
+            $class = 'Payments' . ucfirst($method);
             $payment = new $class();
             $re = $payment->doPay($params, $info, $ext);
             if ($re === false) {
@@ -296,22 +269,6 @@ class PaymentsController extends Controller {
                 exit();
             } else {
                 $this->redirect('/order/payments/completed/id/' . $result['orderId']);
-            }
-        }else if ($way == 'alipaybill') {
-            $type = Yii::app()->request->getParam('callback');
-            $func = $type . 'Callback';
-            $payment = new PaymentsAlipay();
-            $result = $payment->$func();
-            if ($result['result'] == 1) {//成功
-                $SmsHandler = new SMS();
-                $SmsHandler->sendPaymentMsg($result['id']);
-            }
-            if ($type == 'async' || Yii::app()->user->isGuest) {
-                $url = 'http://' . $_SERVER['HTTP_HOST'] . '/order/payments/completed/id/' . $result['id'];
-                echo "<result>{$result['result']}</result><redirecturl>$url</redirecturl>";
-                exit();
-            } else {
-                $this->redirect('/order/payments/completed/id/' . $result['id']);
             }
         }
     }

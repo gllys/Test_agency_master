@@ -58,7 +58,9 @@
 /* Interaction Cues
 ----------------------------------*/
 .ui-state-disabled {
-	cursor: default !important;
+    cursor: default !important;
+    background-image: none;
+    opacity: 0.35;
 }
 
 
@@ -789,7 +791,7 @@ body .ui-tooltip {
 .ui-datepicker {
 	background: #fff;
 	margin-top: 1px;
-	z-index:100000 !important;
+	z-index: 9000;
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
 	border-radius: 2px;

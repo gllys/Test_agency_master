@@ -1,4 +1,4 @@
-<div class="contentpanel">
+<div class="contentpanel" id="maincontent">
     <div class="row">
         <div class="col-md-12">
             <div class="panel panel-default">
@@ -18,9 +18,9 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <label class="col-sm-2 control-label"><span class="text-danger">*</span> 账号</label>
+                                    <label class="col-sm-2 control-label"><span class="text-danger">*</span> 用户名</label>
                                     <div class="col-sm-6">
-                                        <input type="text" placeholder="" tag="账号" data-validation-engine="form-control validate[required]" class="form-control validate[required]" name="account" value="<?php echo $user['account']; ?>" readonly/>
+                                        <input type="text" placeholder="" tag="用户名" data-validation-engine="validate[required]" class="form-control validate[required]" name="account" value="<?php echo $user['account']; ?>" readonly/>
                                         <input type="hidden" name="id" value="<?php echo $user['id']?>" >
                                     </div>
                                 </div>
@@ -29,7 +29,7 @@
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label">密码</label>
                                     <div class="col-sm-6">
-                                        <input type="password" placeholder="" tag="密码" data-validation-engine="form-control  validate[minSize[6],maxSize[16]]" class="form-control  validate[minSize[6],maxSize[16]]" name="password" />
+                                        <input type="password" placeholder="" tag="密码" data-validation-engine="validate[minSize[6],maxSize[16],custom[onlyLetterNumber]]" onkeypress="return IsOnlyNumLetter(event)" class="form-control  validate[minSize[6],maxSize[16]]" onblur="this.name='password'" />
                                     </div>
                                 </div>
                                 <!-- form-group -->
@@ -127,7 +127,8 @@
                 promptPosition: 'topRight',
                 addFailureCssClassToField: 'error',
                 autoHidePrompt: true,
-                autoHideDelay: 3000
+                autoHideDelay: 3000,
+	            maxErrorsPerField: 1
             });
 
             if($('#role_id').val() == ''){
@@ -138,14 +139,13 @@
             if ($('#repass-form').validationEngine('validate') === true) {
                 $.post('/system/staff/saveStaff/', $('#repass-form').serialize(), function (data) {
                     if (data.error) {
-                        var warn_msg = '<div class="alert alert-danger"><button data-dismiss="alert" class="close" type="button">×</button><i class="icon-warning-sign"></i>'+data.msg+'</div>';
-                        $('#show_msg').html(warn_msg);
-                        location.href='#show_msg';
-                        $('#buttomsub').removeAttr('disabled');
+                        alert(data.msg, function() {
+                            $('#buttomsub').removeAttr('disabled');
+                        });
                     } else {
-                        var succss_msg = '<div class="alert alert-success"><strong>更新成功！</strong></div>';
-                        $('#show_msg').html(succss_msg);
-                        location.href='/system/staff/';
+                        alert('更新成功！', function() {
+                            location.href='/site/switch/#/system/staff/';
+                        });
                     }
                 }, 'json');
             } else {

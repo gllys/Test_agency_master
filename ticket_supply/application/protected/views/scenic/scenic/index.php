@@ -1,28 +1,39 @@
 <?php
 $this->breadcrumbs = array('景区管理', '景区列表');
 ?>
-<div class="contentpanel">
+<link rel="stylesheet" href="/css/jquery-ui-1.11.2.min.css"/>
+<style type="text/css">
 
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <div style="display: none;" class="panel-btns">
-                <a data-original-title="" href="" class="panel-minimize tooltips" data-toggle="tooltip" title=""><i class="fa fa-minus"></i></a>
-                <a data-original-title="" href="" class="panel-close tooltips" data-toggle="tooltip" title=""><i class="fa fa-times"></i></a>
-            </div><!-- panel-btns -->
-            <h4 class="panel-title">景区查询</h4>
-        </div>
-        <div class="panel-body">
-            <form id="form" class="form-inline" action="/scenic/scenic/desk/" method="post">
-                <div class="mb10">
-                    <div class="input-group mb10">
-                        <input type="text" name="keyword" value="<?php if (isset($_REQUEST['keyword'])) echo $_REQUEST['keyword']; ?>" placeholder="请输入景区名" style="width:300px" class="form-control">
-                        <button type="submit" class="btn btn-primary mr5 btn-sm" style="margin-left:10px"> 搜索</button>
-                        <!--span class="input-group-btn" style="padding-left:10px">
-                            
-                        </span-->
-                    </div>
-                </div>
-                <div style="height: auto; overflow: hidden; position: relative;display: none;" id="more-wrap">
+    .ui-widget-content {
+        background: #fff;
+    }
+
+    .ui-widget-content .ui-state-focus {
+        background: #F6FAFD;
+        border: 1px solid #ddd;
+        color: #666;
+        font-weight: normal;
+    }
+
+</style>
+<div class="contentpanel">
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h4 class="panel-title">
+				景区查询
+			</h4>
+		</div>
+
+		<div class="panel-body">
+			<form action="/scenic/scenic/" id="searchForm" class="form-inline">
+					<div class="form-group">
+						<input class="form-control" placeholder="请输入景区名称" type="text" name="keyword" id="keyword" maxlength="100" style="width:318px;" value="<?php if (isset($_REQUEST['keyword'])) echo $_REQUEST['keyword']; ?>">
+					</div>
+
+					<div class="form-group">
+						<button class="btn btn-primary btn-sm" type="submit">查询</button>
+					</div>
+					<div style="height: auto; overflow: hidden; position: relative; display: none;" id="more-wrap">
                     <?php
                     $province = Districts::model()->findAllByAttributes(array("parent_id" => 0));
                     $_province_ids = isset($_REQUEST['province_ids']) ? $_REQUEST['province_ids'] : array();
@@ -42,85 +53,96 @@ $this->breadcrumbs = array('景区管理', '景区列表');
                         <a id="more-btn" flag='0' href="javascript:void(0)">更多 ∨</a>
                     </div>
                 </div>
-            </form>
-        </div><!-- panel-body -->
-    </div>
+			</form>
+		</div>
+	</div>
 
 
-
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h4 class="panel-title">景区列表</h4>
-        </div>
-
-
-
-        <div class="table-responsive">
-            <table class="table table-bordered mb30">
-                <thead>
-                    <tr>
-                        <!--th>序号</th-->
-                        <th>景区名称</th>
-                        <th>账号/密码</th>
-                        <th>所属地区</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?PHP
-                    foreach ($lists as $item):
-                        ?>
-                        <tr>
-                            <td style="display:none"><?php echo $item['id'] ?></td>
-                            <td><a href="/scenic/scenic/view/?id=<?php echo $item['id'] ?>"><?php echo $item['name'] ?></a></td>
-                            <td>
-                                <?php
-                                    $_rs =Users::model()->findByAttributes(array('organization_id'=>Yii::app()->user->org_id,'landscape_id'=>$item['id']));
-                                    if($_rs){
-                                        echo $_rs['account'].'/'.$_rs['password_str'] ;
-                                    }
-                                ?>
-                            </td>
-                            <td><?php
-                                if(!empty($item['district_id']) && isset($item['district_id'])){
-                                    $params['id'] = $item['district_id'];
-                                }elseif(empty($item['district_id']) || $item['district_id'] == 0 || !isset($item['district_id'])){
-                                    $params['id'] = $item['city_id'];
-                                }else{
-                                    $params['id'] = $item['province_id'];
-                                }
-                                
-                                $rs = Districts::model()->findByPk($params['id']);
-                                echo isset($rs['name']) ? $rs['name'] : '';
-                                ?></td>
-                        </tr>
-                        <?php
-                    endforeach;
-                    ?>
-                </tbody>
-            </table>
-        </div>
-
-        <div style="text-align:center" class="panel-footer">
-            <div id="basicTable_paginate" class="pagenumQu">
-                <?php
-					if (!empty($lists)) {
-						$this->widget('CLinkPager', array(
-							'cssFile' => '',
-							'header' => '',
-							'prevPageLabel' => '上一页',
-							'nextPageLabel' => '下一页',
-							'firstPageLabel' => '',
-							'lastPageLabel' => '',
-							'pages' => $pages,
-							'maxButtonCount' => 5, //分页数量
-						)
-						);
+	<div class="table-responsive">
+		<table class="table table-bordered mb30">
+			<thead>
+			<tr>
+				<th>景区编号</th>
+				<th>景区名称</th>
+<!--				<th>密码/账号</th>-->
+				<th>所属地区</th>
+			</tr>
+			</thead>
+			<tbody>
+			<?PHP foreach ($lists as $item): ?>
+			<tr>
+				<td style="text-align: center"><?php echo $item['id'] ?></td>
+				<td><a href="/scenic/scenic/view/id/<?php echo $item['id'] ?>"><?php echo $item['name'];?></a>
+				</td>
+<!--				<td>-->
+<!--				--><?php
+//					$_rs =Users::model()->findByAttributes(array('organization_id'=>Yii::app()->user->org_id,'landscape_id'=>$item['id']));
+//					if($_rs){
+//						echo $_rs['account'].'/'.$_rs['password_str'] ;
+//					}
+//				?>
+<!--				</td>-->
+				<td>
+				<?php
+					if (!empty($item['district_id']) && isset($item['district_id'])) {
+						$params['id'] = $item['district_id'];
+					} elseif (empty($item['district_id']) || $item['district_id'] == 0 || !isset($item['district_id'])) {
+						$params['id'] = $item['city_id'];
+					} else {
+						$params['id'] = $item['province_id'];
 					}
-                ?>
-            </div>
-        </div>
+					echo count($item['district']) == 0 ? '' : implode(' ', $item['district']);
+					// $rs = Districts::model()->findByPk($params['id']);
+					// echo isset($rs['name']) ? $rs['name'] : '';
+				?>
+				</td>
+			</tr>
+			<?php endforeach; ?>
+			</tbody>
+		</table>
+	</div>
 
-    </div>
+
+	<div style="text-align:center" class="panel-footer">
+		<div id="basicTable_paginate" class="pagenumQu">
+			<?php
+				if (!empty($lists)) {
+					$this->widget('common.widgets.pagers.ULinkPager', array(
+						'cssFile' => '',
+						'header' => '',
+						'prevPageLabel' => '上一页',
+						'nextPageLabel' => '下一页',
+						'firstPageLabel' => '',
+						'lastPageLabel' => '',
+						'pages' => $pages,
+						'maxButtonCount' => 5, //分页数量
+					)
+					);
+				}
+			?>
+		</div>
+	</div>
+	<div id='verify-modal' class="modal fade modal-bank" tabindex="-1" role="dialog"></div>
+	<script type="text/javascript">
+
+
+		$(function() {
+			$("#distributor-select-search").select2(); //景区查询下拉框
+
+			$('.allcheck').click(function() {
+				if ($(this).text() == '全选') {
+					$('#staff-body').find('input').prop('checked', true)
+					$(this).text('反选')
+				} else {
+					$('#staff-body').find('input').prop('checked', false)
+					$(this).text('全选')
+				};
+
+			});
+		});
+
+
+	</script>
 </div>
 <script type="text/javascript">
 jQuery(document).ready(function() {
@@ -141,7 +163,44 @@ jQuery(document).ready(function() {
 //                $.cookie('city_more', null);
 //            }
 //        });
-        
+
+        function focusEnd(obj) {
+            var value = obj.val();
+            obj.val('').focus().val(value);
+        }
+        // 默认选中搜索框focus
+        var $keyword = $('#keyword');
+        focusEnd($keyword);
+
+        // 搜索框模糊查询自动补全
+        $keyword.autocomplete({
+            source: function(request, response) {
+                $.ajax({
+                    url:'/scenic/scenic/index',
+                    dataType: 'json',
+                    data: {
+                        keyword: request.term,
+                        items: 8,
+                        search: 1
+                    },
+                    success: function(data) {
+                        response($.map(data, function(item) {
+                            return {
+                                value: item.name,
+                                data: 'name'
+                            }
+                        }));
+                    },
+                    minLenght: 1,
+                });
+            },
+            select: function() {
+                setTimeout(function() {
+                    $('#searchForm').submit();
+                }, 300);
+            }
+        });
+
         $('#more-wrap input:checkbox').click(function(){
             if($('#form').submit()){
                 children.location.reload();

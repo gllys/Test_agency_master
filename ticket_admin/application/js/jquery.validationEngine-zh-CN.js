@@ -152,6 +152,14 @@
                     "regex": /^[\u4E00-\u9FA5a-zA-Z]+$/,
                     "alertText": "* 请输入有效的{tag}，只能包含中文汉字与英文字母"
                 },
+                "account": {
+                    "regex": /^[\u4E00-\u9FA5a-zA-Z0-9\_]+$/,
+                    "alertText": "* 请输入有效的{tag}，只能包含中文汉字，英文字母，数字与下划线"
+                },
+                "numChinese": {
+                    "regex": /^[\u4E00-\u9FA5a-zA-Z0-9]+$/,
+                    "alertText": "* 请输入有效的{tag}，只能包含中文汉字、英文字母或数字"
+                },
                 "NoSp": {
                     "regex": /^[^\s]+$/,
                     "alertText": "请输入有效的{tag}，名字不能有空格"

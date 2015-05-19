@@ -145,7 +145,7 @@ class V1Controller extends Base_Controller_Abstract
 //        Tools::dump($ticketTemplateInfo);
         isset($ticketTemplateInfo['code']) && $ticketTemplateInfo['code']=='fail' && Lang_Msg::error($ticketTemplateInfo['message']);
         // 获取分销商和供应商名字
-        $orgs = OrganizationModel::model()->getList(array($ticketTemplateInfo['organization_id'],$this->ota['id']));
+        $orgs = OrganizationModel::model()->getList(array($ticketTemplateInfo['organization_id'],$this->ota['id']),'name,supply_type');
         $supplier_name = empty($orgs['data'][$ticketTemplateInfo['organization_id']])?' ':$orgs['data'][$ticketTemplateInfo['organization_id']]['name'];
         $distributor_name = empty($orgs['data'][$this->ota['id']])?' ':$orgs['data'][$this->ota['id']]['name'];
         // 确认支付方式
@@ -192,7 +192,7 @@ class V1Controller extends Base_Controller_Abstract
             'expire_end' => date('Y-m-d',$ticketTemplateInfo['expire_end']),
         ),$owner_mobile);
         // 写入redis
-        OrderModel::model()->redis->hset(OrderModel::model()->tradeNoKey.$trade_no , 'order_id',  $res);
+
         // succ
         Tools::lsJson(true,'succ',array(
             'order_id' => $res,
@@ -319,7 +319,7 @@ class V1Controller extends Base_Controller_Abstract
         $str .= '您已成功预订 「'.$orderInfo['name']."」门票 ".$orderInfo['nums'].' 张，订单号：'.$orderInfo['id'].'，可于：'.$orderInfo['use_day'].'-'.$orderInfo['expire_end'].'游玩，';
         $url = 'http://www.piaotai.com/qr/'.$orderInfo['id'];
         $str.='点击以下链接，向工作人员展示二维码，工作人员扫描后即可入园。 '."\n".$url;
-        return Sms::sendSMS($mobile,urlencode($str));
+        return Sms::sendSMS($mobile,urlencode($str),1,$orderInfo['id']);
     }
 
     /**

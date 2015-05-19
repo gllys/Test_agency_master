@@ -41,25 +41,37 @@ function getLodop(oOBJECT,oEMBED){
 	     //=====判断Lodop插件是否安装过，没有安装或版本过低就提示下载安装:==========
 	     if ((LODOP==null)||(typeof(LODOP.VERSION)=="undefined")) {
 	             if (navigator.userAgent.indexOf('Chrome')>=0){
-	             	document.getElementById("lodopMsgDiv").innerHTML = strHtmChrome;
+	             	//document.getElementById("lodopMsgDiv").innerHTML = strHtmChrome;
+                        alert(strHtmChrome);
 	             }
 	             if (navigator.userAgent.indexOf('Firefox')>=0){
-					document.getElementById("lodopMsgDiv").innerHTML=strHtmFireFox;
+                        //document.getElementById("lodopMsgDiv").innerHTML=strHtmFireFox;
+                        alert(strHtmFireFox);
 	             }
 	             if (is64IE){
-	             	document.getElementById("lodopMsgDiv").innerHTML = strHtm64_Install;
+	             	//document.getElementById("lodopMsgDiv").innerHTML = strHtm64_Install;
+                        alert(strHtm64_Install);
 	             }else if (isIE){
-	             	document.getElementById("lodopMsgDiv").innerHTML = strHtmInstall;
+	             	//document.getElementById("lodopMsgDiv").innerHTML = strHtmInstall;
+                        alert(strHtmInstall);
 	             }else{
-	             	document.getElementById("lodopMsgDiv").innerHTML = strHtmInstall;
+	             	//document.getElementById("lodopMsgDiv").innerHTML = strHtmInstall;
+                        alert(strHtmInstall);
 	             }
-	             document.getElementById("lodopMsgDiv").style.display = "block";
+	             //document.getElementById("lodopMsgDiv").style.display = "block";
 	             return LODOP;
 	     } else 
 	     if (LODOP.VERSION<"6.1.8.7") {
-	             if (is64IE) document.write(strHtm64_Update); else
-	             if (isIE) document.write(strHtmUpdate); else
-	             document.getElementById("lodopMsgDiv").innerHTML = strHtmUpdate;
+	             if (is64IE){
+                         //document.write(strHtm64_Update);
+                         alert(strHtm64_Update);
+                     } else if (isIE){
+                         //document.write(strHtmUpdate);
+                         alert(strHtmUpdate);
+                     } else{
+                         alert(strHtmUpdate);
+	             //document.getElementById("lodopMsgDiv").innerHTML = strHtmUpdate;
+                     }
 	    	     return LODOP;
 	     };
 	     //=====如下空白位置适合调用统一功能(如注册码、语言选择等):====	     
@@ -68,9 +80,13 @@ function getLodop(oOBJECT,oEMBED){
 	     //============================================================	     
 	     return LODOP; 
 	} catch(err) {
-	     if (is64IE)	
-            document.documentElement.innerHTML="Error:"+strHtm64_Install+document.documentElement.innerHTML;else
-            document.documentElement.innerHTML="Error:"+strHtmInstall+document.documentElement.innerHTML;
+            if (is64IE) {
+                alert(strHtm64_Install);
+                //document.documentElement.innerHTML = "Error:" + strHtm64_Install + document.documentElement.innerHTML;
+            } else {
+                 alert(strHtmInstall);
+                document.documentElement.innerHTML = "Error:" + strHtmInstall + document.documentElement.innerHTML;
+            }
 	     return LODOP; 
 	};
 }

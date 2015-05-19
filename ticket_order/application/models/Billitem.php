@@ -17,13 +17,13 @@ class BillitemModel extends Base_Model_Abstract
     }
 
     public function share($ts = 0) {
-    	if (!$ts) $ts = time();
-    	$this->tblname = $this->basename . date('Ym', $ts);
+    	// if (!$ts) $ts = time();
+    	// $this->tblname = $this->basename . date('Ym', $ts);
     	return $this;
     }
 
     public function shareById($id) {
-    	$this->tblname = $this->basename . Util_Common::payid2date($id);
+    	// $this->tblname = $this->basename . Util_Common::payid2date($id);
     	return $this;
     }
 }

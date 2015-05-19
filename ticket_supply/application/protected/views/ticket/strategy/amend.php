@@ -52,7 +52,7 @@ $this->breadcrumbs = array('产品', '价格、库存规则定制');
                                         </div>
                                         <div class="panel-body">
                                             <div class="form-group">
-                                                <label class="col-sm-2 control-label">散客价</label>
+                                                <label class="col-sm-2 control-label">散客结算价</label>
 
                                                 <div class="col-sm-6">
                                                     <select id="s_type" class="select2" data-placeholder=""
@@ -190,7 +190,7 @@ $this->breadcrumbs = array('产品', '价格、库存规则定制');
             json['desc'] = $('#desc').val();
             var wrap = $('#configWrap').html();
             $.ajax({
-                url: "/ticket/product/commit",
+                url: "/ticket/strategy/commit",
                 type: "POST",
                 dataType: "json",
                 data: json,
@@ -203,6 +203,7 @@ $this->breadcrumbs = array('产品', '价格、库存规则定制');
                         //delete(storageCal.data[year_month]);
                         alert("设置成功");
                         location.href = '/ticket/strategy/amend/id/' + result.id;
+                        //storageCal.show(year_month, $("#pid").val(), $("#begintime").val());
                     } else {
                         alert(result.message);
                     }
@@ -232,8 +233,10 @@ $this->breadcrumbs = array('产品', '价格、库存规则定制');
                 },
                 success: function(result) {
                     if (result.code == 200) {
-                        alert("保存成功");
-                        location.href = '/ticket/strategy/amend/id/' + result.id;
+                        //var year_month = $("#storageCalContent input.year_month").first().val();
+                        //delete(storageCal.data[year_month]);
+                        alert("保存成功",function(){location.href = '/ticket/strategy/amend/id/' + result.id;});
+                        //storageCal.show(year_month, $("#pid").val(), $("#begintime").val());
                     } else {
                         alert(result.message);
                     }
@@ -251,8 +254,18 @@ $this->breadcrumbs = array('产品', '价格、库存规则定制');
 
 
         var spinner = jQuery('.spinner').spinner({'min': 1});
-        spinner.spinner('value', 1);
-
-
+        //spinner.spinner('value', 1);
+        //因url写死，改放在调用页面处理
+        $('.rule-remove-btn').click(function(){
+            var date = $(this).parent().parent().attr('date');
+		    PWConfirm('确认要删除"+date+"的规则设定吗？',function(){
+			       var pid = $("#pid").val();
+                $.get('/ticket/strategy/delete', {id: pid, date: date}, function(result){
+                    if (result == 1) {
+                        location.href = '/ticket/strategy/amend/id/'+pid;
+                    }
+                });
+            });
+        });
     });
 </script>

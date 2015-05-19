@@ -6,6 +6,7 @@
 class Log_Test extends Log_Base
 {
 	protected $tblname = 'log_test';
+    public static $type = array('CREATE'=>1,'UPDATE'=>2,'DEL'=>3);
     
 	public function getTable() {
         return $this->tblname;

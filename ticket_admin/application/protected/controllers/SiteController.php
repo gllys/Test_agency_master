@@ -27,12 +27,13 @@ class SiteController extends Controller {
     }
 
     public function actionIndex() {
-        $redirectChild = CreateUrl::model()->getRedirectOne();
-        if (empty($redirectChild['params'])) {
-            $this->onUnauthorizedAccess('');
-        }
-        $url = $redirectChild['params']['href'];
-        $this->redirect($url);
+        $this->redirect('/site/switch/#/dashboard/');
+        $this->render('index');
+    }
+    
+    //ajax首页
+    public function actionSwitch(){
+        $this->render('switch');
     }
 
     public function actionHeader($index) {
@@ -45,7 +46,7 @@ class SiteController extends Controller {
      */
     public function actionError() {
         if (Yii::app()->user->isGuest) {
-            $this->redirect('/site/login');
+            $this->redirect('site/login');
         }
 
         if ($error = Yii::app()->errorHandler->error) {
@@ -174,6 +175,10 @@ class SiteController extends Controller {
             $this->redirect('/');
         }
         
+        if(!isset($_POST['ajax']) && !isset($_POST['ULoginForm'])&&Yii::app()->request->getIsAjaxRequest()){
+            $this->_end(3,'你已经退出') ;
+        }
+        
         $rec = Recommend::api()->lists(array('pos_id'=>1,'expire_time'=>'true','status'=>1,'items'=>10000));
         $rec = $rec['body']['data'];
         
@@ -203,7 +208,8 @@ class SiteController extends Controller {
 //                $session_id = Yii::app()->getSession()->getSessionId();
 //                Yii::app()->redis->hMset('session_' . $session_id, $info);
 //                Yii::app()->redis->expire('session_' . $session_id, 3600 * 24);
-                $this->redirect('/');
+                //$this->redirect('/');
+                 $this->redirect('/site/switch/#/dashboard/');
             }
         }
 
@@ -360,15 +366,22 @@ class SiteController extends Controller {
 
     public function actionUpyunAgent() {
         $model = array('code', 'message', 'url', 'time', 'image-width', 'image-height', 'image-frames', 'image-type');
-        foreach ($model as $val)
+        foreach ($model as $val){
             if (!isset($_GET[$val])) {
                 echo '<script type="text/javascript">parent.upload_callback({status:1,msg:"参数不全上传失败"});</script>';
                 Yii::app()->end();
             }
-        if (md5("{$_GET['code']}&{$_GET['message']}&{$_GET['url']}&{$_GET['time']}&" . Yii::app()->upyun->formApiSecret) != $_GET['sign']) {
-            echo '<script type="text/javascript">parent.upload_callback({status:1,msg:"密钥不正确上传失败"});</script>';
-            Yii::app()->end();
         }
+        
+        if($_GET['code']!=200){
+             echo '<script type="text/javascript">parent.upload_callback({status:1,msg:"'.$_GET['message'].'"});</script>';
+            Yii::app()->end();
+        }    
+        
+//        if (md5("{$_GET['code']}&{$_GET['message']}&{$_GET['url']}&{$_GET['time']}&" . Yii::app()->upyun->formApiSecret) != $_GET['sign']) {
+//            echo '<script type="text/javascript">parent.upload_callback({status:1,msg:"密钥不正确上传失败"});</script>';
+//            Yii::app()->end();
+//        }
 
         echo '<script type="text/javascript">parent.upload_callback({status:200,msg:"' . Yii::app()->upyun->host . $_GET['url'] . '"});</script>';
         Yii::app()->end();

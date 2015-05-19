@@ -1,8 +1,9 @@
 <?php
 
 Yii::setPathOfAlias('common', realpath(dirname(__FILE__) . '/../../../common'));
-include(dirname(__FILE__) . '/../../../../setting/ticket_admin.php');
-defined('VERSION') || define('VERSION', '6.1.1');
+include(dirname(__FILE__) . '/../../../../setting/ticket_admin.php'); #配置文件
+if (defined('XHPROF_OPEN') && XHPROF_OPEN) require (dirname(__FILE__) . '/../../xhprof.php'); #性能监控
+defined('VERSION') || define('VERSION', '6.1.1'); #版本控制
 // This is the main Web application configuration. Any writable
 // CWebApplication properties can be configured here.
 $config = array(
@@ -112,7 +113,7 @@ $config = array(
             'routes' => array(
                 array(
                     'class' => 'CFileLogRoute',
-                    'levels' => 'info, error, warning',
+                    'levels' => 'error, warning',
                 ),
             ),
         ),

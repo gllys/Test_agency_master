@@ -16,7 +16,9 @@ class Db_Mysql
     protected $tryLimit = 3;
     protected $transCounter = 0;
     protected $listKey;
+    protected $groupBy;
     public $sql;
+    public $start_time;
     
     /**
      * [factory description]
@@ -47,6 +49,7 @@ class Db_Mysql
      * @param [type] $options [description]
      */
     public function __construct($options) {
+        $this->start_time = time();
         $this->config = new MysqlConfig($options);
     }
     
@@ -77,6 +80,12 @@ class Db_Mysql
      */
     public function connect() {
         try {
+            $now = time();
+            if($now - $this->start_time>3600){
+                $this->db = null;
+                $this->connected = false;
+                $this->start_time = $now;
+            }
             $this->_connect();
             $this->try = 0;
         }
@@ -99,7 +108,12 @@ class Db_Mysql
         $this->listKey = $key;
         return $this;
     }
-    
+
+    public function setGroupBy($groupBy = null){
+        $this->groupBy = $groupBy;
+        return $this;
+    }
+
     public function select($tblname, $cond, $fields = '*', $order = null, $limit = null) {
         $data = array();
         $sth = $this->doQuery($tblname, $cond, $fields, $order, $limit);
@@ -108,10 +122,12 @@ class Db_Mysql
         }
         $sth = null;
         $this->setListKey();
+        $this->setGroupBy();
         return $data;
     }
 
     public function selectBySql($sql) {
+        $this->connect();
         $data = array();
         $this->sql = $sql;
         $sth = $this->db->prepare($this->sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
@@ -121,6 +137,7 @@ class Db_Mysql
         }
         $sth = null;
         $this->setListKey();
+        $this->setGroupBy();
         return $data;
     }
 
@@ -166,12 +183,15 @@ class Db_Mysql
         $limit = $this->getLimit($limit);
         $limit = $limit ? ' LIMIT ' . $limit : '';
 
-        $this->sql = "SELECT " . $fields . " FROM `" . $tblname . "`" . $where . $order . $limit;
+        $groupBy = $this->groupBy?' GROUP BY '.$this->groupBy:'';
+
+        $this->sql = "SELECT " . $fields . " FROM `" . $tblname . "`" . $where . $groupBy . $order . $limit;
         Log_Base::save('query', 'sql:'.$this->sql);
         $sth = $this->db->prepare($this->sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
 //        echo $this->sql;print_r($params);
         $sth->execute($params);
 //         echo $this->sql;print_r($params);
+        $this->groupBy='';
         return $sth;
     }
 

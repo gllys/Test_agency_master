@@ -11,6 +11,7 @@ $this->breadcrumbs = array('结算管理', '交易流水');
     .table-bordered a:hover {
         text-decoration: none;
     }
+    .ui-datepicker { z-index:9999!important }
 </style>
 <div class="contentpanel">
 
@@ -207,7 +208,30 @@ unset($type, $label)
         jQuery('#timepicker3').timepicker({minuteStep: 15});
 
 // Date Picker
-        jQuery('.datepicker').datepicker({showOtherMonths: true, selectOtherMonths: true});
+        $('.datepicker').datepicker({
+            changeMonth: true,
+            changeYear: true,
+            dateFormat: 'yy-mm-dd',
+            monthNamesShort: [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" ],
+            yearRange: "1995:2065",
+            beforeShow: function(d){
+                setTimeout(function(){
+                    $('.ui-datepicker-title select').select2({
+                        minimumResultsForSearch: -1
+                    });
+                },0)
+            },
+            onChangeMonthYear: function(){
+                setTimeout(function(){
+                    $('.ui-datepicker-title select').select2({
+                        minimumResultsForSearch: -1
+                    });
+                },0)
+            },
+            onClose: function(dateText, inst) { 
+                $('.select2-drop').hide(); 
+            }
+        });
         jQuery('#datepicker-inline').datepicker();
         jQuery('#datepicker-multiple').datepicker({
             numberOfMonths: 3,
@@ -267,11 +291,11 @@ unset($type, $label)
         });
 
 //        $('#mode_link').change(function() {
-//            location.href = '/finance/blotter/view/mode/' + $(this).val();
+//            location.href = '/site/switch/#/finance/blotter/view/mode/' + $(this).val();
 //        });
 //
 //        $('#type_link').change(function() {
-//            location.href = '/finance/blotter/view/type/' + $(this).val();
+//            location.href = '/site/switch/#/finance/blotter/view/type/' + $(this).val();
 //        });
     });
 </script>

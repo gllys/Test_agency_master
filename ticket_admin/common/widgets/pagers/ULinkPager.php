@@ -163,10 +163,21 @@ class ULinkPager extends CBasePager {
         echo $this->header;
         echo '<div class="col-xs-7"><div class="pagenumQu">';
         if (!empty($buttons)) {
-             echo CHtml::tag('ul', $this->htmlOptions, implode("\n", $buttons));
-            $url = (strpos($_SERVER['SCRIPT_URI'],'/page/')?substr($_SERVER['SCRIPT_URI'],0,strpos($_SERVER['SCRIPT_URI'],'/page/')):$_SERVER['SCRIPT_URI']) ;
-            echo ' 跳转到<input id="go" class="form-control" type="text" value="">'
-            . '<button id="goButton"  class="btn btn-primary btn-sm" type="button" onclick="window.location.href=\''. $url.'?page=\'+parseInt($(\'#go\').val())">GO</button>';
+            $request_url = !empty($_SERVER['SCRIPT_URI']) ? $_SERVER['SCRIPT_URI'] : (!empty($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : $_SERVER['SCRIPT_NAME']);
+            //点击“go”时，带get参数跳转
+            $url = $buttons[count($buttons)-1];
+            $url = substr($url,strpos($url,'href="')+strlen('href="'));
+            $url = substr($url,0,strpos($url,'/page/'));
+            $url = substr($url,0,strpos($url,'/mod/'));
+            
+            //如果ajax加载分页
+            if(!empty($_GET['mod'])&&$_GET['mod']=='part'){
+                $url = '/site/switch/#'.$url ;
+            }
+            echo CHtml::tag('ul', $this->htmlOptions, implode("\n", $buttons));
+//            $url = (strpos($request_url, '/page/') ? substr($request_url, 0, strpos($request_url, '/page/')) : $request_url);
+            echo ' 跳转到<input id="go" class="form-control" type="text" value="">' .
+                '<button id="goButton"  class="btn btn-primary btn-sm" type="button" onclick="window.location.href=\'' . $url .'/page/\'+(isNaN(parseInt($(\'#go\').val()))?\'\':parseInt($(\'#go\').val()))">GO</button>';
         }
         echo '</div></div>';
         echo '</div>';

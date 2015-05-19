@@ -5,6 +5,9 @@
  */
 final class Payment_Kuaiqian
 {
+    //退款成功
+    const PAY_BACK_SUCC = '1';
+
     private static $req;
     //基本参数
     private $merchantAcctId; //快钱账号

@@ -1,201 +1,256 @@
 <?php
-use common\huilian\utils\Format;
-
 /**
  * Created by PhpStorm.
  * User: grg
  * Date: 11/19/14
  * Time: 4:29 PM
  */
-$this->breadcrumbs = array(
-	'门票管理',
-	'我的收藏'
-);
+$this->breadcrumbs = array('门票管理', '我的收藏');
 ?>
+<style>
+	.prov_p{width:120px;display:inline-block;height: 20px;text-align: left; cursor: pointer;}
+	.ticket_type{cursor: pointer;}
+	#proname{color:red;}
+	#tablecss th,#tablecss td{text-align: center;}
+	.bun {color: #999}
+	.fav-done {color: #269abc}
+	.sub-done {color: #643534}
+	.sub-done:hover {color: #801504}
+</style>
 <div class="contentpanel">
-	<div class="panel panel-default">
-		<div class="panel-heading">
-			<div class="panel-btns" style="display: none;">
-				<a title="" data-toggle="tooltip" class="panel-minimize tooltips" href="" data-original-title="Minimize Panel"><i class="fa fa-minus"></i></a> <a title="" data-toggle="tooltip" class="panel-close tooltips" href="" data-original-title="Close Panel"><i class="fa fa-times"></i></a>
-			</div>
-			<!-- panel-btns -->
-			<h4 class="panel-title" style="padding-left: 0;">查询</h4>
-		</div>
-		<div class="panel-body">
-			<!--搜索结构改动--->
-			<form class="form-inline" method="get" action="/ticket/favorites/index/type/<?= $type ?>">
-				<div class="form-group">
-					门票名称： <input class="form-control" placeholder="" type="text" name="name" value="<?= $name ?>">
-				</div>
-				<div class="form-group">
-					<button class="btn btn-primary mr5 btn-sm">搜索</button>
-				</div>
-			</form>
-		</div>
-		<!-- panel-body -->
+
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h4 class="panel-title">查询</h4>
+	</div>
+	<div class="panel-body">
+		<form class="form-inline" method="get" action="/ticket/favorites/index/type/<?php echo $type?>">
+			<table>
+				<tr>
+
+					<td>
+						<div class="form-group">
+							门票名称：
+							<input class="form-control" type="text" name="name" value="<?php echo $name?>"/>
+						</div>
+						<button class="btn btn-primary mr5 btn-sm">搜索</button>
+					</td>
+
+				</tr>
+			</table>
+		</form>
+	</div><!-- panel-body -->
+</div>
+
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h4 class="panel-title btn-list">
+			<?php
+			$btn_cls = array('primary', 'default');
+			$group_cls = '';
+			if ($type == 0) {
+				$btn_cls = array('default', 'primary');
+				$group_cls = 'group';
+			}
+			?>
+			<button type="button" data-id="1" class="btn bun-link btn-<?php echo $btn_cls[0]?> btn-xs">散 客</button>
+			<button type="button" data-id="0" class="btn bun-link btn-<?php echo $btn_cls[1]?> btn-xs">团 客</button>
+			<script>
+				$(function(){
+					$('.bun-link').click(function(){
+						location.href = '/ticket/favorites/index/type/' + $(this).attr('data-id');
+					});
+				});
+			</script>
+		</h4>
 	</div>
 	<style>
-.table-bordered th:nth-child(1) {
-	padding-left: 20px;
-}
+		.table-responsive img{
+			max-width:100px
+		}
+		.table-responsive th,.table-responsive td{
+			vertical-align:middle!important
+		}
+		.rules{
+			position:relative;
+			display:inline-block;
+		}
+		.rules+.rules{
+			margin-left:20px;
+		}
+		.rules > span{
+			color:#999;
+			font-size:12px;
+			cursor:pointer
+		}
+		.rules > div >span{
+			margin:0 10px
+		}
+		.rules > div{
+			display:none;
+			position:absolute;
+			top:15px;
+			left:50px;
+			z-index:999;
+			width:500px;
+			padding:10px;
+			background-color:#fbf8e9;
+			border:1px solid #fed202;
+			border-radius:2px;
+			box-shadow:0 0 10px rgba(0,0,0,.2);
+		}
+		.rules > div .table{
+			background:none;
+		}
+		.rules > div .table tr > *{
+			border:1px solid #e0d9b6
+		}
+		.rules:hover > div{
+			display:block;
+		}
+	</style>
+	<div class="table-responsive">
+		<table class="table table-bordered mb30" id="tablecss">
+			<thead>
+			<tr>
+				<th style="width:5%">票种</th>
+				<th style="text-align:left;">景区</th>
+				<th style="text-align:left;width: 25%">门票名称</th>
+				<th style="text-align:left">供应商</th>
+				<th style="width:15%">游玩日期</th>
+				<th style="text-align:right;width:5%">销售价</th>
+				<th style="text-align:right;width:5%">挂牌价</th>
+				<th style="text-align:right;width:5%">散客价</th>
+				<th style="width:5%">类型</th>
+				<th style="width:5%">操作</th>
+			</tr>
+			</thead>
+			<tbody>
+			<?php if (isset($lists)):
+			foreach($lists as $model):
+				?>
+				<tr>
+					<td><?php echo $model['is_union'] == 1 ?'联票': '单票'?></td>
+					<td style="text-align:left"><?php
+						$result = Landscape::api()->lists(array("ids" => $model['scenic_id']));
+						$landspaceInfo = ApiModel::getLists($result);
+						foreach ($landspaceInfo as $value) {
+							echo "<a href='/ticket/show/?id=" . $value['id'] . "'>" . $value['name'] . "</a><br>";
+						}
+						?></td>
+					<td style="text-align:left">
+						<div class="col-md-12">
+							<div class="pull-left"><strong><?php echo  $model['name'];?></strong></div>
+							<div class="pull-right" data-id="<?php echo $model['id'] ?>"><?php
+								echo true
+									? '<a class="bun fav '.$group_cls.' fav-done" href="javascript:;" title="取消收藏">已收藏</a>'
+									: '<a class="bun fav '.$group_cls.'" href="javascript:;" title="加入收藏">收藏</a>';
+								?></div>
+						</div>
+						<div class="col-md-12">
+							<div class="pull-left">
+								<div class="rules"><span>订票规则</span>
+									<div class="table-responsive">
+										<table class="table table-bordered mb30">
+											<?php echo $model['remark'];?>
+										</table>
+									</div>
+								</div>
+								<div class="rules"><span>游玩星期</span>
 
-.table-bordered td:nth-child(1) {
-	padding-left: 20px;
-}
-</style>
-	<ul class="nav nav-tabs">
-		<li class="<?= $type == 1 ? 'active' : '' ?>"><a data-id="1" data-toggle="tab" href="#t1" class="bun-link"><strong>散客</strong></a></li>
-		<li class="<?= $type == 0 ? 'active' : '' ?>"><a data-id="0" data-toggle="tab" href="#t2" class="bun-link"><strong>团队</strong></a></li>
-		<script>
-			$(function(){
-				$('.bun-link').click(function(){
-					location.href = '/ticket/favorites/index/type/' + $(this).attr('data-id');
-				});
-			});
-		</script>
-	</ul>
-	<div class="tab-content mb30" style="padding: 0; border: none;">
-		<div id="t1" class="tab-pane active">
-			<table class="table table-bordered" id="tablecss">
-				<thead>
-					<tr>
-						<th>票种</th>
-						<th>景区</th>
-						<th>门票名称</th>
-						<th>供应商</th>
-						<th>游玩有效期</th>
-						<th>门市挂牌价</th>
-						<th>网络销售价</th>
-						<th><?= $type == 0 ? '团客' : '散客' ?>结算价</th>
-						<?php if($type == 0): ?>
-						<th>最低订购数</th>
-						<?php endif; ?>
-						<th>类型</th>
-						<th>操作</th>
-					</tr>
-				</thead>
-				<tbody>
-					<?php 
-						if (isset($lists)):
-							foreach($lists as $model):
-					?>
-					<tr>
-						<td><?= $model['is_union'] == 1 ? '联票' : '单票' ?></td>
-						<td><?php
-                            //单例，性能优化
-                            if (!isset($singleLans)) {
-                                //得到所有景点信息
-                                $ids = PublicFunHelper::arrayKey($lists, 'scenic_id');
-                                $param = array();
-                                $param['ids'] = join(',', $ids);
-                                $param['items'] = 100000;
-                                $param['fields'] = 'id,name';
-                                $data = Landscape::api()->lists($param,true,30);
-                                $singleLans = PublicFunHelper::ArrayByUniqueKey(ApiModel::getLists($data), 'id');
-                                //print_r($singleLans);
-                            }
-                            $_lans = explode(',', $model['scenic_id']);
-                            //print_r($_lans);
-                            $html = '';
-                            foreach ($_lans as $id) {
-                                if (!empty($singleLans[$id])) {
-                                    $html .= "<a href='/ticket/show/?id=" . $singleLans[$id]['id'] . "'>" . $singleLans[$id]['name'] . "</a><br>";
-                                }
-                            }
-                            ?>
-                            <div class="lanpart<?php echo $model['id']?>">
-								 <?php echo $html?>
-                            </div>
-                            <div class="lan<?php echo $model['id']?>" style="display: none"><?php echo $html;?></div>
-                        </td>
-
-						<td><?= $model['name'] ?></td>
-						<td><?php
+									<div class="day"><?php
+										if (strstr($model['week_time'], '1')) {
+											echo '周一' . '&nbsp;';
+										}
+										if (strstr($model['week_time'], '2')) {
+											echo '周二' . '&nbsp;';
+										}
+										if (strstr($model['week_time'], '3')) {
+											echo '周三' . '&nbsp;';
+										}
+										if (strstr($model['week_time'], '4')) {
+											echo '周四' . '&nbsp;';
+										}
+										if (strstr($model['week_time'], '5')) {
+											echo '周五' . '&nbsp;';
+										}
+										if (strstr($model['week_time'], '6')) {
+											echo '周六' . '&nbsp;';
+										}
+										if (strstr($model['week_time'], '0') === '0') {
+											echo '周日' . '&nbsp;';
+										}
+										?></div>
+								</div>
+							</div>
+							<div class="pull-right" data-id="<?php echo $model['id'] ?>" data-fat="<?php echo $model['fat_price'] ?>" data-group="<?php echo $model['group_price'] ?>"><?php
+								echo isset($model['sub']) && $model['sub'] == 1
+									? '<a class="bun sub '.$group_cls.' sub-done" href="javascript:;" title="取消订阅">已订阅</a>'
+									: '<a class="bun sub '.$group_cls.'" href="javascript:;" title="加入订阅">订阅</a>';
+								?></div>
+						</div>
+					</td>
+					<td style="text-align:left">
+						<?php
 						$organ = Organizations::api()->show(array('id'=>$model['organization_id']));
 						echo isset($organ['body']['name'])?$organ['body']['name']:"";
 						?></td>
-						<td><?php
+					<td>
+						<?php
 						$time = explode(',',$model['date_available']);
 						if(!empty($time[0]) && !empty($time[1])){
-							echo Format::date($time[0], 'zh') . '~<br/>' . Format::date($time[1], 'zh');
+							echo date('m月d日',$time[0]) . '~' .date('m月d日',$time[1]);
 						}else{
 							echo '';
 						}
 
-						?></td>
-						<td><?= $model['listed_price'];?></td>
-						<td><?= $model['sale_price'] ?></td>
-						<td><?= $type == 0 ? number_format($model['group_price'],2) : number_format($model['fat_price'],2) ?></td>
-						<?php if($type == 0): ?>
-						<td><?= $model['mini_buy'] ?></td>
-						<?php endif; ?>
-						<td>电子票</td>
-						<td>
+						?>
+					</td>
+					<td style="text-align:right"><del><?php echo $model['sale_price'];?></del></td>
+					<td style="text-align:right"><del><?php echo $model['listed_price'];?></del></td>
+					<td style="text-align:right" class="text-success"><?php echo number_format($model['fat_price'],2);?></td>
+					<td><?php echo $model['type']?'任务单':'电子票';?></td>
+					<td>
+						<a class="btn btn-success btn-xs" href=".bs-example-modal-lg" onclick="buy('<?php echo $model['id'] ?>','<?php echo $model['organization_id']?>');" data-toggle="modal">购买</a>
+					</td>
+				</tr>
+			<?php endforeach;
+			endif;?>
+			</tbody>
+		</table>
 
-							<div class="pull-left"><a data-toggle="modal" onclick="buy('<?= $model['ticket_id'] ?>','<?= $model['organization_id']?>');" href=".bs-example-modal-lg" class="btn btn-success btn-xs">购买</a></div>
-                            <div class="pull-right"><a data-id="<?= $model['ticket_id'] ?>" data-operate="1" data-type="<?= $type ?>" data-name="<?= $model['name'] ?>"
-                                                      data-fat="<?= $model['fat_price'] ?>" data-group="<?= $model['group_price'] ?>"
-                                                      class="favorite-operator btn btn-danger btn-xs" href="javascript:;" title="删除">删除</a></div>
-                        </td>
-					</tr>
-					<?php 
-						endforeach;
-							endif;
-					?>
-				</tbody>
-			</table>
-		</div>
-		<!-- tab-pane -->
-		
-			<div style="text-align:center" class="panel-footer">
-				<div id="basicTable_paginate" class="pagenumQu">
-					<?php
-					if (isset($pages)) {
-						$this->widget('common.widgets.pagers.ULinkPager', array(
-							'cssFile' => '',
-							'header' => '',
-							'prevPageLabel' => '上一页',
-							'nextPageLabel' => '下一页',
-							'firstPageLabel' => '',
-							'lastPageLabel' => '',
-							'pages' => $pages,
-							'maxButtonCount' => 5, //分页数量
-						));
-					}
-					?>
-				</div>
-			</div>
-		
 	</div>
-</div>
-<!-- contentpanel -->
 
-<div id="lock_layer" class="unlocked" style="display: none">
-	<div class="lockedpanel">
-		<div class="loginuser">
-			<img src="/img/logo.png" width="200" class="img-circleimg-online" alt="" />
+	<div style="text-align:center" class="panel-footer">
+		<div id="basicTable_paginate" class="pagenumQu">
+			<?php
+			if (isset($pages)) {
+				$this->widget('CLinkPager', array(
+					'cssFile' => '',
+					'header' => '',
+					'prevPageLabel' => '上一页',
+					'nextPageLabel' => '下一页',
+					'firstPageLabel' => '',
+					'lastPageLabel' => '',
+					'pages' => $pages,
+					'maxButtonCount' => 5, //分页数量
+				));
+			}
+			?>
 		</div>
-		<div class="logged">
-			<h3 style="color:darkred">金额:0元</h3>
-			<strong class="text-muted">支付中，请勿关闭页面</strong>
-		</div>
-		<form id="unlock" method="post" class="form-inline" action="">
-			<div class="form-group">
-				<button class="btn btn-success">支付成功</button>
-			</div>
-			<div class="form-group" style="margin-right: 0">
-				<button class="btn btn-fail">支付失败</button>
-			</div>
-			<!-- input-group -->
-		</form>
 	</div>
-	<!-- lockedpanel -->
-</div>
-<!-- locked -->
 
+
+</div>
+</div><!-- contentpanel -->
+
+<style>
+	.red{color:red;}
+</style>
 
 <!--购买票开始-->
 <div class="modal fade bs-example-modal-lg" id="verify-modal-buy" tabindex="-1" role="dialog"></div>
+
 <script type="text/javascript">
 	function buy(id,supplier_id){
 		$('#verify-modal-buy').html();
@@ -225,13 +280,7 @@ $this->breadcrumbs = array(
 		window.location.href = url;
 	}
 
-    //全展示
-    $('.lanview').click(function(){
-        var id = $(this).attr('data-id');
-        $('.lanpart' + id).hide();
-        $('.lan' + id).show();
 
-    })
 
 
 	$("#getOver0").click(function(){
@@ -252,32 +301,11 @@ $this->breadcrumbs = array(
 
 	})
 </script>
+
+
+
 <script>
 	jQuery(document).ready(function(){
-
-		// 收藏
-		$('.favorite-operator').click(function() {
-			var _this = this;
-			var params = {
-				id: $(this).attr('data-id'),
-				done: $(this).attr('data-operate'),
-				single: $(this).attr('data-type'),
-				name: $(this).attr('data-name'),
-                fat_price : $(this).attr('data-fat'),
-                group_price : $(this).attr('data-group')
-			}
-			$.post('/ticket/favorites/toggle', params, function(data) {
-				if(data['code'] == 1) {
-					if($(_this).attr('data-operate') == 1) {
-						$(_this).attr('data-operate', 0).removeClass('btn-danger').addClass('btn-success').text('添加');
-					} else {
-						$(_this).attr('data-operate', 1).removeClass('btn-success').addClass('btn-danger').text('删除');
-					}
-				}	
-		    }, 'json');
-			
-		});
-		
 		// Tags Input
 		jQuery('#tags').tagsInput({width:'auto'});
 
@@ -351,7 +379,28 @@ $this->breadcrumbs = array(
 
 	});
 
-	
-	
 </script>
+<script src="/js/fav-sub.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

@@ -1,51 +1,58 @@
 <?php
-$this->breadcrumbs = array('核销', '核销');
+$this->breadcrumbs = array('验票', '验票');
 ?>
 <div class="contentpanel">
-    <form class="form-inline" id="_search">
+    <form action="/check/used/" method="get" class="form-inline" id="_search">
 
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h4 class="panel-title">打印小票</h4>
+                <div class="inline-block" style="float:right; margin-top: -25px;">
+                    <a class="btn btn-primary btn-xs" onclick="setPrinter();return false;">
+                        <i class="fa fa-print"></i>
+                        打印设置
+                    </a>
+                </div>
+                <div class="inline-block" style="float:right; margin-top: -25px; margin-right: 10px;">
+                <a class="btn btn-primary btn-xs"  href="/check/check/setsimpleticket/" onclick="modal_jump(this);"  data-target=".modal-bank" data-toggle="modal">
+                   小票设置
+                </a>
+                </div>
             </div>
             <div class="panel-body">
                 <div class="form-group" style="margin:0">
-                	<div class="rdio rdio-default">                    
-                		<input type="radio" name="xiaopiao" id="radioDefault" value="1" <?php if (isset($_COOKIE['xiaopiao']) && $_COOKIE['xiaopiao'] == 1): ?>checked="checked"<?php endif ?>/>
-                		<label for="radioDefault">是</label>
-                	</div>
+                    <div class="rdio rdio-default">                    
+                        <input type="radio" name="xiaopiao" id="radioDefault" value="1" <?php if (isset($_COOKIE['xiaopiao']) && $_COOKIE['xiaopiao'] == 1): ?>checked="checked"<?php endif ?>/>
+                        <label for="radioDefault">是</label>
+                    </div>
                     <div class="rdio rdio-default">
-                    	<input type="radio" name="xiaopiao" value="0" id="radioDefault1">
-                    	<label for="radioDefault1">否</label>
+                        <input type="radio" name="xiaopiao" value="0" <?php if (!isset($_COOKIE['xiaopiao']) || $_COOKIE['xiaopiao'] == 0): ?>checked="checked"<?php endif ?> id="radioDefault1">
+                        <label for="radioDefault1">否</label>
                     </div>
                 </div>
             </div>
         </div><!-- panel-body -->
 
-        <div class="panel panel-default">
+        <div class="panel panel-default" style="display:none;">
             <div class="panel-heading">
                 <h4 class="panel-title">选择景区</h4>
             </div>
             <div class="panel-body">
                 <div class="form-group" style="margin:0">
                     <select class="select2" name="landscape_id" style="width:200px;padding:0 10px;">
-                        <option value="">请选择</option>
-                        <?php
-                        foreach ($landscapes as $item): #如果是供应该商景区核销，则显示一个景区
-                            if ($_lanId = Yii::app()->user->lan_id):
-                                if ($_lanId != $item['id']) {
-                                    continue;
-                                }
-                                ?>
-                                <option selected="selected" value="<?php echo $item['id'] ?>"><?php echo $item['name'] ?></option>
-                            <?php else: ?>
-                                <option value="<?php echo $item['id'] ?>"><?php echo $item['name'] ?></option>
-                            <?php endif ?>
-                        <?php endforeach; ?>
+                        <option value="<?php echo Yii::app()->user->lan_id ?>" selected="selected"><?php 
+                        $param = array();
+                        $param['id'] = Yii::app()->user->lan_id;
+                        $param['fields'] = 'name' ; 
+                        $rs = Landscape::api()->detail($param);
+                        $data = ApiModel::getData($rs);
+                        echo $data['name'];
+                        ?></option>
                     </select>
                 </div>
             </div>
-        </div><!-- panel-body -->
+        </div>
+        <!-- panel-body -->
 
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -64,7 +71,7 @@ $this->breadcrumbs = array('核销', '核销');
                 <div class="form-group" style="margin: 0 5px 0 0">
                     <input class="form-control" name='id' value="<?php if (isset($_GET['id'])) echo $_GET['id'] ?>" placeholder="" type="text" style="width:400px;height:30px;line-height: 15px; font-size: 14px;">
                 </div>
-                <button class="btn btn-primary submit"  style="height:30px; line-height: 30px; padding: 0px 15px;">查询</button>
+                <button class="btn btn-primary submit" type="submit"  style="height:30px; line-height: 30px; padding: 0px 15px;">查询</button>
             </div><!-- panel-body -->
         </div>
     </form>
@@ -74,7 +81,7 @@ $this->breadcrumbs = array('核销', '核销');
     <style>
         .table tr>*{
             text-align:center;
-            font-size:16px;
+            font-size:14px;
         }
 
     </style>
@@ -87,16 +94,20 @@ $this->breadcrumbs = array('核销', '核销');
             <table class="table table-bordered table1">
                 <?php
                 foreach ($lists as $item):
+                    $_rs = Order::api()->detail(array('id' => $item['order_id'],'show_order_items'=>1));
+                    $detail = ApiModel::getData($_rs);
                     ?>
                     <tr>
-                        <th>订单号：<?php echo $item['order_id'] ?></th>
+                        <th style="width: 220px;">订单号：<?php echo $item['order_id'] ?></th>
+                        <th>取票人：<?php echo $detail['owner_name'] ?></th>
+                        <th>手机号：<?php echo $detail['owner_mobile'] ?></th>
                         <th style=" text-align: left;">票名称：<?php
 	                        //todo optimize
-                            $_rs = Order::api()->detail(array('id' => $item['order_id']));
                             if (ApiModel::isSucc($_rs)) { #得到景点
                                 $detail = ApiModel::getData($_rs);
-                                echo $detail['order_items'][0]['name'];
-                                $viewPoints = $detail['order_items'][0]['view_point'];
+                                $orderItem = current($detail['order_items']) ;
+                                echo $orderItem['name'];
+                                $viewPoints = $orderItem['view_point'];
                                 $param['ids'] = $viewPoints;
                                 $param['items'] = 1000;
                                 $_rs = Poi::api()->lists($param);
@@ -111,7 +122,7 @@ $this->breadcrumbs = array('核销', '核销');
                             }
                             ?></th>
                         <th>可用门票张数：<span id="can_used"><?php echo $item['nums']; ?></span>张</th>
-                        <th>已选择： <input type="text" style="padding:0px;" name="datas[<?php echo $item['order_id'] ?>]" id="min_spinner-<?php echo $item['order_id'] ?>" value="0" /> 张</th>
+                        <th>已选择： <input type="text"  name="datas[<?php echo $item['order_id'] ?>]" id="min_spinner-<?php echo $item['order_id'] ?>" value="0" onafterpaste="this.value=this.value.replace(/\D/g,'')" onkeyup="this.value=this.value.replace(/\D/g,'')"/> 张</th>
                     </tr>
                 <?php endforeach; ?>
             </table>
@@ -126,8 +137,11 @@ $this->breadcrumbs = array('核销', '核销');
     <?php endif ?>
 </div><!-- contentpanel -->
 
+<div id='verify-modal' class="modal fade modal-bank" tabindex="-1" role="dialog"></div>
+
 <div id="print" style="display:none;">
     <div style="width:48mm; padding-bottom:20px;font-size:12px; position:relative;">
+        <div style="font-size: 14px;top:-5mm;">{print_type}</div>
         <div><span style="display:inline-block;*display:inline;zoom:1; width:15mm;">景区名称:</span><span style="display:inline-block;*display:inline;zoom:1; width:30mm;vertical-align:middle;">{lan_name}</span>
         </div>
         <div><span style="display:inline-block;*display:inline;zoom:1; width:15mm;">产品名称:</span><span style="display:inline-block;*display:inline;zoom:1; width:30mm; vertical-align:middle;">{ticket_name}</span>
@@ -146,6 +160,13 @@ $this->breadcrumbs = array('核销', '核销');
 <script language="javascript" src="/js/lodop/LodopFuncs.js?v=1"></script>
 <object classid="clsid:2105C259-1E0C-4534-8141-A753534CB4CA" codebase="/js/lodop/lodop.cab#version=6,1,8,7" width=0 height=0></object>
 <script>
+    function modal_jump(obj) {
+        $('#verify-modal').html('');
+        $.get($(obj).attr('href'), function(data) {
+            $('#verify-modal').html(data);
+        });
+    }
+    
     jQuery(document).ready(function() {
         //选中
         $('[name=landscape_id]').val(<?php echo isset($_GET['landscape_id']) ? $_GET['landscape_id'] : '' ?>);
@@ -175,21 +196,24 @@ $this->breadcrumbs = array('核销', '核销');
         	var can_used = $('#can_used').text();
         	var used_num = $('table tr th').eq(3).find('input').val();
         	if(Number(used_num) > Number(can_used)){
-        		alert('核销票数不得大于可用票数');
+        		alert('验票票数不得大于可用票数');
         		return false;
         	}else{
         		$.post('/check/used/used', $('#used_form').serialize(), function(data) {
 	                if (data.error === 0) {
 	                    if ($.cookie('xiaopiao') && $.cookie('xiaopiao') != 0) {
-	                        printLodop(data.params);
-	                        setTimeout(function() {
-	                            printLodop(data.params);
-	                            alert('验证成功');
-	                            top.location.reload();
-	                        }, 1000);
+                                if(<?php echo Users::model()->findByPk(Yii::app()->user->uid)->print_type ?>==1){
+                                    printLodop(data.params,'正联');
+                                    setTimeout(function() {
+                                        printLodop(data.params,'副联');
+                                        alert('验证成功',function(){top.location.reload();});
+                                    }, 1000);
+                                }else{
+                                    printLodop(data.params,'正联');
+                                    alert('验证成功',function(){top.location.reload();});
+                                }
 	                    } else {
-	                        alert('验证成功');
-	                        top.location.reload();
+	                        alert('验证成功',function(){top.location.reload();});
 	                    }
 	                } else {
 	                    alert(data.msg);
@@ -199,12 +223,13 @@ $this->breadcrumbs = array('核销', '核销');
             return false;
         });
 
-        function printLodop(params) {
+        function printLodop(params,print_type) {
             var $content = '<div><img style="display:block; margin:10mm auto; margin-bottom:5mm;" src="/img/xiaopiao_logo.png" /></div>';
             var $templet = $('#print').html();
             for (i in params) {
                 var _content = $templet;
                 var _param = params[i];
+                _param['print_type'] = print_type ;
                 _param['lan_name'] = $('[name=landscape_id] option:selected').text();
                 for (j in _param) {
                     _content = _content.replace('{' + j + '}', _param[j]);
@@ -231,6 +256,14 @@ $this->breadcrumbs = array('核销', '核销');
             return cookValue;
         }
 
+        function setPrinter(){
+            var username = 'print_' + "<?php echo Yii::app()->user->id; ?>";
+            LODOP = getLodop();
+            var cookValue = LODOP.SELECT_PRINTER();
+            $.cookie(username, cookValue, {expires: 365});
+        }
+        
+        window.setPrinter = setPrinter ;
         $('#all-btn').click(function() {
             var obj = $(this).parents('table')
             if ($(this).is(':checked')) {
@@ -277,19 +310,6 @@ foreach ($lists as $item):
 
         // Form Toggles
         jQuery('.toggle').toggles({on: true});
-
-        // Time Picker
-        jQuery('#timepicker').timepicker({defaultTIme: false});
-        jQuery('#timepicker2').timepicker({showMeridian: false});
-        jQuery('#timepicker3').timepicker({minuteStep: 15});
-
-        // Date Picker
-        jQuery('.datepicker').datepicker({showOtherMonths: true, selectOtherMonths: true});
-        jQuery('#datepicker-inline').datepicker();
-        jQuery('#datepicker-multiple').datepicker({
-            numberOfMonths: 3,
-            showButtonPanel: true
-        });
 
         // Input Masks
         jQuery("#date").mask("99/99/9999");

@@ -9,8 +9,8 @@ class SingleTemplateController extends Controller {
         $param['ticket_id'] = $_GET['id'];
         if (Yii::app()->request->isPostRequest) {
             $param['data'] = json_encode($_POST['price']);
-            //TicketTemplate::api()->debug = true;
-            $rs = TicketTemplate::api()->setfxp($param);
+            //Tickettemplate::api()->debug = true;
+            $rs = Tickettemplate::api()->setfxp($param);
             if (ApiModel::isSucc($rs)) {
                 $this->_end(0, $rs['message']);
             } else {
@@ -18,8 +18,8 @@ class SingleTemplateController extends Controller {
             }
         }
 
-        //TicketTemplate::api()->debug = true;
-        $rs = TicketTemplate::api()->listByCity($param);
+        //Tickettemplate::api()->debug = true;
+        $rs = Tickettemplate::api()->listByCity($param);
         $_lists = ApiModel::getData($rs);
         $lists = PublicFunHelper::ArrayByKeys($_lists, 'city_id');
 

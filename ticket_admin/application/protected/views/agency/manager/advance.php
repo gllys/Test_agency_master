@@ -117,7 +117,7 @@
             $.post('/agency/manager/over', {id: id, money: number}, function (data) {
                 if (data.error == 0) {
                     alert("保存成功", function () {
-                        location.reload();
+                        location.partReload();
                     });
                 } else {
                     alert("保存失败," + data.msg);
@@ -142,7 +142,7 @@
             $.post('/agency/manager/saveAdvance', {id: id, num: number, remark: remark}, function (data) {
                 if (data.error === 0) {
                     alert("保存成功", function () {
-                        location.reload();
+                        location.partReload();
                     });
                 } else {
                     alert("保存失败," + data.msg);

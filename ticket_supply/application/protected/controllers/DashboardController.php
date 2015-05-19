@@ -10,6 +10,7 @@ class DashboardController extends Controller
 {
 
 	public function actionIndex() {
+            $data = array('mun1'=>0,'mun2'=>0,'mun3'=>0,'mun4'=>0,'mun5'=>0);
             //待处理退款申请单
             $param['supplier_id'] = YII::app()->user->org_id;
             $param['allow_status'] = 0;
@@ -45,18 +46,30 @@ class DashboardController extends Controller
             $rs = Order::api()->supplierstat($filed);
             $mun4 = 0; //当天票总数目
             $mun5 = 0; //当天已付款总金额
-            if(count($rs['body']) > 0){
-                foreach ($rs['body'] as $item){
-                   $mun4 += $item['ticket_nums']; 
-                   $mun5 += $item['money_amount']; 
+            if($rs['code'] == 'succ'){
+                if(count($rs['body']) > 0){
+                    foreach ($rs['body'] as $item){
+                        $mun4 += $item['ticket_nums'];
+                        $mun5 += $item['money_amount'];
+                    }
+                    $data['list'] = $rs['body'];
+                    $data['total'] = count($rs['body']);
                 }
-             $data['list'] = $rs['body']; 
-             $data['total'] = count($rs['body']);
             }
+
             $data['mun4'] = $mun4;
             $data['mun5'] = $mun5;
             
             
             $this->render('index',$data);
 	}
+
+    /*
+ * 在线帮助
+ * 徐娟
+ * 4-8
+ */
+    public function actionHelp() {
+        $this->render('help');
+    }
 } 

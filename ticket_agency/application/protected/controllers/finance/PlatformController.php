@@ -13,22 +13,21 @@ class PlatformController extends Controller {
                 'actions' => array('api'),
                 'users' => array('*'),
             ),
-        );
+        ); 
     }
 
     public function filters() {
         return array('accessControl',);
     }
-
+    
     public function actionIndex() {
         $para = array();
         $params = $_REQUEST;
         $org_id = Yii::app()->user->org_id;
-        if (isset($params['tab']))
-            $data['tab'] = $params['tab'];
+        if(isset($params['tab'])) $data['tab'] = $params['tab'];
         if (!empty($org_id) && intval($org_id) > 0) {
             /* 平台金额 */
-            $money = Unionmoney::api()->total(array('org_ids' => $org_id), 0); //var_dump($money);
+            $money = Unionmoney::api()->total(['org_ids' => $org_id], 0); //var_dump($money);
             if (isset($money['code']) && $money['code'] == 'succ') {
                 $data['total'] = $money['body'];
             }
@@ -38,8 +37,8 @@ class PlatformController extends Controller {
 
             //$e_order_ids = array();
             unset($_COOKIE['order_id']);
-
-
+            
+            
             /* 提现 */
             $bank = Bank::api()->list();
             $data['bank'] = $bank['body'];
@@ -50,13 +49,13 @@ class PlatformController extends Controller {
             $org = Yii::app()->user;
             $data['user_name'] = $org->display_name;
             $data['user_account'] = $org->account;
-            $user = Users::model()->find('id=:id', array('id' => $org->uid));
+            $user = Users::model()->find('id=:id', ['id' => $org->uid]);
             $data['user_mobile'] = $user->mobile;
             /* 提现记录 */
             $data['status_labels'] = array('0' => '未打款', '1' => '已打款', '2' => '驳回');
-            $data['status_class'] = array('0' => 'danger', '1' => 'success', '2' => 'info');
-            $data['mode_type'] = array('credit' => '信用支付', 'advance' => '储值支付', 'union' => '平台支付', 'kuaiqian' => '快钱', 'alipay' => '支付宝');
-            if (isset($params['status']) && (!in_array($params['status'], array_keys($data['status_labels']))||$params['status']==='')) {
+            $data['status_class'] = array( '0' => 'danger', '1' => 'success','2' => 'info');
+            $data['mode_type'] = array('credit' => '信用支付', 'advance' =>'储值支付','union' =>'平台支付', 'kuaiqian' => '快钱', 'alipay' => '支付宝');
+            if (isset($params['status']) && !in_array($params['status'], array_keys($data['status_labels'])) ) {
                 unset($params['status']);
             }
             $data['get'] = $params;
@@ -67,7 +66,7 @@ class PlatformController extends Controller {
             $month = explode('-', $params['time']);
             $days = cal_days_in_month(CAL_GREGORIAN, $month[1], $month[0]);
             $params['start_date'] = $params['time'] . '-01';
-            $params['end_date'] = $params['time'] . '-' . $days;
+            $params['end_date'] = $params['time'] . '-'.$days;
             if (intval($org_id) > 0) {
                 $params['org_ids'] = $org_id; //机构ID
                 //$params['org_name'] = $org->display_name; //分销商名字
@@ -76,175 +75,90 @@ class PlatformController extends Controller {
                 $params['org_role'] = '0'; //机构角色：0分销售，1供应商
                 $params['current'] = isset($params['page']) ? $params['page'] : 1;
                 $params['items'] = 20;  //var_dump($params);exit;
-                $result = Unionmoneyencash::api()->lists($params);
-
+                $result = Unionmoneyencash::api()->lists($params); 
                 if ($result['code'] == 'succ') {
-                    $data['lists'] = $result['body'];
+                    $data['lists'] = $result['body']; 
                     $data['pages'] = new CPagination($data['lists']['pagination']['count']);
                     $data['pages']->pageSize = $params['items'];
                 } //var_dump($data['lists']['pagination']['count']);exit;
             }//var_dump($data);exit;
         }
-
-        //充值
-        $charge = Coupon::api()->lists(array('items'=>10000,'status' => 1,'can_use'=>'true'));
-        $data['charge'] = apiModel::getLists($charge);
         $this->render('index', $data);
     }
 
-    /**
-     * 查看充值记录
-     * 2015-01-23
-     * xj
-     */
-    public function actionLook(){
-
-        $look = $_REQUEST;
-        $data['get'] = $_REQUEST;
-        if(isset($look['start_date']) && isset($look['end_date'])){
-            $look['paid_at'] =$look['start_date'].' - '.$look['end_date'];
-            unset($look['start_date']);  unset($look['end_date']);
-        }
-        $look['organization_id'] = Yii::app()->user->org_id;
-        $look['p'] = isset($look['page']) ? $look['page'] : 1;
-        $look['items'] = 20;
-        $look_list = Coupon::api()->history($look);
-        $data['list'] = empty($look_list['body']) ? array() : $look_list['body']['data'];
-
-        //设置分页
-        $pagination = ApiModel::getPagination($look_list);
-        $data['pages'] = new CPagination($pagination['count']);
-        $data['pages']->pageSize = 10;
-
-        $this->render('look',$data);
-    }
-
-    function actionFetchCashExport() {
-        $params = $_REQUEST;
-        $provider = array();
-        $org_id = Yii::app()->user->org_id;
-        if (intval($org_id) > 0) {
-            Yii::import('ext.CSVExport');
-            $org = Yii::app()->user;
-            $data['status_labels'] = array('0' => '未打款', '1' => '已打款', '2' => '驳回');
-            if (isset($params['status']) && !in_array($params['status'], array_keys($data['status_labels']))) {
-                unset($params['status']);
+	function actionFetchCashExport()
+	{
+		$params = $_REQUEST;
+		$provider = array();
+		$org_id = Yii::app()->user->org_id;
+		if (intval($org_id) > 0) {
+			Yii::import('ext.CSVExport');
+			$org = Yii::app()->user;
+			$data['status_labels'] = array('0' => '未打款', '1' => '已打款', '2' => '驳回');
+			if (isset($params['status']) && !in_array($params['status'], array_keys($data['status_labels'])) ) {
+                unset($params['status']); 
             }
-            if (!isset($params['time']) || empty($params['time'])) {
+			if (!isset($params['time']) || empty($params['time'])) {
                 $params['time'] = date('Y-m');
             }
             $month = explode('-', $params['time']);
             $days = cal_days_in_month(CAL_GREGORIAN, $month[1], $month[0]);
             $params['start_date'] = $params['time'] . '-01';
-            $params['end_date'] = $params['time'] . '-' . $days;
+            $params['end_date'] = $params['time'] . '-'.$days;
+            
+                $params['org_ids'] = $org_id; //机构ID
+                //$params['org_name'] = $org->display_name; //分销商名字
+                $params['op_account'] = $org->account; //操作者账号	
+                $params['trade_type'] = '4'; //交易类型:1支付,2退款,3充值,4提现,5应收账款
+                $params['org_role'] = '0'; //机构角色：0分销售，1供应商
+                $params['current'] = isset($params['page']) ? $params['page'] : 1;
+                $params['items'] = 20; 
+                $result = Unionmoneyencash::api()->lists($params);
+                if($result['body']['pagination']['count']=='0'){
+                    $flag['msg'] = '对不起,没有找到相关记录,无法导出!';
+                    echo '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />'."<script>alert('".$flag['msg']."');history.go(-1);</script>";
+                    exit; //json_encode($flag);
+                }
+                $provider_header[0] = array('id'=>'序列','created_at'=>'提现时间','apply_username'=>'操作人','apply_account'=>'用户账号','money'=>'金额',
+                                            'type'=>'交易类型','status'=>'交易状态','union_money'=>'账户总余额');
+            if ($result['code'] == 'succ') {
+                 foreach ($result['body']['data'] as $key => $value) {
+                    foreach ($provider_header[0] as $k => $val) {
+                        if(in_array($k, array_keys($value) )){
+                            if($k=='created_at') 
+                                 $provider[$key][$k] =  date('y年m月d日',$value[$k]);
+                            elseif($k=='money' || $k=='union_money') 
+                                 $provider[$key][$k] =  number_format($value[$k],2);
+                            elseif($k=='status' && $val=='1') 
+                                 $provider[][$k] = '-'. $data['status_labels'][$value[$k]];
+                            elseif($k=='status') 
+                                 $provider[$key][$k] =  $data['status_labels'][$value[$k]];
+                            else $provider[$key][$k] =  $value[$k];
+                        }
+                        if($k=='type' && isset($provider[$key]))
+                                 $provider[$key][$k] =  '提现';
+                    }
+                 }
+               }  
+               if(!empty($provider)) $provider = array_merge($provider_header,$provider);
 
-            $params['org_ids'] = $org_id; //机构ID
-            //$params['org_name'] = $org->display_name; //分销商名字
-            $params['op_account'] = $org->account; //操作者账号	
-            $params['trade_type'] = '4'; //交易类型:1支付,2退款,3充值,4提现,5应收账款
-            $params['org_role'] = '0'; //机构角色：0分销售，1供应商
-            $params['current'] = isset($params['page']) ? $params['page'] : 1;
-            $data = $this->getApiLists($params,true,$data);
-//            $result = Unionmoneyencash::api()->lists($params);
-//            if ($result['body']['pagination']['count'] == '0') {
-//                $flag['msg'] = '对不起,没有找到相关记录,无法导出!';
-//                echo '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />' . "<script>alert('" . $flag['msg'] . "');history.go(-1);</script>";
-//                exit; //json_encode($flag);
-//            }
-//            $provider_header[0] = array('id' => '序列', 'created_at' => '提现时间', 'apply_username' => '操作人', 'apply_account' => '用户账号', 'money' => '金额',
-//                'type' => '交易类型', 'status' => '交易状态', 'union_money' => ' 账户总余额');
-//            if ($result['code'] == 'succ') {
-//                foreach ($result['body']['data'] as $key => $value) {
-//                    $value['union_money'] = intval(100 * $value['union_money'] - 100 * $value['money']) / 100;
-//                    $value['union_money'] = (string)$value['union_money'];
-//                    foreach ($provider_header[0] as $k => $val) {
-//                        if (in_array($k, array_keys($value))) {
-//                            if ($k == 'created_at')
-//                                $provider[$key][$k] = "\t".date('Y/m/d', $value[$k]);
-//                            elseif ($k == 'money')
-//                                $provider[$key][$k] = number_format($value[$k], 2);
-//                            elseif ($k == 'status' && $val == '1')
-//                                $provider[][$k] = '-' . $data['status_labels'][$value[$k]];
-//                            elseif ($k == 'status')
-//                                $provider[$key][$k] = $data['status_labels'][$value[$k]];
-//                            else
-//                                $provider[$key][$k] = $value[$k];
-//                        }
-//                        if ($k == 'type' && isset($provider[$key]))
-//                            $provider[$key][$k] = '提现';
-//                    }
-//                }
-//            }
-//            if (!empty($provider))
-//                $provider = array_merge($provider_header, $provider);
-//
-//            $csv = new ECSVExport($provider, true, false);
-//            $content = $csv->toCSV();
-//            if(isset($params['status'])&&isset($data['status_labels'][$params['status']])) {
-//                $filename = $params['time'] . $data['status_labels'][$params['status']] . '提现记录.csv';
-//            } else {
-//                $filename = $params['time'] . '提现记录.csv';
-//            }
-//            $filename = iconv("UTF-8", "GBK", $filename);
-//            Yii::app()->getRequest()->sendFile($filename, $content . "\r\n", "text/csv", false);
-//            exit();
+                $csv = new ECSVExport($provider,true,false); 
+                $content = $csv->toCSV();
+                if(isset($params['status'])) $filename = $params['time'].$data['status_labels'][$params['status']].'提现记录.csv'; 
+                else
+                $filename = $params['time'].'提现记录.csv'; 
+                Yii::app()->getRequest()->sendFile($filename, $content, "text/csv", false);
+                exit();
         }
         return '';
     }
-    private function getApiLists($params,$is_export,$data)
-    {
-        $d = array();
-        $pagination =null;
-        $result = null;
-        $num = 0;
-        
-        if($is_export)
-        {
-            $this->renderPartial("excelTop",$data);
-            $params['show_verify_items'] = 1;
-            $params["items"] = 1000;
-        }
-        
-        do{
-            if($result)
-            {
-                unset($result);
-            }
-            $result = Unionmoneyencash::api()->lists($params);
-            $params["current"] = ((int)trim($params["current"]))+1;
-            $params["page"] = $params["current"];
-            
-            if($result['code'] == 'succ')
-            {
-                
-                $pagination = $result['body']['pagination'];
-                $data['lists'] = array("data"=>$result['body']["data"],"pagination"=>$pagination,"result"=>$result);
-               
-                if($is_export)
-                {
-                    $this->renderPartial("excelBody",$data);
-                }
-                
-                $num += count($data['lists']["data"]);
-            }
-         }while($params["current"]<1000 && $is_export==true && $result['code'] == 'succ' && empty($pagination)==false && $pagination['current']<$pagination['total']);
-         if($is_export==true)
-         {
-             $data["num"] = $num;
-            $this->renderPartial("excelBottom",$data);
-            exit;
-          }
-         return $data;
-    }
+
     /**
      * 跳转到支付方式页面 ,成功生成充值流水单
      */
     public function actionPrePay() {
         Yii::import('application.extensions.Payments.*');
         $params = $_POST;
-        if(empty($_POST['activity_id'])){
-            unset($_POST['activity_id']);
-        }
         $params['org_id'] = Yii::app()->user->org_id;
         $params['user_id'] = Yii::app()->user->uid;
         $params['user_name'] = Yii::app()->user->name;
@@ -259,7 +173,7 @@ class PlatformController extends Controller {
 
         //得到平台资金充值记录
         $data = ApiModel::getData($rs);
-        setcookie('order_id', $data['id'], time() + 3600, '/', '.piaotai.com');
+        setcookie('order_id',$data['id'],time()+3600,'/','.piaotai.com');
         $info = array('subject' => '平台充值', 'show_url' => 'http://www.xxx.com/myorder.html');
         $method = $this->payPlatform[$_POST['pay_type']];
         $class = 'Payments' . ucfirst($method);
@@ -315,8 +229,8 @@ class PlatformController extends Controller {
                 'id' => $pid,
                 ), 0);
             if ($result['code'] == 'succ') {
-                $data = ApiModel::getData($result);
-                $status = $data['paid_at'] ? 'succ' : 'fail';
+                $data = ApiModel::getData($result) ;
+                $status = $data['paid_at']?'succ':'fail';
             } else {
                 $this->redirect('/finance/platform/');
             }
@@ -331,13 +245,13 @@ class PlatformController extends Controller {
     }
 
     public function actionState() {
-        if (!isset($_COOKIE['order_id'])) {
+        if(!isset($_COOKIE['order_id'])){
             echo 0;
             exit();
         }
         $result = Unionmoneyrecharge::api()->detail(array(
-            'id' => $_COOKIE['order_id'],
-            ), 0);
+                'id' => $_COOKIE['order_id'],
+                ), 0);
         if ($result['code'] == 'succ' && $result['body']['paid_at']) {
             echo $result['body']['id'];
         } else {
@@ -345,54 +259,54 @@ class PlatformController extends Controller {
         }
     }
 
-    /*     * 提取现金
-      org_id 	是 	Int 	机构ID
-      apply_uid 	是 	Int 	申请者UID
-      apply_account 	是 	string 	申请者账号
-      apply_username 	否 	string 	申请者名称
-      apply_phone 	否 	string 	申请者联系电话
-      money 	是 	double 	申请提现额度
-      bank_id 	否 	int 	银行ID
-      bank_name 	否 	string 	银行名称
-      open_bank 	是 	string 	开户行
-      account 	是 	string 	账号/卡号
-      account_name 	是 	string 	账户名
-      remark 	否 	string 	备注
-     * */
+/**提取现金
+org_id 	是 	Int 	机构ID
+apply_uid 	是 	Int 	申请者UID
+apply_account 	是 	string 	申请者账号
+apply_username 	否 	string 	申请者名称
+apply_phone 	否 	string 	申请者联系电话
+money 	是 	double 	申请提现额度
+bank_id 	否 	int 	银行ID
+bank_name 	否 	string 	银行名称
+open_bank 	是 	string 	开户行
+account 	是 	string 	账号/卡号
+account_name 	是 	string 	账户名
+remark 	否 	string 	备注
+**/
 
-    public function actionFetchapply() {
+    public function actionFetchapply() { 
 
-        $params = $_POST;
-        $flag = array();
-        $band_id = '';
-        //$this->actionPre();
-        $params['organization_id'] = Yii::app()->user->org_id;
+		$params = $_POST;
+		$flag = array();
+		$band_id = '';
+		//$this->actionPre();
+		$params['organization_id'] = Yii::app()->user->org_id; 
         //Unionmoney::api()->debug= true;
-        if (!empty($_POST['bank_open'])) {
-            $band_option = $_POST['bank_addid'];
-            $bank_op = explode(' _ ', $band_option);
-            $params['bank_id'] = $bank_op[0];
-            $params['bank_name'] = $bank_op[1];
-            $bankcard = $this->actionAddCard($params);
-            $band_id = $bankcard['body']['id'];
-        } elseif (!empty($_POST['bank_own'])) {
-            $band_option = $_POST['bank_own'];
-            $bank_op = explode(' _ ', $band_option);
-            // $param['id'] = $band_id;
-            //         $param['organization_id'] = $params['organization_id'];
-            //         $bank = Bank::api()->list_own($param, 0); $bank['body']['data'][$bank_own]['account']
-            //$params['bank_id'] = $bank_op[0];
-            $params['bank_name'] = $bank_op[1];
+ 		if(!empty($_POST['bank_open'])) { 
+ 			$band_option = $_POST['bank_addid'];
+ 			$bank_op = explode(' _ ', $band_option);
+ 			$params['bank_id'] = $bank_op[0];
+ 			$params['bank_name'] = $bank_op[1];
+ 			$bankcard = $this->actionAddCard($params);
+ 			$band_id = $bankcard['body']['id'];
+
+ 		}elseif(!empty($_POST['bank_own'])){
+ 			$band_option = $_POST['bank_own'];
+ 			$bank_op = explode(' _ ', $band_option);
+ 			// $param['id'] = $band_id;
+    //         $param['organization_id'] = $params['organization_id'];
+    //         $bank = Bank::api()->list_own($param, 0); $bank['body']['data'][$bank_own]['account']
+ 			//$params['bank_id'] = $bank_op[0];
+ 			$params['bank_name'] = $bank_op[1];
             $params['bank_account'] = $bank_op[2];
-            $params['bank_open'] = $bank_op[3];
+ 			$params['bank_open'] = $bank_op[3];
             $params['account_name'] = $bank_op[4];
-        }
-        if (empty($params['bank_name'])) {
-            $flag['status'] = false;
-            $flag['msg'] = '请选择银行卡';
-            echo json_encode($flag);
-            exit;
-        }
+ 		}
+ 		if(empty($params['bank_name']))	{
+ 			$flag['status'] = false;
+ 			$flag['msg'] = '提取银行卡出错';
+        	echo json_encode($flag);exit;
+ 		} 
         $para = array(
             'org_id' => Yii::app()->user->org_id,
             'money' => $_POST['amount'],
@@ -406,17 +320,18 @@ class PlatformController extends Controller {
             'account' => $params['bank_account'],
             'account_name' => $params['account_name'],
         );
-
-        $result = Unionmoneyencash::api()->apply($para, 0);
+       
+        $result = Unionmoneyencash::api()->apply($para, 0); 
 
         if ($result['code'] == 'succ') {
             $flag['status'] = true;
             $flag['msg'] = '申请提现成功!'; //.$result['body']['id']
-        } else {
+            Yii::app()->redis->delete('code_for_fetchcash:' . Yii::app()->getSession()->getSessionId());
+        } else{
             $flag['status'] = false;
             $flag['msg'] = $result['message'];
         }
-
+        
         echo json_encode($flag);
         exit;
     }
@@ -441,7 +356,7 @@ class PlatformController extends Controller {
             'account_name' => $params['account_name'],
             'open_bank' => $params['bank_open'],
             'bank_id' => $params['bank_id'],
-        );
+        ); 
         return Bank::api()->add_own($param, 0);
     }
 
@@ -449,19 +364,14 @@ class PlatformController extends Controller {
         $data = array();
         $data['error'] = 0;
         $val = Yii::app()->request->getParam('code');
-        $val = trim($val);
-        $key = 'code_for_fetchcash:' . Yii::app()->getSession()->getSessionId();
-//strlen($val) != 6 || $val != Yii::app()->redis->get('code_for_fetchcash:' . Yii::app()->getSession()->getSessionId())
-        if (strlen($val) != 6 || $val != Yii::app()->redis->get($key)) {
+        $val = trim($val); 
+
+        if (strlen($val) != 6 || $val != Yii::app()->redis->get('code_for_fetchcash:' . Yii::app()->getSession()->getSessionId())) {
             $data['msg'] = '短信验证码输入错误';
             $data['error'] = 1;
-        }
-        if (strlen($val) == 6 && $val == Yii::app()->redis->get($key)) {
-//注销短信验证码
-            Yii::app()->redis->expire($key, 0);
-        }
-        echo json_encode($data);
-        exit;
+        } 
+        echo json_encode($data);  exit;
     }
 
+   
 }

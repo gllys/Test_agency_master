@@ -41,19 +41,60 @@ class SMS extends CComponent
 	 */
 	public function _getCreateOrderContent($orderInfo)
 	{
+		$orderitem = Order::api()->detail(array('id' => $orderInfo['id'],'show_order_items'=>1));
+
+		$orderitem = reset($orderitem['body']["order_items"]);
+		$timeday = $orderitem['valid'];
+		$use_day = strtotime($orderInfo['use_day']);
+		$endtime = strtotime("+$timeday day", $use_day);
+		if ($endtime > $orderitem['expire_end']) {
+			$endtime = strtotime(date("Y-m-d", $orderitem['expire_end']));
+		}
+		if ($endtime == $use_day) {
+			$endtime = "当天";
+		} else {
+			$endtime = "~" . date('Y-m-d', $endtime);
+		}
 		$str = '';
-		$str .= '您已成功预订 '.$orderInfo['order_item'][0]['name']." ".$orderInfo['nums'].' 张，订单号：'.$orderInfo['id'].'，可于：'.$orderInfo['order_item'][0]['useday'].'当日游玩，';
-		if($orderInfo['owner_card']){
-			$str .='通过身份证 '.$orderInfo['owner_card'].' 换取入园门票或';
+		$str .= '您已成功预订 「' . $orderInfo['name'] . "」门票 " . $orderInfo['nums'] . ' 张，订单号：' . $orderInfo['id'];
+		$url = $orderInfo['host'] . '/qr/' . $orderInfo['id'];
+		$str.='， 点击以下链接，至售票处展示二维码，工作人员扫描后即可入园。 ' . $url.' ';
+		$str .=  '，可于：' . $orderInfo['use_day'] . $endtime . '游玩，';
+//		if($orderInfo['owner_card']){
+//			$str .='通过身份证 '.$orderInfo['owner_card'].' 换取入园门票或';
+//		}
+
+
+		/* 获取地址字符串 */
+		$landscapeIds = explode(',', $orderitem['landscape_ids']);
+		if (count($landscapeIds) == 1) {
+			$addresses = "";
+			foreach ($landscapeIds as $v) {
+				$rs = Landscape::api()->detail(array('id' => $v));
+				$addresses .= $rs['body']['address'];
+			}
+			if (!empty($addresses)) {
+				$str .= '景区地址：' . $addresses.'。  ';
+			}
 		}
 
-		$str.='通过以下二维码链接进行手机二维码：http://'.PI_APP_DOMAIN.'/qrcode_index_'.$orderInfo['id'].'.html 入园';
-		if($orderInfo['pay_type'] == 'offline') {
-			$str .= '请至景区窗口支付并取票。';
+		// 如果供应商ID是204，即浙风。则，添加应急电话
+		if($orderitem['supplier_id'] == 204) {
+			$str .= '应急电话：18939755352、13361985062';
 		}
 
+		/* 查询客服电话 */
+//                $rs = Organizations::api()->show(array('id'=>$orderInfo['supplier_id']));
+//                if(isset($rs['body']['mobile'])) {
+//                    $str .= '，客服电话：'.$rs['body']['mobile'];
+//                }
+
+		//$str .= '请至景区窗口支付并取票。';
+//		if($orderInfo['pay_type'] == 'offline') {
+//			$str .= '请至景区窗口支付并取票。';
+//		}
 		//须加签名，不然发不出去
-		return urlencode($str);
+		return $str;
 	}
 
 	/**
@@ -123,13 +164,12 @@ class SMS extends CComponent
 	 * @param string $content
 	 *  * @return String
 	 */
-     public function sendSMS($mobile, $content) {
-	$result = SendMessage::api()->send(array('mobile'=>$mobile, 'content'=>$content));
-        // var_dump($result);die;
-        if ($result && $result['code'] == 'succ') {
-            return true;
-        } else {
-            return false;
-        }
+     public function sendSMS($mobile, $content, $type=null, $order_id=null) {
+		 $result = SendMessage::api()->send(array('mobile'=>$mobile, 'content'=>$content ,'type'=>$type,'order_id'=>$order_id));
+		 if ($result && $result['code'] == 'succ') {
+			 return true;
+		 } else {
+			 return false;
+		 }
     }
 }

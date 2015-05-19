@@ -10,23 +10,25 @@ class UYouPai extends CApplicationComponent {
     public $returnUrl = '/site/upyunAgent/' ;
     public $host = 'http://image.shehuan.net' ;
     public $outtime = 86400 ;
+    public $x_gmkerl_type = 'fix_width' ;
+    public $x_gmkerl_value = '560';
     
-    //µÃÓÖÅÄ¼ÓÃÜ
+    //ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½
     public function getCode() {
-        /// (»Øµ÷ÖÐµÄËùÓÐÐÅÏ¢¾ùÎª UTF-8 ±àÂë£¬Ç©ÃûÑéÖ¤µÄÊ±ºòÐèÒª×¢Òâ±àÂëÊÇ·ñÒ»ÖÂ)
+        /// (ï¿½Øµï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½Îª UTF-8 ï¿½ï¿½ï¿½ë£¬Ç©ï¿½ï¿½ï¿½ï¿½Ö¤ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Òª×¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½Ò»ï¿½ï¿½)
         $options = array();
-        $options['bucket'] = $this->bucket; /// ¿Õ¼äÃû
-        $options['expiration'] = time() + intval($this->outtime); /// ÊÚÈ¨¹ýÆÚÊ±¼ä
-        $options['save-key'] = '/'.$this->uploadDir.'/{year}/{mon}/{day}/{filemd5}{.suffix}'; /// ÎÄ¼þÃûÉú³É¸ñÊ½£¬Çë²ÎÔÄ API ÎÄµµ
-        $options['allow-file-type'] = 'jpg,jpeg,gif,png'; /// ¿ØÖÆÎÄ¼þÉÏ´«µÄÀàÐÍ£¬¿ÉÑ¡
-        $options['content-length-range'] = '0,5120000'; /// ÏÞÖÆÎÄ¼þ´óÐ¡£¬¿ÉÑ¡
-        $options['x-gmkerl-type'] = 'fix_width';
-        $options['x-gmkerl-value'] = '560';
+        $options['bucket'] = $this->bucket; /// ï¿½Õ¼ï¿½ï¿½ï¿½
+        $options['expiration'] = time() + intval($this->outtime); /// ï¿½ï¿½È¨ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
+        $options['save-key'] = '/'.$this->uploadDir.'/{year}/{mon}/{day}/{filemd5}{.suffix}'; /// ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¸ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ API ï¿½Äµï¿½
+        $options['allow-file-type'] = 'jpg,jpeg,gif,png'; /// ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½Ï´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½Ñ¡
+        $options['content-length-range'] = '0,5120000'; /// ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½Ñ¡
+        $options['x-gmkerl-type'] = $this->x_gmkerl_type;
+        $options['x-gmkerl-value'] = $this->x_gmkerl_value;
 
-        $options['return-url'] = 'http://'.$_SERVER['HTTP_HOST'].':'.$_SERVER["SERVER_PORT"].$this->returnUrl; // Ò³ÃæÌø×ªÐÍ»Øµ÷µØÖ· !!! iframe »Øµ÷µØÖ·£¬×¢Òâ¿Í»§ÍøÕ¾ÉÏÒª²¿Êð agent.html ½øÐÐ¿çÓò´úÀí
-        //$options['notify-url'] = 'http://www.shehuan.com/tpogao/callback/'; /// ·þÎñ¶ËÒì²½»Øµ÷µØÖ·, Çë×¢Òâ¸ÃµØÖ·±ØÐë¹«Íø¿ÉÒÔÕý³£·ÃÎÊ
+        $options['return-url'] = 'http://'.$_SERVER['HTTP_HOST'].':'.$_SERVER["SERVER_PORT"].$this->returnUrl; // Ò³ï¿½ï¿½ï¿½ï¿½×ªï¿½Í»Øµï¿½ï¿½ï¿½Ö· !!! iframe ï¿½Øµï¿½ï¿½ï¿½Ö·ï¿½ï¿½×¢ï¿½ï¿½Í»ï¿½ï¿½ï¿½Õ¾ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ agent.html ï¿½ï¿½ï¿½Ð¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        //$options['notify-url'] = 'http://www.shehuan.com/tpogao/callback/'; /// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ì²½ï¿½Øµï¿½ï¿½ï¿½Ö·, ï¿½ï¿½×¢ï¿½ï¿½Ãµï¿½Ö·ï¿½ï¿½ï¿½ë¹«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         $policy = base64_encode(json_encode($options));
-        $sign = md5($policy . '&' . $this->formApiSecret); /// ±íµ¥ API ¹¦ÄÜµÄÃÜ³×£¨Çë·ÃÎÊÓÖÅÄÔÆ¹ÜÀíºóÌ¨µÄ¿Õ¼ä¹ÜÀíÒ³Ãæ»ñÈ¡£©
+        $sign = md5($policy . '&' . $this->formApiSecret); /// ï¿½ï¿½ API ï¿½ï¿½ï¿½Üµï¿½ï¿½Ü³×£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¹ï¿½ï¿½ï¿½ï¿½Ì¨ï¿½Ä¿Õ¼ï¿½ï¿½ï¿½ï¿½Ò³ï¿½ï¿½ï¿½È¡ï¿½ï¿½
         return json_encode(array('policy' => $policy, 'signature' => $sign));
     }
 

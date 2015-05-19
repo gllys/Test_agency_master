@@ -21,6 +21,7 @@ class Cache_Redis implements Countable
      * @return [type]       [description]
      */
     public static function factory($name='default') {
+        if (!$name) $name = 'default';
         if(!isset(self::$instances[$name])) {
             $cls = __CLASS__;
             self::$instances[$name] = new $cls(self::getConfig($name));

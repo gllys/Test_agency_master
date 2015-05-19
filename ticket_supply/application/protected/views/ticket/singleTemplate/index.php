@@ -90,16 +90,16 @@ $this->breadcrumbs = array('单票管理', '设置单票模板');
                                                     <label for="all-btn-<?php echo $city ?>"><?php echo Districts::model()->findByPk($city)->name ?></label>
                                                 </div>
                                             </td>
-                                            <td><input type="text" class="form-control i-price" placeholder="散客价"></td>
-                                            <td><input type="text" class="form-control g-price" placeholder="团队价"></td>
+                                            <td><input type="text" class="form-control i-price" placeholder="散客结算价"></td>
+                                            <td><input type="text" class="form-control g-price" placeholder="团队结算价"></td>
                                             <td><button class="btn btn-success btn-xs area-set-btn" type="button">批量设置</button></td>
                                             </thead>
                                             <tbody>
                                                 <tr>
                                                     <th></th>
                                                     <th>名称</th>
-                                                    <th>散客价</th>
-                                                    <th>团队价</th>
+                                                    <th>散客结算价</th>
+                                                    <th>团队结算价</th>
                                                 </tr>
                                                 <tr>
                                                     <?Php
@@ -166,7 +166,7 @@ $this->breadcrumbs = array('单票管理', '设置单票模板');
                 if (i) {
                     sd.find('.table-responsive').eq(i - 1).find('tbody').append('<tr><td><div class="ckbox ckbox-primary"><input type="checkbox" value="1" id="checkbox-' + o + '"><label for="checkbox-' + o + '"></label></div></td><td>' + obj.find('option:selected').text() + '</td><td><input type="text" class="form-control i-price"></td><td><input type="text" class="form-control g-price"></td></tr>')
                 } else {
-                    sd.append('<div class="table-responsive mb10"><table class="table table-bordered"><thead><td><div class="ckbox ckbox-primary"><input type="checkbox" class="all-btn" id="all-btn-' + o + '" value="1"><label for="all-btn-' + o + '">' + obj.find('option:selected').text() + '</label></div></td><td><input type="text" class="form-control i-price" placeholder="散客价"></td><td><input type="text" class="form-control g-price" placeholder="团队价"></td><td><button class="btn btn-success btn-xs area-set-btn" type="button">批量设置</button></td></thead><tbody><tr><th></th><th>名称</th><th>散客价</th><th>团队价</th></tr><tr></tr><tr><td><div class="ckbox ckbox-primary"><input type="checkbox" id="checkbox-' + o + '" value="1"><label for="checkbox-' + o + '"></label></div></td><td>土楼</td><td><input type="text" class="form-control i-price"></td><td><input type="text" class="form-control g-price"></td></tr></tbody></table></div>')
+                    sd.append('<div class="table-responsive mb10"><table class="table table-bordered"><thead><td><div class="ckbox ckbox-primary"><input type="checkbox" class="all-btn" id="all-btn-' + o + '" value="1"><label for="all-btn-' + o + '">' + obj.find('option:selected').text() + '</label></div></td><td><input type="text" class="form-control i-price" placeholder="散客结算价"></td><td><input type="text" class="form-control g-price" placeholder="团队结算价"></td><td><button class="btn btn-success btn-xs area-set-btn" type="button">批量设置</button></td></thead><tbody><tr><th></th><th>名称</th><th>散客结算价</th><th>团队结算价</th></tr><tr></tr><tr><td><div class="ckbox ckbox-primary"><input type="checkbox" id="checkbox-' + o + '" value="1"><label for="checkbox-' + o + '"></label></div></td><td>土楼</td><td><input type="text" class="form-control i-price"></td><td><input type="text" class="form-control g-price"></td></tr></tbody></table></div>')
                 }
             }
 
@@ -215,8 +215,8 @@ $this->breadcrumbs = array('单票管理', '设置单票模板');
                     $.get('/ticket/singleTemplate/CityAgencys/id/' + val, function(data) {
                         if (data.error == 0) {
                             var lists = data['msg'];
-                            var _html = '<div class="table-responsive  mb' + val + '" id="city_' + val + '"><table class="table table-bordered"><thead><td><div class="ckbox ckbox-primary"><input type="checkbox" class="all-btn" id="all-btn-' + val + '" value="1"><label for="all-btn-' + val + '">' + obj.find('option:selected').text() + '</label></div></td><td><input type="text" class="form-control i-price" placeholder="散客价"></td><td><input type="text" class="form-control g-price" placeholder="团队价"></td><td><button class="btn btn-success btn-xs area-set-btn" type="button">批量设置</button></td></thead><tbody>';
-                            _html += '<tr><th></th><th>名称</th><th>散客价</th><th>团队价</th></tr><tr></tr>';
+                            var _html = '<div class="table-responsive  mb' + val + '" id="city_' + val + '"><table class="table table-bordered"><thead><td><div class="ckbox ckbox-primary"><input type="checkbox" class="all-btn" id="all-btn-' + val + '" value="1"><label for="all-btn-' + val + '">' + obj.find('option:selected').text() + '</label></div></td><td><input type="text" class="form-control i-price" placeholder="散客结算价"></td><td><input type="text" class="form-control g-price" placeholder="团队结算价"></td><td><button class="btn btn-success btn-xs area-set-btn" type="button">批量设置</button></td></thead><tbody>';
+                            _html += '<tr><th></th><th>名称</th><th>散客结算价</th><th>团队结算价</th></tr><tr></tr>';
                             for (i in lists) {
                                 var _list = lists[i];
                                 _html += '<tr id="agency_' + _list['id'] + '"><td><div class="ckbox ckbox-primary"><input type="checkbox" id="checkbox-' + val + '" value="1"><label for="checkbox-' + val + '"></label></div></td><td>' + _list['name'] + '</td><td><input type="text" name="price[' + val + '][' + _list['id'] + '][]" class="form-control i-price"></td><td><input type="text" name="price[' + val + '][' + _list['id'] + '][]" class="form-control g-price"></td></tr>';
@@ -245,8 +245,8 @@ $this->breadcrumbs = array('单票管理', '设置单票模板');
                     if ($('#city_' + pcityId).length > 0) {
                         $('#city_' + pcityId).find('tbody').append('<tr id="agency_' + val + '"><td><div class="ckbox ckbox-primary"><input type="checkbox" id="checkbox-' + pcityId + '" value="1"><label for="checkbox-' + pcityId + '"></label></div></td><td>' + obj.find("option:selected").text() + '</td><td><input type="text" name="price[' + pcityId + '][' + val + '][]" class="form-control i-price"></td><td><input type="text"  name="price[' + pcityId + '][' + val + '][]" class="form-control g-price"></td></tr>');
                     } else {
-                        var _html = '<div class="table-responsive  mb' + pcityId + '" id="city_' + pcityId + '"><table class="table table-bordered"><thead><td><div class="ckbox ckbox-primary"><input type="checkbox" class="all-btn" id="all-btn-' + pcityId + '" value="1"><label for="all-btn-' + pcityId + '">' + $pcityObj.text() + '</label></div></td><td><input type="text"  class="form-control i-price" placeholder="散客价"></td><td><input type="text"   class="form-control g-price" placeholder="团队价"></td><td><button class="btn btn-success btn-xs area-set-btn" type="button">批量设置</button></td></thead><tbody>';
-                        _html += '<tr><th></th><th>名称</th><th>散客价</th><th>团队价</th></tr><tr></tr>';
+                        var _html = '<div class="table-responsive  mb' + pcityId + '" id="city_' + pcityId + '"><table class="table table-bordered"><thead><td><div class="ckbox ckbox-primary"><input type="checkbox" class="all-btn" id="all-btn-' + pcityId + '" value="1"><label for="all-btn-' + pcityId + '">' + $pcityObj.text() + '</label></div></td><td><input type="text"  class="form-control i-price" placeholder="散客结算价"></td><td><input type="text"   class="form-control g-price" placeholder="团队结算价"></td><td><button class="btn btn-success btn-xs area-set-btn" type="button">批量设置</button></td></thead><tbody>';
+                        _html += '<tr><th></th><th>名称</th><th>散客结算价</th><th>团队结算价</th></tr><tr></tr>';
                         _html += '<tr id="agency_' + val + '"><td><div class="ckbox ckbox-primary"><input type="checkbox" id="checkbox-' + pcityId + '" value="1"><label for="checkbox-' + pcityId + '"></label></div></td><td>' + obj.find("option:selected").text() + '</td><td><input type="text"  name="price[' + pcityId + '][' + val + '][]" class="form-control i-price"></td><td><input type="text" name="price[' + pcityId + '][' + val + '][]" class="form-control g-price"></td></tr>';
                         _html += '</tbody></table></div>';
                         sd.append(_html);
@@ -271,8 +271,7 @@ $this->breadcrumbs = array('单票管理', '设置单票模板');
             if ($(this).validationEngine('validate') === true) {
                 $.post('#', $(this).serialize(), function(data) {
                     if(data.error==0){
-                         alert('保存成功');
-                        window.location.reload();
+                         alert('保存成功',function(){ window.location.reload();});
                     }else{
                     alert('保存失败');
                     }
@@ -340,19 +339,6 @@ $this->breadcrumbs = array('单票管理', '设置单票模板');
 
         // Form Toggles
         jQuery('.toggle').toggles({on: true});
-
-        // Time Picker
-        jQuery('#timepicker').timepicker({defaultTIme: false});
-        jQuery('#timepicker2').timepicker({showMeridian: false});
-        jQuery('#timepicker3').timepicker({minuteStep: 15});
-
-        // Date Picker
-        jQuery('.datepicker').datepicker({showOtherMonths: true, selectOtherMonths: true});
-        jQuery('#datepicker-inline').datepicker();
-        jQuery('#datepicker-multiple').datepicker({
-            numberOfMonths: 3,
-            showButtonPanel: true
-        });
 
         // Input Masks
         jQuery("#date").mask("99/99/9999");

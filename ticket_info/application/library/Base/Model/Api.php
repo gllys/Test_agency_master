@@ -50,7 +50,7 @@ class Base_Model_Api
         return Yaf_Registry::get($key);
     }
 
-    public function request($header = null) {
+    public function request($header = null,$timeout = 5) {
         $url = $this->getSrvUrl() . $this->url;
         $params = $this->params;
         $method = strtoupper($this->method);
@@ -68,7 +68,7 @@ class Base_Model_Api
                 $params = array();
             }
             $this->params = array();
-            $data = Tools::curl($url, $method, $params, $header);
+            $data = Tools::curl($url, $method, $params, $header, $timeout);
             if ($method == 'GET') $this->getMemcache()->set($cacheKey,$data,$this->expireTime);
         }
         return $data;

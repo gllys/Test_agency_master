@@ -18,8 +18,8 @@
     <script src="/js/custom.js"></script>
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-    <script src="http://supply.test.demo.org.cn/js/html5shiv.js"></script>
-    <script src="http://supply.test.demo.org.cn/js/respond.min.js"></script>
+    <script src="/js/html5shiv.js"></script>
+    <script src="/js/respond.min.js"></script>
     <![endif]-->
 
      <style>
@@ -147,7 +147,7 @@
                     <div class="item active" style="background-image:url(/img/text1.jpg)"><a href=""></a></div>
                     <div class="item" style="background-image:url(/img/text2.jpg)"><a href=""></a></div>
                     <div class="item" style="background-image:url(/img/text3.jpg)"><a href=""></a></div>
-                    <div class="item" style="background-image:url(/img/text4.jpg)"><a href=""></a></div>
+                    <div class="item" style="background-image:url(/img/gaoxiao.jpg)"><a href=""></a></div>
                 </div>
 
                 <!-- Controls -->
@@ -187,13 +187,10 @@
         												<i class="icon-warning-sign"></i>' . $model->errors['password'][0]
                                             : '&nbsp;&nbsp;'; ?>
                                     </div>
-                                    <label for="rememberMe">&nbsp;</label>
                                 </div>
-                                <a href="/site/reset/" >忘记密码？</a>
                             </div>
                             <div class="btn-list">
                                 <button type="submit" class="btn btn-success submit">登录</button>
-                                <a href="/site/register/" class="new-account">申请账号</a>
                             </div>
                         </div>
                     </form>

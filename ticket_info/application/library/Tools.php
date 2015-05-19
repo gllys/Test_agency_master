@@ -1380,13 +1380,13 @@ class Tools {
 	 * @return mixed
 	 * @throws Exception
 	 */
-	public static function curl($url, $method = 'GET', $postFields = null, $header = null) {
+	public static function curl($url, $method = 'GET', $postFields = null, $header = null, $timeout = 5) {
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0);
 		curl_setopt($ch, CURLOPT_FAILONERROR, false);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+		curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
 
 		if (strlen($url) > 5 && strtolower(substr($url, 0, 5)) == "https")
 		{

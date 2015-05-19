@@ -1,14 +1,32 @@
 <?php
+/**
+ * @link
+ */
+use common\huilian\utils\Header;
+use common\huilian\models\ModificationMessage;
 
 class OrganizationController extends Controller {
 
     //机构信息页 编辑
     public function actionIndex() {
+
+        
         $org_id = Yii::app()->user->org_id;
         if (!empty($org_id) && intval($org_id) > 0) {
             $info = Organizations::api()->show(array('id' => $org_id), 0);
             if ($info['code'] == 'succ') {
                 $data['organizations'] = $info['body'];
+                /*
+                 * 老数据遗留问题，省市区三联动无法达成，导致部分机构只保留了其中一些数值，故删除
+                 */
+                if(empty($info['body']['province_id'])){
+                    unset($data['organizations']['city_id']);
+                    unset($data['organizations']['district_id']);
+                }
+                if(empty($info['body']['city_id'])){
+                    unset($data['organizations']['district_id']);
+                }
+
                 $this->render('index', $data);
             } else {
                 $this->redirect('/system/organization/compile');
@@ -33,14 +51,19 @@ class OrganizationController extends Controller {
         $this->render('compile', compact('organizations'));
     }
 
-    //注册分销商
-    public function actionSaveSupply() { 
-	    //todo
-        // $user = Yii::app()->redis->hMget('session_' . Yii::app()->getSession()->getSessionId(), array('id', 'organization_id'));
-      
+     /**
+      * 注册或修改分销商
+      * 注意：
+      * - ModificationMessage 发送修改消息
+      */
+    public function actionSaveSupply() {
         if (Yii::app()->request->isPostRequest) {
+        	
+        	new ModificationMessage($_POST);
+        	
             $_POST['business_license'] = addslashes($_POST['business_license']); 
-            if(!isset($_POST['province_id']) || empty($_POST['province_id'])){
+            $_POST['supply_type'] = 0;
+            if(!isset($_POST['province_id']) || empty($_POST['province_id'])  || $_POST['province_id'] == '__NULL__'){
                 echo json_encode(array('errors' => '省市区至少选择一项'));
                 exit;
             }
@@ -50,9 +73,8 @@ class OrganizationController extends Controller {
                 $result = Organizations::api()->edit($_POST);
             } else {
                 $_POST['type'] = 'supply';
-                $result = Organizations::api()->reg($_POST); //var_dump($_POST); var_dump($result);exit;
+                $result = Organizations::api()->reg($_POST);
                 if ($result['code'] == 'succ' && isset($result['body']['id'])) {
-                   //echo "string".$result['body']['id'];exit;
                         $users = Users::model()->findByPk(Yii::app()->user->uid);
                         $users->organization_id = $result['body']['id'];
                         $users->save();

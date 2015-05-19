@@ -1,0 +1,1579 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2013 (http://www.altova.com) by  () -->
+<!-- edited by shuo.chang -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:qm="http://piao.qunar.com/2013/QMenpiaoResponseSchema" xmlns="http://piao.qunar.com/2013/QMenpiaoResponseSchema" targetNamespace="http://piao.qunar.com/2013/QMenpiaoResponseSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="response">
+		<xs:annotation>
+			<xs:documentation>门票数据的根节点</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="header" type="qm:ResponseHeader">
+					<xs:annotation>
+						<xs:documentation>门票数据头节点</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="body" type="qm:ResponseBody">
+					<xs:annotation>
+						<xs:documentation>门票数据体节点</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="ResponseHeader" final="#all">
+		<xs:annotation>
+			<xs:documentation>门票数据头类型，该类型不得以任何形式继承。</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="application" type="xs:string" default="Qunar.Menpiao.Agent">
+				<xs:annotation>
+					<xs:documentation>应用名称：如Qunar.Mnepiao.Agent</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="processor" type="xs:string" default="SupplierDataExchangeProcessor">
+				<xs:annotation>
+					<xs:documentation>处理程序，如：SupplierDataExchangeProcessor</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="version" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>处理程序的版本号：v2.0.0</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="bodyType" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Body的类型，继承QMenpiaoBody的具体实现BodyType</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="createUser" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>创建人：此处可以是创建者，可以为系统名称，供应商名称等。</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="createTime" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>创建时间</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="code" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>验证结果代码</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="describe" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>验证结果说明</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ResponseBody">
+		<xs:annotation>
+			<xs:documentation>门票数据体基类</xs:documentation>
+		</xs:annotation>
+	</xs:complexType>
+	<xs:complexType name="GetProductByQunarResponseBody">
+		<xs:annotation>
+			<xs:documentation>【供应商提供】【产品】去哪儿获取产品信息接口（getProductByQunar）</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="qm:ResponseBody">
+				<xs:sequence>
+					<xs:element name="count" type="xs:string"/>
+					<xs:element name="productInfos">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="productInfo" minOccurs="0" maxOccurs="unbounded">
+									<xs:complexType>
+										<xs:sequence>
+											<xs:element name="baseInfo">
+												<xs:complexType>
+													<xs:sequence>
+														<xs:element name="resourceId" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>供应商ID</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="saleType" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>销售类型</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="suggestPrice" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>建议售卖价</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="sights">
+															<xs:annotation>
+																<xs:documentation>景区列表</xs:documentation>
+															</xs:annotation>
+															<xs:complexType>
+																<xs:sequence>
+																	<xs:element name="sight" maxOccurs="unbounded">
+																		<xs:annotation>
+																			<xs:documentation>景区</xs:documentation>
+																		</xs:annotation>
+																		<xs:complexType>
+																			<xs:sequence>
+																				<xs:element name="sightName" type="xs:string">
+																					<xs:annotation>
+																						<xs:documentation>景区名称</xs:documentation>
+																					</xs:annotation>
+																				</xs:element>
+																				<xs:element name="sightAddress" type="xs:string">
+																					<xs:annotation>
+																						<xs:documentation>景区地址</xs:documentation>
+																					</xs:annotation>
+																				</xs:element>
+																				<xs:element name="city" type="xs:string">
+																					<xs:annotation>
+																						<xs:documentation>目的地</xs:documentation>
+																					</xs:annotation>
+																				</xs:element>
+																				<xs:element name="sightlon" type="xs:string">
+																					<xs:annotation>
+																						<xs:documentation>经度</xs:documentation>
+																					</xs:annotation>
+																				</xs:element>
+																				<xs:element name="sightlat" type="xs:string">
+																					<xs:annotation>
+																						<xs:documentation>维度</xs:documentation>
+																					</xs:annotation>
+																				</xs:element>
+																			</xs:sequence>
+																		</xs:complexType>
+																	</xs:element>
+																</xs:sequence>
+															</xs:complexType>
+														</xs:element>
+														<xs:element name="productName" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>产品名称，2-20字</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+													</xs:sequence>
+												</xs:complexType>
+											</xs:element>
+											<xs:element name="bookConfig">
+												<xs:complexType>
+													<xs:sequence>
+														<xs:element name="paymentType" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>付款方式 
+PREPAY；在线支付
+CASHPAY：景区支付</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="advanceOption">
+															<xs:complexType>
+																<xs:sequence>
+																	<xs:element name="bookAdvanceDay" type="xs:string" default="0">
+																		<xs:annotation>
+																			<xs:documentation>提前预定天数，
+默认0，即当天</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="bookAdvanceTime" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>提前预定时间，hh:mm
+默认22:00，即当天22:00后无法预定当日门票</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="useAdvanceHour" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>预订后N小时才能入园</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																</xs:sequence>
+															</xs:complexType>
+														</xs:element>
+														<xs:element name="autoCancelTime" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>订单自动取消时间：订单下单未支付自动取消时间（单位：分钟）</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="contactPersonRequired">
+															<xs:complexType>
+																<xs:sequence>
+																	<xs:element name="nameRequired" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>姓名是否必填
+TRUE、FALSE</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="namePinyinRequired" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>姓名拼音是否必填
+TRUE、FALSE</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="emailRequired" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>邮箱是否必填
+TRUE、FALSE</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="addressRequired" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>地址（含邮编）是否必填
+TRUE、FALSE</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																</xs:sequence>
+															</xs:complexType>
+														</xs:element>
+														<xs:element name="bookPersonType">
+															<xs:annotation>
+																<xs:documentation>CONTACT_PERSON：只需要取票人信息
+CONTACT_PERSON_AND_VISIT_PERSON
+：需要游客和取票人信息</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="visitPersonRequiredForQuantity" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>每 N个游客共用 1 个身份信息,数字，表示每N张票需要填写一个visitPerson的信息</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="visitPersonRequired">
+															<xs:complexType>
+																<xs:sequence>
+																	<xs:element name="nameRequired" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>姓名是否必填
+TRUE、FALSE</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="namePinYinRequired" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>姓名拼音是否必填
+TRUE、FALSE</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="credentialsRequired" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>证件是否必填
+TRUE、FALSE</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="credentialsRequiredTypes" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>证件类型，（支持多选一，逗号分隔）
+身份证 : ID_CARD,
+护照 : HUZHAO,
+台胞证 : TAIBAO
+港澳通行证: GANGAO</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="userRequiredDefined1" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>必填自定义元素1</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="userRequiredDefined2" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>必填自定义元素2</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																</xs:sequence>
+															</xs:complexType>
+														</xs:element>
+														<xs:element name="perPhoneMaximum" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>手机号最大购买量的限制</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="perPhoneMaximumType" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>手机号最大购买量的限制类型
+USE_DATE_MAX ：游玩日限制（日历有效）
+BOOK_DATE_MAX： 购买日限制
+PRODUCT_MAX：产品限制</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+													</xs:sequence>
+												</xs:complexType>
+											</xs:element>
+											<xs:element name="priceConfig">
+												<xs:complexType>
+													<xs:sequence>
+														<xs:element name="validType" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>有效期限制：
+USE_DATE :游客选定的游玩日期当天有效
+ BETWEEN_USE_DATE_AND_N_DAYSAFTER ：游客选定的游玩日期起_____天内有效
+
+BETWEEN_BOOK_DATE_AND_N_DAYSAFTER： 游客购买日起_____天内有效
+
+BETWEEN_USE_DATE_START_AND_END ：游客在使用日期期限内均可使用</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="daysAfterUseDateValid" type="xs:string"/>
+														<xs:element name="daysAfterBookDateValid" type="xs:string"/>
+														<xs:element name="dayUseTimePeriod" type="xs:string" minOccurs="0">
+															<xs:annotation>
+																<xs:documentation>可使用时间：HH:mm-HH:mm
+例： 08:00-16:00</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="calendarPrices" minOccurs="0">
+															<xs:complexType>
+																<xs:sequence>
+																	<xs:element name="calendarPrice" maxOccurs="unbounded">
+																		<xs:complexType>
+																			<xs:sequence>
+																				<xs:element name="useDate" type="xs:string">
+																					<xs:annotation>
+																						<xs:documentation>日期</xs:documentation>
+																					</xs:annotation>
+																				</xs:element>
+																				<xs:element name="marketPrice" type="xs:string">
+																					<xs:annotation>
+																						<xs:documentation>市场价</xs:documentation>
+																					</xs:annotation>
+																				</xs:element>
+																				<xs:element name="sellPrice" type="xs:string">
+																					<xs:annotation>
+																						<xs:documentation>Qunar售卖价</xs:documentation>
+																					</xs:annotation>
+																				</xs:element>
+                                                                                <xs:element name="settlePrice" type="xs:string">
+                                                                                    <xs:annotation>
+                                                                                        <xs:documentation>结算价</xs:documentation>
+                                                                                    </xs:annotation>
+                                                                                </xs:element>
+																				<xs:element name="sellstock" type="xs:string">
+																					<xs:annotation>
+																						<xs:documentation>当日库存</xs:documentation>
+																					</xs:annotation>
+																				</xs:element>
+																				<xs:element name="minimum" type="xs:string">
+																					<xs:annotation>
+																						<xs:documentation>单笔订单最小购买量</xs:documentation>
+																					</xs:annotation>
+																				</xs:element>
+																				<xs:element name="maximum" type="xs:string">
+																					<xs:annotation>
+																						<xs:documentation>单笔订单最大购买量</xs:documentation>
+																					</xs:annotation>
+																				</xs:element>
+																			</xs:sequence>
+																		</xs:complexType>
+																	</xs:element>
+																</xs:sequence>
+															</xs:complexType>
+														</xs:element>
+														<xs:element name="periodPrice" minOccurs="0">
+															<xs:complexType>
+																<xs:sequence>
+																	<xs:element name="periodStart" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>价格有效期起</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="periodEnd" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>价格有效期止</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="validWeek" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>有效周几，默认1,2,3,4,5,6,7</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="invalidDate" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>不可使用日期
+yyyy-MM-dd
+如十一不可用，则输入2014-10-01，如果有多个日期不可用，则多个日期以逗号分隔如：“2014-10-01,2014-10-02,2014-10-03”</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="marketPrice" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>市场价</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="sellPrice" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>qunar售卖价</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+                                                                    <xs:element name="settlePrice" type="xs:string">
+                                                                        <xs:annotation>
+                                                                            <xs:documentation>结算价</xs:documentation>
+                                                                        </xs:annotation>
+                                                                    </xs:element>
+																	<xs:element name="sellstock" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>总库存</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="minimum" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>单笔订单最小购买量</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="maximum" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>单笔订单最大购买量</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																</xs:sequence>
+															</xs:complexType>
+														</xs:element>
+													</xs:sequence>
+												</xs:complexType>
+											</xs:element>
+											<xs:element name="promoteConfig">
+												<xs:complexType>
+													<xs:sequence>
+														<xs:element name="cashBackMoney" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>返现金额</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+													</xs:sequence>
+												</xs:complexType>
+											</xs:element>
+											<xs:element name="productDescription">
+												<xs:complexType>
+													<xs:sequence>
+														<xs:element name="feeInfo" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>费用说明</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="feeInclude" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>费用包含</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="feeExclude" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>费用不包含</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="pickupTime" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>取票时间</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="pickupAddress" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>取票地点</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="remind" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>使用说明</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="refundOption">
+															<xs:annotation>
+																<xs:documentation>退款</xs:documentation>
+															</xs:annotation>
+															<xs:complexType>
+																<xs:sequence>
+																	<xs:element name="canRefund" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>TRUE，FALSE</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="refundApplyTimeBeforeValidEndDay" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>最晚有效期前几天几点可退款。
+如： 2_22:00</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="refundChargeType" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>按单，按票
+ORDER
+QUANTITY</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="refundCharge" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>退款手续费</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="refundInfo" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>退款规则</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																</xs:sequence>
+															</xs:complexType>
+														</xs:element>
+													</xs:sequence>
+												</xs:complexType>
+											</xs:element>
+											<xs:element name="otherConfig">
+												<xs:complexType>
+													<xs:sequence>
+														<xs:element name="telephone" type="xs:string"/>
+														<xs:element name="salePeriods">
+															<xs:complexType>
+																<xs:sequence>
+																	<xs:element name="salePeriod" minOccurs="0" maxOccurs="unbounded">
+																		<xs:complexType>
+																			<xs:sequence>
+																				<xs:element name="saleStartTime" type="xs:string">
+																					<xs:annotation>
+																						<xs:documentation>产品上架时间yyyy-MM-dd
+00:00生效</xs:documentation>
+																					</xs:annotation>
+																				</xs:element>
+																				<xs:element name="saleEndTime" type="xs:string">
+																					<xs:annotation>
+																						<xs:documentation>产品下架时间yyyy-MM-dd
+00:00生效</xs:documentation>
+																					</xs:annotation>
+																				</xs:element>
+																			</xs:sequence>
+																		</xs:complexType>
+																	</xs:element>
+																</xs:sequence>
+															</xs:complexType>
+														</xs:element>
+														<xs:element name="smsTemplet" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>自定义短信内容，请填写取票方式或入园方式，80字以内
+不填写将默认为空</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="eticketType" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>Q_CODE
+S_CODE
+NO_CODE</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+													</xs:sequence>
+												</xs:complexType>
+											</xs:element>
+										</xs:sequence>
+									</xs:complexType>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="CreateOrderForBeforePaySyncResponseBody">
+		<xs:annotation>
+			<xs:documentation>【供应商提供】【订单】创建订单（支付前下单）（createOrderForBeforePaySync）</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="qm:ResponseBody">
+				<xs:sequence>
+					<xs:element name="orderInfo">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="partnerorderId" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>供应商的订单ID</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="orderStatus" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>PREPAY_ORDER_INIT 预付：初始订单
+PREPAY_ORDER_BOOK_FAILED 预付：预订失败
+PREPAY_ORDER_NOT_PAYED 预付：预订成功，待支付
+PREPAY_ORDER_CANCEL 预付：订单已取消
+PREPAY_ORDER_PRINTING 预付：已付款，出票中
+PREPAY_ORDER_PRINT_FAILED 预付：出票失败
+PREPAY_ORDER_PRINT_SUCCESS 预付：出票成功
+CASHPAY_ORDER_INIT 现付：初始订单
+CASHPAY_ORDER_PRINTING  现付：出票中
+CASHPAY_ORDER_PRINT_FAILED 现付：出票失败
+CASHPAY_ORDER_PRINT_SUCCESS 现付：出票成功
+CASHPAY_ORDER_CANCEL 现付：订单已取消</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="PayOrderForBeforePaySyncResponseBody">
+		<xs:annotation>
+			<xs:documentation>【供应商提供】【订单】支付订单（支付前下单）（payOrderForBeforePaySync）</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="qm:ResponseBody">
+				<xs:sequence>
+					<xs:element name="orderInfo">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="partnerorderId" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>供应商生成的订单ID</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="orderStatus" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>PREPAY_ORDER_INIT 预付：初始订单
+PREPAY_ORDER_BOOK_FAILED 预付：预订失败
+PREPAY_ORDER_NOT_PAYED 预付：预订成功，待支付
+PREPAY_ORDER_CANCEL 预付：订单已取消
+PREPAY_ORDER_PRINTING 预付：已付款，出票中
+PREPAY_ORDER_PRINT_FAILED 预付：出票失败
+PREPAY_ORDER_PRINT_SUCCESS 预付：出票成功
+CASHPAY_ORDER_INIT 现付：初始订单
+CASHPAY_ORDER_PRINTING  现付：出票中
+CASHPAY_ORDER_PRINT_FAILED 现付：出票失败
+CASHPAY_ORDER_PRINT_SUCCESS 现付：出票成功
+CASHPAY_ORDER_CANCEL 现付：订单已取消</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="PushOrderForBeforePaySyncResponseBody">
+		<xs:annotation>
+			<xs:documentation>【供应商提供】【订单】同步订单（支付前下单）（pushOrderForBeforePaySync）</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="qm:ResponseBody">
+				<xs:sequence>
+					<xs:element name="orderInfo">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="partnerorderId" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>供应商生成的订单ID</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="orderStatus" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>订单状态
+PREPAY_ORDER_INIT 预付：初始订单
+PREPAY_ORDER_BOOK_FAILED 预付：预订失败
+PREPAY_ORDER_NOT_PAYED 预付：预订成功，待支付
+PREPAY_ORDER_CANCEL 预付：订单已取消
+PREPAY_ORDER_PRINTING 预付：已付款，出票中
+PREPAY_ORDER_PRINT_FAILED 预付：出票失败
+PREPAY_ORDER_PRINT_SUCCESS 预付：出票成功
+CASHPAY_ORDER_INIT 现付：初始订单
+CASHPAY_ORDER_PRINTING  现付：出票中
+CASHPAY_ORDER_PRINT_FAILED 现付：出票失败
+CASHPAY_ORDER_PRINT_SUCCESS 现付：出票成功
+CASHPAY_ORDER_CANCEL 现付：订单已取消</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="CheckCreateOrderForAfterPaySyncResponseBody">
+		<xs:annotation>
+			<xs:documentation>【供应商提供】【订单】创建订单校验（支付后下单）（不建议使用）（checkCreateOrderForAfterPaySync）</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="qm:ResponseBody">
+				<xs:sequence>
+					<xs:element name="message" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>空消息</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="CreateOrderForAfterPaySyncResponseBody">
+		<xs:annotation>
+			<xs:documentation>【供应商提供】【订单】创建订单（支付后下单）（不建议使用）（createOrderForAfterPaySync）</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="qm:ResponseBody">
+				<xs:sequence>
+					<xs:element name="orderInfo">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="partnerorderId" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>供应商的订单ID</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="orderStatus" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>PREPAY_ORDER_INIT 预付：初始订单
+PREPAY_ORDER_BOOK_FAILED 预付：预订失败
+PREPAY_ORDER_NOT_PAYED 预付：预订成功，待支付
+PREPAY_ORDER_CANCEL 预付：订单已取消
+PREPAY_ORDER_PRINTING 预付：已付款，出票中
+PREPAY_ORDER_PRINT_FAILED 预付：出票失败
+PREPAY_ORDER_PRINT_SUCCESS 预付：出票成功
+CASHPAY_ORDER_INIT 现付：初始订单
+CASHPAY_ORDER_PRINTING  现付：出票中
+CASHPAY_ORDER_PRINT_FAILED 现付：出票失败
+CASHPAY_ORDER_PRINT_SUCCESS 现付：出票成功
+CASHPAY_ORDER_CANCEL 现付：订单已取消</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="GetOrderByQunarResponseBody">
+		<xs:annotation>
+			<xs:documentation>【供应商提供】【订单】获取订单信息（支付前下单）（getOrderByQunar）</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="qm:ResponseBody">
+				<xs:sequence>
+					<xs:element name="orderInfo">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="partnerorderId" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>供应商订单号</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="orderStatus" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>PREPAY_ORDER_INIT 预付：初始订单
+PREPAY_ORDER_BOOK_FAILED 预付：预订失败
+PREPAY_ORDER_NOT_PAYED 预付：预订成功，待支付
+PREPAY_ORDER_CANCEL 预付：订单已取消
+PREPAY_ORDER_PRINTING 预付：已付款，出票中
+PREPAY_ORDER_PRINT_FAILED 预付：出票失败
+PREPAY_ORDER_PRINT_SUCCESS 预付：出票成功
+CASHPAY_ORDER_INIT 现付：初始订单
+CASHPAY_ORDER_PRINTING  现付：出票中
+CASHPAY_ORDER_PRINT_FAILED 现付：出票失败
+CASHPAY_ORDER_PRINT_SUCCESS 现付：出票成功
+CASHPAY_ORDER_CANCEL 现付：订单已取消</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="orderQuantity" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>票张数</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="eticketNo" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>该笔订单实际使用的电子票信息。可以为Q_CODE，也可以为S_CODE，没有的话，可以为空。</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="eticketSended" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>已发送：TRUE
+未发送：FALSE
+如果没有电子票，则记录实际通知用户后，才能将此设置为true返回。</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="useQuantity" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>电子票中已使用张数</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="consumeInfo" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>电子票消费信息</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="SendOrderEticketResponseBody">
+		<xs:annotation>
+			<xs:documentation>【供应商提供】【订单】（重）发入园凭证（sendOrderEticket）</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="qm:ResponseBody">
+				<xs:sequence>
+					<xs:element name="message" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>空消息</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="NoticeOrderRefundedByQunarResponseBody">
+		<xs:annotation>
+			<xs:documentation>【供应商提供】【订单】Qunar退款通知（noticeOrderRefundedByQunar）</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="qm:ResponseBody">
+				<xs:sequence>
+					<xs:element name="message" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>空消息即可</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ApplyOrderRefundByUserResponseBody">
+		<xs:annotation>
+			<xs:documentation>【供应商提供】【订单】用户向供应商申请退款（applyOrderRefundByUser）</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="qm:ResponseBody">
+				<xs:sequence>
+					<xs:element name="message" type="xs:string"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="NoticeOrderAlreadyCashBackResponseBody">
+		<xs:annotation>
+			<xs:documentation>【供应商提供】【订单】订单已返现通知（noticeOrderAlreadyCashBack）</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="qm:ResponseBody">
+				<xs:sequence>
+					<xs:element name="message" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>空消息</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="NoticeProductChangedResponseBody">
+		<xs:annotation>
+			<xs:documentation>【qunar提供】【产品】产品变化通知（noticeProductChanged）</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="qm:ResponseBody">
+				<xs:sequence>
+					<xs:element name="message" type="xs:string"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="GetProductBySupplierResponseBody">
+		<xs:annotation>
+			<xs:documentation>【qunar提供】【产品】供应商获取产品信息接口（getProductBySupplier）</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="qm:ResponseBody">
+				<xs:sequence>
+					<xs:element name="productInfo" minOccurs="0">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="baseInfo">
+									<xs:complexType>
+										<xs:sequence>
+											<xs:element name="resourceId" type="xs:string">
+												<xs:annotation>
+													<xs:documentation>供应商ID</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+											<xs:element name="sights">
+												<xs:annotation>
+													<xs:documentation>景区列表</xs:documentation>
+												</xs:annotation>
+												<xs:complexType>
+													<xs:sequence>
+														<xs:element name="sight" maxOccurs="unbounded">
+															<xs:annotation>
+																<xs:documentation>景区</xs:documentation>
+															</xs:annotation>
+															<xs:complexType>
+																<xs:sequence>
+																	<xs:element name="sightName" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>景区名称</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="sightAddress" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>景区地址</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="city" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>目的地</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="sightlon" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>经度</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="sightlat" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>维度</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																</xs:sequence>
+															</xs:complexType>
+														</xs:element>
+													</xs:sequence>
+												</xs:complexType>
+											</xs:element>
+											<xs:element name="productName" type="xs:string">
+												<xs:annotation>
+													<xs:documentation>产品名称，2-20字</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+										</xs:sequence>
+									</xs:complexType>
+								</xs:element>
+								<xs:element name="bookConfig">
+									<xs:complexType>
+										<xs:sequence>
+											<xs:element name="paymentType" type="xs:string">
+												<xs:annotation>
+													<xs:documentation>付款方式 
+PREPAY；在线支付
+CASHPAY：景区支付</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+											<xs:element name="advanceOption">
+												<xs:complexType>
+													<xs:sequence>
+														<xs:element name="bookAdvanceDay" type="xs:string" default="0">
+															<xs:annotation>
+																<xs:documentation>提前预定天数，
+默认0，即当天</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="bookAdvanceTime" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>提前预定时间，hh:mm
+默认22:00，即当天22:00后无法预定当日门票</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="useAdvanceHour" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>预订后N小时才能入园</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+													</xs:sequence>
+												</xs:complexType>
+											</xs:element>
+											<xs:element name="autoCancelTime" type="xs:string">
+												<xs:annotation>
+													<xs:documentation>订单自动取消时间：订单下单未支付自动取消时间（单位：分钟）</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+											<xs:element name="contactPersonRequired">
+												<xs:complexType>
+													<xs:sequence>
+														<xs:element name="nameRequired" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>姓名是否必填
+TRUE、FALSE</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="namePinyinRequired" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>姓名拼音是否必填
+TRUE、FALSE</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="emailRequired" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>邮箱是否必填
+TRUE、FALSE</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="addressRequired" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>地址（含邮编）是否必填
+TRUE、FALSE</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+													</xs:sequence>
+												</xs:complexType>
+											</xs:element>
+											<xs:element name="bookPersonType" type="xs:string">
+												<xs:annotation>
+													<xs:documentation>CONTACT_PERSON：只需要取票人信息
+CONTACT_PERSON_AND_VISIT_PERSON
+：需要游客和取票人信息</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+											<xs:element name="visitPersonRequiredForQuantity" type="xs:string">
+												<xs:annotation>
+													<xs:documentation>每 N个游客共用 1 个身份信息,数字，表示每N张票需要填写一个visitPerson的信息</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+											<xs:element name="visitPersonRequired">
+												<xs:complexType>
+													<xs:sequence>
+														<xs:element name="nameRequired" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>姓名是否必填
+TRUE、FALSE</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="namePinYinRequired" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>姓名拼音是否必填
+TRUE、FALSE</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="credentialsRequired" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>证件是否必填
+TRUE、FALSE</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="credentialsRequiredTypes" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>证件类型，（支持多选一，逗号分隔）
+身份证 : ID_CARD,
+护照 : HUZHAO,
+台胞证 : TAIBAO
+港澳通行证: GANGAO</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="userRequiredDefined1" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>必填自定义元素1</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="userRequiredDefined2" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>必填自定义元素2</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+													</xs:sequence>
+												</xs:complexType>
+											</xs:element>
+											<xs:element name="perPhoneMaximum" type="xs:string">
+												<xs:annotation>
+													<xs:documentation>手机号最大购买量的限制</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+											<xs:element name="perPhoneMaximumType" type="xs:string">
+												<xs:annotation>
+													<xs:documentation>手机号最大购买量的限制类型
+USE_DATE_MAX ：游玩日限制（日历有效）
+BOOK_DATE_MAX： 购买日限制
+PRODUCT_MAX：产品限制</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+										</xs:sequence>
+									</xs:complexType>
+								</xs:element>
+								<xs:element name="priceConfig">
+									<xs:complexType>
+										<xs:sequence>
+											<xs:element name="validType" type="xs:string">
+												<xs:annotation>
+													<xs:documentation>有效期限制：
+USE_DATE :游客选定的游玩日期当天有效
+ BETWEEN_USE_DATE_AND_N_DAYSAFTER ：游客选定的游玩日期起_____天内有效
+
+BETWEEN_BOOK_DATE_AND_N_DAYSAFTER： 游客购买日起_____天内有效
+
+BETWEEN_USE_DATE_START_AND_END ：游客在使用日期期限内均可使用</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+											<xs:element name="daysAfterUseDateValid" type="xs:string"/>
+											<xs:element name="daysAfterBookDateValid" type="xs:string"/>
+											<xs:element name="dayUseTimePeriod" type="xs:string" minOccurs="0">
+												<xs:annotation>
+													<xs:documentation>可使用时间：HH:mm-HH:mm
+例： 08:00-16:00</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+											<xs:element name="calendarPrices" minOccurs="0">
+												<xs:complexType>
+													<xs:sequence>
+														<xs:element name="calendarPrice" maxOccurs="unbounded">
+															<xs:complexType>
+																<xs:sequence>
+																	<xs:element name="useDate" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>日期</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="marketPrice" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>市场价</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="sellPrice" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>Qunar售卖价</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="sellstock" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>当日库存</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="minimum" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>单笔订单最小购买量</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="maximum" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>单笔订单最大购买量</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																</xs:sequence>
+															</xs:complexType>
+														</xs:element>
+													</xs:sequence>
+												</xs:complexType>
+											</xs:element>
+											<xs:element name="periodPrice" minOccurs="0">
+												<xs:complexType>
+													<xs:sequence>
+														<xs:element name="periodStart" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>价格有效期起</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="periodEnd" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>价格有效期止</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="validWeek" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>有效周几，默认1,2,3,4,5,6,7</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="invalidDate" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>不可使用日期</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="marketPrice" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>市场价</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="sellPrice" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>qunar售卖价</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="sellstock" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>总库存</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="minimum" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>单笔订单最小购买量</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="maximum" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>单笔订单最大购买量</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+													</xs:sequence>
+												</xs:complexType>
+											</xs:element>
+										</xs:sequence>
+									</xs:complexType>
+								</xs:element>
+								<xs:element name="promoteConfig">
+									<xs:complexType>
+										<xs:sequence>
+											<xs:element name="cashBackMoney" type="xs:string">
+												<xs:annotation>
+													<xs:documentation>返现金额</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+										</xs:sequence>
+									</xs:complexType>
+								</xs:element>
+								<xs:element name="productDescription">
+									<xs:complexType>
+										<xs:sequence>
+											<xs:element name="feeInfo" type="xs:string">
+												<xs:annotation>
+													<xs:documentation>费用说明</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+											<xs:element name="feeInclude" type="xs:string">
+												<xs:annotation>
+													<xs:documentation>费用包含</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+											<xs:element name="feeExclude" type="xs:string">
+												<xs:annotation>
+													<xs:documentation>费用不包含</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+											<xs:element name="pickupTime" type="xs:string">
+												<xs:annotation>
+													<xs:documentation>取票时间</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+											<xs:element name="pickupAddress" type="xs:string">
+												<xs:annotation>
+													<xs:documentation>取票地点</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+											<xs:element name="remind" type="xs:string">
+												<xs:annotation>
+													<xs:documentation>使用说明</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+											<xs:element name="refundOption">
+												<xs:annotation>
+													<xs:documentation>退款</xs:documentation>
+												</xs:annotation>
+												<xs:complexType>
+													<xs:sequence>
+														<xs:element name="canRefund" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>TRUE，FALSE</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="refundApplyTimeBeforeValidEndDay" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>最晚有效期前几天几点可退款。
+如： 2_22:00</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="refundChargeType" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>按单，按票
+ORDER
+QUANTITY</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="refundCharge" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>退款手续费</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="refundInfo" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>退款规则</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+													</xs:sequence>
+												</xs:complexType>
+											</xs:element>
+										</xs:sequence>
+									</xs:complexType>
+								</xs:element>
+								<xs:element name="otherConfig">
+									<xs:complexType>
+										<xs:sequence>
+											<xs:element name="telephone" type="xs:string"/>
+											<xs:element name="salePeriods">
+												<xs:complexType>
+													<xs:sequence>
+														<xs:element name="salePeriod" minOccurs="0" maxOccurs="unbounded">
+															<xs:complexType>
+																<xs:sequence>
+																	<xs:element name="saleStartTime" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>产品上架时间yyyy-MM-dd
+00:00生效</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																	<xs:element name="saleEndTime" type="xs:string">
+																		<xs:annotation>
+																			<xs:documentation>产品下架时间yyyy-MM-dd
+00:00生效</xs:documentation>
+																		</xs:annotation>
+																	</xs:element>
+																</xs:sequence>
+															</xs:complexType>
+														</xs:element>
+													</xs:sequence>
+												</xs:complexType>
+											</xs:element>
+											<xs:element name="smsTemplet" type="xs:string">
+												<xs:annotation>
+													<xs:documentation>自定义短信内容，请填写取票方式或入园方式，80字以内</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+											<xs:element name="eTicketType" type="xs:string">
+												<xs:annotation>
+													<xs:documentation>Q_CODE
+S_CODE
+NO_CODE</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+										</xs:sequence>
+									</xs:complexType>
+								</xs:element>
+								<xs:element name="productStatus" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>产品状态：
+待上架：PRE_ONLINE
+申请上架：APPLY_ONLINE
+上架：ONLINE
+下架：OFFLINE
+处罚下架：IFFY</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="isProductOnSell" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>产品是否在售
+true or false</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ApplyProductSaleBySupplierResponseBody">
+		<xs:annotation>
+			<xs:documentation>【qunar提供】【产品】产品申请上架（applyProductSaleBySupplier）</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="qm:ResponseBody">
+				<xs:sequence>
+					<xs:element name="message" type="xs:string"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="GetOrderBySupplierResponseBody">
+		<xs:annotation>
+			<xs:documentation>【qunar提供】【订单】供应商获取订单信息（getOrderBySupplier）</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="qm:ResponseBody">
+				<xs:sequence>
+					<xs:element name="orderInfo">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="partnerorderId" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>供应商生成的订单ID</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="orderStatus" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>订单状态
+PREPAY_ORDER_INIT 预付：初始订单
+
+PREPAY_ORDER_BOOK_FAILED 预付：预订失败
+
+PREPAY_ORDER_NOT_PAYED 预付：预订成功，待支付
+
+PREPAY_ORDER_CANCEL 预付：订单已取消
+
+PREPAY_ORDER_PRINTING 预付：已付款，出票中
+
+PREPAY_ORDER_PRINT_FAILED 预付：出票失败
+
+PREPAY_ORDER_PRINT_SUCCESS 预付：出票成功
+
+CASHPAY_ORDER_INIT 现付：初始订单
+
+CASHPAY_ORDER_PRINTING  现付：出票中
+
+CASHPAY_ORDER_PRINT_FAILED 现付：出票失败
+
+CASHPAY_ORDER_PRINT_SUCCESS 现付：出票成功
+
+CASHPAY_ORDER_CANCEL 现付：订单已取消</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="contactPerson">
+									<xs:complexType>
+										<xs:sequence>
+											<xs:element name="name" type="xs:string">
+												<xs:annotation>
+													<xs:documentation>订单的取票人姓名</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+											<xs:element name="namePinyin" type="xs:string">
+												<xs:annotation>
+													<xs:documentation>取票人姓名拼音</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+											<xs:element name="mobile" type="xs:string">
+												<xs:annotation>
+													<xs:documentation>订单取票人的电话</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+											<xs:element name="email" type="xs:string">
+												<xs:annotation>
+													<xs:documentation>订单取票人的邮箱</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+											<xs:element name="address" type="xs:string">
+												<xs:annotation>
+													<xs:documentation>取票人邮寄地址</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+											<xs:element name="zipCode" type="xs:string">
+												<xs:annotation>
+													<xs:documentation>邮政编码</xs:documentation>
+												</xs:annotation>
+											</xs:element>
+										</xs:sequence>
+									</xs:complexType>
+								</xs:element>
+								<xs:element name="visitPerson">
+									<xs:complexType>
+										<xs:sequence>
+											<xs:element name="person" minOccurs="0" maxOccurs="unbounded">
+												<xs:complexType>
+													<xs:sequence>
+														<xs:element name="name" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>游玩人姓名</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="namePinyin" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>游玩人姓名拼音</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="credentials" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>游玩人证件(身份证号)</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="credentialsType" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>游玩人证件类型(如身份证)</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="defined1Value" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>必填自定义元素名称+：+值</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+														<xs:element name="defined2Value" type="xs:string">
+															<xs:annotation>
+																<xs:documentation>必填自定义元素名称2+：+值</xs:documentation>
+															</xs:annotation>
+														</xs:element>
+													</xs:sequence>
+												</xs:complexType>
+											</xs:element>
+										</xs:sequence>
+									</xs:complexType>
+								</xs:element>
+								<xs:element name="orderRemark" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>游客订单备注</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="NoticeOrderEticketSendedResponseBody">
+		<xs:annotation>
+			<xs:documentation>【qunar提供】【订单】用户发码通知（noticeOrderEticketSended）</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="qm:ResponseBody">
+				<xs:sequence>
+					<xs:element name="message" type="xs:string"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="NoticeOrderConsumedResponseBody">
+		<xs:annotation>
+			<xs:documentation>【qunar提供】【订单】用户消费通知（noticeOrderConsumed）</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="qm:ResponseBody">
+				<xs:sequence>
+					<xs:element name="message" type="xs:string"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ApplyOrderRefundBySupplierResponseBody">
+		<xs:annotation>
+			<xs:documentation>【qunar提供】【订单】供应商向Qunar申请退款（applyOrderRefundBySupplier）</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="qm:ResponseBody">
+				<xs:sequence>
+					<xs:element name="orderInfo">
+						<xs:complexType>
+							<xs:annotation>
+								<xs:documentation>仲裁退款备注</xs:documentation>
+							</xs:annotation>
+							<xs:sequence>
+								<xs:element name="partnerorderId" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>供应商订单号id			</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="refundSeq" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>退款流水号</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="orderQuantity" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>订单张数</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="refundQuantity" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>退款票数</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="refundMoney" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>退款金额 单位：分</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="orderRefundCharge" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>订单退款手续费总额</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="NoticeOrderRefundApproveResultResponseBody">
+		<xs:annotation>
+			<xs:documentation>【qunar提供】【订单】供应商通知用户申请退款结果（noticeOrderRefundApproveResult）</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="qm:ResponseBody">
+				<xs:sequence>
+					<xs:element name="message" type="xs:string"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>

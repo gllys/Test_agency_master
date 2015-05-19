@@ -5,12 +5,47 @@ class ManagerController extends Controller {
     public function actionIndex() {
         $name = isset($_GET['name']) ? $_GET['name'] : "";
         $page = isset($_GET['page']) ? $_GET['page'] : 1;
-        $param = array('supplier_id' => Yii::app()->user->org_id, 'name' => $name, 'p' => $page);
-        //Credit::api()->debug = true;
+
+        $param = array('supplier_id' => Yii::app()->user->org_id, 'name' => $name, 'source'=>'1','p' => $page);
+        //合作时间
+        if(isset($_GET['start_date']) && !empty($_GET['start_date'])){
+            $param['add_time'] = $_GET['start_date'].' - '.$_GET['end_date'];
+       }
+//else{
+//            $param['add_time'] = date('Y-m-d',time()).' - '.date('Y-m-d',time());
+//        }
+        //分销账号
+        if(isset($_GET['agency_name']) && !empty($_GET['agency_name'])){
+            $Agency_names = AgencyUser::api()->lists(array('account'=>$_GET['agency_name'], 'fields'=>'id,organization_id'));
+
+                if( $Agency_names['code'] == 'succ' ){
+                   $org_ids = implode(array_unique(ArrayColumn::i_array_column($Agency_names['data'],
+                       'organization_id'))); //获取用户的机构id 并且进行去除重复和转化成‘，’分割的字符串
+                    $param['distributor_id'] =  $org_ids;
+                }else{
+                    $param['distributor_id'] = 100000000000;
+                   // $data['error'] =  "查找分销商账号不存在请核实，再查询";
+                }
+        }
+
+        $data['get'] = $_GET;
         $rs = Credit::api()->lists($param);
+        $data['lists'] = empty($rs['body']) ? array() : $rs['body']['data'];
+        $list_ids = array();
+        if(count( $data['lists']) != 0){
+            foreach($data['lists'] as $key => $val){
+
+                $arr_id[] = $val['distributor_id'];
+            }
+            $ids = implode(',',$arr_id);
+            $list_i = Organizations::api()->list(array('type'=>'agency','id'=>$ids));
+            $list_ids = apiModel::getLists($list_i);
+        }
+
         //print_r($rs);exit;
         if ($rs['code'] == 'succ') {
             $data['lists'] = empty($rs['body']) ? array() : $rs['body']['data'];
+            $data['list_ids']  = $list_ids;
             $pagination = ApiModel::getPagination($rs);
             $pages = new CPagination($pagination['count']);
             $pages->pageSize = 15; #每页显示的数目
@@ -23,10 +58,64 @@ class ManagerController extends Controller {
         }
     }
 
+    public function actionIndex2() {
+        $name = isset($_GET['name']) ? $_GET['name'] : "";
+        $page = isset($_GET['page']) ? $_GET['page'] : 1;
+        $param = array('supplier_id' => Yii::app()->user->org_id, 'name' => $name,'source'=>'2', 'p' => $page);
+        //合作时间
+        if(isset($_GET['start_date']) && !empty($_GET['start_date'])){
+            $param['add_time'] = $_GET['start_date'].' - '.$_GET['end_date'];
+        }
+//        else{
+//            $param['add_time'] = date('Y-m-d',time()).' - '.date('Y-m-d',time());
+//        }
+        //分销账号
+        if(isset($_GET['agency_name']) && !empty($_GET['agency_name'])){
+            $Agency_names = AgencyUser::api()->lists(array('account'=>$_GET['agency_name'], 'fields'=>'id,organization_id'));
+
+            if( $Agency_names['code'] == 'succ' ){
+                $org_ids = implode(array_unique(ArrayColumn::i_array_column($Agency_names['data'],
+                    'organization_id'))); //获取用户的机构id 并且进行去除重复和转化成‘，’分割的字符串
+                $param['distributor_id'] =  $org_ids;
+            }else{
+                throw new CHttpException(500, "查找分销商账号不存在请核实，在查询");
+            }
+        }
+        $rs = Credit::api()->lists($param);
+        $data['get'] = $_GET;
+        $data['lists'] = empty($rs['body']) ? array() : $rs['body']['data'];
+        $list_ids = array();
+        if(count( $data['lists']) != 0){
+            foreach($data['lists'] as $key => $val){
+
+                $arr_id[] = $val['distributor_id'];
+            }
+            $ids = implode(',',$arr_id);
+            $list_i = Organizations::api()->list(array('type'=>'agency','id'=>$ids));
+            $list_ids = apiModel::getLists($list_i);
+        }
+
+        //print_r($rs);exit;
+        if ($rs['code'] == 'succ') {
+            $data['lists'] = empty($rs['body']) ? array() : $rs['body']['data'];
+            $data['list_ids']  = $list_ids;
+            $pagination = ApiModel::getPagination($rs);
+            $pages = new CPagination($pagination['count']);
+            $pages->pageSize = 15; #每页显示的数目
+            $data['pages'] = $pages;
+            $rs = Organizations::api()->show(array('id' => Yii::app()->user->org_id), 0);
+            $data['orgInfo'] = ApiModel::getData($rs);
+            $this->render('index2', $data);
+        } else {
+            throw new CHttpException(500, $rs['message']);
+        }
+    }
+
     public function actionRes() {
         $param['name'] = isset($_POST['name']) ? $_POST['name'] : "";
         $param['type'] = 'agency';
-        $param['items'] = 500;
+		$param['fields'] = 'id,name' ;
+		$param['items'] = 500;
         $rs = Organizations::api()->list($param);
         if ($rs['code'] == 'succ') {
             $data['lists'] = empty($rs['body']) ? array() : $rs['body']['data'];
@@ -187,6 +276,8 @@ class ManagerController extends Controller {
         } else {
             $data['city'] = $data['city'];
         }
+        $data['detail'] = $result['body'];
+
         $param['name'] = $_POST['name'];
         $param['distributor_id'] = $_POST['id'];
         $param['supplier_id'] = Yii::app()->user->org_id;
@@ -200,7 +291,14 @@ class ManagerController extends Controller {
 
     public function actionDelCredit() {
         $params['id'] = $_REQUEST['id'];
+        $params['supply_id'] = Yii::app()->user->org_id;
         $rs = Credit::api()->del($params);
+        //print_r($rs);die;
+        if($rs['code'] == 'succ'){
+            $this->_end(0, "解除合作成功");
+        }else{
+            $this->_end(1,"解除合作失败");
+        }  
     }
 
     //立刻结算
@@ -222,4 +320,19 @@ class ManagerController extends Controller {
         }
     }
 
+
+    /*
+     * 查看分销商的详细详细
+     *xj
+     * */
+     public function actionLook(){
+         $look['id'] = $_GET['id'];
+         $look['type'] = 'agency';
+
+         $lookdata = Organizations::api()->list($look);
+         $ldata = apiModel::getLists($lookdata);
+         $lookd = $ldata[$look['id']];
+
+         $this->render('look',compact('lookd'));
+     }
 }

@@ -144,14 +144,14 @@
                     <div class="block">
                         <label class="control-label"></label>
                         <div class="col-lg-4">
-                            <select class="form-control" id="account_cycle" name="account_cycle"  onchange="changeDayShow(this.value)">
+                            <select class="form-control select2" id="account_cycle" name="account_cycle"  onchange="changeDayShow(this.value)">
                                 <option value="">请选择结算周期</option>
                                 <option value="1">月结算</option>
                                 <option value="0">周结算</option>
                             </select>
                         </div>
                         <div class="col-lg-4">
-                            <select class="form-control" name="account_cycle_day" id="account_cycle_day">
+                            <select class="form-control select2" name="account_cycle_day" id="account_cycle_day">
                                 <option value="">请选择结算日</option>
                             </select>
                         </div>
@@ -235,7 +235,7 @@
 
         $.post('/agency/manager/setCycle',$('#settle-form').serialize(),function(data){
             if(data.error==0){
-                alert("保存成功",function(){location.href = '/agency/manager';});
+                alert("保存成功",function(){location.href = '/site/switch/#/agency/manager';});
             }else{
                 alert("保存失败,"+data.msg);
             }
@@ -252,9 +252,9 @@
             $.post('/agency/manager/genbill',{'id':$('#agency-credit-id').val()}, function(data){
 	            data = JSON.parse(data);
                 if(data.error){
-                   alert("结算失败",function(){top.location.reload();});
+                   alert("结算失败",function(){top.location.partReload();});
                 }else{
-                    alert("结算成功",function(){location.href = '/agency/manager';});
+                    alert("结算成功",function(){location.href = '/site/switch/#/agency/manager';});
                 }
             });
             return false;
@@ -281,16 +281,16 @@
             	  // alert(datamsg);
                    if(datamsg.error==0){
                        //setTimeout(alert("解除合作成功"),100);
-                       //setTimeout(window.location.reload(),110);
+                       //setTimeout(window.location.partReload(),110);
                        setTimeout(function(){
-                           alert('解除合作成功',function(){window.location.reload();});
+                           alert('解除合作成功',function(){window.location.partReload();});
                        },500)
                    }else{
                        setTimeout(function(){
-                           alert('解除合作失败',function(){window.location.reload();});
+                           alert('解除合作失败',function(){window.location.partReload();});
                        },500)
                         //setTimeout(alert("解除合作失败"),100);
-                        //setTimeout(window.location.reload(),110);
+                        //setTimeout(window.location.partReload(),110);
                    }
                    
 				}, " json ");  

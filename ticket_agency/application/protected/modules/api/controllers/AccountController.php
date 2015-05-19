@@ -3,17 +3,16 @@
 class AccountController extends CController {
 
     public function actionAdd() {
-		$result = new Users;
-		$_POST['repassword'] = $_POST['password'];
+        $result = new Users;
         $result->attributes = $_POST;
         try {
             if ($result->save()) {
                 $this->_end('succ', '用户添加成功');
             }
-        } catch (Exception $ex) {            
-             $this->_end('fail', $ex->getMessage());
+        } catch (Exception $ex) {
+            
         }
-        $this->_end('fail', $result->getErrors());
+        $this->_end('fail', print_r($result->errors, true));
     }
 
     //查看分销商账号是否已经存在

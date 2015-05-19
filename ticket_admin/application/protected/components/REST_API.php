@@ -48,7 +48,9 @@ class REST_API {
         array_unshift($arguments, $verb);
         ApiModel::$inParam = $arguments;
         ApiModel::$outResult = $result = call_user_func_array(array($this, 'post'), $arguments);
-        //LogCollect::add();
+        LogCollect::add();
+        //Yii::log('API arguments:' . var_export($arguments, true), 'warning', 'api');
+        //Yii::log('API result:' . var_export($result, true), 'warning', 'api');
         return $result == "" ? array('code' => 'fail') : json_decode(trim($result), true);
     }
 

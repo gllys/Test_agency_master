@@ -375,7 +375,18 @@ abstract class Base_Model_Abstract
     }
 
     public function countResult($where){
-        return intval(reset(reset($this->search($where,"count(*) as count"))));
+        $r = $this->search($where,"count(*) as count");
+        if(is_array($r) && count($r)>0) {
+            $r=reset($r);
+        } else {
+            return 0;
+        }
+        if(is_array($r) && count($r)>0) {
+            $r=reset($r);
+            return intval($r);
+        } else {
+            return 0;
+        }
     }
 
     public function exec($sql) {

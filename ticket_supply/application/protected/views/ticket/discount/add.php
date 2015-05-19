@@ -2,6 +2,9 @@
 $this->breadcrumbs = array('产品管理', '添加优惠规则');
 $action = isset($action) ? $action : $this->getAction()->getId();
 ?>
+<style>
+.ui-datepicker { z-index:9999!important }
+</style>
 <div class="contentpanel">
 
     <div class="row">
@@ -46,7 +49,7 @@ $action = isset($action) ? $action : $this->getAction()->getId();
                                 <select data-placeholder="Choose One" style="width:300px;" name="namelist_id"
                                         id="distributor-select" data-validation-engine="validate[required]">
                                     <?php if(!empty($info)){ ?>
-                                        <?php $res = Ticketorgnamelist::api()->detail(array('id'=>$info['namelist_id'])); ?>
+                                        <?php $res = Ticketorgnamelist::api()->detail(array('id'=>$info['namelist_id'], 'fields'=>'id,name')); ?>
                                         <?php $limitInfo = $res['code']=="succ"?$res['body']:array(); ?>
                                         <option value="<?php echo !empty($limitInfo)?$limitInfo['id']:""; ?>">
                                             <?php echo !empty($limitInfo)?$limitInfo['name']:"请选择限制分销商清单"; ?>
@@ -150,8 +153,7 @@ $action = isset($action) ? $action : $this->getAction()->getId();
                 if ($('#discount-form').validationEngine('validate') === true) {
                     $.post('/ticket/discount/save', $('#discount-form').serialize(), function (data) {
                         if (data.error == 0) {
-                            alert("保存成功！");
-                            location.href = "/ticket/discount";
+                            alert("保存成功！",function(){location.href = "/ticket/discount";});
                         } else {
                             alert("保存失败," + data.msg);
                         }
@@ -191,7 +193,30 @@ $action = isset($action) ? $action : $this->getAction()->getId();
         jQuery('#timepicker3').timepicker({minuteStep: 15});
 
         // Date Picker
-        jQuery('.datepicker').datepicker();
+        $('.datepicker').datepicker({
+            changeMonth: true,
+            changeYear: true,
+            dateFormat: 'yy-mm-dd',
+            monthNamesShort: [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" ],
+            yearRange: "1995:2065",
+            beforeShow: function(d){
+                setTimeout(function(){
+                    $('.ui-datepicker-title select').select2({
+                        minimumResultsForSearch: -1
+                    });
+                },0)
+            },
+            onChangeMonthYear: function(){
+                setTimeout(function(){
+                    $('.ui-datepicker-title select').select2({
+                        minimumResultsForSearch: -1
+                    });
+                },0)
+            },
+            onClose: function(dateText, inst) { 
+                $('.select2-drop').hide(); 
+            }
+        });
         jQuery('#datepicker-inline').datepicker();
         jQuery('#datepicker-multiple').datepicker({
             numberOfMonths: 3,

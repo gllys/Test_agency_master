@@ -182,6 +182,23 @@ class PublicFunHelper {
         return $_model;
     }
 
+    //PublicFunHelper::arrayIds($model,$key)
+    //model得到ids
+    public static function arrayIds($model, $key,$separator=',') {
+        if (!$model) {
+            return array();
+        }
+
+        $_model = array();
+        foreach ($model as $val) {
+            if(!empty($val[$key])){
+                $_ids = explode($separator,$val[$key]) ;
+                $_model = array_merge($_model,$_ids);
+            }
+        }
+        return $_model;
+    }
+    
     //PublicFunHelper::print_view($this);
     public static function print_view($obj) {
         //只支持最多一层模块打印
@@ -243,7 +260,7 @@ class PublicFunHelper {
     }
 
     //文件大小转换
-    static public function sizecount($filesize) {
+    public static function sizecount($filesize) {
         if ($filesize >= 1073741824) {
             $filesize = round($filesize / 1073741824 * 100) / 100 . ' GB';
         } elseif ($filesize >= 1048576) {
@@ -256,4 +273,19 @@ class PublicFunHelper {
         return $filesize;
     }
 
+    //过滤空值，不过滤数值
+    public static function filter($model){
+        if (!$model) {
+            return array();
+        }
+
+        $_model = array();
+        foreach ($model as $key=>$val) {
+            if($val === ''){
+                continue;
+            }
+            $_model[$key] = $val;
+        }
+        return $_model;
+    }
 }

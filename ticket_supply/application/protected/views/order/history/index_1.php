@@ -1,6 +1,9 @@
 <?php
 $this->breadcrumbs = array('订单管理', '近期订单');
 ?>
+<style>
+.ui-datepicker { z-index:9999!important }
+</style>
 <div class="contentpanel">
 
 	<div class="panel panel-default">
@@ -121,7 +124,7 @@ $this->breadcrumbs = array('订单管理', '近期订单');
 					<th>取票人</th>
 					<th>取票人手机号</th>
 					<th>游玩日期</th>
-					<th>票数</th>
+					<th>预定票数</th>
 					<th>支付金额</th>
 					<th>订单状态</th>
 					<th>分销商</th>
@@ -150,7 +153,7 @@ $this->breadcrumbs = array('订单管理', '近期订单');
 			<div class="panel-footer pagenumQu" style="padding-top:15px;text-align:right;border:1px solid #ddd;border-top:0">
 				<?php
 				if (isset($lists['data'])) {
-					$this->widget('CLinkPager', array(
+					$this->widget('common.widgets.pagers.ULinkPager', array(
 						'cssFile' => '',
 						'header' => '',
 						'prevPageLabel' => '上一页',
@@ -264,7 +267,30 @@ jQuery('#colorpicker3').val('#'+hex);
 				$(this).text('全选')
 			}
 		});
-		jQuery('.datepicker').datepicker({dateFormat: 'yy-mm-dd'});
+		$('.datepicker').datepicker({
+            changeMonth: true,
+            changeYear: true,
+            dateFormat: 'yy-mm-dd',
+            monthNamesShort: [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" ],
+            yearRange: "1995:2065",
+            beforeShow: function(d){
+                setTimeout(function(){
+                    $('.ui-datepicker-title select').select2({
+                        minimumResultsForSearch: -1
+                    });
+                },0)
+            },
+            onChangeMonthYear: function(){
+                setTimeout(function(){
+                    $('.ui-datepicker-title select').select2({
+                        minimumResultsForSearch: -1
+                    });
+                },0)
+            },
+            onClose: function(dateText, inst) { 
+                $('.select2-drop').hide(); 
+            }
+        });
 	});
 </script>
 

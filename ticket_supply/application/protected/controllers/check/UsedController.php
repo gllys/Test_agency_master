@@ -8,39 +8,21 @@ class UsedController extends Controller {
             $this->redirect('/check/used/?landscape_id=' . Yii::app()->user->lan_id);
         }
 
-        //景点列表
-        $param['status'] = 1;
-        $param['items'] = 1000;
-        $param['organization_id'] = YII::app()->user->org_id;
-        $data = Landscape::api()->lists($param);
-        $landscapes = ApiModel::getLists($data);
-
-        //得到子景点
-        $pois = array();
-//        if (!empty($_GET['landscape'])) {
-//            $param['status'] = 1;
-//            $param['items'] = 1000;
-//            $param['organization_ids'] = YII::app()->user->org_id;
-//            $param['landscape_ids'] = $_GET['landscape'];
-//            $data = Poi::api()->lists($param);
-//            $pois = ApiModel::getLists($data);
-//        }
-
         //得到可使用订单列表
         $lists = array();
-        $error = '';
+        $error = '该订单没有可以使用的门票';
         if (!empty($_GET['id'])) {
             //Verification::api()->debug = true;
             $param = $_GET;
-            $param['supplier_id'] = YII::app()->user->org_id;
             $rs = Verification::api()->lists($param, 0);
             if (ApiModel::isSucc($rs)) {
                 $lists = ApiModel::getData($rs);
-                echo $error = $rs['message'];
+            }else{
+                $lists = ApiModel::getData($rs);
+                $error = $rs['message'];
             }
-            $error = '未查到相关门票';
         }
-        $this->render('index', compact('landscapes', 'pois', 'lists', 'error'));
+        $this->render('index', compact('lists', 'error'));
     }
 
     //使用票
@@ -48,17 +30,19 @@ class UsedController extends Controller {
         if (Yii::app()->request->isPostRequest) {
             $param = $_POST;
             $param['uid'] = Yii::app()->user->id;
-            $param['user_name'] = Yii::app()->user->name;
-            $param['or_id'] = Yii::app()->user->org_id;
-            $param['view_point'] = 0 ;
-          
+            $param['user_name'] = Yii::app()->user->display_name;
+            if (Yii::app()->user->org_id) {
+                $param['or_id'] = Yii::app()->user->org_id;
+            }
+            $param['view_point'] = 0;
+
             //去零
             $param['datas'] = array();
             foreach ($_POST['datas'] as $k => $v) {
-                if(intval($v)<0){
+                if (intval($v) < 0) {
                     $this->_end(1, "订单号{$k}验证的票不能为负");
                 }
-                    
+
                 if ($v) {
                     $param['datas'][$k] = $v;
                 }
@@ -76,14 +60,15 @@ class UsedController extends Controller {
                     if (!$num) { #如果是零张则不打印小票
                         continue;
                     }
-	                //todo optimize
-                    $_rs = Order::api()->detail(array('id' => $orderId));
+                    //todo optimize
+                    $_rs = Order::api()->detail(array('id' => $orderId, 'show_order_items' => 1));
                     $detail = ApiModel::getData($_rs);
+                    $orderItem = current($detail['order_items']);
                     $printInfo[$orderId]['order_id'] = $orderId;
-                    $printInfo[$orderId]['ticket_name'] = $detail['order_items'][0]['name'];
+                    $printInfo[$orderId]['ticket_name'] = $orderItem['name'];
                     $printInfo[$orderId]['num'] = $num;
                     $printInfo[$orderId]['date'] = date('Y/m/d H:i:s');
-                    $printInfo[$orderId]['op_name'] = Yii::app()->user->name;
+                    $printInfo[$orderId]['op_name'] = Yii::app()->user->display_name;
                     $printInfo[$orderId]['owner_name'] = $detail['owner_name'];
                     $printInfo[$orderId]['owner_mobile'] = $detail['owner_mobile'];
                     $printInfo[$orderId]['remark'] = $detail['remark'];

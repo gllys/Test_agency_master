@@ -6,22 +6,19 @@ $this->breadcrumbs = array('结算管理','资产管理');
 	.table tr>*{
 		text-align:center
 	}
-	.table-bordered th:nth-child(1){padding-left:35px;}
-	.table-bordered td:nth-child(1){padding-left:35px;}
 	</style>
 
 	
 	<div class="panel panel-default">
         <div class="panel-heading">
-            <h4 class="panel-title" style="padding-left:0;">资产管理</h4>
+            <h4 class="panel-title">资产管理</h4>
         </div>
         <div class="panel-body">
             <form class="form-inline" method="post">
 				<div class="form-group">
-					<input class="form-control" name="supplier_name" placeholder="请输入供应商名称" type="text" style="width:400px;">
+					<input class="form-control" name="supplier_name" placeholder="请输入供应商名称" type="text" style="width:480px;">
 				</div>
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary btn-sm">查询</button></div>
+				<button type="submit" class="btn btn-primary btn-xs">查询</button>
             </form>
         </div><!-- panel-body -->
     </div>
@@ -57,7 +54,7 @@ $this->breadcrumbs = array('结算管理','资产管理');
 		<div class="panel-footer pagenumQu" style="padding-top:15px;text-align:right;border:1px solid #ddd;border-top:0">
 				<?php
 				if (isset($lists['data'])) {
-					$this->widget('common.widgets.pagers.ULinkPager', array(
+					$this->widget('CLinkPager', array(
 						'cssFile' => '',
 						'header' => '',
 						'prevPageLabel' => '上一页',

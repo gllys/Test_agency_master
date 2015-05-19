@@ -27,9 +27,6 @@
  */
 class Users extends UActiveRecord
 {
-    public $repassword;
-	public $verifycode;
-	public static $verifycodeAllowEmpty = true;
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @return Users the static model class
@@ -58,20 +55,16 @@ class Users extends UActiveRecord
 			array('account', 'unique'),
             array('account', 'match', 'pattern'=>'/^[a-z0-9\-_]+$/','message'=>'账号不合法，必须为字母数字或下划线！'),  
 			array('account, password, mobile', 'required'),
-			array('repassword', 'required', 'on'=>'create'),
             array('mobile', 'match', 'pattern' => "/^1\d{10}$/", 'allowEmpty'=>false, 'message' => "手机号码格式不正确"),
 			array('account', 'length', 'min'=>3, 'max'=>30),
-//			array('password', 'length', 'is'=>6),
-//			array('repassword', 'length', 'is'=>6, 'on'=>'create'),
-			array('verifycode', 'captcha', 'allowEmpty'=>Users::$verifycodeAllowEmpty),
-			array('landscape_id, status, is_super, is_guide, last_updated_source, is_weixin', 'numerical', 'integerOnly'=>true),
-			array('account, password, password_str, name, email, mobile, telephone, identity, position', 'length', 'max'=>100),
-			array('organization_id, created_by', 'length', 'max'=>10),
+			array('status, is_super, is_guide, last_updated_source', 'numerical', 'integerOnly'=>true),
+			array('account, password, name, email, mobile, telephone, identity, position', 'length', 'max'=>100),
+			array('created_by', 'length', 'max'=>10),
 			array('gender', 'length', 'max'=>6),
-			array('birthday, sell_role,biography, created_at, deleted_at', 'safe'),
+			array('birthday, sell_role,biography, is_delete, created_at, deleted_at', 'safe'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, account, password, name, gender, email, mobile, telephone, birthday, identity, position, biography, status, created_by, created_at, updated_at, deleted_at, is_super, is_guide, last_updated_source', 'safe', 'on'=>'search'),
+			array('id, account, password, name, gender, email, mobile, telephone, birthday, identity, position, biography, status, is_delete, created_by, created_at, updated_at, deleted_at, is_super, is_guide, last_updated_source', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -96,11 +89,8 @@ class Users extends UActiveRecord
 			'account' => '用户名',
 			'password' => '密码',
 			'repassword' => '确认密码',
-			'password_str' => 'Password Str',
 			'name' => 'Name',
 			'sell_role' => '角色',
-			'organization_id' => 'Organization',
-			'landscape_id' => 'Landscape',
 			'gender' => 'Gender',
 			'email' => 'Email',
 			'mobile' => '手机号',
@@ -117,7 +107,6 @@ class Users extends UActiveRecord
 			'is_super' => 'Is Super',
 			'is_guide' => 'Is Guide',
 			'last_updated_source' => 'Last Updated Source',
-			'is_weixin' => 'Is Weixin',
 		);
 	}
 

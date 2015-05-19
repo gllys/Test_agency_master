@@ -1,0 +1,1 @@
+INSERT INTO `ticket_order`.`process_config` (`id`, `name`, `path`, `num`, `state`) VALUES (NULL, 'refundchange', 'RefundChange.php', '1', '1');

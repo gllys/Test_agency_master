@@ -20,5 +20,5 @@
 
 
 <script type="text/javascript">
-$('#child_nav a[href="<?php echo $this->childNav ?>"]').parent().addClass('active').parent().show();
+//$('#child_nav a[href="<?php echo $this->childNav ?>"]').parent().addClass('active').parent().show();
 </script>

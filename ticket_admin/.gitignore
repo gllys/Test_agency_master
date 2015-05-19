@@ -5,6 +5,7 @@ application/assets/*
 !application/assets/*.xlsx
 !application/assets/*.exe
 application/protected/runtime/*
+!application/protected/runtime/Null
 .idea/*
 state.bin
 .buildpath

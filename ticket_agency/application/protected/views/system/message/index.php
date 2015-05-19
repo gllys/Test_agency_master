@@ -1,188 +1,153 @@
-<style>
-    .title{overflow: hidden;text-overflow: ellipsis;white-space: nowrap;width: 36em;}
-    .badge{background-color:#fc3232;}
-    .no-read td{font-weight:bold;}
-    .table-bordered td span{margin-left:5px;}
-    .table-bordered td a{font-weight:normal;}
-</style>
+<?php
+$this->breadcrumbs = array('系统管理','消息');
+?>
 <div class="contentpanel">
-    <ul class="nav nav-tabs">
-        <li class="<?php echo !isset($read_time) || $read_time == '' ? 'active' : ''?>"><a href="/system/message/view/type/<?php echo $type ?>"><strong>全部</strong></a></li>
-        <li class="<?php echo $read_time == '0' ? 'active' : ''?>">
-            <a href="/system/message/view/type/<?php echo $type ?>/read_time/0" style="float:none;" class="btn btn-sm"> 未读
-                <?php if($unread_num > 0): ?><span class="badge" id="unread"><?php echo $unread_num; ?></span><?php endif;?>
-            </a>
-        </li>
-        <li class="<?php echo $read_time == '1' ? 'active' : ''?>">
-            <a href="/system/message/view/type/<?php echo $type ?>/read_time/1" style="float: none;" class="btn btn-sm">已读</a>
-        </li>
-    </ul>
-    <div id="show_msg"></div>
-    <div class="table-responsive" style="margin-bottom:30px;">
-        <table class="table table-bordered">
-            <thead>
-            <tr>
-                <th width="80">
-                    <div class="ckbox ckbox-primary" style="margin-left:17px;">
-                        <input type="checkbox" class="ids" id="checkbox-allcheck">
-                        <label for="checkbox-allcheck" class="allcheck">全选</label>
-                    </div>
-                </th>
-                <th width="150">
-                    <a class="btn btn-xm btn-default btn-bordered" id="delete-all"> 删除</a>
-                </th>
-                <th width="400" />
-                <th width="100" />
-                <th width="80" />
-            </tr>
-            </thead>
-            <tbody id="staff-body">
-            <?php if (isset($lists) && !empty($lists)) : foreach ($lists as $message) : ?>
-            <tr class="<?php echo $message['read_time'] == 0 ? 'no-read' : ''?>">
-                <td>
-                    <div class="ckbox ckbox-primary" style="margin-left: 17px;">
-                        <input type="checkbox" class="ids" id="checkbox<?php echo $message['id']?>" value="<?php echo $message['id']?>">
-                        <label for="checkbox<?php echo $message['id']?>"></label>
-                    </div>
-                </td>
-                <td>
-                    <?php echo $message['title']?><span class="text-<?php echo $sys_class[$message['sys_type']]?>">(<?php echo $sys_name[$message['sys_type']]?>)</span>
-                </td>
-                <td>
-                    <?php if($message['sys_type'] != 0):?>
-                        <p id="setRead<?php echo $message['id']?>" style="cursor: pointer;cursor: hand;margin: 5px 0px;" class="Newclass setRead <?php echo $message['read_time'] == 0 ? 'font-bold' : ''?>"
-                           data-id="<?php echo $message['id']?>"
-                           data-food="<?php echo $message['read_time']?>">
-                            <?php echo $message['content']?>
-                        </p>
-                    <?php else:?>
-                        <p id="readAdvice<?php echo $message['id']?>" style="cursor: pointer;cursor: hand;margin: 5px 0px;" class="readAdvice <?php echo $message['read_time'] == 0 ? 'font-bold' : ''?> title"
-                           data-id="<?php echo $message['id']?>"
-                           data-name="<?php echo $message['organization_name']?>"
-                           data-food="<?php echo $message['read_time'] == 0 ? 0 : date('Y年m月d日',$message['created_at'])?>"
-                           data-time="<?php echo date('Y年m月d日',$message['created_at'])?>"
-                           data-title="<?php echo $message['title']?>"
-                            data-content='<?php echo strip_tags($message['content'],'<a><p><br/><br>'); ?>'>
-                            <?php   $content = trim($message['content']);
-                                    $content = htmlspecialchars_decode($content);
-                                    $content = preg_replace("/<(.*?)>/","",$content);
-                                    echo $content;
-                            ?>
-                        </p>
+	<div class="row">
+		<div class="col-sm-3 col-md-3 col-lg-2">
+			<!--a href="/system/message/write" class="btn btn-success btn-block btn-create-msg">新消息</a-->
+			<br />
+			<ul class="nav nav-pills nav-stacked nav-msg">
+				<li class="<?php echo $type == null ? 'active' : '' ?>">
+					<a href="/system/message/all">
+						<!--span class="badge pull-right"></span-->
+						<i class="glyphicon glyphicon-inbox"></i> 全部
+					</a>
+				</li>
+				<li class="<?php echo $type == 1 ? 'active' : '' ?>"><a href="/system/message/sub/"><i
+							class="glyphicon glyphicon-star"></i> 订阅</a></li>
+				<li class="<?php echo $type == 2 ? 'active' : '' ?>"><a href="/system/message/org/"><i
+							class="glyphicon glyphicon-tower"></i> 机构</a></li>
+				<li class="<?php echo $type == 3 ? 'active' : '' ?>"><a href="/system/message/rem/"><i
+							class="glyphicon glyphicon-bullhorn"></i> 提醒</a></li>
+				<li class="<?php echo $type == 4 ? 'active' : '' ?>"><a href="/system/message/col/"><i
+							class="glyphicon glyphicon-heart"></i> 收藏</a></li>
+				<!--li class="<?php //echo $type == 'sent' ? 'active' : '' ?>"><a href="/system/message/sent/"><i
+							class="glyphicon glyphicon-send"></i> 已发送</a></li-->
+			</ul>
+		</div>
+		<style>
+			#title{
+				overflow: hidden; /*自动隐藏文字*/
+            	text-overflow: ellipsis;/*文字隐藏后添加省略号*/
+            	white-space: nowrap;/*强制不换行*/
+            	width: 10em;/*不允许出现半汉字截断*/
+			}
+		</style>
 
-                    <?php endif;?>
-                </td>
-                <td><?php echo date('Y-m-d',$message['created_at'])?></td>
-                <td><a href="javascript:;" data-id="<?php echo $message['id']?>" class="text-danger setDeleted">删除</a></td>
-            </tr>
-            <?php endforeach;?>
-            <?php else:?>
-                <tr><td colspan="5">暂无数据</td></tr>
-            <?php endif;?>
-            </tbody>
-        </table>
+		<div class="col-sm-9 col-md-9 col-lg-10">
 
-        <div class="msg-footer">
-            <div class="panel-footer pagenumQu" style="padding-top:15px;text-align:right;border:1px solid #ddd;border-top:0" <?php if(empty($lists)){ echo 'hidden';}?>>
-                <?php
-                if (isset($lists)) {
-                    $this->widget('common.widgets.pagers.ULinkPager', array(
-                        'cssFile' => '',
-                        'header' => '',
-                        'prevPageLabel' => '上一页',
-                        'nextPageLabel' => '下一页',
-                        'firstPageLabel' => '',
-                        'lastPageLabel' => '',
-                        'pages' => $pages,
-                        'maxButtonCount' => 5, //分页数量
-                    ));
-                }
-                ?>
-            </div>
-        </div>
+			<ul class="media-list msg-list">
+				<?php if ($messages) : foreach ($messages as $message) : ?>
+					<li id="message<?php echo $message{'id'} ?>" class="media <?php echo $message['read_time'] == 0 ? 'unread' : '' ?>">
+						<!--div class="ckbox ckbox-primary pull-left">
+							<input type="checkbox" id="checkbox<?php //echo $message{'id'} ?>">
+							<label for="checkbox<?php //echo $message{'id'} ?>"></label>
+						</div-->
+						<!--a class="pull-left" href="#">
+							<img class="media-object img-circle img-online" src="/img/user1.png" alt="...">
+						</a-->
 
-    </div>
-</div>
-<!-- contentpanel -->
+						<div class="media-body">
+							<div class="pull-right media-option">
+								<i class="fa fa-paperclip mr5" style="display: none"></i>
+								<small><?php echo date('Y年m月d日',$message['created_at']) ?></small>
+								<!--i class="fa fa-star"></i-->
+
+								<div class="btn-group">
+									<a class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+										<i class="fa fa-cog"></i>
+									</a>
+									<ul class="dropdown-menu pull-right" role="menu">
+										<li><a href="javascript:;" class="setDeleted" data-id="<?php echo $message{'id'} ?>">删除</a></li>
+										<li style="display:<?php echo $message['read_time'] == 0 ? '' : 'none'?>"><a href="javascript:;" class="setRead" data-id="<?php echo $message{'id'} ?>">标记为已读</a></li>
+									</ul>
+								</div>
+							</div>
+							<h4 class="sender"><div style="float:left" <?php echo $message['read_time'] == 0 ? '' : 'hidden'?> ><i style="padding-right:5px" id="read<?php echo $message['id']?>" class="glyphicon glyphicon-envelope" ></i></div>
+							<?php $result = Organizations::api()->show(array('id' => $message['send_organization']));
+											if(!empty($result['body']['name'])){
+												echo $result['body']['name'];
+											}else{
+												echo '系统公告';
+											}
+											?><span class="text-<?php echo $sms_class[$message['sms_type']]?>">（<?php echo $sms_label[$message['sms_type']]?>）</span></h4>
+
+							<p id="title"><a href="javascript:;"  class="setRead" data-id="<?php echo $message{'id'} ?>" data-food="<?php echo $message['read_time']?>"><strong
+										class="subject"></strong> <?php echo htmlspecialchars($message['content']) ?>
+								</a></p>
+							<p style="display:none" id="content<?php echo $message['id']?>"><?php echo htmlspecialchars($message['content'])?></p>	
+						</div>
+					</li>
+				<?php endforeach; ?>
+			<?php else:?>
+				<li> 暂无消息</li>
+			<?php endif;?>
+			</ul>
+			<div class="msg-footer">
+				<div class="panel-footer pagenumQu" style="padding-top:15px;text-align:right;border:1px solid #ddd;border-top:0" <?php if(empty($messages)){ echo 'hidden';}?>>
+					<?php
+					if (isset($messages)) {
+						$this->widget('CLinkPager', array(
+						'cssFile' => '',
+						'header' => '',
+						'prevPageLabel' => '上一页',
+						'nextPageLabel' => '下一页',
+						'firstPageLabel' => '',
+						'lastPageLabel' => '',
+						'pages' => $pages,
+						'maxButtonCount' => 5, //分页数量
+					));
+				}
+				?>
+				</div>
+			</div>
+			<!-- msg-footer -->
+		</div>
+	</div>
+</div><!-- contentpanel -->
 <script>
 	jQuery(document).ready(function (){
-        /*
-        删除消息
-         */
-		$('.setDeleted').on("click",function() {
-            var id = $(this).data('id');
-			PWConfirm('确定要删除消息？',function(){
-				$.post('/system/message/delete', {id : id},function(data) {
+		$('.setRead').click(function() {
+			var sels = $(this);
+			var id = Math.floor($(this).attr('data-id'));
+			var rt = $(this).attr('data-food');
+			$('#content' + id).toggle('normal');
+			if(rt == 0){
+				$.post('/system/message/read',{'id' : id},function(data) {
+				if (data.error == 0) {
+					$('#read' + id).remove();
+					var num = $('.badge').text();
+					if(Number(num) > 0){
+						num = num - 1;
+					}
+					if(Number(num) == 0){
+						$('.badge').remove();
+					}else{
+						$('.badge').text(num);		
+					}
+					sels.attr('data-food','1');
+				}else{
+					alert(data.msg);
+				}
+			},'json');
+		}else{
+				return false;
+	}
+			
+		});
+		$('.setDeleted').click(function() {
+			if (!window.confirm("确定要删除消息?")) {
+                return false;
+            }
+			var id = Math.floor($(this).attr('data-id'));
+			$.post('/system/message/delete', {'id' : id},function(data) {
 				if (data.error == 0) {
 					$('#message' + id).remove();
 					top.location.reload();
 				}else{
 					alert(data.msg);
 				}
-			  },'json');
-            });
+			},'json');
 		});
-
-        /*
-        全选/全不选
-         */
-        $('#checkbox-allcheck').click(function(){
-            var obj = $(this).parents('table');
-            if($(this).attr('checked')){
-                obj.find('input').prop('checked', true)
-                obj.find('tbody tr[class!="empty"]').addClass('selected')
-                $('.allcheck').text('全不选')
-            }else{
-                obj.find('input').prop('checked', false)
-                obj.find('tbody tr').removeClass('selected')
-                $('.allcheck').text('全选')
-            }
-        })
-
-
-        $('.ids').click(function(){
-            $(this).parents('tr').toggleClass('selected');
-        });
-
-        //批量删除
-        $('#delete-all').click(function(){
-            var ids = "";
-            /*$('tr[class="selected"]').each(function(){
-                if(ids != "") {
-                    ids += ',';
-                }
-                ids += $(this).find('input[type="checkbox"]').val();
-            });*/
-
-            $(".selected").each(function(i){
-            if(ids != "") {
-                ids += ',';
-            }
-                var a = $(this).find('input[type="checkbox"]').val();
-                if(a!="" || a!="undefined" || a!="on"){
-                    ids += $(this).find('input[type="checkbox"]').val();
-                }
-            })
-			
-            if(ids==""){
-                alert("请先选中要删除的消息");return false;
-            //var delMsg = "请先选中要删除的消息";
-            }else{
-                var delMsg = "确定要删除选中消息" 
-            }
-			PWConfirm(delMsg,function(){
-			    $.post('/system/message/updateall/',{ids : ids, type : 'del'},function(data){
-                if (data.error) {
-                    var warn_msg = '<div class="alert alert-danger"><button data-dismiss="alert" class="close" type="button">×</button><i class="icon-warning-sign"></i>'+data.msg+'</div>';
-                    $('#show_msg').html(warn_msg);
-                    location.href='#show_msg';
-                } else {
-                    var succss_msg = '<div class="alert alert-success"><strong>'+ data.msg +'</strong></div>';
-                    $('#show_msg').html(succss_msg);
-                    window.location.reload();
-                }
-            },'json');
-            });
-        })
 	});
 </script>

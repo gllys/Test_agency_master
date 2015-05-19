@@ -12,7 +12,7 @@ class DashboardController extends Controller
 	public function actionIndex() {
             $data = array('mun1'=>0,'mun2'=>0,'mun3'=>0,'mun4'=>0,'mun5'=>0);
             //待处理退款申请单
-            $param['supplier_id'] = YII::app()->user->org_id;
+            $param['supplier_id'] = 0;
             $param['allow_status'] = 0;
             $lists = Refund::api()->apply_list($param);
             if($lists['code'] == 'succ'){
@@ -24,7 +24,7 @@ class DashboardController extends Controller
             //待查看消息
             
             $par['read_time'] = 0;
-            $par['receiver_organization'] = YII::app()->user->org_id;
+            $par['receiver_organization'] = 0;
             $list = Message::api()->list($par);
             if($list['code'] == 'succ'){
                 $data['mun2'] = !empty($list['body']['pagination']['count']) ?  $list['body']['pagination']['count'] : '0';
@@ -41,8 +41,7 @@ class DashboardController extends Controller
             
             
             //今日订单统计
-          //  print_r(yii::app()->user);
-            $filed['supplier_id'] = yii::app()->user->org_id;
+            $filed['supplier_id'] = 0;
             $rs = Order::api()->supplierstat($filed);
             $mun4 = 0; //当天票总数目
             $mun5 = 0; //当天已付款总金额

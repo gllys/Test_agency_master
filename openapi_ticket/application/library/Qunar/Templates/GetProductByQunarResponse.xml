@@ -20,6 +20,8 @@
                             {{/foreach}}
 						</sights>
 						<productName>{{$product.productName}}</productName>
+                        <saleType>{{$product.saleType}}</saleType>
+                        <suggestPrice>{{$product.suggestPrice}}</suggestPrice>
 					</baseInfo>
 					<bookConfig>
 						<paymentType>{{$product.paymentType}}</paymentType>
@@ -50,18 +52,21 @@
 					</bookConfig>
 					<priceConfig>
 						<validType>{{$product.validType}}</validType>
-						<daysAfterUseDateValid></daysAfterUseDateValid>
+						<daysAfterUseDateValid>{{$product.daysAfterUseDateValid}}</daysAfterUseDateValid>
 						<daysAfterBookDateValid>{{$product.daysAfterBookDateValid}}</daysAfterBookDateValid>
 						<dayUseTimePeriod></dayUseTimePeriod>						
 						<calendarPrices>
+                            {{foreach from=$product.calendarPrices item=calendarPrice}}
 							<calendarPrice>
-								<useDate></useDate>
-								<marketPrice></marketPrice>
-								<sellPrice></sellPrice>
-								<sellstock></sellstock>
-								<minimum></minimum>
-								<maximum></maximum>
+								<useDate>{{$calendarPrice.useDate}}</useDate>
+								<marketPrice>{{$calendarPrice.marketPrice}}</marketPrice>
+								<sellPrice>{{$calendarPrice.sellPrice}}</sellPrice>
+                                <settlePrice>{{$calendarPrice.settlePrice}}</settlePrice>
+								<sellstock>{{$calendarPrice.sellstock}}</sellstock>
+								<minimum>{{$calendarPrice.minimum}}</minimum>
+								<maximum>{{$calendarPrice.maximum}}</maximum>
 							</calendarPrice>
+                            {{/foreach}}
 						</calendarPrices>
 						<periodPrice>
 							<periodStart>{{$product.periodStart}}</periodStart>
@@ -70,6 +75,7 @@
 							<invalidDate></invalidDate>
 							<marketPrice>{{$product.marketPrice}}</marketPrice>
 							<sellPrice>{{$product.sellPrice}}</sellPrice>
+                            <settlePrice>{{$product.settlePrice}}</settlePrice>
 							<sellstock></sellstock>
 							<minimum></minimum>
 							<maximum></maximum>

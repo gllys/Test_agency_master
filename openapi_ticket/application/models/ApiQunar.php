@@ -8,15 +8,17 @@
 class ApiQunarModel extends Base_Model_Api{
     public static function sendCodeNotice($data){
         try{
-             $config = Yaf_Registry::get('config');
-             $send_code_url = $config['qunar']['sendcode_url'];
-
             $service = new Qunar_Service(array());
-echo 'ApiQunar-sendCodeNotice:';
-var_dump($data);
-            $service->qunar_url = $send_code_url;
+
+            $config = Yaf_Registry::get('config');
+            $service->qunar_url = $config['qunar']['sendcode_url'];
             $arr = $service->request('NoticeOrderEticketSendedRequest.xml', 'noticeOrderEticketSended', $data);
-var_dump($arr);
+
+            Util_Logger::getLogger('qunar')->info(__METHOD__,
+                array('data' => $data,'header' => $service->response_header, 'body' => $service->response_body), '', '发码通知',
+                $data['partnerorderId']
+            );
+
             if($arr && isset($arr->message)){
                 return $arr->message;
             }

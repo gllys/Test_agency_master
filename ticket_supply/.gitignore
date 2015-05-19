@@ -1,4 +1,13 @@
 application.log*
 application/assets/*
-nbproject
-application/runtime/*
+!application/assets/README
+!application/assets/*.xls
+!application/assets/*.xlsx
+!application/assets/*.exe
+/nbproject/
+.idea/*
+state.bin
+.buildpath
+.project
+.settings/
+nbproject/

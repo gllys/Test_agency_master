@@ -250,7 +250,7 @@ $(function(){
             }
             $.post('/agency/manager/saveCredit/', data, function(data) {
                 if (data.error === 0) {
-                    alert("保存成功",function(){location.reload();});
+                    alert("保存成功",function(){location.partReload();});
                 } else {
                     alert("保存失败," + data.msg);
                 }

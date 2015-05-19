@@ -15,7 +15,12 @@ class LogCollect {
      * @param $param 传过去的参数
      */
 
-    public static function add($log, $data = null, $param = null) {
+    public static function add($log='', $data = null, $param = null) {
+        return false;
+        if (!Yii::app()->request->isPostRequest){
+            return false;
+        }
+        
         $rs = debug_backtrace();
 
         foreach ($rs as $item) {

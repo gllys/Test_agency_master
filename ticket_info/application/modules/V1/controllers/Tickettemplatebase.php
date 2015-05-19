@@ -63,6 +63,8 @@ class TickettemplatebaseController extends Base_Controller_Api
         if(intval($this->body['organization_id'])) $where['organization_id'] = intval($this->body['organization_id']);
         else if(intval($this->body['or_id'])) $where['organization_id'] = intval($this->body['or_id']);
 
+        if(isset($this->body['source_type'])) $where['source_type'] = intval($this->body['source_type']);
+
         if(isset($this->body['p']))
             $this->current = $this->body['p'];
 
@@ -138,7 +140,7 @@ class TickettemplatebaseController extends Base_Controller_Api
         $TicketTemplateBaseModel = new TicketTemplateBaseModel();
 
         $groupBy = $show_group?'gid,organization_id,scenic_id,created_at':'';
-        $fields = $show_group?$this->getFields('id').",group_concat(id,'_',type,'_',sale_price) as type_prices":$this->getFields('id');
+        $fields = $show_group?$this->getFields('id').",group_concat(id,'_',type,'_',sale_price,'_',mult_enter,'_',enter_by_card,'_',num_by_card,'_',enter_by_qrcode,'_',poi_enter_num) as type_prices":$this->getFields('id');
 
         if($show_all) {
             $data = $TicketTemplateBaseModel->setGroupBy($groupBy)->search( $where, $fields, $this->getSortRule('updated_at'));
@@ -158,7 +160,16 @@ class TickettemplatebaseController extends Base_Controller_Api
                 $v['type_prices'] = array();
                 foreach($type_prices as $tpv) {
                     $tp = explode('_',$tpv);
-                    $v['type_prices'][] = array('id'=>$tp[0],'type'=>$tp[1],'sale_price'=>$tp[2]);
+                    $v['type_prices'][] = array(
+                        'id'=>$tp[0],
+                        'type'=>$tp[1],
+                        'sale_price'=>$tp[2],
+                        'mult_enter'=>$tp[3],
+                        'enter_by_card'=>$tp[4],
+                        'num_by_card'=>$tp[5],
+                        'enter_by_qrcode'=>$tp[6],
+                        'poi_enter_num'=>$tp[7],
+                    );
                 }
                 $tmp_arr[$v['gid'].'_'.$v['organization_id'].'_'.$v['scenic_id'].'_'.$v['created_at']] = $v;
             }
@@ -192,6 +203,7 @@ class TickettemplatebaseController extends Base_Controller_Api
         !$return && Lang_Msg::error('基础票不存在');
         $return = reset($return);
         //获取参数
+        $args = array();
         if( isset(  $this->body[ 'name']))$args[ 'name' ] = $this->body[ 'name'] ;
         if( isset(  $this->body[ 'fat_price']))$args[ 'fat_price' ] = $this->body[ 'fat_price'] ;
         if( isset(  $this->body[ 'group_price']))$args[ 'group_price' ] = $this->body[ 'group_price'] ;
@@ -230,6 +242,7 @@ class TickettemplatebaseController extends Base_Controller_Api
         if(isset($this->body['district_id'])) $args['district_id'] = intval($this->body['district_id']);
         if(isset($this->body['is_infinite'])) $args['is_infinite'] = intval($this->body['is_infinite']);
         if(isset($this->body['state'])) $args['state'] = intval($this->body['state']);
+        if(isset($this->body['source_type'])) $args['source_type'] = intval($args['source_type'])?1:0;
 
         if((isset($args['state']) && $args['state']==2 && $return['state']==1) || 1===$args['is_del']){ //下架或删除需检查是否有相关上架产品
             $productItems = TicketTemplateItemModel::model()->search(array('base_id'=>$id));
@@ -254,9 +267,9 @@ class TickettemplatebaseController extends Base_Controller_Api
 
         if( isset( $this->body[ 'date_available' ] ))
         {
-            $args[ 'date_available' ] = $this->body['date_available'];
-            $args[ 'expire_start' ] = reset(explode(',',$this->body['date_available']));
-            $args[ 'expire_end'] = end(explode(',',$this->body['date_available']));
+            $args['date_available'] = $this->body['date_available'];
+            $args['expire_start'] = reset(explode(',',$this->body['date_available']));
+            $args['expire_end'] = end(explode(',',$this->body['date_available']));
             $args['real_expire_end'] = $args[ 'expire_end']-$args[ 'scheduled_time' ];
         }
         if((isset($this->body['date_available']) && $this->body['date_available']==0) || $this->body['is_infinite']==1){
@@ -267,6 +280,16 @@ class TickettemplatebaseController extends Base_Controller_Api
         }elseif($this->body['date_available']){
             $args['is_infinite'] = 0;
         }
+
+        if(isset($this->body['mult_enter'])) { //是否允许多次入园:0否1是
+            $args['mult_enter'] = intval($this->body['mult_enter'])?1:0;
+            isset($this->body['enter_by_card']) && $args['enter_by_card'] = ($args['mult_enter'] && intval($this->body['enter_by_card'])) ? 1:0; //是否允许使用身份证入园:0否1是
+            isset($this->body['num_by_card']) && $args['num_by_card'] = $args['enter_by_card'] ? intval($this->body['num_by_card']):0; //使用身份证可购买张数,0不限
+            isset($this->body['enter_by_qrcode']) && $args['enter_by_qrcode'] = ($args['mult_enter'] && intval($this->body['enter_by_qrcode'])) ? 1:0; //是否允许使用二维码入园:0否1是
+            isset($this->body['poi_enter_num']) && $args['poi_enter_num'] = ($args['mult_enter'] && intval($this->body['poi_enter_num'])) ? intval($this->body['poi_enter_num']):1; //每个景点在使用有效期内可使用次数
+            isset($this->body['enter_by_palm']) && $args['enter_by_palm'] = intval($this->body['enter_by_palm']); //是否允许掌纹
+        }
+
         if( empty( $args ) )Lang_Msg::error('没有需要修改的参数');
         $args['updated_at'] = time();
         $r = TicketTemplateBaseModel::model()->updateById( $id, $args );
@@ -297,9 +320,13 @@ class TickettemplatebaseController extends Base_Controller_Api
         $params['city_id'] = intval($this->body['city_id']);
         $params['district_id'] = intval($this->body['district_id']);
         $params['remark'] = trim(Tools::safeOutput($this->body['remark']));
+        $params['source_type'] = intval($this->body['source_type'])?1:0;
         $params['state'] = null !== $this->body['state'] ? intval($this->body['state']) : 2;
         $items = json_decode($this->body['items'],true);
-
+        if(isset($this->body['date_available']) && $params['date_available']){
+            $params['expire_start'] = reset(explode(',',$params['date_available']));
+            $params['real_expire_end'] = $params['expire_end'] = end(explode(',',$params['date_available']));
+        }
         !$params['name'] && Lang_Msg::error("ERROR_AddGenerate_1");
         !$params['scenic_id'] && Lang_Msg::error("ERROR_AddGenerate_5");
         !$params['view_point'] && Lang_Msg::error("ERROR_AddGenerate_6");
@@ -322,8 +349,12 @@ class TickettemplatebaseController extends Base_Controller_Api
         $params['created_by'] = $params['user_id'];
         $params['created_at'] = $now;
         $params['updated_at'] = $now;
-        $params['gid'] = microtime();
-        $params['gid'] = substr($params['gid'],11).substr($params['gid'],2,5);
+
+        $params['gid'] = Cache_Redis::factory()->incr('TicketTemplatebaseGid');
+        if(empty($params['gid'])) {
+            $params['gid'] = microtime();
+            $params['gid'] = substr($params['gid'],11).substr($params['gid'],2,5).mt_rand(10,99);
+        }
         $data = array();
         foreach($items as $item){
             $tmp = $params;
@@ -332,6 +363,13 @@ class TickettemplatebaseController extends Base_Controller_Api
             $tmp['sale_price'] = doubleval($item['sale_price']);
             $tmp['listed_price'] = (isset($item['listed_price']) && doubleval($item['listed_price']))>0?doubleval($item['listed_price']):$tmp['sale_price'];
             $tmp['type'] = $item['type'];
+
+            $tmp['mult_enter'] = (isset($item['mult_enter']) && intval($item['mult_enter']))?1:0; //是否允许多次入园:0否1是
+            $tmp['enter_by_card'] = (isset($item['enter_by_card']) && $tmp['mult_enter'] && intval($item['enter_by_card'])) ? 1:0; //是否允许使用身份证入园:0否1是
+            $tmp['num_by_card'] = (isset($item['num_by_card']) && $tmp['enter_by_card']) ? intval($item['num_by_card']):0; //使用身份证可购买张数,0不限
+            $tmp['enter_by_qrcode'] = (isset($item['enter_by_qrcode']) && $tmp['mult_enter'] && intval($item['enter_by_qrcode'])) ? 1:0;; //是否允许使用二维码入园:0否1是
+            $tmp['poi_enter_num'] = (isset($item['poi_enter_num']) && $tmp['mult_enter'] && intval($item['poi_enter_num'])) ? intval($item['poi_enter_num']):1; //每个景点在使用有效期内可使用次数
+            isset($item['enter_by_palm']) && $tmp['enter_by_palm'] = intval($item['enter_by_palm']); //是否允许掌纹
 
             $data[] = $tmp;
         }
@@ -367,7 +405,12 @@ class TickettemplatebaseController extends Base_Controller_Api
         isset($this->body['valid']) && $params['valid'] = intval($this->body['valid']); //门票有效期，预定后多少天内有效
         isset($this->body['valid_flag']) && $params['valid_flag'] = intval($this->body['valid_flag']); //预定后是否一直有效 0否 1是
         isset($this->body['scheduled_time']) && $params['scheduled_time'] = intval($this->body['scheduled_time']); //需提前X天/X小时预定
-        isset($this->body['date_available']) && $params['date_available'] = trim(Tools::safeOutput($this->body['date_available'])); //可玩日期  int(11),int(11) 表示一个时间段 ，逗号分隔
+        if(isset($this->body['date_available'])) {
+            //可玩日期  int(11),int(11) 表示一个时间段 ，逗号分隔
+            $params['date_available'] = trim(Tools::safeOutput($this->body['date_available']));
+            $params['expire_start'] = reset(explode(',',$params['date_available']));
+            $params['real_expire_end'] = $params['expire_end'] = end(explode(',',$params['date_available']));
+        }
         isset($this->body['week_time']) && $params['week_time'] = trim(Tools::safeOutput($this->body['week_time'])); //周几使用
         isset($this->body['province_id']) && $params['province_id'] = intval($this->body['province_id']);
         isset($this->body['city_id']) && $params['city_id'] = intval($this->body['city_id']);
@@ -375,6 +418,7 @@ class TickettemplatebaseController extends Base_Controller_Api
         isset($this->body['remark']) && $params['remark'] = trim(Tools::safeOutput($this->body['remark']));
         isset($this->body['state']) && $params['state'] = null !== $this->body['state'] ? intval($this->body['state']) : 2;
         isset($this->body['is_del']) && $params['is_del'] = intval($this->body['is_del'])?1:0;
+        isset($this->body['source_type']) && $params['source_type'] = intval($this->body['source_type'])?1:0;
 
         $TicketTemplateBaseModel = new TicketTemplateBaseModel();
         $ids = array_keys($data);
@@ -410,6 +454,12 @@ class TickettemplatebaseController extends Base_Controller_Api
             $upItems = array(); //需更新的门票
             $addItems = array(); //需新增的门票
             foreach($items as $id=>$item){
+                $item['mult_enter'] = (isset($item['mult_enter']) && intval($item['mult_enter']))?1:0; //是否允许多次入园:0否1是
+                $item['enter_by_card'] = (isset($item['enter_by_card']) && $item['mult_enter'] && intval($item['enter_by_card'])) ? 1:0; //是否允许使用身份证入园:0否1是
+                $item['num_by_card'] = (isset($item['num_by_card']) && $item['enter_by_card']) ? intval($item['num_by_card']):0; //使用身份证可购买张数,0不限
+                $item['enter_by_qrcode'] = (isset($item['enter_by_qrcode']) && $item['mult_enter'] && intval($item['enter_by_qrcode'])) ? 1:0;; //是否允许使用二维码入园:0否1是
+                $item['poi_enter_num'] = (isset($item['poi_enter_num']) && $item['mult_enter'] && intval($item['poi_enter_num'])) ? intval($item['poi_enter_num']):1; //每个景点在使用有效期内可使用次数
+
                 $item['id'] && $upItems[$item['id']] = $item;
                 !$item['id'] && $addItems[] = $item;
             }
@@ -432,6 +482,12 @@ class TickettemplatebaseController extends Base_Controller_Api
                 !isset($item['type']) && Lang_Msg::error("ERROR_AddGenerate_27");
                 $tmp['sale_price'] = doubleval($item['sale_price']);
                 $tmp['type'] = $item['type'];
+                $tmp['mult_enter'] = $item['mult_enter'];
+                $tmp['enter_by_card'] = $item['enter_by_card'];
+                $tmp['num_by_card'] = $item['num_by_card'];
+                $tmp['enter_by_qrcode'] = $item['enter_by_qrcode'];
+                $tmp['poi_enter_num'] = $item['poi_enter_num'];
+
 
                 $r = $TicketTemplateBaseModel->update($tmp,array('id'=>$item['id']));
                 if(!$r) {
@@ -443,13 +499,18 @@ class TickettemplatebaseController extends Base_Controller_Api
             if($addItems){  //需新增的门票
                 $newData = array();
                 foreach($addItems as $item){
-                    $tmpN = $info+$params;
+                    $tmpN = array_merge($info,$params);
                     unset($tmpN['id']);
                     !isset($item['sale_price']) && Lang_Msg::error("ERROR_AddGenerate_25");
                     !isset($item['type']) && Lang_Msg::error("ERROR_AddGenerate_27");
                     $tmpN['sale_price'] = doubleval($item['sale_price']);
                     $tmpN['listed_price'] = (isset($item['listed_price']) && doubleval($item['listed_price']))>0?doubleval($item['listed_price']):$tmpN['sale_price'];
                     $tmpN['type'] = $item['type'];
+                    $tmpN['mult_enter'] = $item['mult_enter'];
+                    $tmpN['enter_by_card'] = $item['enter_by_card'];
+                    $tmpN['num_by_card'] = $item['num_by_card'];
+                    $tmpN['enter_by_qrcode'] = $item['enter_by_qrcode'];
+                    $tmpN['poi_enter_num'] = $item['poi_enter_num'];
 
                     $newData[] = $tmpN;
                 }
@@ -506,6 +567,11 @@ class TickettemplatebaseController extends Base_Controller_Api
         $now = time();
         $date_available = trim($this->body['date_available'])?trim($this->body['date_available']):0;
         $arr_date_available = explode(',',$date_available);
+
+        $mult_enter = (isset($this->body['mult_enter']) && intval($this->body['mult_enter'])) ?1:0; //是否允许多次入园:0否1是
+        $enter_by_card = (isset($this->body['enter_by_card']) && $mult_enter && intval($this->body['enter_by_card']))?1:0;  //是否允许使用身份证入园:0否1是
+        $enter_by_qrcode = (isset($this->body['enter_by_qrcode']) && $mult_enter && intval($this->body['enter_by_qrcode']))?1:0;  //是否允许使用二维码入园:0否1是
+
         $data = array(
             'organization_id' => intval($this->body['organization_id']),
             'name' => $this->body['name'],
@@ -539,10 +605,22 @@ class TickettemplatebaseController extends Base_Controller_Api
             'state' => $state,
             'is_infinite'=>isset($this->body['is_infinite'])?$this->body['is_infinite']:0,
             'valid_flag' => intval($this->body['valid_flag']),
+            'mult_enter'=> $mult_enter,
+            'enter_by_card'=>$enter_by_card,
+            'num_by_card'=> (isset($this->body['num_by_card']) && $enter_by_card) ?intval($this->body['num_by_card']):0, //使用身份证可购买张数,0不限
+            'enter_by_qrcode'=>$enter_by_qrcode,
+            'poi_enter_num'=> (isset($this->body['poi_enter_num']) && $mult_enter && intval($this->body['poi_enter_num'])) ? intval($this->body['poi_enter_num']) : 1,
+            'enter_by_palm'=> isset($this->body['enter_by_palm']) ? intval($this->body['enter_by_palm']) : 0,
         );
+        if(isset($this->body['source_type'])){
+            $data['source_type'] = intval($this->body['source_type'])?1:0;
+        }
         $data['listed_price'] = $data['listed_price']>0?$data['listed_price']:$data['sale_price'];
-        $data['gid'] = microtime();
-        $data['gid'] = substr($data['gid'],11).substr($data['gid'],2,5);
+        $data['gid'] = Cache_Redis::factory()->incr('TicketTemplatebaseGid');
+        if(empty($data['gid'])) {
+            $data['gid'] = microtime();
+            $data['gid'] = substr($data['gid'],11).substr($data['gid'],2,5).mt_rand(10,99);
+        }
 
         if($data['scenic_id'] && !$data['province_id']){
             $scenicInfo = ScenicModel::model()->getScenicInfo(array('id'=>$data['scenic_id']));
@@ -681,6 +759,13 @@ class TickettemplatebaseController extends Base_Controller_Api
     {
         $where = " is_del=0 and ota_type = 'system' ";
         $now = time();
+
+        $organization_id = intval($this->body['organization_id']);
+        $organization_id = $organization_id ? $organization_id : $this->body['or_id'];
+        if(preg_match("/^[\d,]+$/",$organization_id)) {
+            $where.=" AND organization_id IN (".$organization_id.")";
+        }
+
         // 地区
         if($this->body['province_id'] && !$this->body['city_id'] && !$this->body['district_id']){    // 省份筛选
             $where.=" AND province_id IN (".trim(Tools::safeOutput($this->body['province_id'])).") ";
@@ -689,6 +774,8 @@ class TickettemplatebaseController extends Base_Controller_Api
         }elseif(isset($this->body['district_id']) && Validate::isUnsignedId($this->body['district_id'])){   // 区筛选
             $where.=" AND district_id IN (".trim(Tools::safeOutput($this->body['district_id'])).") ";
         }
+
+        if(isset($this->body['source_type'])) $where.= " AND source_type = ".intval($this->body['source_type'])." ";
 
         if(isset($this->body['state']) && in_array(intval($this->body['state']), array(0,1)))       // 上下架
             $where.= " AND state=".intval($this->body['state'])." ";
@@ -765,4 +852,23 @@ class TickettemplatebaseController extends Base_Controller_Api
         $result['types'] = TicketTypeModel::model()->getAll();
         Tools::lsJson(true,'ok',$result);
     }
+	
+    /**
+     * 修改票模板机构ID
+     * @param  [type] $fields [description]
+     * @return [type]         [description]
+     */
+    public function updateOrganizationIdAction() {
+        $scenic_id = intval($this->body['scenic_id']);
+        !$scenic_id && Lang_Msg::error("ERROR_LANDSCAPE_1"); //缺少景区ID参数
+        $organization_id = intval($this->body['organization_id']);
+        !$organization_id && Lang_Msg::error("缺少机构ID参数");
+        $new_organization_id = intval($this->body['new_organization_id']);
+        !$new_organization_id && Lang_Msg::error("缺少新机构ID参数");
+
+        TicketTemplateBaseModel::model()->update(['organization_id'=>$new_organization_id], ['organization_id'=>$organization_id, 'scenic_id'=>$scenic_id]);
+        TicketTemplateItemModel::model()->update(['base_org_id'=>$new_organization_id], ['base_org_id'=>$organization_id, 'scenic_id'=>$scenic_id]);
+
+        Tools::lsJson(true,'ok',$result);
+	}
 }

@@ -110,23 +110,23 @@ class ScenicController extends Base_Controller_Ota
             $res_products   = ApiProductModel::model()->products($req_products);
 
             $products       = array();
-            
+
             if($res_products['code'] == 'succ' && !empty($res_products['body']['data'])){
                 foreach($res_products['body']['data'] as $pro) {
                     $product = array(
                         'id'        => $pro['id'],
                         'name'      => $pro['name'],
                         'scenic_id' => $pro['scenic_id'],
-                        'payment'   => 2,
+                        'payment'   => strpos($pro['payment'], '2') === false ? '0' : '0,1',
                         //以下信息尚未明确
                         'fee'       => '',
                         'exchange'  => '',
-                        'term'      => '',
-                        'audience'  => $pro['remark'],
+                        'term'      => $pro['remark'],
+                        'audience'  => '',
                         'advance_booking_min_days'  => '',
                         'advance_booking_max_days'  => '',
                         'requirement'   => '',
-                        'price'         => $pro['sale_price'],
+                        'price'         => $pro['fat_price'],
                         'market_price'  => $pro['listed_price'],
                     );
                     $products[] = $product;

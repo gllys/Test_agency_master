@@ -1,7 +1,9 @@
 <?php 
 $this->breadcrumbs = array('图表统计','平台资产');
 ?>
-
+<style>
+.ui-datepicker { z-index:9999!important }
+</style>
 <div class="contentpanel">
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -393,9 +395,30 @@ if(isset($agencylists))
 <script src="/js/select2.min.js"></script>
 <script src="/js/jquery-ui-1.10.3.min.js"></script>
 <script>
-   jQuery('.datepicker').datepicker({
-    dateFormat: 'yy-mm-dd'
-});
+   $('.datepicker').datepicker({
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: 'yy-mm-dd',
+        monthNamesShort: [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" ],
+        yearRange: "1995:2065",
+        beforeShow: function(d){
+            setTimeout(function(){
+                $('.ui-datepicker-title select').select2({
+                    minimumResultsForSearch: -1
+                });
+            },0)
+        },
+        onChangeMonthYear: function(){
+            setTimeout(function(){
+                $('.ui-datepicker-title select').select2({
+                    minimumResultsForSearch: -1
+                });
+            },0)
+        },
+        onClose: function(dateText, inst) { 
+            $('.select2-drop').hide(); 
+        }
+    });
    jQuery('.select2').select2({
     minimumResultsForSearch: -1
 });

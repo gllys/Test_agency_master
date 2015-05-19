@@ -184,7 +184,7 @@ $this->breadcrumbs = array('景区管理', '图文全景');
         </div>
     </div>
 <div class="panel-footer" style="padding-left:5%">
-    <button class="btn btn-primary btn-sm" type="button" onclick="javascript:history.go(-1);" id="export">返回</button>
+    <button class="btn btn-default" type="button" onclick="javascript:history.go(-1);" id="export">返回</button>
 </div>
 <div id='verify-modal' data-backdrop="static" role="dialog" tabindex="-1" class="modal fade bs-example-modal-static">
 
@@ -194,7 +194,6 @@ $this->breadcrumbs = array('景区管理', '图文全景');
 </div>
 
 
-<style>
 <style>
     .th-width tr{height:40px;}
     .th-width th{width:200px;}
@@ -252,13 +251,11 @@ $this->breadcrumbs = array('景区管理', '图文全景');
        var status = status;
         $.post('/scenic/scenic/DownUP/', {id: id, status: status,'landscape_id':$('#landscape_id').val()}, function(data) {         
             if (data.error) {
-                var warn_msg = '<div class="alert alert-error" style="background:#FF8888;"><button data-dismiss="alert" class="close" type="button">×</button><i class="icon-warning-sign"></i>' + data.msg + '</div>';
-                $('#verify_return').html(warn_msg);
+                alert(data.msg);
             } else{
-               // alert(data.msg);
-                var succss_msg = '<div class="alert alert-success"><button data-dismiss="alert" class="close" type="button">×</button><strong>操作成功</strong></div>';
-                $('#verify_return').html(succss_msg);
-                setTimeout("location.href='/scenic/scenic/view?id="+$('#landscape_id').val()+"'", '2000');
+                alert('操作成功!', function() {
+                    location.href = '/site/switch/#/scenic/scenic/view?id='+$('#landscape_id').val();
+                });
             }
         }, "json");
         return false;  

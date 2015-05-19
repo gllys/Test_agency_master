@@ -1,5 +1,5 @@
 <?php
-
+if (!defined('IS_MASTER')) define('IS_MASTER', 0);
 /**
  * 进程管理器
  * @author  mosen
@@ -59,7 +59,7 @@ class Process_Manager extends Process_Base
     public function check() {
         if ($this->list) {
             foreach ($this->list as $key => $item) {
-                if (!$item['state']) {
+                if (!$item['state'] || ($item['run_type'] && !IS_MASTER)) {
                     unset($this->list[$key]);
                     continue;
                 }

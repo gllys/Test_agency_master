@@ -87,7 +87,7 @@ class ApiModel {
             $data = json_decode($rs, true);
         }
         self::$outResult = $data;
-        //LogCollect::add();
+        LogCollect::add();
         return $data;
     }
 

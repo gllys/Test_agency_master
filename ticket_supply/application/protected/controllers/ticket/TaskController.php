@@ -9,7 +9,7 @@ class TaskController extends Controller {
     public function actionEditTask() {
         $get = $this->getGet();
         if (isset($get['id'])) {
-            $ticket = TicketTemplate::api()->detail($get);
+            $ticket = Tickettemplate::api()->detail($get);
             if (!empty($ticket)) {
                 $this->render('edit', compact($ticket));
             } else {
@@ -22,7 +22,7 @@ class TaskController extends Controller {
 
     public function actionAddTask() {
         if (Yii::app()->request->isPOSTRequest) {
-            $data = TicketTemplate::api()->add($this->getPost());
+            $data = Tickettemplate::api()->add($this->getPost());
             if ($data['code'] == 'succ') {
                 
             } else {
@@ -34,7 +34,7 @@ class TaskController extends Controller {
 
     public function actionUpdateTask() {
         if (Yii::app()->request->isPOSTRequest) {
-            $data = TicketTemplate::api()->update($this->getPost());
+            $data = Tickettemplate::api()->update($this->getPost());
             if ($data['code'] == 'succ') {
                 
             } else {

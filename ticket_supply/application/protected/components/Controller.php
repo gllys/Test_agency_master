@@ -25,11 +25,10 @@ class Controller extends CController {
     public $breadcrumbs = array();
     public $nav = null; #主导航
     public $childNav = null; #子导航
-
     public function accessRules() {
         return array(
             array('allow',
-                'actions' => array('reset', 'register', 'login', 'error', 'pre', 'smsCode', 'captcha', 'upyunAgent'),
+                'actions' => array('reset', 'register', 'login', 'error', 'pre', 'smsCode', 'captcha', 'upyunAgent', 'validatereg'),
                 'users' => array('*'),
             ),
             array('allow', 'users' => array('@')),
@@ -49,6 +48,18 @@ class Controller extends CController {
 
         if (isset($_POST) && $_POST) {
             Filter::htmls($_POST);
+        } 
+        
+         if (isset($_REQUEST) && $_REQUEST) {
+            $_REQUEST = $_GET + $_POST + $_COOKIE ;
+        }
+    }
+
+    //  检测权限
+    protected function beforeAction($action) {
+        #post请求全部通过
+        if (Yii::app()->request->isPostRequest||Yii::app()->request->isAjaxRequest) {
+            return true;
         }
 
         #得到主导航菜单
@@ -58,31 +69,32 @@ class Controller extends CController {
 
         #得到子导航
         if (!$this->childNav) {
-            $this->childNav = CreateUrl::model()->getChildNav('/' . $this->id . '/');
+            $this->childNav = CreateUrl::model()->getChildNav('/' . $this->id . '/'.$this->action->id.'/');
             if (!$this->childNav) {
-                $this->childNav = '/' . $this->id . '/';
+                $this->childNav = CreateUrl::model()->getChildNav('/' . $this->id . '/');
+            }
+            
+            if(!$this->childNav){
+                 $this->childNav = '/' . $this->id . '/';
             }
         }
-    }
-
-    //  检测权限
-    protected function beforeAction($action) {
+        
         #完善机构信息url
         if (Yii::app()->user->id) {
+            $lan_id = Yii::app()->user->lan_id;
+            if($lan_id){
+               return true;
+            }
+            
             $org_id = Yii::app()->user->org_id;
             if ((empty($org_id) || !$org_id) &&
                 !in_array($this->id, array('system/organization', 'ajaxServer', 'site'))) {
                 $this->redirect('/system/organization/compile');
             } else if (!in_array($this->id, array('system/organization', 'ajaxServer', 'site'))) {
-                $rs = Organizations::api()->show(array('id' => $org_id), 0);
-                if (ApiModel::isSucc($rs)) {
-                    $data = ApiModel::getData($rs);
-                    if ($data['status'] == 0) {
+                    $data = $this->getOrgInfo();
+                    if (!$data||$data['status'] == 0) {
                         $this->redirect('/system/organization/compile');
                     }
-                } else {
-                    $this->redirect('/system/organization/compile');
-                }
             }
         }
         $access = $this->getAccess();
@@ -93,6 +105,16 @@ class Controller extends CController {
             $this->onUnauthorizedAccess($access);
         }
         return true;
+    }
+    
+    //得到当前供应商信息,缓存10s
+    protected $orgInfo = null ; #供应商信息保存
+    public function getOrgInfo(){
+        if($this->orgInfo){
+            return $this->orgInfo;
+        }
+        $rs = Organizations::api()->show(array('id' => Yii::app()->user->org_id), true,20);
+        return $this->orgInfo = $data = ApiModel::getData($rs);
     }
 
     // 获取access 字符串

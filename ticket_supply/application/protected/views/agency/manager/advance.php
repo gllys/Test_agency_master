@@ -10,32 +10,21 @@
             <h4 class="panel-title">储值管理</h4>
         </div>
         <div class="panel-body">
-            <form class="form-inline">
-                <!--<div class="mb10">
-                    <div class="inline-block">
-                        <div class="form-group" style="width:160px">
-                            当前透支额度： <?php echo $balance_over; ?> 元
-                        </div>
-                        <div class="form-group">
-                            <input class="form-control" id="over-number" placeholder="输入大于0的数值 "type="text">
-                        </div>
-
-                        <button type="button" id="save-over-credit" class="btn btn-primary btn-xs">保存透支额度</button>
-                    </div>
-                </div>-->
+            <form class="form-inline" id="advance-form">
                 <div>
-                    <div class="inline-block">
-                        <div class="form-group" style="width:160px">
-                            增加储值：
-                        </div>
+                    <div class="form-inline">
                         <div class="form-group">
-                            <input class="form-control" id="advance_number" placeholder="输入大于0的数值 "type="text">
-                        </div><!-- form-group -->
-
-                        <div class="form-group">
-                            <input class="form-control" id="advance-remark" placeholder="操作原因" type="text" style="width:480px;">
+                            <label>增加储值：</label>
                         </div>
-                        <button type="button" id="advance-btn"  class="btn btn-primary btn-xs">保存</button>
+                        <div class="form-group" style="border:none !important;">
+                            <input class="form-control" id="advance_number" placeholder="大于0的值"  type="text">
+                        </div>
+                        <div class="form-group" style="border:none !important;">
+                            <input class="form-control" id="advance-remark" placeholder="操作原因" style="width:200px;" type="text">
+                        </div>
+                        <div class="form-group"  style="border:none !important;">
+                            <button type="button" id="advance-btn" class="btn btn-primary btn-sm">保存</button>
+                        </div>
                     </div>
                 </div>
             </form>
@@ -50,9 +39,11 @@
             <form class="form-inline">
                 <div class="form-group">
                     <input type="hidden" id="credit-over-id" name="id" value="<?php echo $id; ?>">
-                    <input class="form-control" name="remark" value="<?php echo isset($_GET['remark'])?$_GET['remark']:"";?>" placeholder="操作原因" type="text" style="width:480px;">
+                    <input class="form-control" name="remark" value="<?php echo isset($_GET['remark'])?$_GET['remark']:"";?>" placeholder="操作原因" type="text" style="width:200px;">
                 </div>
-                <button type="submit" class="btn btn-primary btn-xs">查询</button>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-sm">查询</button>
+                </div>
             </form>
         </div><!-- panel-body -->
     </div>
@@ -85,11 +76,11 @@
             </tbody>
         </table>
 
-        <div style="text-align:center" class="panel-footer">
-            <a class="btn btn-primary btn-xs" href="/agency/manager">返回</a>
+        <div class="panel-footer">
+            <a class="btn btn-default" href="/agency/manager">返回</a>
             <div id="basicTable_paginate" style="float:right;margin:0" class="pagenumQu">
                 <?php
-                $this->widget('CLinkPager', array(
+                $this->widget('common.widgets.pagers.ULinkPager', array(
                         'cssFile' => '',
                         'header' => '',
                         'prevPageLabel' => '上一页',
@@ -108,39 +99,58 @@
 </div><!-- contentpanel -->
 
 <script>
-    $('#over-number').keyup(function(){
-        var number = parseFloat($(this).val());
-        if(number<=0){
-            $(this).val("");
-            alert("透支额度只能是大于0的数值");
-            return false;
-        }
-    });
-    $('#save-over-credit').click(function(){
-        var id = $('#credit-over-id').val();
-        var number = parseFloat($('#over-number').val());
-        $.post('/agency/manager/over',{id:id,money:number},function(data){
-            if(data.error==0){
-                alert("保存成功");
-                location.reload();
-            }else{
-                alert("保存失败,"+data.msg);
+    jQuery(document).ready(function() {
+        $('#advance-form').validationEngine({
+            promptPosition: 'topRight',
+            autoHidePrompt: true,
+            autoHideDelay: 2000
+        });
+
+        $('#over-number').keyup(function () {
+            var number = parseFloat($(this).val());
+            if (number <= 0) {
+                $(this).val("");
+                alert("透支额度只能是大于0的数值");
+                return false;
             }
-        },'json');
-    });
-    $('#advance-btn').click(function(){
-        var id = $('#credit-over-id').val();
-        var number = parseFloat($('#advance_number').val());
-        var remark = $('#advance-remark').val();
-        if(number<=0 || isNaN(number)){alert("储值只能是不小于0的数值");return false;}
-        if(remark==""){alert("原因不能为空");}
-        $.post('/agency/manager/saveAdvance',{id:id,num:number,remark:remark},function(data){
-            if(data.error===0){
-                alert("保存成功");
-                location.reload();
-            }else{
-                alert("保存失败,"+data.msg);
+        });
+        $('#save-over-credit').click(function () {
+            var id = $('#credit-over-id').val();
+            var number = parseFloat($('#over-number').val());
+            $.post('/agency/manager/over', {id: id, money: number}, function (data) {
+                if (data.error == 0) {
+                    alert("保存成功", function () {
+                        location.reload();
+                    });
+                } else {
+                    alert("保存失败," + data.msg);
+                }
+            }, 'json');
+        });
+
+
+
+        $('#advance-btn').click(function () {
+            var id = $('#credit-over-id').val();
+            var number = parseFloat($('#advance_number').val());
+            var remark = $('#advance-remark').val();
+            if (number <= 0 || isNaN(number)) {
+                $('#advance_number').validationEngine('showPrompt', '请输入正确的金额', 'error');
+                return false;
             }
-        },'json');
+            if (remark == "") {
+                $('#advance-remark').validationEngine('showPrompt', '请输入相应的原因', 'error');
+                return false;
+            }
+            $.post('/agency/manager/saveAdvance', {id: id, num: number, remark: remark}, function (data) {
+                if (data.error === 0) {
+                    alert("保存成功", function () {
+                        location.reload();
+                    });
+                } else {
+                    alert("保存失败," + data.msg);
+                }
+            }, 'json');
+        });
     });
 </script>

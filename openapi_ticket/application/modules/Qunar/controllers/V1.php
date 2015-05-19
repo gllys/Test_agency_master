@@ -32,28 +32,27 @@ class V1Controller extends Base_Controller_ApiDispatch {
 //        $this->agency_id = $this->config['qunar']['agency_id'];
         $this->initErrorMap();
 
-        self::echoLog('body', var_export($this->body, true), 'qunar_bee.log');
+//        self::echoLog('body', var_export($this->body, true), 'qunar_bee.log');
+        Util_Logger::getLogger('qunar')->info(__METHOD__, $this->body);
     }
 
     /**
      * 接口入口方法
      */
     public function restAction() {
-//        $this->body = array (
-//            'method' => 'createOrderForAfterPaySync',
-//            'requestParam' => '{\\"data\\":\\"PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/Pg0KPHJlcXVlc3QgeG1sbnM9Imh0dHA6Ly9waWFvLnF1bmFyLmNvbS8yMDEzL1FNZW5waWFvUmVxdWVzdFNjaGVtYSI+DQo8aGVhZGVyPg0KPGFwcGxpY2F0aW9uPg0KUXVuYXIuTWVucGlhby5BZ2VudDwvYXBwbGljYXRpb24+DQo8cHJvY2Vzc29yPg0KU3VwcGxpZXJEYXRhRXhjaGFuZ2VQcm9jZXNzb3I8L3Byb2Nlc3Nvcj4NCjx2ZXJzaW9uPg0KdjIuMC4wPC92ZXJzaW9uPg0KPGJvZHlUeXBlPg0KQ3JlYXRlT3JkZXJGb3JBZnRlclBheVN5bmNSZXF1ZXN0Qm9keTwvYm9keVR5cGU+DQo8Y3JlYXRlVXNlcj4NClF1bmFyLk1lbnBpYW8uQWdlbnQ8L2NyZWF0ZVVzZXI+DQo8Y3JlYXRlVGltZT4NCjIwMTUtMDMtMTYgMjM6NDE6MDg8L2NyZWF0ZVRpbWU+DQo8c3VwcGxpZXJJZGVudGl0eT4NCk1FSUpJTkdURVNUMjwvc3VwcGxpZXJJZGVudGl0eT4NCjwvaGVhZGVyPg0KPGJvZHkgeHNpOnR5cGU9IkNyZWF0ZU9yZGVyRm9yQWZ0ZXJQYXlTeW5jUmVxdWVzdEJvZHkiIHhtbG5zOnhzaT0iaHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEtaW5zdGFuY2UiPg0KPG9yZGVySW5mbz4NCjxvcmRlcklkPg0KNjAwMzYzODA3PC9vcmRlcklkPg0KPHByb2R1Y3Q+DQo8cmVzb3VyY2VJZD4NCjkzNTwvcmVzb3VyY2VJZD4NCjxwcm9kdWN0TmFtZT4NCuWOu+WTquWEv1RXTzwvcHJvZHVjdE5hbWU+DQo8dmlzaXREYXRlPg0KPC92aXNpdERhdGU+DQo8c2VsbFByaWNlPg0KMTAwPC9zZWxsUHJpY2U+DQo8Y2FzaEJhY2tNb25leT4NCjA8L2Nhc2hCYWNrTW9uZXk+DQo8L3Byb2R1Y3Q+DQo8Y29udGFjdFBlcnNvbj4NCjxuYW1lPg0KYWRkPC9uYW1lPg0KPG5hbWVQaW55aW4+DQo8L25hbWVQaW55aW4+DQo8bW9iaWxlPg0KMTg4MTcyMDk0ODA8L21vYmlsZT4NCjxlbWFpbD4NCjwvZW1haWw+DQo8YWRkcmVzcz4NCjwvYWRkcmVzcz4NCjx6aXBDb2RlPg0KPC96aXBDb2RlPg0KPC9jb250YWN0UGVyc29uPg0KPHZpc2l0UGVyc29uPg0KPHBlcnNvbj4NCjxuYW1lPg0KYTI8L25hbWU+DQo8bmFtZVBpbnlpbj4NCjwvbmFtZVBpbnlpbj4NCjxjcmVkZW50aWFscz4NCjwvY3JlZGVudGlhbHM+DQo8Y3JlZGVudGlhbHNUeXBlPg0KSURfQ0FSRDwvY3JlZGVudGlhbHNUeXBlPg0KPGRlZmluZWQxVmFsdWU+DQo8L2RlZmluZWQxVmFsdWU+DQo8ZGVmaW5lZDJWYWx1ZT4NCjwvZGVmaW5lZDJWYWx1ZT4NCjwvcGVyc29uPg0KPHBlcnNvbj4NCjxuYW1lPg0KYTE8L25hbWU+DQo8bmFtZVBpbnlpbj4NCjwvbmFtZVBpbnlpbj4NCjxjcmVkZW50aWFscz4NCjwvY3JlZGVudGlhbHM+DQo8Y3JlZGVudGlhbHNUeXBlPg0KSURfQ0FSRDwvY3JlZGVudGlhbHNUeXBlPg0KPGRlZmluZWQxVmFsdWU+DQo8L2RlZmluZWQxVmFsdWU+DQo8ZGVmaW5lZDJWYWx1ZT4NCjwvZGVmaW5lZDJWYWx1ZT4NCjwvcGVyc29uPg0KPC92aXNpdFBlcnNvbj4NCjxvcmRlclF1YW50aXR5Pg0KMjwvb3JkZXJRdWFudGl0eT4NCjxvcmRlclByaWNlPg0KODAwMDwvb3JkZXJQcmljZT4NCjxvcmRlckNhc2hCYWNrTW9uZXk+DQowPC9vcmRlckNhc2hCYWNrTW9uZXk+DQo8b3JkZXJTdGF0dXM+DQpQUkVQQVlfT1JERVJfUFJJTlRJTkc8L29yZGVyU3RhdHVzPg0KPG9yZGVyUmVtYXJrPg0KPC9vcmRlclJlbWFyaz4NCjxvcmRlclNvdXJjZT4NCk5PUk1BTDwvb3JkZXJTb3VyY2U+DQo8cGF5bWVudFNlcmlhbG5vPg0KcGlhbzYwMDM2MzgwNzwvcGF5bWVudFNlcmlhbG5vPg0KPC9vcmRlckluZm8+DQo8L2JvZHk+DQo8L3JlcXVlc3Q+\\",\\"securityType\\":\\"MD5\\",\\"signed\\":\\"debug\\"}',
-//        );
 
         if (isset($this->body['method']) && !empty($this->body['method'])) {
             $method = $this->body['method'];
             $requestParam = $this->body['requestParam'];
             $this->service = new Qunar_Service($requestParam);
+            Util_Logger::getLogger('qunar')->info(__METHOD__,
+                array('header' => $this->service->request_header, 'body' => $this->service->request_body), '', '去哪儿请求数据',
+                $method
+            );
             try {
 
                 if (method_exists($this, $method)) {
-
                     $res = $this->$method();
-
                     echo json_encode($res);
                     exit;
                 } else {
@@ -73,7 +72,7 @@ class V1Controller extends Base_Controller_ApiDispatch {
     private function getProductByQunar() {
 
         $req = $this->service->request_body;
-        self::echoLog('req', var_export($req, true), 'qunar_getProductByQunar.log');
+//        self::echoLog('req', var_export($req, true), 'qunar_getProductByQunar.log');
 
         $products = array();
         $pagination = array();
@@ -90,17 +89,19 @@ class V1Controller extends Base_Controller_ApiDispatch {
             $api_res = ApiProductModel::model()->getProductListByCode($api_arr);
             $products = $api_res['body']['data'];
             $pagination = $api_res['body']['pagination'];
-            self::echoLog('proALL', var_export($api_res, true), 'qunar_getProductByQunar.log');
-        } else if ($req->method = 'SINGLE') {
+
+//            self::echoLog('proALL', var_export($api_res, true), 'qunar_getProductByQunar.log');
+            Util_Logger::getLogger('qunar')->info(__METHOD__, $api_res, '', '全品拉取数据');
+        } else if ($req->method == 'SINGLE') {
             $api_arr = array(
-                'code' => $req->resourceId
+                'code' => isset($req->resourceId) ? $req->resourceId : '',
             );
 
-
             $api_res = ApiProductModel::model()->getProductByCode($api_arr);
-
             $products[] = $api_res['body'];
-            self::echoLog('proSINGLE', var_export($api_res, true), 'qunar_getProductByQunar.log');
+
+//            self::echoLog('proSINGLE', var_export($api_res, true), 'qunar_getProductByQunar.log');
+            Util_Logger::getLogger('qunar')->info(__METHOD__, $api_res, '', '单品拉取数据' , $req->resourceId);
         }
 
 
@@ -139,17 +140,65 @@ class V1Controller extends Base_Controller_ApiDispatch {
             $productInfos[$key]['refundInfo']       = $product['refund_detail'];
 
 
-            $productInfos[$key]['validType'] = $product['valid_flag'] == 0 ? 'BETWEEN_BOOK_DATE_AND_N_DAYSAFTER' : 'BETWEEN_USE_DATE_START_AND_END';
-            $productInfos[$key]['daysAfterBookDateValid'] = $product['valid'] + 1;   //几天内有效，valid==0 表示当天有效，故需要加1
+            $productInfos[$key]['validType'] = $product['valid_flag'] == 0 ? 'BETWEEN_USE_DATE_AND_N_DAYSAFTER' : 'BETWEEN_USE_DATE_START_AND_END';
             $date_available = explode(',',$product['date_available']);
-            $productInfos[$key]['periodStart'] = date('Y-m-d',$date_available[0]);             //有效期开始日
-            $productInfos[$key]['periodEnd'] = date('Y-m-d',$date_available[1]);               //有效期结束日
+            $start  = isset($date_available[0]) && is_int($date_available[0]) ? date('Y-m-d',$date_available[0]) : '';
+            $end    = isset($date_available[1]) && is_int($date_available[1]) ? date('Y-m-d',$date_available[1]) : ''; 
 
-            $productInfos[$key]['validWeek']    = str_replace('0','7',$product['week_time']);
-            $productInfos[$key]['marketPrice']  = intval($product['listed_price2']) * 100;             //票面价格单位：分
-            $productInfos[$key]['sellPrice']    = floatval($product['price']) * 100;               //Qunar 销售产品单价单位：分
-            $productInfos[$key]['minimum']      = $product['mini_buy'];//最小购买量
-            $productInfos[$key]['maximum']      = $product['max_buy'];//最大购买量
+            //日历票模式
+            if($productInfos[$key]['validType'] == 'BETWEEN_USE_DATE_AND_N_DAYSAFTER'){
+                $productInfos[$key]['daysAfterUseDateValid'] = $product['valid'] + 1;
+                $rule = ApiProductModel::model()->getTicketRule(
+                    array(
+                        'id' => $product['rule_id'],
+                        'supplier_id'=> $product['organization_id'],
+                        'show_items' => 1,
+                ));
+                $rule_items = array();
+                foreach($rule['body']['rule_items'] as $item){
+                    $rule_items[$item['date']] = $item;
+                }
+                $calendarPrices = array();
+                //按有效日期，构造日历票数据
+                for($now = date('Y-m-d',time()); strtotime($now) <= strtotime($end); $now = date("Y-m-d",strtotime("$now +1 day"))){
+                    $calendarPrice['useDate']       = $now;
+                    $calendarPrice['marketPrice']   = floatval($product['listed_price2']) * 100;
+                    $calendarPrice['sellPrice']     = floatval($product['price']) * 100;
+                    $calendarPrice['minimum']       = 1;
+                    $calendarPrice['maximum']       = 100;
+                    if(isset($rule_items[$now])){
+                        $s = $product['fat_price'] . $rule_items[$now]['fat_price'];
+                        eval("\$a=$s;");
+                        $calendarPrice['settlePrice']   = floatval($a) * 100;
+                        $calendarPrice['sellstock']     = $rule_items[$now]['reserve'] - $rule_items[$now]['used_reserve'];
+                        //最多购买不能大于整体库存
+                        if($calendarPrice['sellstock'] < $calendarPrice['maximum'])
+                            $calendarPrice['maximum']   = $calendarPrice['sellstock'];
+                    }else{
+                        $calendarPrice['settlePrice']   = floatval($product['fat_price']) * 100;
+                        $calendarPrice['sellstock']     = 9999;
+                    }
+                    $calendarPrices[] = $calendarPrice;
+                }
+                $productInfos[$key]['calendarPrices'] = $calendarPrices;
+            }
+
+            //期票模式
+            if($productInfos[$key]['validType'] == 'BETWEEN_USE_DATE_START_AND_END'){
+                $productInfos[$key]['daysAfterBookDateValid'] = $product['valid'] + 1;   //几天内有效，valid==0 表示当天有效，故需要加1
+                $productInfos[$key]['periodStart']  = $start;             //有效期开始日
+                $productInfos[$key]['periodEnd']    = $end;               //有效期结束日
+                $productInfos[$key]['validWeek']    = str_replace('0','7',$product['week_time']);
+                $productInfos[$key]['marketPrice']  = intval($product['listed_price2']) * 100;             //票面价格单位：分
+                $productInfos[$key]['sellPrice']    = floatval($product['price']) * 100;               //Qunar 销售产品单价单位：分
+    //            $productInfos[$key]['minimum']      = $product['mini_buy'];//最小购买量 - 团购时才有购买量限制
+    //            $productInfos[$key]['maximum']      = $product['max_buy'];//最大购买量
+                $productInfos[$key]['settlePrice']  = floatval($product['fat_price']) * 100;
+            }
+
+            $productInfos[$key]['saleType']     = $req->saleType == 'ALL' ? 'B2B' : $req->saleType;
+            $productInfos[$key]['suggestPrice'] = intval($product['sale_price']) * 100;
+
             //景区信息
             $api_res = ApiScenicModel::model()->lists(array('ids' => $product['scenic_id']));
 
@@ -163,7 +212,6 @@ class V1Controller extends Base_Controller_ApiDispatch {
                     );
                 }
             }
-//            self::echoLog('time', var_export(time(), true), 'qunar_getProductByQunar.log'); die;
         }
 
         $arr = array(
@@ -171,15 +219,14 @@ class V1Controller extends Base_Controller_ApiDispatch {
             'productInfos' => $productInfos
         );
 
-        self::echoLog('productInfos', var_export($arr, true), 'qunar_getProductByQunar.log');
+//        self::echoLog('productInfos', var_export($arr, true), 'qunar_getProductByQunar.log');
+        Util_Logger::getLogger('qunar')->info(__METHOD__, $arr, '', '回传给去哪儿的数据');
         return $this->service->generateResponse("GetProductByQunarResponse.xml", $arr);
 
-        //self::echoLog('body', var_export($res, true), 'qunar_getProductByQunar.log');
-        //echo ($res); die;
     }
 
     /**
-     * 创建订单校验（用于支付后下单）
+     *  创建订单（用于支付后下单）
      */
     private function createOrderForAfterPaySync() {
         $request = $this->service->request_body;
@@ -189,11 +236,11 @@ class V1Controller extends Base_Controller_ApiDispatch {
         $params = array();
         $params['source_id'] = $orderInfo->orderId;
 
-        if (is_string($product->visitDate)) {
-            $params['use_day'] = trim($product->visitDate);
-        } else {
-            $params['use_day'] = date('Y-m-d');
-        }
+//        if (is_string($product->visitDate)) {
+//            $params['use_day'] = trim($product->visitDate);
+//        } else {
+//            $params['use_day'] = date('Y-m-d');
+//        }
         $params['distributor_id'] = $this->service->agency_id;
         $params['price_type'] = self::PRICE_TYPE;
         $params['local_source'] = self::LOCAL_SOURCE;
@@ -234,6 +281,12 @@ class V1Controller extends Base_Controller_ApiDispatch {
 
         //get prod detail by code
         $productDetail = $this->getProdByCode($product->resourceId);
+        if (is_string($product->visitDate)) {
+            $params['use_day'] = trim($product->visitDate);
+        } else {
+            $day = intval($productDetail['scheduled_time']/86400);
+            $params['use_day'] = date('Y-m-d', strtotime("+$day day"));
+        }
         if (strpos(strtoupper($orderInfo->orderStatus), 'PREPAY') !== FALSE) {
             $payment = array(
                 1=> 'alipay',
@@ -247,11 +300,11 @@ class V1Controller extends Base_Controller_ApiDispatch {
         }
         if ($productDetail) {
             $params['ticket_template_id'] = $productDetail['product_id'];
-            if ($productDetail['price'] != $params['price']) {
-                $error = array(
-                    'code' => 'fail',
-                    'message' => '该产品价格不符，无法购买'
-                );
+            if ($productDetail['price'] != $params['price'] && $productDetail['fat_price'] != $params['price']) {
+//                $error = array(
+//                    'code' => 'fail',
+//                    'message' => '该产品价格不符，无法购买'
+//                );
             }
         } else {
             $error = array(
@@ -287,10 +340,13 @@ class V1Controller extends Base_Controller_ApiDispatch {
             $item = $error;
             $id = 0;
             $status = $req_status . '_FAILED';
+//            self::echoLog('error', var_export(array('error' => $error, 'status' => $status), true), 'qunar_createorderError.log');
+            Util_Logger::getLogger('qunar')->error(__METHOD__, array('error' => $error, 'status' => $status), '', '创建订单错误' ,  $orderInfo->orderId);
         } else {
             $params['is_checked'] = 1;
             $item = ApiOrderModel::model()->create($params);
-            self::echoLog('body', var_export(array('param' => $params, 'item' => $item), true), 'qunar_createorder.log');
+//            self::echoLog('body', var_export(array('param' => $params, 'item' => $item), true), 'qunar_createorder.log');
+            Util_Logger::getLogger('qunar')->info(__METHOD__, array('param' => $params, 'item' => $item), '', '创建订单数据',  $orderInfo->orderId);
 
             if ($item['code'] !== 'succ') {
                 $id = 0;
@@ -308,7 +364,7 @@ class V1Controller extends Base_Controller_ApiDispatch {
     }
 
     /**
-     * 创建订单（用于支付后下单）
+     * 创建订单校验（用于支付后下单）
      */
     private function checkCreateOrderForAfterPaySync() {
         $request = $this->service->request_body;
@@ -324,11 +380,11 @@ class V1Controller extends Base_Controller_ApiDispatch {
 
         if ($productDetail) {
             $params['ticket_template_id'] = $productDetail['product_id'];
-            if ($productDetail['price'] != $params['price']) {
-                $error = array(
-                    'code' => 'fail',
-                    'message' => '该产品价格不符，无法购买'
-                );
+            if ($productDetail['price'] != $params['price'] && $productDetail['fat_price'] != $params['price']) {
+//                $error = array(
+//                    'code' => 'fail',
+//                    'message' => '该产品价格不符，无法购买'
+//                );
             }
         } else {
             $error = array(
@@ -368,10 +424,12 @@ class V1Controller extends Base_Controller_ApiDispatch {
                     
         if ($error) {
             $item = $error;
+//            self::echoLog('error', var_export($error, true), 'qunar_checkorderError.log');
+            Util_Logger::getLogger('qunar')->error(__METHOD__, $error, '', '检验可定性错误', $product->resourceId);
         } else {
             $item = ApiOrderModel::model()->check($params);
-            self::echoLog('body', var_export(array('param' => $params, 'item' => $item), true), 'qunar_checkorder.log');
-
+//            self::echoLog('body', var_export(array('param' => $params, 'item' => $item), true), 'qunar_checkorder.log');
+            Util_Logger::getLogger('qunar')->info(__METHOD__, array('param' => $params, 'item' => $item), '', '检验可定性数据', $product->resourceId);
         }
         $this->setHeader($item, __METHOD__);
 
@@ -444,6 +502,7 @@ class V1Controller extends Base_Controller_ApiDispatch {
             }
         }
 
+        Util_Logger::getLogger('qunar')->info(__METHOD__, $data, '', '查询订单数据', $request->partnerOrderId);
         $this->setHeader($r, __METHOD__);
         $rst = $this->service->generateResponse('GetOrderByQunarResponse.xml', $data);
 
@@ -462,7 +521,8 @@ class V1Controller extends Base_Controller_ApiDispatch {
         );
         $send = ApiOrderModel::model()->sendTicket($api_arr);
 
-        self::echoLog('body', var_export($send, true), 'qunar_sendOrderEticket.log');
+//        self::echoLog('body', var_export($send, true), 'qunar_sendOrderEticket.log');
+        Util_Logger::getLogger('qunar')->info(__METHOD__, $send, '', '重发码数据', $resq->partnerOrderId);
 
         $arr = array(
             'message' => $send['message'],
@@ -481,8 +541,8 @@ class V1Controller extends Base_Controller_ApiDispatch {
     private function noticeOrderRefundedByQunar() {
         $order = $this->service->request_body->orderInfo;
 
-        self::echoLog('body', var_export($this->service->request_body, true), 'qunar_noticeOrderRefundedByQunar.log');
-        self::echoLog('body', var_export($this->service->request_header, true), 'qunar_noticeOrderRefundedByQunar.log');
+//        self::echoLog('body', var_export($this->service->request_body, true), 'qunar_noticeOrderRefundedByQunar.log');
+//        self::echoLog('body', var_export($this->service->request_header, true), 'qunar_noticeOrderRefundedByQunar.log');
 
         $api_arr = array(
             'order_id' => $order->partnerorderId, //我们的订单ID
@@ -495,8 +555,10 @@ class V1Controller extends Base_Controller_ApiDispatch {
 
         $cancel = ApiOrderModel::model()->cancelAndRefund($api_arr);
 
-        self::echoLog('body', var_export($cancel, true), 'qunar_noticeOrderRefundedByQunar.log');
-        self::echoLog('body', var_export($api_arr, true), 'qunar_noticeOrderRefundedByQunar.log');
+//        self::echoLog('body', var_export($cancel, true), 'qunar_noticeOrderRefundedByQunar.log');
+//        self::echoLog('body', var_export($api_arr, true), 'qunar_noticeOrderRefundedByQunar.log');
+        Util_Logger::getLogger('qunar')->info(__METHOD__, array('api_arr' => $api_arr, 'cancel' => $cancel), '', '退款通知数据', $order->partnerorderId);
+
         $arr = array(
             'message' => $cancel['message']
         );

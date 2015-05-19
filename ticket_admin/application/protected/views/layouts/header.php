@@ -20,7 +20,7 @@
             <div class="header-profile">
                 <div><?php echo Yii::app()->user->display_name ?>，欢迎登录!</div>
                 <?php
-                $org_name = '汇联分销系统';
+                $org_name = '汇联运营管理系统';
 //                $info = Organizations::api()->show(array('id' => Yii::app()->user->org_id,'fields'=>'name'));
 //                if ($info['code'] == 'succ') {
 //                    $org_name = $info['body']['name'];
@@ -36,7 +36,7 @@
                 if (CreateUrl::model()->checkAccess('/system/message/')):
                     ?>
                     <div class="btn-group btn-group-option">
-                        <a href="/system/message" title="消息" class="btn btn-default dropdown-toggle"><i class="fa fa-bell"></i>
+                        <a href="/site/switch/#/message/notice/" title="消息" class="btn btn-default dropdown-toggle"><i class="fa fa-bell"></i>
                             <?php
 //                            $result = Message::api()->count(array('receiver_organization' => Yii::app()->user->org_id,
 //                                'read_time' => 0
@@ -52,7 +52,7 @@
 
                 <!--工作台开始-->
                 <div class="btn-group btn-group-option">
-                    <a href="/dashboard" class="btn btn-default dropdown-toggle" title="工作台"><i class="fa fa-desktop"></i>工作台</a>
+                    <a href="/site/switch/#/dashboard/" class="btn btn-default dropdown-toggle" title="工作台"><i class="fa fa-desktop"></i>工作台</a>
                 </div>
                 <!--工作台结束-->
 

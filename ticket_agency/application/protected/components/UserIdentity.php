@@ -58,7 +58,7 @@ class UserIdentity extends CUserIdentity {
                     }
                 }
                 $this->setState('uid', $result->id);
-                $this->setState('display_name', isset($result->name) ? $result->name : $result->account);
+                $this->setState('display_name', $result->name . ' ');
                 $this->setState('account', $result->account);
                 $this->setState('org_id', $result->organization_id);
                 $this->setState('is_super', $result->is_super);

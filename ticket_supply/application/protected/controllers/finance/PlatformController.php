@@ -12,13 +12,13 @@ class PlatformController extends Controller
 		}
 		if(isset($params['tab'])) $data['tab'] = $params['tab'];
 		/*平台金额*/
-		$money = Unionmoney::api()->total(['org_ids'=>$org_id],0); 
+		$money = Unionmoney::api()->total(array('org_ids'=>$org_id),0); 
 		if(isset($money['code'])&&$money['code']=='succ') {	
 				$data['total'] = $money['body'];
 			}
 		$data['trade_type'] = array('1' => '支付', '2' => '退款', '3' => '充值', '4' => '提现', '5' => '应收账款');
 		/*提现*/
-		$bank = Bank::api()->list();
+		$bank = Bank::api()->list(array('fields'=>'id,name'));
 		$data['bank'] = $bank['body'];
 		$param['organization_id'] = $org_id;
 		$bank = Bank::api()->list_own($param,0);
@@ -27,13 +27,13 @@ class PlatformController extends Controller
 		$org = Yii::app()->user;
 		$data['user_name'] = $org->display_name;
         $data['user_account'] = $org->account;
-		$user = Users::model()->find('id=:id',['id' => $org->uid]);
+		$user = Users::model()->find('id=:id',array('id' => $org->uid));
 		$data['user_mobile'] = $user->mobile;	
 		/*提现记录*/
 		$data['status_labels'] = array('0' => '未打款', '1' => '已打款', '2' => '驳回');
 		$data['status_class'] = array( '0' => 'danger', '1' => 'success','2' => 'info');
         $data['mode_type'] = array('credit'=>'信用支付','advance' =>'储值支付','union' =>'平台支付','kuaiqian'=>'快钱','alipay'=>'支付宝');
-        	if (isset($params['status']) && !in_array($params['status'], array_keys($data['status_labels'])) ) {
+        	 if (isset($params['status']) && (!in_array($params['status'], array_keys($data['status_labels']))||$params['status']==='')) {
                 unset($params['status']);
             }
           	$data['get'] = $params;
@@ -68,11 +68,24 @@ class PlatformController extends Controller
 
 	function actionFetchCashExport()
 	{
+        Yii::import('application.extensions.PHPExcel');
+        require_once "PHPExcel.php";
+        require_once "PHPExcel/Autoloader.php";
+        Yii::registerAutoloader(array('PHPExcel_Autoloader','Load'), true);
 		$params = $_REQUEST;
 		$provider = array();
 		$org_id = Yii::app()->user->org_id;
 		if (intval($org_id) > 0) {
-			Yii::import('ext.CSVExport');
+            set_time_limit(180000) ;
+            ini_set('memory_limit', '256M');
+            $path = YiiBase::getPathOfAlias('webroot') .'/assets';
+            if (!is_dir($path)) {
+                mkdir($path,0755,true);
+            }
+            $objExcel = PHPExcel_IOFactory::load($path .'/export-platform-template.xls');
+            $objExcel->setActiveSheetIndex(0);
+            $sheet = $objExcel->getActiveSheet();
+			// Yii::import('ext.CSVExport');
 			$org = Yii::app()->user;
 			$data['status_labels'] = array('0' => '未打款', '1' => '已打款', '2' => '驳回');
 			if (isset($params['status']) && !in_array($params['status'], array_keys($data['status_labels'])) ) {
@@ -102,15 +115,25 @@ class PlatformController extends Controller
                 $provider_header[0] = array('id'=>'序列','created_at'=>'提现时间','apply_username'=>'操作人','apply_account'=>'用户账号','money'=>'金额',
                                             'type'=>'交易类型','status'=>'交易状态','union_money'=>'账户总余额');
             if ($result['code'] == 'succ') {
+                $last_row = count($result['body']['data']) + 2;
+                $i = 4;                
                  foreach ($result['body']['data'] as $key => $value) {
+                    $value['union_money'] = intval(100 * $value['union_money'] - 100 * $value['money']) / 100;
+                    if($i<$last_row){
+                        if(0 != $i%2){
+                          $sheet->duplicateStyle($sheet->getStyle('A3:H3'),'A'.$i.':H'.$i);
+                        }else{
+                          $sheet->duplicateStyle($sheet->getStyle('A2:H2'),'A'.$i.':H'.$i);
+                        }
+                      }
                     foreach ($provider_header[0] as $k => $val) {
                         if(in_array($k, array_keys($value) )){
                             if($k=='created_at') 
-                                 $provider[$key][$k] =  date('y年m月d日',$value[$k]);
+                                 $provider[$key][$k] =  date('Y年m月d日',$value[$k]);
                             elseif($k=='money' || $k=='union_money') 
                                  $provider[$key][$k] =  number_format($value[$k],2);
                             elseif($k=='status' && $val=='1') 
-                                 $provider[$key][$k] = '-'. $data['status_labels'][$value[$k]];
+                                 $provider[][$k] = '-'. $data['status_labels'][$value[$k]];
                             elseif($k=='status') 
                                  $provider[$key][$k] =  $data['status_labels'][$value[$k]];
                             else $provider[$key][$k] =  $value[$k];
@@ -118,16 +141,31 @@ class PlatformController extends Controller
                         if($k=='type' && isset($provider[$key]))
                                  $provider[$key][$k] =  '提现';
                     }
+                    $i++;
                  }
                }  
-               if(!empty($provider)) $provider = array_merge($provider_header,$provider);
-
-                $csv = new ECSVExport($provider,true,false); 
-                $content = $csv->toCSV();
-                if(isset($params['status'])) $filename = $params['time'].$data['status_labels'][$params['status']].'提现记录.csv'; 
-                else
-                $filename = $params['time'].'提现记录.csv'; 
-                Yii::app()->getRequest()->sendFile($filename, $content, "text/csv", false);
+               // if(!empty($provider)) $provider = array_merge($provider_header,$provider);
+                $objExcel->getActiveSheet()->fromArray($provider, null, 'A2');
+                $objWriter = PHPExcel_IOFactory::createWriter($objExcel, 'Excel5');
+                // $csv = new ECSVExport($provider,true,false); 
+                // $content = $csv->toCSV();
+                if(isset($params['status'])&&isset($data['status_labels'][$params['status']])) {
+                    $filename = $params['time'].$data['status_labels'][$params['status']].'提现记录.xls'; 
+                }else{
+                $filename = $params['time'].'提现记录.xls'; 
+                }
+                $filename = iconv("UTF-8","GBK",$filename); 
+                // Yii::app()->getRequest()->sendFile($filename, $content . "\r\n", "text/csv", false);
+                header("Pragma: public");
+                header("Expires: 0");
+                header("Cache-Control:must-revalidate, post-check=0, pre-check=0");
+                header("Content-Type:application/force-download");
+                header("Content-Type: application/vnd.ms-excel;");
+                header("Content-Type:application/octet-stream");
+                header("Content-Type:application/download");
+                header("Content-Disposition:attachment;filename=".$filename);
+                header("Content-Transfer-Encoding:binary");
+                $objWriter->save("php://output");
                 exit();
         }
       return '';
@@ -177,7 +215,7 @@ remark 	否 	string 	备注
  		}
  		if(empty($params['bank_name']))	{
  			$flag['status'] = false;
- 			$flag['msg'] = '提取银行卡出错';
+ 			$flag['msg'] = '请选择银行卡';
         	echo json_encode($flag);exit;
  		} 
         $para = array(
@@ -199,7 +237,6 @@ remark 	否 	string 	备注
         if ($result['code'] == 'succ') {
             $flag['status'] = true;
             $flag['msg'] = '申请提现成功!'; //.$result['body']['id']
-            Yii::app()->redis->delete('code_for_fetchcash:' . Yii::app()->getSession()->getSessionId());
         } else{
             $flag['status'] = false;
             $flag['msg'] = $result['message'];
@@ -237,8 +274,9 @@ public function actionPre() {
         $data = array();
         $data['error'] = 0;
         $val = Yii::app()->request->getParam('code');
-        $val = trim($val); 
-        if (strlen($val) != 6 || $val != Yii::app()->redis->get('code_for_fetchcash:' . Yii::app()->getSession()->getSessionId())) {
+        $val = trim($val);
+       $code_arr = explode(',', Yii::app()->redis->get('code_for_fetchcash:' . Yii::app()->getSession()->getSessionId()));
+        if (strlen($val) != 6 || $val != $code_arr['0']) {
             $data['msg'] = '短信验证码输入错误';
             $data['error'] = 1;
         } 
