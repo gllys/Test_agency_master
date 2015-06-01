@@ -44,10 +44,9 @@
         var description =$('#description').val();
         if(name !='' && description !=''){
            $.post('/scenic/scenic/add/', {'name': $('#name').val(), "description": $('#description').val(),'landscape_id':$('#landscape_id').val()}, function(data) {
-                 
-                if (data.errors) {
+                if (data.error) {
                     var tmp_errors = '';
-                    $.each(data.errors, function(i, n) {
+                    $.each(data.error, function(i, n) {
                         tmp_errors += n;
                     });
                     var warn_msg = '<div class="alert alert-error"><button data-dismiss="alert" class="close" type="button">×</button><i class="icon-warning-sign"></i>' + tmp_errors + '</div>';
@@ -55,7 +54,7 @@
                 } else{
                     var succss_msg = '<div class="alert alert-success"><button data-dismiss="alert" class="close" type="button">×</button><strong>操作成功!</strong></div>';
                     $('#verify_return').html(succss_msg);
-                    setTimeout("location.href='/scenic/scenic/view?id="+$('#landscape_id').val()+"'", '2000');
+                    setTimeout(function(){window.location.href= '/#/scenic/scenic/view?id='+$('#landscape_id').val()+'&time='+ Date.parse(new Date());}, '2000');
                 }
             }, "json"); 
         }else{

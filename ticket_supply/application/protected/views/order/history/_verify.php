@@ -96,7 +96,7 @@ use common\huilian\utils\Format;
                                                 $landscapeName .= isset($landscape_lists[$landscapeId]) ? $landscape_lists[$landscapeId] : "";
                                             }
                                             ?>
-                                            <a style="color: #636e7b;cursor: pointer;cursor: hand;" title="<?php echo $landscapeName?>" readonly>
+                                            <a style="color: #636e7b;cursor: default;" class="clearPart" href="javascipt:void(0)" title="<?php echo $landscapeName?>" readonly>
                                                 <?php echo mb_strlen($landscapeName,'UTF8') > 15 ? mb_substr($landscapeName,0,14,'UTF8') . '...' : $landscapeName ?>
                                             </a> </td>
                                         <td style="width:9%"><?php echo $order['name'] ?></td>

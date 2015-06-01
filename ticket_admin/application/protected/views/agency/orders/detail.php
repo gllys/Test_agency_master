@@ -143,7 +143,7 @@ $this->breadcrumbs = array('订单', '订单详情');
 				<input type="hidden" name="mobile" value="<?php echo $detail['owner_mobile'];?>" id="complexmobile"/>
 				<input type="hidden" name="id" value="<?php echo $detail['id'];?>" id="complexid"/>
 				<?php if($detail['status'] == 'paid'){ ?>
-				<button id="complexConfirm" class="btn btn-primary btn-xs ml10" type="button">重发短信</button></td>
+				<button id="complexConfirm" class="btn btn-primary btn-xs ml10" <?php if($detail['message_open']===0): ?>style="display:none;"<?php endif; ?>  type="button">重发短信</button></td>
 			    <!-- onclick="againSms('<?php //echo $detail['id'] ?>', '<?php //echo $detail['owner_mobile'] ?>');"-->
 			  <?php  }  ?>
 			<td>取票人身份证号码：<?php echo $detail['owner_card']?></td>
@@ -216,7 +216,7 @@ $this->breadcrumbs = array('订单', '订单详情');
                 <tr>
                     <th>景点</th><th>未使用张数</th><th>已使用张数</th>
                 </tr>
-                <?php if(isset($infos['poi_counts'])){ foreach ($infos['poi_counts'][$item['scenic_id']] as $poi){?>
+                <?php if(isset($infos['poi_counts'])){ foreach ((array)$infos['poi_counts'][$item['scenic_id']] as $poi){?>
                 <tr>
                     <td><?php echo $infos['poi_names'][$poi['poi_id']];?></td>
                     <td><?php echo $poi['unuse_num'];?></td>

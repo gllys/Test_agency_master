@@ -4,8 +4,7 @@ class SubscribesModel extends Base_Model_Abstract
  	protected $dbname = 'itourism';
     protected $tblname = 'subscribes';
     protected $pkKey = 'id';
-    //protected $preCacheKey = 'cache|subscribesModel|';
-    protected $preCacheKey ='';
+    protected $preCacheKey = 'cache|subscribesModel|';
     
     public function getTable() {
         return $this->tblname;

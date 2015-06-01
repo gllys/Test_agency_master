@@ -260,9 +260,11 @@
                         $('#save_scenic').show();
                     });
                 } else {
-                    alert('更新成功！', function() {
+                    window.setTimeout(function(){
+                      alert('更新成功！', function() {
                         location.href='/site/switch/#/scenic/scenic/';
-                    });
+                      });
+                    },200);
                 }
             }, "json")
         }else{

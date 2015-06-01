@@ -119,14 +119,14 @@
 <body class="signin  pace-done">
 <div class="new-head clearfix">
     <div class="new-inner new-nav">
-        <h1 class="new-nav-logo"><a href="#">票台-景旅通</a></h1>
+        <h1 class="new-nav-logo"><a href="javascript:void(0)">票台-景旅通</a></h1>
         <div class="nav-inner">
-            <a href="#" class="nav-active">首页</a>
-            <a href="#">票台介绍</a>
-            <a href="#">如何入驻</a>
-            <a href="#">配套设备</a>
-            <a href="#">合作资质</a>
-            <a href="#">联系我们</a>
+            <a href="javascript:void(0)" class="nav-active">首页</a>
+            <a href="javascript:void(0)">票台介绍</a>
+            <a href="javascript:void(0)">如何入驻</a>
+            <a href="javascript:void(0)">配套设备</a>
+            <a href="javascript:void(0)">合作资质</a>
+            <a href="javascript:void(0)">联系我们</a>
         </div>
     </div>
 </div>

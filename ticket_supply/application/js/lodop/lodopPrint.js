@@ -3,11 +3,6 @@
  * 
  * @author LRS
  */
-
-document.write('<script type="text/javascript" src="/js/jquery.cookies.js"></script>');
-document.write('<script language="javascript" src="/js/lodop/LodopFuncs.js?v=1"></script>');
-document.write('<object classid="clsid:2105C259-1E0C-4534-8141-A753534CB4CA" codebase="/js/lodop/lodop.cab#version=6,1,8,7" width=0 height=0></object>');
-
 /**
  * 打印小票
  * @param integer id 验票记录的列表的id，注意不是订单编号

@@ -13,6 +13,7 @@ class Base_Model_Api
     protected static $appSecret;
     protected static $srvUrls;
     protected static $instances = array();
+    protected $preCacheKey = 'cache|';
 
     public static function model() {
         $className = get_called_class();
@@ -54,5 +55,21 @@ class Base_Model_Api
         unset($params['sign']);
         ksort($params);
         return md5(http_build_query($params) . self::$appSecret);
+    }
+
+    public function customCache($cacheKey,$data=null,$expire=3600) {
+        $mc = Cache_Memcache::factory();
+        $cacheNs = $mc->get($this->preCacheKey.'NS');
+        $cacheData = $mc->get($cacheKey);
+        if(empty($cacheData) || $cacheData['cacheNS']!=$cacheNs) {
+            if($data==null) return null;
+            $res = $data;
+            if(!empty($res))
+                $mc->set($cacheKey,array('data'=>$res,'cacheNS'=>$cacheNs),$expire);
+        }
+        else {
+            $res = $cacheData['data'];
+        }
+        return $res;
     }
 }

@@ -409,7 +409,7 @@ $this->breadcrumbs = array('门票管理', '编辑电子票');
     jQuery(document).ready(function () {
 
         $('#return').click(function(){
-    		location.href = '/ticket/single';
+    		location.href = '/#'+ '/ticket/single';
    		})
 
         // HTML5 WYSIWYG Editor
@@ -710,12 +710,12 @@ $this->breadcrumbs = array('门票管理', '编辑电子票');
                         var tmp_errors = data.errors;
                         var warn_msg = '<div class="alert alert-danger"> <button type="button" class="close" data-dismiss="alert"><i class="fa fa-times"></i></button> <i class="fa fa-ban-circle fa-lg"></i>' + tmp_errors + '</div>';
                         $('#show_msg').html(warn_msg);
-                        location.href = '#show_msg';
+                        location.href = '/#'+ '#show_msg';
                     } else if (data.succ) {
                         var succss_msg = '<div class="alert alert-success"> <button type="button" class="close" data-dismiss="alert"><i class="fa fa-times"></i></button> <i class="fa fa-check fa-lg"></i>保存成功</div>';
                         $('#show_msg').html(succss_msg);
-                        location.href = '#show_msg';
-                        setTimeout("location.href='/ticket/single/'", '2000');
+                        location.href = '/#'+ '#show_msg';
+                        setTimeout("location.href= '/#'+'/ticket/single/'", '2000');
                     }
                 }, "json")
             }

@@ -202,7 +202,7 @@ $this->breadcrumbs = array('产品', '价格、库存规则定制');
                         //var year_month = $("#storageCalContent input.year_month").first().val();
                         //delete(storageCal.data[year_month]);
                         alert("设置成功");
-                        location.href = '/ticket/strategy/amend/id/' + result.id;
+                        location.href = '/#'+ '/ticket/strategy/amend/id/' + result.id;
                         //storageCal.show(year_month, $("#pid").val(), $("#begintime").val());
                     } else {
                         alert(result.message);
@@ -235,7 +235,7 @@ $this->breadcrumbs = array('产品', '价格、库存规则定制');
                     if (result.code == 200) {
                         //var year_month = $("#storageCalContent input.year_month").first().val();
                         //delete(storageCal.data[year_month]);
-                        alert("保存成功",function(){location.href = '/ticket/strategy/amend/id/' + result.id;});
+                        alert("保存成功",function(){location.href = '/#'+ '/ticket/strategy/amend/id/' + result.id;});
                         //storageCal.show(year_month, $("#pid").val(), $("#begintime").val());
                     } else {
                         alert(result.message);
@@ -262,7 +262,7 @@ $this->breadcrumbs = array('产品', '价格、库存规则定制');
 			       var pid = $("#pid").val();
                 $.get('/ticket/strategy/delete', {id: pid, date: date}, function(result){
                     if (result == 1) {
-                        location.href = '/ticket/strategy/amend/id/'+pid;
+                        location.href = '/#'+ '/ticket/strategy/amend/id/'+pid;
                     }
                 });
             });

@@ -72,10 +72,13 @@ class ApiWayModel extends Base_Model_Api {
             switch ($consumeType) {
                 case self::CONSUME_UPDATE:
                     $orderStatus = 9;
+                    $status = 2;
                     break;
                 case self::CONSUME_INIT:
                     $orderStatus = 6;
+                    $status = 1;
             }
+            
             $post['appOrderData'][0]['AppOrderStatus'] = $orderStatus;
 
             if (isset($params['order_items']) && $params['order_items']) {
@@ -93,18 +96,11 @@ class ApiWayModel extends Base_Model_Api {
                     continue;
                 }
 
-//                $row['status'] = 2;
-//                $row['use_time'] = time();
-
                 switch ($row['status']) {
                     case 2:
-                        $status = 2;
-//                        $useDay = $row['use_time'];
-                        // 使用之前预约的时间
                         $useDay = 0;
                         break;
                     case 1:
-                        $status = 1;
                         $useDay = strtotime($row['use_day'] . ' 23:58:50');
                         break;
                     case 0:
@@ -126,6 +122,8 @@ class ApiWayModel extends Base_Model_Api {
                         $post['appId'],
                         $sourceId
                             ), $account['key']);
+            
+            Util_Logger::getLogger('way')->debug(__METHOD__, $post, '', '订单核销', $sourceId);
             
             return self::callApi($url, json_encode($post));
         } else {

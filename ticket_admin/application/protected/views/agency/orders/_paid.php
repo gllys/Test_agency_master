@@ -1,5 +1,7 @@
 <?php
 use common\huilian\utils\Format;
+use common\huilian\utils\GET;
+use common\huilian\models\Channel;
 ?>
 <!--子查询开始-->
     <div class="panel-body"  style=" padding-bottom: 0px; border-left: 1px solid #ebeef0;border-right: 1px solid #ebeef0;">
@@ -55,7 +57,19 @@ use common\huilian\utils\Format;
             </select>
         </div>
         <!--取消状态结束-->
-        
+        <!--来源开始-->
+		<div class="form-group" style="width: 120px;">
+			<select name="source" id="status_link" class="select2" data-placeholder="支付状态" style="width: 120px; height: 34px;">
+				<option value="">来源</option>
+                <?php foreach(Channel::used() as $k => $v) { ?>
+             	<option value="<?= $k ?>"<?= GET::name('source') == strval($k) ? ' selected' : '' ?>><?= $v ?></option>
+             	<?php } ?>
+            </select>
+		</div>
+		<!--来源结束-->
+		<div class="form-group" style="margin: 0; width: 150px; margin-top:-10px;">
+			<input type="text" name="agency_name" class="form-control" placeholder="分销商名称" value="<?= GET::name('agency_name') ?>">
+		</div>
         <div class="form-group">
             <input type="hidden" name="is_export" class="is_export" value="0">
             <button class="btn btn-primary btn-sm" type="submit">查询</button>
@@ -95,6 +109,7 @@ use common\huilian\utils\Format;
                             <th style="width:5%">支付金额</th>
                             <th style="width:5%">支付状态</th>
                             <th style="width:5%">取消状态</th>
+                            <th style="width:5%">来源</th>
                             <th style="width:5%">分销商</th>
                             <th style="width:5%">供应商</th>
                         </tr>
@@ -106,7 +121,7 @@ use common\huilian\utils\Format;
                         <tbody>
 <?php if (isset($lists['data'])) : foreach ($lists['data'] as $order) : ?>
                                     <tr>
-                                        <td style="width:12%"><a class="clearPart" href="/agency/orders/detail?id=<?php echo $order['id']?>"><?php echo $order['id']; ?></td>
+                                        <td style="width:12%"><a class="clearPart" href="/agency/orders/detail?id=<?php echo $order['id']?>"><?php echo $order['id']; ?></a></td>
                                          <td style="width:5%"> <?php
                                             $landscapeArr = explode(',', $order['landscape_ids']);
                                             $landscapeName = '';
@@ -114,7 +129,7 @@ use common\huilian\utils\Format;
                                                 $landscapeName .= isset($landscape_lists[$landscapeId]) ? $landscape_lists[$landscapeId] : "";
                                             }
                                             ?>
-                                            <a style="color: #636e7b;cursor: pointer;cursor: hand;" title="<?php echo $landscapeName?>" readonly>
+                                            <a style="color: #636e7b;cursor: default;" class="clearPart" href="javascipt:void(0)" title="<?php echo $landscapeName?>" readonly>
                                                 <?php echo mb_strlen($landscapeName,'UTF8') > 15 ? mb_substr($landscapeName,0,14,'UTF8') . '...' : $landscapeName ?>
                                             </a> </td>
                                         <td style="width:6%"><?php echo $order['name'] ?></td>
@@ -122,10 +137,7 @@ use common\huilian\utils\Format;
                                         <td style="width:9%"><?php echo $order['owner_mobile']; ?></td>
                                         <td style="width:8%"><?php echo Format::date($order['created_at']) ?></td>
                                         <td style="width:8%"><?php echo $order['use_day'] ?></td>
-                                        <td style="width:8%"><?php 
-                                        $verify_items = isset($order['verify_items']) ? $order['verify_items'] : array();
-                                        echo count($verify_items)>0?Format::date($verify_items[0]["use_time"]): '';
-                                    ?></td>
+                                        <td style="width:8%"><?php echo $order['use_time']?Format::date($order['use_time']):'' ?></td>
                                         <td style="width:6%"><?php echo $order['nums'] ?></td>
                                         <td style="width:5%"><?php echo $order['nums'] - $order['used_nums'] - $order['refunding_nums'] - $order['refunded_nums'] ?></td>
                                         <td style="width:5%"><?php echo $order['used_nums'] ?></td>
@@ -133,6 +145,7 @@ use common\huilian\utils\Format;
                                         <td style="width:5%"><?php echo number_format($order['amount'], 2) ?></td>
                                         <td style="width:5%" class="text-<?php echo Order::$payStatusStyle[$order['pay_status']] ?>"><span><?php echo Order::$payStatus[$order['pay_status']]; ?></span></td>
                                         <td style="width:5%" class="text-<?php echo Order::$cancelStatusStyle[$order['cancel_status']] ?>"><span><?php echo Order::$cancelStatus[$order['cancel_status']]; ?></span></td>
+                                        <td style="width:5%"><?= Channel::name($order['source']) ?></td>
                                         <td style="width:5%"><?php echo $order['distributor_name'] ?></td>
                                     	<td style="width:5%"><?php echo $order['supplier_name'] ?></td>
                                     </tr>

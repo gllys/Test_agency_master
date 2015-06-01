@@ -23,6 +23,10 @@ Class LandscapeController extends Base_Controller_Api {
         $params['show_district_name']=intval($this->body['show_district_name']);
         !isset($this->body['show_district_name']) && $params['show_district_name']=1;
 
+        if(isset($this->body['partner_type'])){
+            $params['partner_type'] = intval($this->body['partner_type']);
+        }
+
         $take_from_poi = 0; //是否先从运营POI获取数据，1是，0否
         if ($take_from_poi > 0) {
             $this->listsFromPOIAction($params);
@@ -49,6 +53,10 @@ Class LandscapeController extends Base_Controller_Api {
                         Lang_Msg::output($result);
                     }
                 }
+            }
+
+            if(array_key_exists('partner_type', $params)) {
+                $where['partner_type'] = $params['partner_type'];
             }
 
             if ($params['province_ids'] || $params['city_ids'] || $params['district_ids']) {
@@ -410,6 +418,7 @@ Class LandscapeController extends Base_Controller_Api {
         $result['on_shelf'] = intval($detail['on_shelf']);
         $result['images'] = $images;
         $result['landscape_organization'] = $landscape_organization;
+        $result['partner_type']= $detail['partner_type'];
 
         $areaIds = array();
         $result['province_id'] && $areaIds[] = $result['province_id'];
@@ -473,7 +482,7 @@ Class LandscapeController extends Base_Controller_Api {
         if($r){
             $LandscapeModel->commit();
             Yaf_Application::app()->getDispatcher()->getRequest()->setParam('landscape_id',$r['id']);
-            Log_Landscape::model()->add(array('type'=>1,'num'=>1,'content'=>Lang_Msg::getLang('INFO_LANDSCAPE_1').'【'.$data['name'].'】'));
+            Log_Landscape::model()->add(array('type'=>1,'num'=>1,'content'=>Lang_Msg::getLang('INFO_LANDSCAPE_1').'【'.$data['name'].'】，参数：'.json_encode($data,JSON_UNESCAPED_UNICODE)));
             Tools::lsJson(true,Lang_Msg::getLang('ERROR_ADD_0'), $r);
         }
         else{
@@ -584,7 +593,7 @@ Class LandscapeController extends Base_Controller_Api {
 
         isset($_POST['phone']) && empty($phone) && empty($value['telephone']) && Lang_Msg::error("ERROR_PHONE_1");
         isset($_POST['address']) && empty($address) && empty($value['address']) &&  Lang_Msg::error("ERROR_ADDRESS_1");
-        isset($_POST['biography']) && empty($biography) && empty($value['description']) &&  Lang_Msg::error("ERROR_BIOGRAPHY_1");
+        //isset($_POST['biography']) && empty($biography) && empty($value['description']) &&  Lang_Msg::error("ERROR_BIOGRAPHY_1");
 
         //isset($_POST['name']) && $data['name']= $name;
         isset($_POST['province_id']) && $data['province_id']= $province_id;
@@ -595,7 +604,20 @@ Class LandscapeController extends Base_Controller_Api {
         isset($_POST['exaddress']) && $data['exaddress']= $exaddress;
         isset($_POST['note']) && $data['note']= $note;
         isset($_POST['transit']) && $data['transit']= $transit;
-        isset($_POST['organization_id']) && $data['organization_id']= $organization_id;
+        if(isset($_POST['organization_id'])) {
+            $organization_id = intval($_POST['organization_id']);
+            if($organization_id==0) {
+                $data['organization_id'] = 0;
+                $data['partner_type'] = -1;
+            } else {
+                $organization = OrganizationModel::model()->getInfo($organization_id);
+                if($organization === false) {
+                    Lang_Msg::error("所绑定的景区并不存在");
+                }
+                $data['organization_id'] = $organization_id;
+                $data['partner_type'] = $organization['partner_type'];
+            }
+        }
         isset($_POST['impower_id']) && $data['impower_id']= $impower_id; //授权书
         isset($_POST['lat']) && $data['lat'] = $lat;
         isset($_POST['lng']) && $data['lng'] = $lng;
@@ -649,8 +671,8 @@ Class LandscapeController extends Base_Controller_Api {
             $LandscapeModel->commit();
             Yaf_Application::app()->getDispatcher()->getRequest()->setParam('landscape_id',$id);
             Yaf_Application::app()->getDispatcher()->getRequest()->setParam('organization_id',$data['organization_id']);
-            Log_Landscape::model()->add(array('type'=>($deleted?3:2),'num'=>1,'content'=>Lang_Msg::getLang($operation_lang_id).'【'.$data['name'].'】'));
-            Tools::lsJson(true,Lang_Msg::getLang($deleted?'ERROR_DEL_0':'ERROR_OPERATE_0'),$data);
+            Log_Landscape::model()->add(array('type'=>($deleted?3:2),'num'=>1,'content'=>Lang_Msg::getLang($operation_lang_id).'【'.$data['name'].'】，参数：'.json_encode($data,JSON_UNESCAPED_UNICODE)));
+            Tools::lsJson(true,$deleted?'记录删除成功':'操作成功',$data);
         }
         else{
             $LandscapeModel->rollback();
@@ -664,10 +686,21 @@ Class LandscapeController extends Base_Controller_Api {
      * @return [type]         [description]
      */
     public function updateOrganizationIdAction(){
+
+        if(!isset($this->body['id'])) {
+            Lang_Msg::error("需要传入要绑定的景区ID");
+        }
         $id = intval($this->body['id']);
-        !$id && Lang_Msg::error("ERROR_LANDSCAPE_1"); //缺少景区ID参数
+
+        if(!isset($this->body['organization_id'])) {
+            Lang_Msg::error("需要传入要绑定的供应商ID");
+        }
         $organization_id = intval($this->body['organization_id']);
-        !$organization_id && Lang_Msg::error("缺少机构ID参数");
+
+        $organization = OrganizationModel::model()->getInfo($organization_id);
+        if($organization === false) {
+            Lang_Msg::error('需要绑定的机构不存在.');
+        }
 
         $LandscapeModel = new LandscapeModel();
         $detail = $LandscapeModel->setCd(0)->getById($id);
@@ -676,7 +709,8 @@ Class LandscapeController extends Base_Controller_Api {
         $oldOrganizationId = $detail['organization_id'];
         
         $detail['organization_id'] = $organization_id;
-        $LandscapeModel->update($detail, ['id'=>$id]);
+        $detail['partner_type'] = $organization['partner_type'];
+        $LandscapeModel->updateByAttr($detail, ['id'=>$id]);
 		
 		$landscapeOrgs = LandOrgModel::model()->search(['organization_id'=>$detail['organization_id'], 'landscape_id'=>$id]);
 		if (empty($landscapeOrgs)) {

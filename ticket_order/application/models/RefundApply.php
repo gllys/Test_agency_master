@@ -215,6 +215,16 @@ class RefundApplyModel extends Base_Model_Abstract
             }
             $orderInfo = reset(OrderModel::model()->search(array('id'=>$refund_apply['order_id'])));
             $refunding_nums = $orderInfo['refunding_nums'] - $refund_apply['nums'];
+
+            if($orderInfo['local_source'] == 1) { //实际针对所有ota，通知OTA退票，返回成功后继续退款操作
+                if($data['allow_status'] == 3) {
+                    $refund_apply['reject_reason'] = $data['reject_reason'];
+                }
+                if(!OtaCallbackModel::model()->refund($orderInfo, $refund_apply, $refund['allow_status']==3 ? false : true)) {
+                    return false;
+                }
+            }
+
             // 订单表判断
             if ($data['allow_status'] == 3) {
                 // 拒绝
@@ -228,14 +238,6 @@ class RefundApplyModel extends Base_Model_Abstract
             }
             if(!$r){
                 return false;
-            }
-            if($orderInfo['local_source'] == 1) { //实际针对所有ota
-                if($data['allow_status'] == 3) {
-                    $refund_apply['reject_reason'] = $data['reject_reason'];
-                }
-                if(!OtaCallbackModel::model()->refund($orderInfo, $refund_apply, $refund['allow_status']==3 ? false : true)) {
-                    return false;
-                }
             }
             $this->updateByAttr($refund, array('id' => $data['id']));
             $this->commit();
@@ -507,48 +509,70 @@ class RefundApplyModel extends Base_Model_Abstract
             // 票模板为可退属性
             $order['refund'] == 0 && Lang_Msg::error('ERROR_REFUNDAPPLY_7');
             // 根据可退产品数来进行筛选order_items
-            $order_item = $orderItemModel->search(array('order_id' => $order['id'], 'use_time' => 0, 'status' => 1), '*', null, $params['nums']);
-            // 获取退票
-            $ticketModel = new TicketModel();
-            $return_ticket = $ticketModel->search(array('order_item_id|in' => array_keys($order_item), 'status' => 1, 'poi_used_num' => 0, 'deleted_at' => 0));
+            $order_item = $orderItemModel->getCacheByOrderId($order['id']);
+            $order_item_ids = [];
+            $i = 0;
+            foreach ($order_item as $itemID=>&$status) {
+                if ($status == 1) {
+                    $i++;
+                    $order_item_ids[] = $itemID;
+                    $status = 0;
+                }
+                if ($i >= $params['nums']) {
+                    break;
+                }
+            }
+            if (empty($order_item_ids)) {
+                Lang_Msg::error('没有可退票！');
+            }
+            if ($params['nums']>count($order_item_ids)) {
+                Lang_Msg::error('ERROR_REFUNDAPPLY_6');
+            }
+            $clacApply = $this->clacApply($order, $params);
+            $clacApply['refund_apply_id'] = Util_Common::payid(2);
+            //更新缓存
+            $orderItemModel->setCacheByOrderId($order['id'], $order_item);
             // 申请退票操作
-            $res = $this->applyAndCheck($order, $order_item, $return_ticket, $params);
+            $res = Process_Async::presend([__CLASS__, 'asyncApplyAndCheck'], [$order, $order_item_ids, $params, $clacApply]);
+            if ($res == false) {
+                Lang_Msg::error('操作失败!');
+            }
+//            $res = $this->applyAndCheck($order, $order_item_ids, $params, $clacApply);
             $this->commit();
-            return $res;
-        } catch(PDOException $e){
+            return $clacApply['refund_apply_id'];
+        } catch(Exception $e) {
             $this->rollback();
             Lang_Msg::error('ERROR_REFUNDAPPLY_8');
         }
+    }
+    
+    public static function asyncApplyAndCheck($order, $order_item_ids, $params, $calcApply)
+    {
+        $result = RefundApplyModel::model()->applyAndCheck($order, $order_item_ids, $params, $calcApply);
+        if ($result === true) {
+            return true;
+        }
+        //保存参数并发邮件通知
+        $logs = json_encode(func_get_args(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $args = var_export(func_get_args(), true);
+        Log_Base::save("asyncApplyAndCheck", $logs);
+        $content = 'method: '.__METHOD__."\n message: {$result}\n params: {$args}";
+        MailModel::sendSrvGroup("申请并退款异步操作失败", $content);
+        //MailModel::sendTo('tuyuwei@ihuilian.com', "申请并退款异步操作失败", $content);
     }
 
     /**
      * 申请并退款 实际操作
      * author : yinjian
      */
-    public function applyAndCheck($order, $order_item, $return_ticket, $data)
+    public function applyAndCheck($order, $order_item_ids, $data, $calcApply)
     {
+        $this->begin();
         try {
             $now = time();
-            $this->begin();
-            // 金额计算
-            $money = $order['price'] * $data['nums'];
-            $refunded_nums = $order['refunded_nums'] + $data['nums'];
-            $refunded = $order['refunded'] + $money;
-
-            $orderParams = array('refunded_nums' => $refunded_nums,'refunded'=>$refunded);
-            if ($order['used_nums'] == $order['nums'] - $order['refunded_nums'] - $data['nums']) {
-                $orderParams['status'] = 'finish';
-            }
-            if($order['refunding_nums']>0){
-                $orderParams['refund_status'] = 1;
-            }elseif($orderParams['refunded_nums']>0){
-                $orderParams['refund_status'] = 2;
-            }
-            if($refunded_nums>$order['nums']){
-                return false;
-            }
-            $refund_apply_id = Util_Common::payid(2);
-            $order_item_ids = array_keys($order_item);
+            $orderParams = $calcApply['orderParams'];
+            $refund_apply_id = $calcApply['refund_apply_id'];
+            $money = $calcApply['money'];
             // order
             OrderModel::model()->updateByAttr($orderParams, array('id' => $order['id']));
             OrderItemModel::model()->updateByAttr(array('status' => 0), array('id|in' => $order_item_ids));
@@ -603,6 +627,7 @@ class RefundApplyModel extends Base_Model_Abstract
             if($order['activity_paid']>0 && !in_array($order['payment'], $this->online_pay_types)){
                 $refund_apply['money'] = $refund_apply['money'] - $order['activity_paid'];
             }
+
             // 微信的票不需要退款
             if ($order && $order['ota_type'] != 'weixin') {
                 // 储值款项退款到账户@TODO
@@ -616,8 +641,8 @@ class RefundApplyModel extends Base_Model_Abstract
                     $info['op_id'] = $refund_apply['op_id'];
                     $res = OrganizationModel::model()->addRefund($info);
                     if (!$res) {
-                        $this->rollBack();
-                        return false;
+                        //$this->rollBack();
+                        throw new Lang_Exception("修改额度失败！");
                     }
                 }
             }
@@ -638,9 +663,9 @@ class RefundApplyModel extends Base_Model_Abstract
                     'remark' => $refund_apply_id,
                 ));
                 if (!$r || $r['code'] == 'fail') {
-                    $this->rollBack();
-                    !empty($r['message']) && Lang_Msg::error($r['message']);
-                    return false;
+                    //$this->rollBack();
+                    $r['message'] = $r['message'] ? $r['message'] : "平台支付的退票处理 && 单独的优惠券退款  平台申请退款失败";
+                    throw new Lang_Exception($r['message']);
                 }
             }
             //平台支付的退票处理  平台运行退款
@@ -665,17 +690,17 @@ class RefundApplyModel extends Base_Model_Abstract
                 );
                 $r = ApiUnionMoneyModel::model()->unionInout($unionParams);
                 if (!$r || $r['code'] == 'fail') {
-                    $this->rollBack();
-                    !empty($r['message']) && Lang_Msg::error($r['message']);
-                    return false;
+                    //$this->rollBack();
+                    $r['message'] = $r['message'] ? $r['message'] : "平台支付的退票处理  平台运行退款 失败";
+                    throw new Lang_Exception($r['message']);
                 }
             }
             $this->commit();
-            return $refund_apply_id;
-        } catch (PDOException $e) {
+            return true;
+        } catch (Exception $e) {
             // 回滚事务
             $this->rollBack();
-            return false;
+            return $e->getMessage();
         }
     }
 
@@ -739,6 +764,33 @@ class RefundApplyModel extends Base_Model_Abstract
             $this->rollBack();
             return false;
         }
+    }
+
+    /**
+     * @param $order
+     * @param $data
+     * @return array
+     */
+    private function clacApply($order, $data)
+    {
+        // 金额计算
+        $money = $order['price'] * $data['nums'];
+        $refunded_nums = $order['refunded_nums'] + $data['nums'];
+        $refunded = $order['refunded'] + $money;
+
+        $orderParams = array('refunded_nums' => $refunded_nums, 'refunded' => $refunded);
+        if ($order['used_nums'] == $order['nums'] - $order['refunded_nums'] - $data['nums']) {
+            $orderParams['status'] = 'finish';
+        }
+        if ($order['refunding_nums'] > 0) {
+            $orderParams['refund_status'] = 1;
+        } elseif ($orderParams['refunded_nums'] > 0) {
+            $orderParams['refund_status'] = 2;
+        }
+        if ($refunded_nums > $order['nums']) {
+            Lang_Msg::error("没有可退票!");
+        }
+        return array('money'=>$money, 'orderParams'=>$orderParams);
     }
 
 }

@@ -11,6 +11,7 @@ class Crontab_Queue extends Process_Base
     public function reg() {
         // User
         Util_Queue::reg("log", array('Log_Import', 'run'));
+        Util_Queue::reg("async", array('Process_Async', 'run'));
     }
 }
 

@@ -119,11 +119,11 @@ $this->breadcrumbs = array('产品', '仓库管理');
                                 </a></td>
                              <?php  }  ?> 
                             <td>
-                                <a onclick="downUp(<?php echo $item['id'];?>);" title="待上架"><i class="glyphicon glyphicon-arrow-up" style="cursor:pointer"></i></a>
-                                <a title="修改" style="margin-left: 10px;" <?php if($param['type'] == 0){ echo " href='/ticket/goods/singleedit?id=$item[id]'";}else{ echo " href='/ticket/goods/taskedit?id=$item[id]'";}?>>
+                                <a  class='clearPart' onclick="downUp(<?php echo $item['id'];?>);" title="待上架"><i class="glyphicon glyphicon-arrow-up" style="cursor:pointer"></i></a>
+                                <a  title="修改" style="margin-left: 10px;" <?php if($param['type'] == 0){ echo " href='/ticket/goods/singleedit?id=$item[id]'";}else{ echo " href='/ticket/goods/taskedit?id=$item[id]'";}?>>
                                     <span class="glyphicon glyphicon-edit"></span>
                                 </a>
-                                <a title="删除" style="margin-left: 10px;" href="/ticket/depot/del/?id=<?php echo $item['id'] ?>" class="del">
+                                <a title="删除" style="margin-left: 10px;" href="/ticket/depot/del/?id=<?php echo $item['id'] ?>" class="del  clearPart">
                                     <span class="glyphicon glyphicon-trash"></span>
                                 </a>
                             </td>
@@ -169,11 +169,11 @@ $this->breadcrumbs = array('产品', '仓库管理');
                                             }?>
                                        </a></td>
                                    <td>
-                                        <a onclick="downUp(<?php echo $item['id'];?>);" title="待上架"><i class="glyphicon glyphicon-arrow-up" style="cursor:pointer"></i></a>
-                                        <a title="修改" style="margin-left: 10px;" href="/ticket/goods/unionedit?id=<?php echo $item['id']?>">
+                                        <a  class='clearPart' onclick="downUp(<?php echo $item['id'];?>);" title="待上架"><i class="glyphicon glyphicon-arrow-up" style="cursor:pointer"></i></a>
+                                        <a  title="修改" style="margin-left: 10px;" href="/ticket/goods/unionedit?id=<?php echo $item['id']?>">
                                                <span class="glyphicon glyphicon-edit"></span>
                                        </a>
-                                       <a title="删除" style="margin-left: 10px;" href="/ticket/depot/del/?id=<?php echo $item['id'] ?>" class="del">
+                                       <a title="删除" style="margin-left: 10px;" href="/ticket/depot/del/?id=<?php echo $item['id'] ?>" class="del  clearPart">
                                                <span class="glyphicon glyphicon-trash"></span>
                                        </a>
                                    </td>
@@ -248,7 +248,7 @@ $this->breadcrumbs = array('产品', '仓库管理');
             if (data.error) {
                 alert(data.msg);
             }else{
-                location.href = '/ticket/single/';
+                location.href = '/#'+ '/ticket/single/';
             }
         }, "json");
         return false;
@@ -260,7 +260,7 @@ $this->breadcrumbs = array('产品', '仓库管理');
         $('a.del').click(function() {
 			 PWConfirm('确定要删除?',function(){
 			     $.post($(this).attr('href'), function() {
-                window.location.reload();
+                window.location.partReload();
             });
             });
            

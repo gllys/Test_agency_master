@@ -38,8 +38,8 @@ $this->breadcrumbs = array('产品', '价格、库存规则库');
 					<a title="编辑" style="margin-left: 10px;" href="/ticket/strategy/amend/id/<?php echo $rule['id']?>">
 						<span class="glyphicon glyphicon-edit"></span>
 					</a>
-					<a class="del-link" title="删除" style="margin-left: 10px;" href="javascript:void(0);" 
-						onclick="del('<?php echo $rule['id']?>')" class="del">
+					<a title="删除" style="margin-left: 10px;" href="javascript:void(0);" 
+						onclick="del('<?php echo $rule['id']?>')" class="del-link del clearPart">
 						<span class="glyphicon glyphicon-trash"></span>
 					</a>
 					<!--a onclick="" title="复制" style="margin-left: 10px;"><span class="fa fa-copy" style="cursor:pointer"></span></a-->
@@ -72,7 +72,7 @@ $this->breadcrumbs = array('产品', '价格、库存规则库');
 			 PWConfirm('确认删除此条规则？',function(){
 			      $.post('/ticket/strategy/del',{id:id},function(data){
 					if(data.error==0){
-						location.href = "/ticket/strategy";
+						location.href = '/#'+ "/ticket/strategy";
 					}else{
 						alert("删除失败,"+data.message);
 					}

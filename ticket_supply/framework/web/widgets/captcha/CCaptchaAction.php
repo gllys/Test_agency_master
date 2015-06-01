@@ -258,7 +258,8 @@ class CCaptchaAction extends CAction
 		}
 
 		imagecolordeallocate($image,$foreColor);
-
+        //使用验证码组件时，图像因存在错误而无法显示,在输出图像之前，清空输出缓冲区
+        ob_clean();
 		header('Pragma: public');
 		header('Expires: 0');
 		header('Cache-Control: must-revalidate, post-check=0, pre-check=0');

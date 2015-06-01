@@ -28,10 +28,10 @@ $this->breadcrumbs = array('产品', '优惠规则');
                         <td><?php echo $discount['name']; ?></td>
                         <td><?php echo $discount['note'] ?></td>
                         <td>
-                            <a title="编辑" style="margin-left: 10px;" href="/ticket/discount/edit?id=<?php echo $discount['id']; ?>">
+                            <a  title="编辑" style="margin-left: 10px;" href="/ticket/discount/edit?id=<?php echo $discount['id']; ?>">
                                 <span class="glyphicon glyphicon-edit"></span>
                             </a>
-                            <a title="删除" style="margin-left: 10px;" href="javascript:void(0);" onclick="delDiscount('<?php echo $discount['id']; ?>');" class="del">
+                            <a title="删除" style="margin-left: 10px;" href="javascript:void(0);" onclick="delDiscount('<?php echo $discount['id']; ?>');" class="del  clearPart">
                                 <span class="glyphicon glyphicon-trash"></span>
                             </a>
                             <a href="/ticket/discount/copy?id=<?php echo $discount['id']; ?>" title="复制" style="margin-left: 10px;"><span class="fa fa-copy"
@@ -69,7 +69,7 @@ $this->breadcrumbs = array('产品', '优惠规则');
 		 PWConfirm('确定要删除该优惠规则?',function(){
 			      $.post('/ticket/discount/del',{id:id},function(data){
                 if(data.error==0){
-                    alert("删除成功",function(){ location.reload();});
+                    alert("删除成功",function(){ location.partReload();});
                 }else{
                     alert("删除失败,"+data.msg);
                 }

@@ -24,10 +24,17 @@ class ScenicController extends Controller {
             if(isset($param['has_bind_org'])){
                if($param['has_bind_org']==='3'){unset($param['has_bind_org']);}
             }
+
+            // 电子票务类型查询条件
+            if(isset($param['partner_type'])) {
+                // 再查询电子票务系统类型
+                $param['partner_type'] = $_GET['partner_type'];
+            }
+
             $data = Landscape::api()->lists($param, 0);
-            
+
             $lists = ApiModel::getLists($data);
-                
+
             //景区级别
             $level = array(0 => '非A景区', 1 => 'A景区', 2 => 'AA景区', 3 => 'AAA景区', 4 => 'AAAA景区', 5 => 'AAAAA景区');
 
@@ -36,7 +43,7 @@ class ScenicController extends Controller {
             $pages = new CPagination($pagination['count']);
             $pages->pageSize = 15; #每页显示的数目
             $this->render('index', compact('lists', 'pages', 'level'));
-            
+
         }
      }
 
@@ -48,7 +55,7 @@ class ScenicController extends Controller {
 
     public function actionReset() {
         $landscape_id = $_GET['landscape_id'];
-        
+
         $lanRs = Landscape::api()->detail(array('id' => $landscape_id,'take_from_poi'=>0));
         if($lanRs['code'] == 'succ'){
             $scenicInfo = $lanRs['body'];
@@ -303,7 +310,7 @@ class ScenicController extends Controller {
 
             $param['take_from_poi']=0;
             $param['biography'] = $_POST['description'];
-            
+
             $rs = Landscape::api()->update($param);
             if ($rs['code'] == 'succ') {
                 $this->_end(0, '更新成功！');
@@ -344,7 +351,7 @@ class ScenicController extends Controller {
     //编辑景区
     public function actionEdit() {
         $id = $_GET['id'];
-        
+
         $lists = Landscape::api()->detail(array('id' => $id,'take_from_poi'=>0));
         if($lists['code'] == 'succ'){
 
@@ -446,61 +453,28 @@ class ScenicController extends Controller {
                 exit;
             }
 
-            #批量更新电子票务账号及其子账号
-            $param = array(
-                'organization_id' => $post['organization_id'],
-                'landscape_id' => $post['landscape_id'],
-                'status' => 1
-            );
-
-            $update_ticket = $this->UpdateAllTicketUser($param);
-            if ($update_ticket) {
-                $update_user = $this->UpdateAllUsers($param);
-                if ($update_user) {
-                    
-                } else {
-                    $this->_end(1, '禁用账号失败，请刷新后重试！');
-                    exit;
-                }
-            } else {
-                $this->_end(1, '禁用电子票务账号失败，请刷新后重试！');
-                exit;
-            }
-
             $update_lan['organization_id'] = 0;
             $update_org['landscape_id'] = 0;
-            $orgRs = Organizations::api()->edit($update_org);
-            if ($orgRs['code'] != 'succ') {
-                $this->_end(1, $orgRs['message']);
-                exit;
+            $lanRs = Landscape::api()->update($update_lan);
+            if ($lanRs['code'] != 'succ') {
+                $this->_end(1, $lanRs['message']);
             } else {
-                $lanRs = Landscape::api()->update($update_lan);
-                if ($lanRs['code'] != 'succ') {
-                    $this->_end(1, $lanRs['message']);
-                } else {
-                    $this->_end(0, '解绑成功');
-                }
+                $this->_end(0, '解绑成功');
             }
         } else {
             $update_lan['organization_id'] = $post['organization_id'];
             $update_org['landscape_id'] = $post['landscape_id'];
 
-            $orgRs = Organizations::api()->edit($update_org);
-            if ($orgRs['code'] != 'succ') {
-                $this->_end(1, $orgRs['message']);
-                exit;
+            $lanRs = Landscape::api()->updateOrganizationId($update_lan);
+            if ($lanRs['code'] != 'succ') {
+                $this->_end(1, $lanRs['message']);
             } else {
-                $lanRs = Landscape::api()->update($update_lan);
-                if ($lanRs['code'] != 'succ') {
-                    $this->_end(1, $lanRs['message']);
+                $userRs = SupplyUser::api()->landscape(array('organization_id' => $post['organization_id'],
+                    'landscape_id' => $post['landscape_id']));
+                if ($userRs['code'] != 'succ') {
+                    $this->_end(1, $userRs['message']);
                 } else {
-                    $userRs = SupplyUser::api()->landscape(array('organization_id' => $post['organization_id'],
-                        'landscape_id' => $post['landscape_id']));
-                    if ($userRs['code'] != 'succ') {
-                        $this->_end(1, $userRs['message']);
-                    } else {
-                        $this->_end(0, '绑定成功，请点击维护进行电子票务账号的更新');
-                    }
+                    $this->_end(0, '绑定成功，请点击维护进行电子票务账号的更新');
                 }
             }
         }

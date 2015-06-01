@@ -16,7 +16,10 @@ $countAgencies = count($agencies);
 <div class="contentpanel">
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			<h4 class="panel-title">统计</h4>
+			<ul class="list-inline">
+				<li><h4 class="panel-title">统计</h4></li>
+				<li><a href="/order/history/help?#8.2" title="帮助文档" class="clearPart" target="_blank">查看帮助文档</a> </li>
+			</ul>
 		</div>
 		<div class="panel-body">
 			<form class="form-inline" id="form1" method="get" action="/stat/product/index/tab/<?= $tab ?>">

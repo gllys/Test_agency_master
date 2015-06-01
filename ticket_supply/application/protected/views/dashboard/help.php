@@ -22,7 +22,7 @@ $this->breadcrumbs = array('首页', '在线帮助');
                             <div class="form-group" style="clear:both;">
                                 <label class="col-sm-3 control-label">操作手册下载</label>
                                 <div class="col-sm-6">
-                                    <a  target="_blank" class="btn btn-primary btn-xs" style="width:100px;border-width:1px; color: #fff;"
+                                    <a  target="_blank" class="btn btn-primary btn-xs clearPart" style="width:100px;border-width:1px; color: #fff;"
                                         href="http://piaowu-manual.b0.upaiyun.com/%E7%A5%A8%E5%8F%B0%E4%BE%9B%E5%BA%94%E5%95%86%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E6%89%8B%E5%86%8C.pdf?v=1">点击下载</a>
                                 </div>
                             </div>
@@ -30,7 +30,7 @@ $this->breadcrumbs = array('首页', '在线帮助');
                             <div class="form-group" style="clear:both;">
                                 <label class="col-sm-3 control-label">在线客服帮助</label>
                                 <div class="col-sm-6">
-                                    <a target="_blank" class="btn btn-primary btn-xs" style="width:100px;border-width:1px; color: #fff;"
+                                    <a target="_blank" class="btn btn-primary btn-xs clearPart" style="width:100px;border-width:1px; color: #fff;"
                                        href="http://wpa.b.qq.com/cgi/wpa.php?ln=2&uin=4008883288#main">点击客服</a>
                                 </div>
                             </div>

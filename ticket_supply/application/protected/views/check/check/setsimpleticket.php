@@ -41,7 +41,7 @@
                     alert(data.msg);
                 } else {
                     alert('设置小票打印成功', function() {
-                        location=location ;
+                        location.partReload();
                     });
                 }
             }, 'json');

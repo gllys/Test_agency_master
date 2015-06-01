@@ -309,6 +309,7 @@ class ManagequipController extends Controller {
         $param['statue'] = 1;
         $param['scene'] = 1;
         $param['scene_id'] = $post['pid'];       
+        $param['landscape_id'] = $post['landscapeid'];       
         $data = Equipments::api()->binding($param);
         if ($data['code'] != 'succ') {
             echo json_encode(array('errors' => array('msg' => $data['message'])));

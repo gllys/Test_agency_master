@@ -18,22 +18,29 @@ Class LandorgController extends Base_Controller_Api {
 
         $landscape_id>0 && $where['landscape_id'] = $landscape_id;
         $organization_id>0 && $where['organization_id'] = $organization_id;
-        (!$organization_id && !$landscape_id) && Lang_Msg::error("ERROR_LAND_ORG_2"); //缺少参数：机构ID或景区ID
+        //(!$organization_id && !$landscape_id) && Lang_Msg::error("ERROR_LAND_ORG_2"); //缺少参数：机构ID或景区ID
 
+        $show_all = intval($this->body['show_all']);
         $LandOrgModel = new LandOrgModel();
-        $count = $LandOrgModel->countResult($where,"count(*) as count");
-        $pagination = Tools::getPagination($this->getParams(),$count);
-        $data = $count>0  ? $LandOrgModel->search($where,$this->getFields(),$order,$pagination['limit']) : array();
+        if($show_all>0) {
+            $data = $LandOrgModel->search($where,$this->getFields(),$order);
+        } else {
+            $count = $LandOrgModel->countResult($where,"count(*) as count");
+            $pagination = Tools::getPagination($this->getParams(),$count);
+            $data = $count>0  ? $LandOrgModel->search($where,$this->getFields(),$order,$pagination['limit']) : array();
+        }
 
-        $result = array(
-            'data'=>array_values($data),
-            'pagination'=>array(
+        $result = array( 'data'=>array_values($data) );
+        if($show_all>0) {
+            $result['pagination'] =array('count'=>count($data));
+        } else {
+            $result['pagination'] = array(
                 'count'=>$count,
                 'current'=>$pagination['current'],
                 'items'=>$pagination['items'],
                 'total'=>$pagination['total'],
-            )
-        );
+            );
+        }
         Lang_Msg::output($result);
     }
 

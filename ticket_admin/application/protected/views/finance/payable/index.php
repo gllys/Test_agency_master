@@ -127,7 +127,6 @@ $this->breadcrumbs = array('结算管理', '应付账款');
         ?>
     </div>
     <div id="finance-detail" class="modal fade"></div>
-    <div id="finance-upload-show" class="modal fade"></div>
 </div><!-- contentpanel -->
 <script>
 function finance_detail($id)

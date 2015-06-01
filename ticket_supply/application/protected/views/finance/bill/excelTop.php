@@ -1,6 +1,6 @@
 <?php
 use common\huilian\utils\Format;
-    $file_name = "应收账单_".Format::date(time())."_".rand(100000, 999999);
+    $file_name = "应收账款_".Format::date(time())."_".rand(100000, 999999);
      header ( "Content-type:text/xml;charset=utf-8" );
      $str = mb_convert_encoding($file_name, 'gbk', 'utf-8');   
      header('Content-Disposition: attachment;filename="' .$str . '.xml"');      
@@ -184,7 +184,7 @@ use common\huilian\utils\Format;
 
         <Row ss:Height="24">
             <Cell ss:StyleID="s10">
-                <Data ss:Type="String">订单号</Data>
+                <Data ss:Type="String">结算单号</Data>
             </Cell>
             <Cell ss:StyleID="s10">
                 <Data ss:Type="String">打款机构</Data>

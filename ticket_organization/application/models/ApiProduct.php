@@ -17,13 +17,23 @@ class ApiProductModel extends Base_Model_Api
     {
         if (!$org_id)
             return false;
-        $r = Cache_Memcache::factory()->get('subscribeCount_'.$org_id);
+
+        /*$r = Cache_Memcache::factory()->get('subscribeCount_'.$org_id);
         if(empty($r)) {
             $this->url = '/v1/subscribes/count';
             $this->params = array('organization_id' => $org_id);
             $r = json_decode($this->request(), true);
             Cache_Memcache::factory()->set('subscribeCount_'.$org_id,$r,3);
-        }
+        }*/
+
+        $this->preCacheKey = 'cache|subscribesModel|';
+
+        $this->url = '/v1/subscribes/count';
+        $this->params = array('organization_id' => $org_id);
+
+        $r = $this->customCache('subscribeCount_'.$org_id);
+        if($r==null) $this->customCache('subscribeCount_'.$org_id,json_decode($this->request(), true));
+
         if (!$r || empty($r['body']['pagination']))
             return false;
         return $r['body']['pagination']['count'];

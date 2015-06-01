@@ -34,8 +34,8 @@
         </div>
         <div class="panel-body">
             <div class="form-actions"  style="margin-bottom: 12px;">
-                <a href="javascript:;" onclick="history.go(-1);">
-                    <button class="btn btn-default clearPart"  type="button">返回</button>
+                <a href="javascript:;" class="clearPart" onclick="history.go(-1);">
+                    <button class="btn btn-default"  type="button">返回</button>
                 </a>
             </div>
             <table class="table table-normal table-1">
@@ -136,9 +136,10 @@
     function bindScenic(poi_id, poi_name)
     {
         var equipment_id = "<?php echo $equipment['id'];?>";
+        var landscape_id = "<?php echo isset($landscape['id'])?$landscape['id']:''; ?>";
        // if (window.confirm('确定安装到 '+poi_name+' 景区么？'))
         PWConfirm('确定安装到 '+poi_name+' 景区吗？', function (){
-            $.post('/scenic/managequip/saveEScenic', {eid : equipment_id, pid : poi_id}, function(data){
+            $.post('/scenic/managequip/saveEScenic', {eid : equipment_id, pid : poi_id,landscapeid : landscape_id}, function(data){
                     if(typeof data.errors != 'undefined'){
                         setTimeout(function(){
                             alert('安装设备失败!');

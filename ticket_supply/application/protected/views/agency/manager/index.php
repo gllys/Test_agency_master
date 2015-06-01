@@ -14,7 +14,12 @@ $this->breadcrumbs = array('分销商', '分销商管理');
                         <a href="" class="panel-close tooltips" data-toggle="tooltip" title="隐藏面板"><i class="fa fa-times"></i></a>
                     </div>
                     <!-- panel-btns -->
-                    <h4 class="panel-title">分销商管理</h4>
+                    <ul class="list-inline">
+                        <li><h4 class="panel-title">分销商管理</h4></li>
+                        <li><a href="/order/history/help?#7.3" title="帮助文档" class="clearPart"
+                               target="_blank">查看帮助文档</a> </li>
+                    </ul>
+
                 </div>
                 <!-- panel-heading -->
                 <form id="manage-form" method="get" action="/agency/manager/index" class="form-horizontal">
@@ -54,7 +59,7 @@ $this->breadcrumbs = array('分销商', '分销商管理');
                                         //下拉列表
                                         foreach ($_querys as $key => $val) :
                                             ?>
-                                            <li><a class="sec-btn" href="javascript:;" data-id="<?php echo $key ?>" id="" aria-labelledby="search_label"><?php echo $val; ?></a></li>
+                                            <li><a class="sec-btn clearPart" href="javascript:;" data-id="<?php echo $key ?>" id="" aria-labelledby="search_label"><?php echo $val; ?></a></li>
                                         <?php endforeach; ?>
                                     </ul>
                                     <script>
@@ -299,7 +304,7 @@ $this->breadcrumbs = array('分销商', '分销商管理');
 
         $.post('/agency/manager/setCycle',$('#settle-form').serialize(),function(data){
             if(data.error==0){
-                alert("保存成功",function(){window.location.reload();});
+                alert("保存成功",function(){window.location.partReload();});
             }else{
                 alert("保存失败,"+data.msg);
             }
@@ -317,9 +322,9 @@ $this->breadcrumbs = array('分销商', '分销商管理');
             $.post('/agency/manager/genbill',{'id':$('#agency-credit-id').val()}, function(data){
 	            data = JSON.parse(data);
                 if(data.error){
-                   alert("结算失败",function(){top.location.reload();});
+                   alert("结算失败",function(){location.partReload();});
                 }else{
-                    alert("结算成功",function(){window.location.reload();});
+                    alert("结算成功",function(){window.location.partReload();});
                 }
             });
             return false;
@@ -346,16 +351,16 @@ $this->breadcrumbs = array('分销商', '分销商管理');
             	  // alert(datamsg);
                    if(datamsg.error==0){
                        //setTimeout(alert("解除合作成功"),100);
-                       //setTimeout(window.location.reload(),110);
+                       //setTimeout(window.location.partReload(),110);
                        setTimeout(function(){
-                           alert('解除合作成功',function(){window.location.reload();});
+                           alert('解除合作成功',function(){window.location.partReload();});
                        },500)
                    }else{
                        setTimeout(function(){
-                           alert('解除合作失败',function(){window.location.reload();});
+                           alert('解除合作失败',function(){window.location.partReload();});
                        },500)
                         //setTimeout(alert("解除合作失败"),100);
-                        //setTimeout(window.location.reload(),110);
+                        //setTimeout(window.location.partReload(),110);
                    }
                    
 				}, " json ");  

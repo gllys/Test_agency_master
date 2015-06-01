@@ -902,4 +902,14 @@ class HistoryController extends Controller {
       );
       }
      */
+
+
+    /*
+* 帮助文档
+* @author xj
+*/
+    public function actionHelp(){
+        $this->renderPartial('help');
+    }
+
 }

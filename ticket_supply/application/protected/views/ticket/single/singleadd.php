@@ -1,5 +1,6 @@
 <style>
 .ui-datepicker { z-index:9999!important }
+.ui-spinner { border-left-width: 2px;}
 </style>
 <div class="modal-dialog" style="width: 1150px !important;">
     <div class="modal-content" style="padding-left: 10px;padding-right: 10px;">
@@ -74,6 +75,8 @@
                     <div class="col-sm-2">
                         <input type="text" placeholder="请输入价格" tag="散客结算价" readonly class=" form-control onlyMoney" name="fat_price" id="sk_price">
                     </div>
+
+                    <?php  if($orgInfo['partner_type'] < 1):?>
                     <label class="col-sm-1 control-label"><div class="pull-right"><span class="text-danger pull-left">*</span>是否一次验票:</div></label>
                     <div class="col-sm-2">
                         <div class="rdio rdio-default inline-block">
@@ -97,8 +100,9 @@
                         </div>
                         <i style="cursor:pointer" animation="true" class="fa fa-question-circle text-muted popovers" title=""  data-original-title="" data-container="body" data-toggle="popover"  data-trigger="hover" data-placement="top" data-html="true" data-content="一次验票：为了防止倒票，您可以开启此功能，开启后一张包含多个门票的订单第一次验票后，所有未使用的门票都会自动退款而不能被使用。
 <br/>一次取票：对于线下有实体票的联票，为了防止在A景区换实体票后再去B
-景区扫二维码入园，您可以开启此功能，开启后，在A景区验证换实体票后，其他景区不可以再扫二维码。。"></i>
+景区扫二维码入园，您可以开启此功能，开启后，在A景区验证换实体票后，其他景区不可以再扫二维码。"></i>
                     </div>
+                    <?php  endif ;?>
                 </div><!-- form-group -->
                 <div class="form-group" id="shio">
                     <label class="col-sm-2 control-label"><div class="pull-right"><span class="text-danger pull-left"></span>散客提前预定时间:</div></label>
@@ -115,9 +119,6 @@
                     </div>
                 </div>
 
-
-
-                
                 <div class="form-group">
                     <div class="col-sm-2 control-label">
                         <div class="ckbox ckbox-primary pull-right">
@@ -129,6 +130,8 @@
                     <div class="col-sm-2">
                         <input type="text" placeholder="请输入价格" readonly tag="团队结算价" class=" form-control onlyMoney" name="group_price" id="tg_price">
                     </div>
+
+                    <?php  if($orgInfo['partner_type'] < 1 ):   //只允许景旅通的用户可见?>
                     <label class="col-sm-1 control-label"><div class="pull-right"><span class="text-danger pull-left">*</span>是否一次验票:</div></label>
                     <div class="col-sm-2">
                         <div class="rdio rdio-default inline-block">
@@ -151,6 +154,8 @@
                             <label for="is_group_once_taken0">否</label>
                         </div>
                     </div>
+                    <?php  endif ;?>
+
                     <div class="col-sm-2">
                         最少订票 <input type="text" id="spinner-min" tag="最少订票" class="spinner validate[custom[number]]" style="cursor: pointer;cursor: hand;background-color: #ffffff" name="mini_buy"  onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"> 张
                     </div>
@@ -616,8 +621,7 @@
                         </script>
                     </div>
                 </div>
-                <?php $orgInfo = $this->getOrgInfo();?>
-                <?php if($orgInfo['partner_type'] == 1):?>
+                <?php if($orgInfo['partner_type'] >= 1):?>
                 <div class="form-group">
                     <label class="col-sm-2 control-label"><div class="pull-right"><span class="text-danger">*</span>对接系统产品ID:</div></label>
                     <div class="col-sm-3">
@@ -876,6 +880,15 @@
                 cont.html(data);
             }
             
+            if($('#save-template').is(":hidden") == false){
+                alert('请先保存短信模板!');
+                return false;
+            }
+            if(typeof($("#partner_type").val())!='undefined' && $('#partner_product_code').val()==''){
+                alert('请先输入对接产品ID!');
+                return false;
+            }
+            
             if (_flag) {
                 return false;
             }
@@ -887,7 +900,7 @@
                         alert(data.msg);
                         $('#form-button').attr('disabled', false);
                     } else {
-                        alert('新增产品成功',function(){window.location.reload();});
+                        alert('新增产品成功',function(){window.location.partReload();});
                     }
                 }, 'json');
             }

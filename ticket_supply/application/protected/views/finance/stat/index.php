@@ -4,7 +4,10 @@
 <div class="contentpanel">
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title">销售额与人次统计</h3>
+            <ul class="list-inline">
+                <li><h4 class="panel-title">销售额与人次统计</h4></li>
+                <li><a href="/order/history/help?#6.5" title="帮助文档" class="clearPart" target="_blank">查看帮助文档</a> </li>
+            </ul>
             <div class="panel-body">
                 <form id="query1Form" class="form-inline" method="post" >
                     <div class="form-group" style="margin-right:0">请选择分销商:</div>

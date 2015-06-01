@@ -158,12 +158,12 @@ $(".now2").click(function(){
                                     endforeach;
                                     ?></td>
                                 <td> 
-                                    <a href="/ticket/goods/view/?gid=<?php echo $item['gid'] ?>" onclick="modal_jump(this);"  data-target=".modal-bank" data-toggle="modal">查看</a>
+                                    <a  class="clearPart" href="/ticket/goods/view/?gid=<?php echo $item['gid'] ?>" onclick="modal_jump(this);"  data-target=".modal-bank" data-toggle="modal">查看</a>
                                     <?php
                                     if (in_array($item['scenic_id'], $lanIds)):
                                         ?>
-                                        <a style="margin-left: 10px;" href="/ticket/goods/edit/?gid=<?php echo $item['gid'] ?>" onclick="modal_jump(this);"  data-target=".modal-bank" data-toggle="modal">修改</a>
-                                        <a style="margin-left: 10px;" href="/ticket/goods/del/" onclick="del(this, '<?php echo $item['gid'] ?>');
+                                        <a  class="clearPart"  style="margin-left: 10px;" href="/ticket/goods/edit/?gid=<?php echo $item['gid'] ?>" onclick="modal_jump(this);"  data-target=".modal-bank" data-toggle="modal">修改</a>
+                                        <a  class="clearPart"  style="margin-left: 10px;" href="/ticket/goods/del/" onclick="del(this, '<?php echo $item['gid'] ?>');
                                                                 return false;" class="del">删除</a>
                                         <?php
                                     endif;
@@ -248,7 +248,7 @@ $(".now2").click(function(){
                 },500)
             } else {
             	setTimeout(function(){
-            		alert('删除门票成功',function(){window.location.reload();});
+            		alert('删除门票成功',function(){window.location.partReload();});
             	},500)
             }
         }, 'json');

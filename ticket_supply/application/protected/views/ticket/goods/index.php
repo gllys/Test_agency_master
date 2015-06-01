@@ -47,9 +47,11 @@ $this->breadcrumbs = array('产品', '基础票管理');
 <div class="contentpanel">
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h4 class="panel-title"> 
-                门票管理
-            </h4>
+           <ul class="list-inline">
+                <li><h4 class="panel-title">门票管理</h4></li>
+                <li><a href="/order/history/help?#4.1" title="帮助文档" class="clearPart" target="_blank">查看帮助文档</a> </li>
+            </ul>
+
         </div>
 
         <div class="panel-body">
@@ -151,15 +153,15 @@ $this->breadcrumbs = array('产品', '基础票管理');
                                     endforeach;
                                     ?></td>
                                 <td> 
-                                    <a title="查看" href="/ticket/goods/view/?gid=<?php echo $item['gid'] ?>" onclick="modal_jump(this);"  data-target=".modal-bank" data-toggle="modal">查看</a>
+                                    <a title="查看" class="clearPart" href="/ticket/goods/view/?gid=<?php echo $item['gid'] ?>" onclick="modal_jump(this);"  data-target=".modal-bank" data-toggle="modal">查看</a>
                                     <?php
                                     if (in_array($item['scenic_id'], $lanIds)):
                                         ?>
-                                        <a title="修改" style="margin-left: 10px;" href="/ticket/goods/edit/?gid=<?php echo $item['gid'] ?>" onclick="modal_jump(this);"  data-target=".modal-bank" data-toggle="modal">
+                                        <a  class='clearPart' title="修改" style="margin-left: 10px;" href="/ticket/goods/edit/?gid=<?php echo $item['gid'] ?>" onclick="modal_jump(this);"  data-target=".modal-bank" data-toggle="modal">
                                             修改
                                         </a>
                                         <a title="删除" style="margin-left: 10px;" href="/ticket/goods/del/" onclick="del(this,<?php echo $item['gid'] ?>);
-                                                return false;" class="del">
+                                                return false;" class="del  clearPart">
                                             删除
                                         </a>
                                         <?php
@@ -244,7 +246,7 @@ $this->breadcrumbs = array('产品', '基础票管理');
                     $('#form-button').attr('disabled', false);
                 } else {
                     alert('删除门票成功', function() {
-                        window.location.reload();
+                        window.location.partReload();
                     });
                 }
             }, 'json');

@@ -45,5 +45,7 @@ $('#file-upload-button').click(function() {
 
 
     return false; 
+}).mousedown(function(event){
+            return false;
 });
 </script>

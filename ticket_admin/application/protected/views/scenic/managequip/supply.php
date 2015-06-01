@@ -159,7 +159,9 @@
         PWConfirm('确定绑定 '+name+' 供应商吗？', function () {
             $.post('/scenic/managequip/saveESupply', {eid : equipment_id, sid : id}, function(data){
                     if(typeof data.errors != 'undefined'){
-                        alert('绑定设备失败!'+data.errors.msg);
+                        window.setTimeout(function(){
+                            alert('绑定设备失败!'+data.errors.msg);
+                        },200);
                     }else{
                         alert("绑定成功");
                         setTimeout('window.location.reload()',2000);

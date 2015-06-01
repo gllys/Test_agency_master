@@ -28,7 +28,7 @@
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label"><span class="text-danger">*</span> 机构名称</label>
                                     <div class="col-sm-6">
-                                        <input type="text" placeholder=""  tag="机构名称" class="form-control validate[required,custom[chinese],custom[NoSp],minSize[1],maxSize[20]]" value="<?php echo $organizations['name'] ?>" name="name"  />
+                                        <input type="text" placeholder=""  tag="机构名称" class="form-control validate[required,custom[chiMark],custom[NoSp],minSize[1],maxSize[20]]" value="<?php echo $organizations['name'] ?>" name="name"  />
                                     </div>
                                 </div>
 

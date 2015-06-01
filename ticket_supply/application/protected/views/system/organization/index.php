@@ -8,7 +8,11 @@
                         <a href="" class="panel-close tooltips" data-toggle="tooltip" title="隐藏面板"><i class="fa fa-times"></i></a>
                     </div>
                     <!-- panel-btns -->
-                    <h4 class="panel-title">用户信息</h4>
+                    <ul class="list-inline">
+                        <li><h4 class="panel-title">用户信息</h4></li>
+                        <li><a href="/order/history/help?#9.1" title="帮助文档" class="clearPart"
+                               target="_blank">查看帮助文档</a> </li>
+                    </ul>
                 </div>
                 <!-- panel-heading -->
                 <div id="show_msg"></div>
@@ -280,7 +284,7 @@
                 } else if (data.succ) {
                     var succss_msg = '<div class="alert alert-success"><strong>'+ data.succ +'</strong></div>';
                     $('#show_msg').html(succss_msg);
-                    window.location.reload();
+                    window.location.partReload();
                 }
             }, "json");
         }else if(license.length <= 0){

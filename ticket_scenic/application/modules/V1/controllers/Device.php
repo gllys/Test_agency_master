@@ -180,6 +180,7 @@ class DeviceController extends Base_Controller_Api
                     $where['poi_id|>'] = 0;
                 }
             }
+            if(isset($this->body['type'])) $where['type'] = intval($this->body['type']);
             $where['deleted_at'] = 0;
             if ($page > 0) $limit = array(($page - 1) * $page_limit, $page_limit);
             $count = DeviceModel::model()->countResult($where);
@@ -351,9 +352,10 @@ class DeviceController extends Base_Controller_Api
      	$type = in_array($this->body[ 'type'], array( 0,1,2 ) ) ? $this->body[ 'type' ] : 0;
      	$statue = $this->body[ 'statue' ]==1? 1 : 0;
      	$scene_id = $this->body[ 'scene_id'];
+         $landscape_id = intval($this->body['landscape_id']);
      	if( is_null($scene_id) ) Lang_Msg::error( '景点ID不正确！');
         if ($id<=0) Lang_Msg::error( 'ERROR_DEL_2');
-     	$row = DeviceModel::model()->getById( $id );
+     	$row = reset(DeviceModel::model()->search(array('id'=>$id)));
      	if( !$row ) Lang_Msg::error( '设备ID不正确！');
 		
 		$scene_id = intval($scene_id);
@@ -378,10 +380,11 @@ class DeviceController extends Base_Controller_Api
             } else {
                 if( $type == 0 )
                 {
-                    $args[ 'landscape_id' ] = $scene_id;
+                    $args[ 'landscape_id' ] = $landscape_id>0?$landscape_id:$scene_id;
                 }
                 else if( $type ==1 )
                 {
+                    $args[ 'landscape_id' ] = $landscape_id;
                     $args[ 'poi_id' ] = $scene_id;
                 }
                 else if( $type == 2 )
@@ -412,6 +415,46 @@ class DeviceController extends Base_Controller_Api
 			Lang_Msg::error( 'ERROR_SB_7' );
 		}
      }
+
+    /**
+     * 绑定景区设备子景点
+     * author : yinjian
+     */
+    public function bindNewAction()
+    {
+        !Validate::isUnsignedId($this->body['id']) && Lang_Msg::error('设备id不能为空');
+        $id = intval($this->body['id']);
+        $equipment = reset(EquipmentModel::model()->search(array('id'=>$id,'deleted_at'=>0)));
+        !$equipment && Lang_Msg::error('设备ID不正确！');
+        $args = array();
+        $args['updated_at'] = time();
+
+        if(isset($this->body['status']) && in_array($this->body['status'],array(0,1))){
+            $args['status'] = intval($this->body['status']);
+        }
+        if(isset($this->body[' fell_status']) && in_array($this->body[' fell_status'],array(0,1))){
+            $args[' fell_status'] = intval($this->body[' fell_status']);
+        }
+        if(isset($this->body['scene']) && in_array($this->body['scene'],array(1,2))){
+            $args['scene'] = intval($this->body['scene']);
+        }
+        if(isset($this->body['organization_id'])){
+            $args['organization_id'] = intval($this->body['organization_id']);
+        }
+        if(isset($this->body['landscape_id'])){
+            $args['landscape_id'] = intval($this->body['landscape_id']);
+        }
+        if(isset($this->body['poi_id'])){
+            $args['poi_id'] = intval($this->body['poi_id']);
+        }
+
+        $re = DeviceModel::model()->updateByAttr($args,array('id'=>$id));
+        if( $re ) {
+            Lang_Msg::output( 'ok' );
+        } else {
+            Lang_Msg::error( 'ERROR_SB_7' );
+        }
+    }
 
     //落杆
     public function fellAction(){

@@ -288,4 +288,16 @@ class PublicFunHelper {
         }
         return $_model;
     }
+    
+     //禁止缓存
+    public static function forbidCache() {
+        //告诉浏览器此页面的过期时间 
+        header("Expires: Mon, 26 Jul 1970 05:00:00  GMT");
+//告诉浏览器此页面的最后更新日期(用格林威治时间表示)也就是当天,目的就是强迫浏览器获取最新资料  
+        header("Last-Modified:" . gmdate("D, d M Y  H:i:s") . "GMT");
+//告诉客户端浏览器不使用缓存  
+        header("Cache-Control:no-cache, must-revalidate");
+//参数（与以前的服务器兼容）,即兼容HTTP1.0协议  
+        header("Pragma:no-cache");
+    }
 }

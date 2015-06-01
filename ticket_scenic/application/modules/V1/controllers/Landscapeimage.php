@@ -10,11 +10,11 @@
 Class LandscapeImageController extends Base_Controller_Api {
 
     public function listsAction(){
-        $landscape_id = intval($this->getParam('landscape_id'));
+        $landscape_id = trim($this->getParam('landscape_id'));
         !$landscape_id && Lang_Msg::error("ERROR_LANDIMG_1");
         $order = $this->getSortRule();
 
-        $where['landscape_id'] = $landscape_id;
+        $where['landscape_id'] = explode(',',$landscape_id) ;
         $imgs = LandscapeImageModel::model()->search($where,"*",$order);
         Lang_Msg::output(array('data'=>array_values($imgs)));
     }

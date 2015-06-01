@@ -47,7 +47,7 @@ $this->breadcrumbs = array('景区管理', '图文全景');
                                     <div style="text-indent:2em; margin-top:10px;" id="td_biography"><?php echo nl2br($data['biography']); ?></div>
                                     <?php if(isset($data['yes']) && $data['yes'] == 1):?>
                                     <div style="float:right;padding-right:20px;">
-                                        <a href="#" style="color:#06C; margin-left:10px;" class="wirte">编辑</a>
+                                        <a href="javascript:void(0)" style="color:#06C; margin-left:10px;" class="wirte">编辑</a>
                                     </div>
                                     <?php endif;?>
 								</td>
@@ -88,7 +88,7 @@ $this->breadcrumbs = array('景区管理', '图文全景');
                                          <textarea  rows="5" id="biography"  class="form-control" style="text-indent: 2em;" data-prompt-position="topLeft"><?php echo nl2br($data['biography']); ?></textarea>
                                         <input  id="landid" type="hidden" value="<?php echo $_GET['id'] ?>"  name="landscape_id">
 									</div>
-									<div style="float:right;padding-right:20px;"><a href="#" style="color:#06C; margin-left:10px;" class="save">保存</a></div>
+									<div style="float:right;padding-right:20px;"><a href="javascript:void(0)" style="color:#06C; margin-left:10px;" class="save">保存</a></div>
 								</td>
 
 							</tr>

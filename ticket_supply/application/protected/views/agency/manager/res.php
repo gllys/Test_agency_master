@@ -78,7 +78,7 @@ $this->breadcrumbs = array('分销商', '查找分销商');
             	if(data.error==0){
             		$('#selected-distributor tbody').append('<tr><td>' + name + '</td><td>'+ city_name +'</td><td><p>已添加</p></td></tr>')            		
             	}else{
-            		$('#selected-distributor tbody').append('<tr><td>' + name + '</td><td>'+ city_name +'</td><td><a href="javascript:;" data-id="'+id+'"  class="addcredit btn btn-primary btn-xs" >添加</a></td></tr>');
+            		$('#selected-distributor tbody').append('<tr><td>' + name + '</td><td>'+ city_name +'</td><td><a href="javascript:;" data-id="'+id+'"  class="addcredit btn btn-primary btn-xs clearPart" >添加</a></td></tr>');
             		    $('.addcredit').click(function(){
         					add($(this).attr('data-id'));	
         			});
@@ -161,9 +161,9 @@ $this->breadcrumbs = array('分销商', '查找分销商');
         function add(id){
         	$.post('/agency/manager/addcredit',{'id':id},function(data){
         		if(data.error==0){
-                    alert("添加成功",function(){setTimeout("location.href='/agency/manager/history'", '1000');});
+                    alert("添加成功",function(){setTimeout("location.href= '/#'+'/agency/manager/history'", '1000');});
                 }else{
-                    alert("添加失败,"+data.msg,function(){location.reload();});
+                    alert("添加失败,"+data.msg,function(){location.partReload();});
                 }
         	},'json')
         }

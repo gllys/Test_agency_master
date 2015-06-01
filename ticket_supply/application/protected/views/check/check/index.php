@@ -14,16 +14,19 @@ $this->breadcrumbs = array(
                 <a title="" data-toggle="tooltip" class="panel-minimize tooltips" href="" data-original-title=""><i class="fa fa-minus"></i></a> <a title="" data-toggle="tooltip" class="panel-close tooltips" href="" data-original-title=""><i class="fa fa-times"></i></a>
             </div>
             <!-- panel-btns -->
-            <h4 class="panel-title">验票记录</h4>
+            <ul class="list-inline">
+                <li><h4 class="panel-title">验票记录</h4></li>
+                <li><a href="/order/history/help?#5.3" title="帮助文档" class="clearPart" target="_blank">查看帮助文档</a> </li>
+            </ul>
             <div class="inline-block" style="float:right; margin-top: -25px;">
-                <a class="btn btn-primary btn-xs" onclick="setPrinter();
+                <a class="btn btn-primary btn-xs clearPart" onclick="setPrinter();
                         return false;">
                     <i class="fa fa-print"></i>
                     打印设置
                 </a>
             </div>
             <div class="inline-block" style="float:right; margin-top: -25px; margin-right: 10px;">
-                <a class="btn btn-primary btn-xs"  href="/check/check/setsimpleticket/" onclick="modal_jump(this);"  data-target=".modal-bank" data-toggle="modal">
+                <a class="btn btn-primary btn-xs clearPart"  href="/check/check/setsimpleticket/" onclick="modal_jump(this);"  data-target=".modal-bank" data-toggle="modal">
                    小票设置
                 </a>
             </div>
@@ -33,9 +36,7 @@ $this->breadcrumbs = array(
                 <div class="mb10">
                     <div class="form-group" style="margin: 0">
                         <input style="cursor: pointer; cursor: hand; background-color: #ffffff" class="form-control datepicker" name="begin_date" value="<?php if (isset($_GET['begin_date'])) echo $_GET['begin_date'] ?>" placeholder="开始日期" type="text" readonly="readonly">
-                    </div>
-                    <!-- form-group -->
-                    <div class="form-group" style="margin: 0">
+                    ~
                         <input style="cursor: pointer; cursor: hand; background-color: #ffffff" class="form-control datepicker" name="end_date" value="<?php if (isset($_GET['end_date'])) echo $_GET['end_date'] ?>" placeholder="结束日期" type="text" readonly="readonly">
                     </div>
                     <!-- form-group -->
@@ -141,10 +142,7 @@ foreach ($lists as $item) :
                         ?>
                     </td>
                     <td style="width:10%"><span class="text <?php echo $item['status'] ? 'text-success' : 'text-danger' ?>"><?php echo $item['status'] ? '成功' : '失败' ?></span></td>
-                    <td style="width:10%"><?php
-                    echo $item['user_name'];
-                        ?>
-                    </td>
+                    <td style="width:10%"><?= $item['cancel_name'] ? '汇联运营客服' : $item['user_name'] ?></td>
                     <td style="width:7%;"><?php
                         if (isset($item['equipment_code']) && !empty($item['equipment_code'])) {
                             echo $item['device_type'] == 1 ? '闸机' : '手持机';
@@ -172,7 +170,8 @@ foreach ($lists as $item) :
                         } else {
                             if ($item['local_source'] <= 1&&$item['status'] == 1 && (time() - $item['created_at'] < 300)) { // 五分钟内票可以撤销
                                 ?>
-                                <a href="#" onclick="cancel('<?php echo $item['id'] ?>')" class="btn btn-primary btn-xs" id="dell">撤销</a>
+                                <a href="javascript:void(0)" onclick="cancel('<?php echo $item['id'] ?>')" class="btn
+                                 btn-primary btn-xs clearPart" id="dell">撤销</a>
                                 <?php
                             }
                         }
@@ -226,7 +225,7 @@ window.cancel = function(id) {
             if (data.error) {
                 alert(data.msg);
             } else {
-                window.location.reload();
+                window.location.partReload();
             }
         }, "json");
     });
@@ -342,7 +341,9 @@ jQuery(document).ready(function() {
 
 </script>
 
-
+<script type="text/javascript" src="/js/jquery.cookies.js"></script>
+<script language="javascript" src="/js/lodop/LodopFuncs.js?v=1"></script>
+<object classid="clsid:2105C259-1E0C-4534-8141-A753534CB4CA" codebase="/js/lodop/lodop.cab#version=6,1,8,7" width=0 height=0></object>
 <script language="javascript" src="<?php echo Yii::app()->versionUrl->changeUrl('/js/lodop/lodopPrint.js') ?>"></script>
 <script>
 //小票打印    

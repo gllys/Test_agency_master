@@ -24,7 +24,10 @@ $this->breadcrumbs = array('结算管理', '交易流水');
                    data-original-title=""><i class="fa fa-times"></i></a>
             </div>
             <!-- panel-btns -->
-            <h4 class="panel-title">流水账号</h4>
+            <ul class="list-inline">
+                <li><h4 class="panel-title">流水账号</h4></li>
+                <li><a href="/order/history/help?#6.4" title="帮助文档" class="clearPart" target="_blank">查看帮助文档</a> </li>
+            </ul>
         </div>
         
         <div class="panel-body">
@@ -184,7 +187,6 @@ unset($type, $label)
         }
         ?>
     </div>
-</div>
 <!-- tab-pane -->
 
 <div id="t2" class="tab-pane">
@@ -192,10 +194,6 @@ unset($type, $label)
 
 </div>
 <!-- tab-pane -->
-
-</div>
-
-
 </div><!-- contentpanel -->
 <script>
     jQuery(document).ready(function() {
@@ -213,7 +211,9 @@ unset($type, $label)
                 return false;
             }
             $('.is_export').attr('value', '1');
+            $('form').addClass('clearPart');
             $('form').submit();
+			$('form').removeClass('clearPart');
             $('.is_export').attr('value', '0');
         });
 
@@ -319,11 +319,11 @@ unset($type, $label)
         });
 
 //        $('#mode_link').change(function() {
-//            location.href = '/finance/blotter/view/mode/' + $(this).val();
+//            location.href = '/#'+ '/finance/blotter/view/mode/' + $(this).val();
 //        });
 //
 //        $('#type_link').change(function() {
-//            location.href = '/finance/blotter/view/type/' + $(this).val();
+//            location.href = '/#'+ '/finance/blotter/view/type/' + $(this).val();
 //        });
     });
 </script>

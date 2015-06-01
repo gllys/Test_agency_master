@@ -38,6 +38,29 @@ class ScenicModel extends Base_Model_Api
         return $this->getCache($key, 10);
     }
 
+    //按景区ID获取图片列表
+    public function imagesByIds($landscape_ids)
+    {
+        if (empty($landscape_ids)) {
+            return false;
+        }
+        $this->params = array('landscape_id' => implode(',', $landscape_ids));
+        $this->url = '/v1/LandscapeImage/lists';
+        $key = 'ScenicImagesByIds_' . md5(json_encode($landscape_ids));
+        $r = $this->getCache($key, 10);
+        if (!empty($r['body']['data'])) {
+            $images = $r['body']['data'];
+            $arrByIds = array();
+            foreach ($images as $v) {
+                $arrByIds[$v['landscape_id']][] = $v['url'];
+            }
+
+            return $arrByIds;
+        } else {
+            return array();
+        }
+    }
+
     private function getCache($key, $expire = 10)
     {
         $data = Cache_Memcache::factory()->get($key);
@@ -49,4 +72,5 @@ class ScenicModel extends Base_Model_Api
         }
         return $data;
     }
+
 }

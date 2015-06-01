@@ -9,7 +9,11 @@
                         <a href="" class="panel-close tooltips" data-toggle="tooltip" title="隐藏面板"><i class="fa fa-times"></i></a>
                     </div>
                     <!-- panel-btns -->
-                    <h4 class="panel-title">密码修改</h4>
+                    <ul class="list-inline">
+                        <li><h4 class="panel-title">密码修改</h4></li>
+                        <li><a href="/order/history/help?#9.4" title="帮助文档" class="clearPart"
+                               target="_blank">查看帮助文档</a> </li>
+                    </ul>
                 </div>
                 <!-- panel-heading -->
                 <div id="show_msg"></div>
@@ -105,7 +109,7 @@
                         type_msg = '密码修改成功';
                         var succss_msg = '<div class="alert alert-success"><button data-dismiss="alert" class="close" type="button">×</button>' + type_msg + '! </div>';
                         $('#show_msg').html(succss_msg);
-                        setTimeout("location.href='/system/account/'", '2000');
+                        setTimeout("location.href= '/#'+'/system/account/'", '2000');
 
                     }
                 }, 'json');

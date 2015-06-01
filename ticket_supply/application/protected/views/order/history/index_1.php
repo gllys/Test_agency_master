@@ -40,7 +40,7 @@ $this->breadcrumbs = array('订单管理', '近期订单');
 						</select>
 						<script>
 							$('#status_link').change(function() {
-								location.href = '/order/history/view/status/'+$(this).val();
+								location.href = '/#'+ '/order/history/view/status/'+$(this).val();
 							});
 						</script>
 					</div>

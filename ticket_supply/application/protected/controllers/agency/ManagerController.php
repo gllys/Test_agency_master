@@ -43,19 +43,15 @@ class ManagerController extends Controller {
         }
 
         //print_r($rs);exit;
-        if ($rs['code'] == 'succ') {
-            $data['lists'] = empty($rs['body']) ? array() : $rs['body']['data'];
-            $data['list_ids']  = $list_ids;
-            $pagination = ApiModel::getPagination($rs);
-            $pages = new CPagination($pagination['count']);
-            $pages->pageSize = 15; #每页显示的数目
-            $data['pages'] = $pages;
-            $rs = Organizations::api()->show(array('id' => Yii::app()->user->org_id), 0);
-            $data['orgInfo'] = ApiModel::getData($rs);
-            $this->render('index', $data);
-        } else {
-            throw new CHttpException(500, $rs['message']);
-        }
+        $data['lists'] = empty($rs['body']) ? array() : $rs['body']['data'];
+        $data['list_ids'] = $list_ids;
+        $pagination = ApiModel::getPagination($rs);
+        $pages = new CPagination($pagination['count']);
+        $pages->pageSize = 15; #每页显示的数目
+        $data['pages'] = $pages;
+        $rs = Organizations::api()->show(array('id' => Yii::app()->user->org_id), 0);
+        $data['orgInfo'] = ApiModel::getData($rs);
+        $this->render('index', $data);
     }
 
     public function actionIndex2() {

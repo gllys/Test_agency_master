@@ -140,4 +140,56 @@ class DetailController extends Controller {
 //        return $message;
     }
 
+
+/*
+ * 订单详情的重发短信
+ * xujuan
+ */
+    public function actionAgainSms() {
+        if(Yii::app()->request->isPostRequest) {
+            //先判断手机号码是否正确
+            if(preg_match("/^1[34578]\d{9}$/", $_POST['mobile'])){
+               if(strlen($_POST['mobile']) != 11){
+                   echo json_encode(array(
+                       'errors' => '手机号码不对！！！'
+                   ));
+                   exit();
+               }
+            }else{
+                echo json_encode(array(
+                    'errors' => '手机号码不对！！！'
+                ));
+                exit();
+            }
+
+            $rs = Order::api()->lists(array(
+                'items' => 1,
+                'ids' => $_POST['id'],
+                'fields' => 'id,name,nums,used_nums,use_day,refunding_nums,refunded_nums,distributor_id,distributor_name,owner_mobile,owner_name,send_sms_nums,landscape_ids,supplier_id'
+            ), 0);
+
+            if($rs['code'] == 'succ') {
+                $orderInfo = $rs['body']['data'][0];
+                $orderInfo['nums'] = $orderInfo['nums'] - $orderInfo['used_nums'] - $orderInfo['refunding_nums'] - $orderInfo['refunded_nums'];
+                $sms = new SMS();
+                $orderInfo['host'] = Yii::app()->getRequest()->getHostInfo();
+                $content = $sms->_getCreateOrderContent($orderInfo);
+                // 判断合作类型，如果不是默认的0，就不发短信，由后台api发送短信
+                $result = null;
+                if((!isset($orderInfo['partner_type'])) && empty($orderInfo['partner_type'])) {
+                    $result = $sms->sendSMS($_POST['mobile'], $content,1,$orderInfo['id']);
+                }
+                if($result) {
+                    echo json_encode(array(
+                        'errors' => '短信发送成功！！！'
+                    ));
+                    exit();
+                }
+            }
+            echo json_encode(array(
+                'errors' => '短信发送失败！'
+            ));
+        }
+    }
+
 }

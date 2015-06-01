@@ -245,6 +245,7 @@ class CreateUrl {
             array('params' => array('class'=>'part','href' => '/agency/sms/'), 'content' => '短信日志'),
             array('params' => array('class'=>'part','href' => '/agency/product/'), 'content' => '供应商产品'),
             array('params' => array('class'=>'part','href' => '/supply/sales/'), 'content' => '供应商销量'),
+        	array('params' => array('class'=>'part','href' => '/agency/verification/'), 'content' => '验票记录'),
         ),
         array(
             array('params' => array('class'=>'part','href' => '/ticket/ticket/'), 'content' => '景区门票'),
@@ -269,6 +270,7 @@ class CreateUrl {
         ),
         array(
             array('params' => array('class'=>'part','href' => '/channel/account/'), 'content' => '渠道对接'),
+        	array('params' => array('class'=>'part','href' => '/channel/config/'), 'content' => '属性配置'),
         ),
         array(
             array('params' => array('class'=>'part','href' => '/system/staff/'), 'content' => '员工管理'),

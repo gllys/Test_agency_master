@@ -10,7 +10,7 @@ class AgencyProductModel extends Base_Model_Abstract {
     protected $dbname = 'itourism';
     protected $tblname = 'agency_product';
     protected $pkKey = 'id';
-    protected $preCacheKey = '';
+    protected $preCacheKey = 'cache|AgencyProductModel|';
 
     public function getTable() {
         return $this->tblname;

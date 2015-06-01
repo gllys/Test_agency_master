@@ -42,16 +42,21 @@ class Sms
         }
         if($order_id!='') {
             $order = OrderModel::model()->getById($order_id);
-            if(!empty($order) && $order['partner_type']>0 && $order['partner_product_code']!='') { //判断是否合作伙伴大漠产品
-                if($order['partner_order_id']!='' && $order['message_open']==1) { //已有大漠订单号，则短信中系统订单号替换为大漠订单号
-                    $data['content'] = str_replace($order_id, $order['partner_order_id'], $data['content']);
-                    if(!empty($cnt)) {
-                        $expire_end = $order['expire_end'] > 0 ? $order['expire_end'] : strtotime($order['use_day'] . " 23:59:59");
-                        $expire = $expire_end + 86400 * 62 - time();
-                        OrderModel::model()->redis->set('SmsModel|OrderSmsTpl|' . $order_id, $data['content'], $expire);
+            if(!empty($order)) {
+                if($order['partner_type']>0 && $order['partner_product_code']!='') { //判断是否合作伙伴大漠产品
+                    if($order['partner_order_id']!='' && $order['message_open']==1) { //已有大漠订单号，则短信中系统订单号替换为大漠订单号
+                        $data['content'] = str_replace($order_id, $order['partner_order_id'], $data['content']);
+                        if(!empty($cnt)) {
+                            $expire_end = $order['expire_end'] > 0 ? $order['expire_end'] : strtotime($order['use_day'] . " 23:59:59");
+                            $expire = $expire_end + 86400 * 62 - time();
+                            OrderModel::model()->redis->set('SmsModel|OrderSmsTpl|' . $order_id, $data['content'], $expire);
+                        }
+                    } else { //否则不发短信
+                        return true;
                     }
-                } else { //否则不发短信
-                    return true;
+                }
+                if($order['message_open']==0) {
+                    return false;
                 }
             }
         }

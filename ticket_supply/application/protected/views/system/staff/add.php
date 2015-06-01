@@ -128,12 +128,12 @@
                     if (data.error) {
                         var warn_msg = '<div class="alert alert-danger"><button data-dismiss="alert" class="close" type="button">×</button><i class="icon-warning-sign"></i>'+data.msg+'</div>';
                         $('#show_msg').html(warn_msg);
-                        location.href='#show_msg';
+                        location.href= '/#'+'#show_msg';
                         $('#buttomsub').removeAttr('disabled');
                     } else {
                         var succss_msg = '<div class="alert alert-success"><strong>添加成功！</strong></div>';
                         $('#show_msg').html(succss_msg);
-                        location.href='/system/staff/';
+                        location.href= '/#'+'/system/staff/';
                     }
                 }, 'json');
             } else {

@@ -26,7 +26,7 @@ class OtaController extends Base_Controller_Api
 
         $AgencyProduct = AgencyProductModel::model();
         $sql = 'select A.*,T.name,T.fat_price,T.group_price,T.sale_price,T.listed_price,T.rule_id,T.valid,T.max_buy,T.mini_buy,T.scenic_id,' .
-            'T.view_point,T.state,T.scheduled_time,T.week_time,T.refund,T.is_del,T.remark,T.organization_id,T.type,T.date_available,T.policy_id,T.valid_flag,T.sms_template' .
+            'T.view_point,T.state,T.fat_scheduled_time scheduled_time,T.week_time,T.refund,T.is_del,T.remark,T.organization_id,T.type,T.date_available,T.policy_id,T.valid_flag,T.sms_template' .
             ' from ' . $AgencyProduct->getTable() . ' A join ' . TicketTemplateModel::model()->getTable() . ' T on A.product_id=T.id' .
             ' where ' . $where . ' order by A.' . $this->getSortRule('update_at');
 
@@ -59,7 +59,7 @@ class OtaController extends Base_Controller_Api
         $AgencyProduct = AgencyProductModel::model();
         $where = ($product_id > 0 && $agency_id > 0) ? " A.product_id=" . $product_id . " AND A.agency_id=" . $agency_id : "A.code='" . $id . "'";
         $sql = "select A.*,T.name,T.fat_price,T.group_price,T.sale_price,T.listed_price,T.rule_id,T.valid,T.max_buy,T.mini_buy,T.scenic_id," .
-            "T.view_point,T.state,T.scheduled_time,T.week_time,T.refund,T.is_del,T.remark,T.organization_id,T.type,T.date_available,T.policy_id,T.valid_flag,T.sms_template" .
+            "T.view_point,T.state,T.fat_scheduled_time scheduled_time,T.week_time,T.refund,T.is_del,T.remark,T.organization_id,T.type,T.date_available,T.policy_id,T.valid_flag,T.sms_template" .
             " from " . $AgencyProduct->getTable() . " A join " . TicketTemplateModel::model()->getTable() . " T on A.product_id=T.id" .
             " where " . $where . " AND T.is_del=0";
 
@@ -112,8 +112,12 @@ class OtaController extends Base_Controller_Api
                 $scenicList = ScenicModel::model()->getScenicList(array('ids' => implode(',', array_keys($scenicIds2Products)), 'items' => count($scenicIds2Products)));
                 if (!empty($scenicList) && !empty($scenicList['body']['data'])) {
                     $scenicList = $scenicList['body']['data'];
+
+                    $scenicIds = array_keys($scenicList);
+                    $images = ScenicModel::model()->imagesByIds($scenicIds);
                     foreach ($scenicList as $sck => $scV) {
                         $scenicList[$sck]['product_ids'] = $scenicIds2Products[$scV['id']];
+                        $scenicList[$sck]['images'] = empty($images[$scV['id']]) ? array() : $images[$scV['id']];
                         unset(
                             $scenicList[$sck]['thumbnail_id'],
                             $scenicList[$sck]['organization_id'],
@@ -180,7 +184,7 @@ class OtaController extends Base_Controller_Api
         $product_ids = array_unique($product_ids);
         $detail['product_ids'] = empty($products) ? array() : array_keys($products);
 
-        $pois = ScenicModel::model()->getPoiList(array('ids' => implode(',',$product_ids), 'show_all' => 1, 'show_deleted' => 1, 'fields' => 'name'));
+        $pois = ScenicModel::model()->getPoiList(array('ids' => implode(',', $product_ids), 'show_all' => 1, 'show_deleted' => 1, 'fields' => 'name'));
         $detail['scenic_poi_list'] = (empty($pois) || empty($pois['body']['data'])) ? array() : $pois['body']['data'];
         Tools::lsJson(true, '', $detail);
     }

@@ -2,7 +2,6 @@
 use common\huilian\utils\Format;
 
 ?>
-<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 <?php $this->breadcrumbs = array('产品', '产品列表'); ?>
 <style>
 .rules {
@@ -64,64 +63,61 @@ use common\huilian\utils\Format;
 			<form class="form-inline" method="get" action="/agency/product/">
 				<div class="form-group">
 					<select name="state" class="select2" data-placeholder="Choose One" style="width: 130px; padding-left:6px;height: 32px;">
-						<option value="0" <?= isset($_GET['state']) && ($_GET['state'] == 0) ? ' selected' : '' ?>>产品状态</option>
+						<option value="" <?= isset($_GET['state']) && ($_GET['state'] == "") ? ' selected' : '' ?>>产品状态</option>
 						<option value="1" <?= isset($_GET['state']) && ($_GET['state'] == 1) ? ' selected' : '' ?>>已上架</option>
 						<option value="2" <?= isset($_GET['state']) && ($_GET['state'] == 2) ? ' selected' : '' ?>>未上架</option>
 						<option value="3" <?= isset($_GET['state']) && ($_GET['state'] == 3) ? ' selected' : '' ?>>强制下架</option>
 					</select>
 				</div>
-				<div class="form-group">
-					<div class="input-group input-group-sm">
-						<div class="input-group-btn">
-							<button id="search_label" type="button" class="btn btn-default" tabindex="-1">
+				 <!--景区查询开始-->
+                <div class="form-group">
+                    <div class="input-group input-group-sm" style=" position: relative; top: -2px;">
+                        <div class="input-group-btn">
+                            <button id="search_label" type="button" class="btn btn-default" tabindex="-1">
                                 <?php
-								if(isset($_GET['scenic_id']))
-									echo '景区';
-								elseif(isset($_GET['organization_name']))
-									echo '供应商';
-								elseif(isset($_GET['name']))
-									echo '产品名称';
-								else echo '景区';
-								?>
+								$get = $_GET;
+                                //左边显示的名称
+                                $_querys = array('scenic_name' => '景区', 'organization_name' => '供应商', 'name' => '产品名称');
+                                
+                                //当前选择的name
+                                $_queryName = 'scenic_name';
+                                foreach ($_querys as $key => $val) {
+                                    if (isset($get[$key])) {
+                                        $_queryName =  $key;
+                                        break;
+                                    }
+                                }
+                                
+                                echo $_querys[$_queryName] ;
+                            ?>
                             </button>
-							<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" tabindex="-1">
-								<span class="caret"></span>
-							</button>
-							<ul class="dropdown-menu" role="menu">
-								<li><a class="sec-btn" href="javascript:;" data-id="scenic_name" id="">景区</a></li>
-								<li><a class="sec-btn" href="javascript:;" data-id="organization_name" id="" aria-labelledby="search_label">供应商</a></li>
-								<li><a class="sec-btn" href="javascript:;" data-id="name" id="">产品名称</a></li>
-							</ul>
-							<script>
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                                    tabindex="-1">
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                                 <?php
+                                //下拉列表
+                                 foreach ($_querys as $key => $val) :
+                                ?>
+                                <li><a class="sec-btn clearPart" href="javascript:;" data-id="<?php echo $key ?>" id="" aria-labelledby="search_label"><?php echo $val; ?></a></li>
+                                <?php endforeach; ?>
+                            </ul>
+                            <script>
                                 $('.sec-btn').click(function() {
                                     $('#search_label').text($(this).text());
                                     $('#search_field').attr('name', $(this).attr('data-id'));
                                 });
                             </script>
-						</div>
-						<!-- input-group-btn -->
-						<input id="search_field" name="<?php
-						if(isset($_GET['scenic_name']))
-							echo 'scenic_name';
-						elseif(isset($_GET['name']))
-							echo 'name';
-						elseif(isset($_GET['organization_name']))
-							echo 'organization_name';
-						else echo 'scenic_name';
-						?>"
-							value="<?php
-							if(isset($_GET['scenic_name']))
-								echo $_GET['scenic_name'];
-							elseif(isset($_GET['name']))
-								echo $_GET['name'];
-							elseif(isset($_GET['organization_name']))
-								echo $_GET['organization_name'];
-							else echo '';
-							?>" type="text" class="form-control" style="z-index: 0" />
-					</div>
-				</div>
+                        </div>
+                        <!-- input-group-btn -->
+                        <input id="search_field" name="<?php echo $_queryName ?>" value="<?php echo empty($get[$_queryName])?'':$get[$_queryName] ?>" type="text" class="form-control" style="z-index: 0"/>
+                    </div>
+                </div>
+                <!--景区查询结束-->
+	
 				<div class="form-group">
-					<button class="btn btn-primary btn-sm" type="submit">查询</button>
+                                    <button class="btn btn-primary btn-sm" type="submit">查询</button>
 				</div>
 			</form>
 		</div>
@@ -139,6 +135,7 @@ use common\huilian\utils\Format;
 		<table class="table table-bordered mb30" style="">
 			<thead>
 				<tr>
+                    <th style="width:4%">产品ID</th>
 					<th>供应商</th>
 					<th>景区</th>
 					<th>产品名称</th>
@@ -158,6 +155,7 @@ use common\huilian\utils\Format;
 			<tbody id="staff-body">
 				<?php foreach( $lists as $key => $item ) { ?>
 				<tr>
+                    <td  style="width:4%"><?= $item['id'] ?></td>
 					<td><?= empty($item['organization'][0]['name']) ? '' :  $item['organization'][0]['name'] ?></td>
 					<td style="width: 11%;">
 					<?php
@@ -617,7 +615,7 @@ use common\huilian\utils\Format;
 		$('#saveBtn').css('display', 'none');
     })
     
-    
+    /*
     $('form').submit(function() {
 		var state = $('form').find('select[name="state"]').val();
         var search = $('#search_field').val();
@@ -631,6 +629,7 @@ use common\huilian\utils\Format;
 		location.href = url;
 		return false;
     });
+    */
 
     //编辑分销策略
     function viewPolicy(distid, org_id) {

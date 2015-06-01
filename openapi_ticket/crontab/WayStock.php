@@ -44,7 +44,7 @@ class Crontab_WayStock extends Process_Base {
             $product = ApiProductModel::model()->detail(array(
                 'ticket_id' => $product['body']['product_id'],
                 'range' => "$from,$end",
-                'distributor_id' => $config['distributor_id'],
+                'distributor_id' => $account['distributor_id'],
                 'type' => 0
             ));
             $product = $product['body'];

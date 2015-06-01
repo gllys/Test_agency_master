@@ -5,7 +5,7 @@ class UsedController extends Controller {
     public function actionIndex() {
         //如果是景区用户，则直接跳转
         if (Yii::app()->user->lan_id && empty($_GET['landscape_id'])) {
-            $this->redirect('/check/used/?landscape_id=' . Yii::app()->user->lan_id);
+            Yii::app()->runController('/check/used/index/landscape_id/' . Yii::app()->user->lan_id);
         }
 
         //得到可使用订单列表

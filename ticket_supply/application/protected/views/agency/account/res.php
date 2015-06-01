@@ -8,7 +8,11 @@
                         <a href="" class="panel-close tooltips" data-toggle="tooltip" title="隐藏面板"><i class="fa fa-times"></i></a>
                     </div>
                     <!-- panel-btns -->
-                    <h4 class="panel-title">查询分销商</h4>
+                    <ul class="list-inline">
+                        <li><h4 class="panel-title">查询分销商</h4></li>
+                        <li><a href="/order/history/help?#7.2" title="帮助文档" class="clearPart"
+                               target="_blank">查看帮助文档</a> </li>
+                    </ul>
                 </div>
                 <!-- panel-heading -->
                 <form class="form-horizontal" action="/agency/account/res">
@@ -102,7 +106,7 @@
                                     <?php if($agency['is_bind'] == 1):?>
                                         已添加
                                     <?php else:?>
-                                        <a class="addcredit" href="javascript:;" data-id="<?php echo $agency['id']?>">添加</a>
+                                        <a class="addcredit clearPart" href="javascript:;" data-id="<?php echo $agency['id']?>">添加</a>
                                     <?php endif;?>
                                 </td>
                             </tr>
@@ -153,7 +157,7 @@
             $.post('/agency/manager/addcredit',{'id':id},function(data){
                 if(data.error==0){
                     alert("添加成功");
-                    setTimeout("location.href='/agency/manager/'", '1000');
+                    setTimeout("location.href= '/#'+'/agency/manager/'", '1000');
                 }else{
                    alert("添加失败，"+data.msg);
                 }

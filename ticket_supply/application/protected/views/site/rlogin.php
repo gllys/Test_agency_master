@@ -31,7 +31,7 @@
                         	汇联皆景供应商系统
                     </a>
                     <div class="pull-right">
-                        <a href="#" class="menu-collapse">
+                        <a href="javascript:void(0)" class="menu-collapse">
                             <i class="fa fa-bars"></i>
                         </a>
                     </div>

@@ -10,9 +10,9 @@
     </style>
     <div class="headerwrapper">
         <div class="header-left">
-            <a class="logo" href="/ticket/sale" id="title" title="首页"></a>
+            <a class="logo" href="/#/ticket/sale" id="title" title="首页"></a>
             <div class="pull-right">
-                <a class="menu-collapse" href="#">
+                <a class="menu-collapse" href="javascript:void(0)">
                     <i class="fa fa-bars"></i>
                 </a>
             </div>
@@ -43,7 +43,7 @@
                     if (CreateUrl::model()->checkAccess('/system/message/')):
                         ?>
                         <div class="btn-group btn-group-option">
-                        <a href="/system/message" title="消息" class="btn btn-default dropdown-toggle">
+                        <a href="/#/system/message" title="消息" class="btn btn-default dropdown-toggle">
                             <i class="fa fa-envelope-o"></i>
                             <span id="unread_num" class="badge hide unread_message">0</span>消息</a>
                     </div>
@@ -53,7 +53,7 @@
                     <?php if (empty(Yii::app()->user->lan_id)): ?>
                         <!--工作台开始-->
                         <div class="btn-group btn-group-option">
-                            <a href="/dashboard" class="btn btn-default dropdown-toggle" title="工作台"><i class="fa fa-desktop"></i>工作台</a>
+                            <a href="/#/dashboard" class="btn btn-default dropdown-toggle" title="工作台"><i class="fa fa-desktop"></i>工作台</a>
                         </div>
                         <!--工作台结束-->
 
@@ -64,7 +64,7 @@
                         <!--下载结束-->
                         <!--在线帮助开始  author：徐娟-->
                         <div class="btn-group btn-group-option">
-                            <a href="/dashboard/help" class="btn btn-default dropdown-toggle" title="在线帮助"><i class="fa
+                            <a href="/#/dashboard/help" class="btn btn-default dropdown-toggle" title="在线帮助"><i class="fa
                                                                                                               fa-question-circle"></i>在线帮助</a>
                         </div>
                         <!--在线帮助结束-->

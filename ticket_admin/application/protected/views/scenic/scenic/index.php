@@ -23,14 +23,13 @@
 				景区列表
 			</h4>
 		</div>
- 
+
 		<div class="panel-body">
 			<form action="/scenic/scenic/" id="searchForm" class="form-inline">
-					<div class="form-group">
-						<input class="form-control" placeholder="请输入景区名称" type="text" name="keyword" id="keyword" maxlength="100" style="width:318px;" value="<?php if (isset($_REQUEST['keyword'])) echo $_REQUEST['keyword']; ?>">
-					</div>
-                            
-                                <div class="form-group" style="width: 105px; margin-right: 0px;">
+				<div class="form-group">
+					<input class="form-control" placeholder="请输入景区名称" type="text" name="keyword" id="keyword" maxlength="100" style="width:318px;" value="<?php if (isset($_REQUEST['keyword'])) echo $_REQUEST['keyword']; ?>">
+				</div>
+                <div class="form-group" style="width: 105px; margin-right: 0px;">
 					<label>是否绑定供应商:</label>
 				</div>
 				<div class="form-group">
@@ -40,11 +39,20 @@
 						<option value="0" <?php echo isset($_REQUEST['has_bind_org'])&&$_REQUEST['has_bind_org']==0?'selected':'';?>>否</option>
 					</select>
 				</div>
-                            
-					<div class="form-group">
-						<button class="btn btn-primary btn-sm" type="submit">查询</button>
-					</div>
-					<div style="height: auto; overflow: hidden; position: relative; display: none;" id="more-wrap">
+                <div class="form-group" style="width: 92px; margin-right: 0px;">
+                    <label>电子票务系统:</label>
+                </div>
+                <div class="form-group">
+                    <select class="select2" name="partner_type" style="width: 150px; padding: 0 10px;">
+                        <option value="-1">未使用</option>
+                        <option value="0" <?php echo isset($_GET['partner_type'])&&$_GET['partner_type']==0?'selected':'';?>>票台</option>
+                        <option value="1" <?php echo isset($_GET['partner_type'])&&$_GET['partner_type']==1?'selected':'';?>>大漠</option>
+                    </select>
+                </div>
+				<div class="form-group">
+					<button class="btn btn-primary btn-sm" type="submit">查询</button>
+				</div>
+				<div style="height: auto; overflow: hidden; position: relative; display: none;" id="more-wrap">
                     <?php
                     $province = Districts::model()->findAllByAttributes(array("parent_id" => 0));
                     $_province_ids = isset($_REQUEST['province_ids']) ? $_REQUEST['province_ids'] : array();
@@ -52,13 +60,13 @@
                         if ($model->id == 0) {
                             continue;
                         }
-                        ?>
-                        <div class="form-group" style="width:135px;">
-                            <div class="ckbox ckbox-primary">
-                                <input type="checkbox" name="province_ids[]" <?php if (in_array($model['id'], $_province_ids)): ?> checked="checked"<?php endif; ?> value="<?php echo $model['id'] ?>" id="checkbox<?php echo $model['id'] ?>">
-                                <label for="checkbox<?php echo $model['id'] ?>"><?php echo $model['name'] ?></label>
-                            </div>
+                    ?>
+                    <div class="form-group" style="width:135px;">
+                        <div class="ckbox ckbox-primary">
+                            <input type="checkbox" name="province_ids[]" <?php if (in_array($model['id'], $_province_ids)): ?> checked="checked"<?php endif; ?> value="<?php echo $model['id'] ?>" id="checkbox<?php echo $model['id'] ?>">
+                            <label for="checkbox<?php echo $model['id'] ?>"><?php echo $model['name'] ?></label>
                         </div>
+                    </div>
                     <?php endforeach; ?>
                     <div style="position:absolute;top:0;right:0;display: none;">
                         <a id="more-btn" flag='0' href="javascript:void(0)">更多 ∨</a>
@@ -68,16 +76,16 @@
 		</div>
 	</div>
 
-
 	<div class="table-responsive">
 		<table class="table table-bordered mb30">
 			<thead>
 			<tr>
-				<th>景区编号</th>
+				<th width="80px">景区编号</th>
 				<th>景区名称</th>
 				<th>景区级别</th>
 				<th>所属地区</th>
-                                <th>是否已绑定供应商</th>
+                <th>是否已绑定供应商</th>
+                <th>电子票务系统</th>
                 <th>验票账号</th>
                 <th>操作</th>
 			</tr>
@@ -104,18 +112,29 @@
 					}
                                         if(isset($item['district'])){
                                             echo count($item['district']) == 0 ? '' : implode(' ', $item['district']);
-                                        }				
+                                        }
                                 ?>
 				</td>
                                 <td><?php
                                 if(isset($item['has_bind_org'])){
                                     if($item['has_bind_org']==1){
-                                        echo '是';  
+                                        echo '是';
                                     }else if($item['has_bind_org']==0){
-                                        echo '否'; 
-                                    }                                    
-                                }                               
+                                        echo '否';
+                                    }
+                                }
                                 ?></td>
+                <td>
+                    <?php
+                    if((!$item['organization_id']) || $item['partner_type'] == -1) {
+                        echo '未使用';
+                    } else if($item['partner_type'] == 0) {
+                        echo "票台";
+                    } else if($item['partner_type'] == 1) {
+                        echo '大漠';
+                    }
+                    ?>
+                </td>
                 <td>
                     <a style="" data-toggle="modal" data-target=".bs-example-modal-static" onclick="bind(<?php echo $item['id'];?>);">账号管理</a>
                 </td>
@@ -192,7 +211,7 @@
             });
         });
 
-        
+
         $(function(){
              jQuery('.select2').select2({
                 minimumResultsForSearch: -1

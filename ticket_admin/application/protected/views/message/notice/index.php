@@ -22,9 +22,9 @@ use common\huilian\utils\Format;
 				                </div>
 				            </th>
 				            <th width="200">
-                                <a class="btn btn-primary btn-sm" id="delete-all"> 删除</a>
+                                <a class="btn btn-primary btn-sm" href="javascript:void(0)" id="delete-all"> 删除</a>
                                 <?php if(!isset($status) || $status != 2) {?>
-                                <a class="btn btn-primary btn-sm clearPart" id="update-all" style="margin-left: 20px"> 设为已读</a>
+                                <a class="btn btn-primary btn-sm clearPart" href="javascript:void(0)" id="update-all" style="margin-left: 20px"> 设为已读</a>
                                 <?php }?>
 				            </th>
 				            <th width="450"></th>
@@ -44,7 +44,7 @@ use common\huilian\utils\Format;
              					<?= $status == 0 && !$message['is_read'] ?  '<td><b>用户提醒</b></td>' : '<td>用户提醒</td>' ?>
              					<?= $status == 0 && !$message['is_read'] ?  '<td><b>'.$message['content'].'</b></td>' : '<td>'.$message['content'].'</td>' ?>
              					<td><a href="/message/notice/view?id=<?= $message['id'] ?>">查看</a></td>
-             					<td><a href="javascript:;" data-id="<?php echo $message['id']?>" class="text-danger setDeleted clearPart">删除</a></td>
+             					<td><a href="javascript:void(0);" data-id="<?php echo $message['id']?>" class="text-danger setDeleted clearPart">删除</a></td>
              				</tr>
              				<?php } ?>
                         </tbody>
@@ -147,6 +147,7 @@ $(function() {
                 }
             },'json');
         });
+		return false;
     });
 
     //批量设置已读

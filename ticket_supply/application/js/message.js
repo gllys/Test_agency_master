@@ -85,9 +85,9 @@ jQuery(document).ready(function() {
     }
     
     // 头部数目获取，加载完延迟1s获取
-    setTimeout(function (){getTopBar(); }, 1000);
+    setTimeout(function (){getTopBar(); }, 2000);
     // 头部数目获取，30秒定时执行
-    //setInterval(function(){getTopBar(); }, 30000);
+    setInterval(function(){getTopBar(); }, 60000);
     
     function getTopBar()
     {
@@ -95,7 +95,7 @@ jQuery(document).ready(function() {
             if(0 === result.error){
                 var marquee = '';
                 var model = '';
-                if(0 < parseInt(result.params.notice_list.pagination.count)){
+               if(typeof(result.params.notice_list.data) === "object"){
                     marquee += '<ul>';
                     var mdata = [];
                     $.each(result.params.notice_list.data, function(){

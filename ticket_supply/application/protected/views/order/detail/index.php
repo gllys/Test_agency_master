@@ -175,7 +175,11 @@ $this->breadcrumbs = array('订单', '订单详情');
 		<tbody>
 		  <tr>
 			<td>取票人姓名：<?php echo $detail['owner_name']?></td>
-			<td>取票人手机号码：<?php echo $detail['owner_mobile'];?> <!--button class="btn btn-primary btn-xs ml10" type="button">重发短信</button--></td>
+			<td>取票人手机号码：<?php echo $detail['owner_mobile'];?>
+				<?php if($detail['status'] == 'paid'){ ?>
+				<button id="complexConfirm" class="btn btn-primary btn-xs ml10" <?php if($detail['message_open']===0): ?>style="display:none;"<?php endif; ?> type="button">重发短信</button></td>
+			  <?php  }  ?>
+			</td>
 			<td>取票人身份证号码：<?php echo $detail['owner_card']?></td>
 		  </tr>
 		</tbody>
@@ -246,7 +250,7 @@ $this->breadcrumbs = array('订单', '订单详情');
                 <tr>
                     <th>景点</th><th>未使用张数</th><th>已使用张数</th>
                 </tr>
-                <?php foreach ($infos['poi_counts'][$item['scenic_id']] as $poi){?>
+                <?php foreach ((array)$infos['poi_counts'][$item['scenic_id']] as $poi){?>
                 <tr>
                     <td><?php echo $infos['poi_names'][$poi['poi_id']];?></td>
                     <td><?php echo $poi['unuse_num'];?></td>
@@ -298,6 +302,28 @@ $("#applysub").click(function(){
 
 <script>
 jQuery(document).ready(function(){
+
+
+	$("#complexConfirm").confirm({
+		title:"重发短信",
+		text:'<label>请输入需要发送短信的手机号码</label><input type="text" placeholder="" class="form-control" value="<?php echo $detail['owner_mobile'] ?>" id="sms-input">',
+		confirm: function(button) {
+			var id = <?php echo $detail['id'] ?>;
+			var mobile = $('#sms-input').val();
+			if (mobile) {
+				$.post('/order/detail/againSms', {id: id, mobile: mobile}, function(data) {
+					alert(data.errors);
+				}, "json");
+			}
+
+		},
+		cancel: function(button) {
+
+		},
+		confirmButton: "确定",
+		cancelButton: "取消",
+		confirmButtonClass: 'btn-success'
+	});
 
 
 !function(){
@@ -446,16 +472,16 @@ function total(){
                 $.post("/order/detail/rejected/",{orderId:orderId,receiver_organization:receiver_organization,rejectedContent:rejectedContent,t:Math.random()},function(data){
                     if(data.code=="succ"){
                         //alert("驳回成功");
-                        //window.location.href=data.url;
+                        //window.location.href= '/#'+data.url;
 
                         setTimeout(function(){
-			                alert('驳回成功',function(){window.location.reload();});
+			                alert('驳回成功',function(){window.location.partReload();});
 			            },500)
                     }else{
                         //alert("驳回失败");
-                        //window.location.href=data.url;
+                        //window.location.href= '/#'+data.url;
                         setTimeout(function(){
-			                alert('驳回失败',function(){window.location.reload();});
+			                alert('驳回失败',function(){window.location.partReload();});
 			            },500)
                     }
                 } ,' json ');
@@ -467,8 +493,8 @@ function total(){
             $.get("/order/detail/checkStatus/id/<?php echo $detail["id"] ?>"+"/t/"+Math.random(),function(data){
                 if(data=="cancel"){
                    // alert("订单已经取消");
-                   //location.reload();
-                    alert('订单已经取消',function(){window.location.reload();});
+                   //location.partReload();
+                    alert('订单已经取消',function(){window.location.partReload();});
                     return false;
                 }else{
                     
@@ -477,11 +503,11 @@ function total(){
                             if(data.code=="succ"){
                          
                                 setTimeout(function(){
-			                        alert('审核成功',function(){window.location.reload();});
+			                        alert('审核成功',function(){window.location.partReload();});
 			                    },500)
                             }else{
                                 setTimeout(function(){
-			                        alert('审核失败',function(){window.location.reload();});
+			                        alert('审核失败',function(){window.location.partReload();});
 			                    },500)
                             }
                         },' json ');
@@ -491,10 +517,10 @@ function total(){
                         $.get("/order/detail/confirm/id/<?php echo $detail["id"] ?>"+"/receiver_organization/<?php echo $ticket[key($ticket)]['distributor_id']?>"+"/t/"+Math.random(),function(data){
                             if(data.code=="succ"){
                                 alert("审核成功");
-                                window.location.href=data.url;
+                                window.location.href= '/#'+data.url;
                             }else{
                                 alert("审核失败");
-                                window.location.href=data.url;
+                                window.location.href= '/#'+data.url;
                             }
                         },' json ');
                     }else{
@@ -509,8 +535,8 @@ function total(){
                 if(data=="cancel"){
                     $("#myModal").hide();
                     //alert("订单已经取消");
-                    //location.reload();
-                    alert('订单已经取消',function(){window.location.reload();});
+                    //location.partReload();
+                    alert('订单已经取消',function(){window.location.partReload();});
                     return false;
                 }
             });

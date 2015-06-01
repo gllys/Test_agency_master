@@ -49,7 +49,7 @@ $this->breadcrumbs = array('订单', '任务单管理');
 						</select>
 						<script>
 							$('#status_link').change(function() {
-								location.href = '/order/renwu/view/status/'+$(this).val();
+								location.href = '/#'+ '/order/renwu/view/status/'+$(this).val();
 							});
 						</script>
 					</div>
@@ -65,11 +65,11 @@ $this->breadcrumbs = array('订单', '任务单管理');
 								<span class="caret"></span>
 							</button>
 							<ul class="dropdown-menu" role="menu">
-								<li><a class="sec-btn" href="javascript:;" data-id="id" id="">订单号</a></li>
-								<li><a class="sec-btn" href="javascript:;" data-id="name" id="">门票名称</a></li>
-								<li><a class="sec-btn" href="javascript:;" data-id="owner_name" id="">取票人</a></li>
-								<li><a class="sec-btn" href="javascript:;" data-id="owner_mobile" id="">手机号</a></li>
-								<li><a class="sec-btn" href="javascript:;" data-id="owner_card" id="">身份证</a></li>
+								<li><a class="sec-btn clearPart" href="javascript:;" data-id="id" id="">订单号</a></li>
+								<li><a class="sec-btn clearPart" href="javascript:;" data-id="name" id="">门票名称</a></li>
+								<li><a class="sec-btn clearPart" href="javascript:;" data-id="owner_name" id="">取票人</a></li>
+								<li><a class="sec-btn clearPart" href="javascript:;" data-id="owner_mobile" id="">手机号</a></li>
+								<li><a class="sec-btn clearPart" href="javascript:;" data-id="owner_card" id="">身份证</a></li>
 							</ul>
 							<script>
 								$('.sec-btn').click(function(){

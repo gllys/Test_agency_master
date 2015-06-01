@@ -44,7 +44,7 @@
                 } else{
                     var succss_msg = '<div class="alert alert-success"><button data-dismiss="alert" class="close" type="button">×</button><strong>操作成功!</strong></div>';
                     $('#verify_return').html(succss_msg);
-                    setTimeout("location.href='/scenic/Spot/?id="+$('#landscape_id').val()+"'", '2000');
+                    setTimeout("location.href= '/#'+'/scenic/Spot/?id="+$('#landscape_id').val()+"'", '2000');
                 }
             }, "json"); 
         }else{

@@ -8,6 +8,7 @@ namespace common\huilian\models;
 use Yii;
 use Tickettemplate;
 use Credit;
+use Landscape;
 
 /**
  * 供应商类
@@ -77,6 +78,24 @@ class Supply
 		return $agencyNames;
 	}
 	
+	/**
+	 * 获取该供应商所有景区的名称
+	 * @return array ['景区主键' => '景区名称', ...]
+	 */
+	public static function landscapeNames() {
+		$params = [
+			'organization_id' => Yii::app()->user->org_id,
+			'items' => 10000,
+		];
+		$res = Landscape::api()->lists($params);
+		$landscapes = empty($res['body']['data']) ? [] : $res['body']['data'];
+		
+		$landscapeNames = [];
+		foreach($landscapes as $v) {
+			$landscapeNames[$v['id']] = $v['name'];
+		}
+		return $landscapeNames;
+	}
 }
 
 ?>

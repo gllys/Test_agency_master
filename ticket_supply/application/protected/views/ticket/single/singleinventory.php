@@ -131,7 +131,7 @@
             json['rid'] = $("#pid").val();
             json['name'] = $('#name').val();
             json['desc'] = $('#desc').val();
-            var wrap = $('#saveWrap').html();
+            var wrap = '<button class="btn btn-primary mr5" id="setinvBtn">设置</button><br />';//$('#saveWrap').html();
             $.ajax({
                 url: "/ticket/single/saveInvetory",
                 type: "POST",
@@ -144,8 +144,8 @@
                     if (result.code == 200) {
                     	alert('保存成功', function() {
 							$('#modal5').css('display', 'none');
-                    		setInterval(function() {
-                        		window.location.reload();
+                    		setTimeout(function() {
+                        		window.location.partReload();
                             }, 2000);
                         });
                     	

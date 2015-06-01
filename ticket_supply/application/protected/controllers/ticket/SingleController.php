@@ -150,7 +150,10 @@ class SingleController extends Controller {
         $param['items'] = 100000;
         $data = Landorg::api()->lists($param);
         $supplyLans = ApiModel::getLists($data);
-        $this->renderPartial('singleadd', compact('supplyLans'));
+
+        $orgInfo = $this->getOrgInfo(); //判断是否是景旅通 partner_type
+
+        $this->renderPartial('singleadd', compact('supplyLans','orgInfo'));
     }
 
     //票编辑
@@ -239,7 +242,22 @@ class SingleController extends Controller {
         $param['items'] = 100000;
         $data = Landorg::api()->lists($param);
         $supplyLans = ApiModel::getLists($data);
-        $this->renderPartial('singleedit', compact('supplyLans', 'ticket'));
+
+        $orgInfo = $this->getOrgInfo(); //判断是否是景旅通 partner_type
+        $this->renderPartial('singleedit', compact('supplyLans', 'ticket','orgInfo'));
+    }
+
+
+    public function actionDetail() {
+        //得到门票详情
+        //Tickettemplate::api()->debug= true;
+        $data = Tickettemplate::api()->ticketinfo(array('ticket_id' => $_GET['ticket_id']));
+        $ticket = ApiModel::getData($data);
+
+        $orgInfo = $this->getOrgInfo(); //判断是否是景旅通 partner_type
+
+        //得到景区列表
+        $this->renderPartial('singledetail', compact('ticket', 'orgInfo'));
     }
 
     //删除票
@@ -636,17 +654,17 @@ class SingleController extends Controller {
             $data['rule_id'] = $rid;
             $data['supplier_id'] = Yii::app()->user->org_id;
             $data['days'] = implode(',', $params);
-            $s_price = Yii::app()->request->getParam('s_price');
-            $g_price = Yii::app()->request->getParam('g_price');
+            $s_price = abs(Yii::app()->request->getParam('s_price'));
+            $g_price = abs(Yii::app()->request->getParam('g_price'));
             $dateSelected = Array();
-            $data['fat_price'] = Yii::app()->request->getParam('s_price');
-            if (intval($data['fat_price']) > 0) {
+            $data['fat_price'] = $s_price;
+            if ($data['fat_price'] > 0) {
                 $data['fat_price'] = $this->types[Yii::app()->request->getParam('s_type')] . $data['fat_price'];
             } else {
                 unset($data['fat_price']);
             }
-            $data['group_price'] = Yii::app()->request->getParam('g_price');
-            if (intval($data['group_price']) > 0) {
+            $data['group_price'] = $g_price;
+            if ($data['group_price'] > 0) {
                 $data['group_price'] = $this->types[Yii::app()->request->getParam('g_type')] . $data['group_price'];
             } else {
                 unset($data['group_price']);

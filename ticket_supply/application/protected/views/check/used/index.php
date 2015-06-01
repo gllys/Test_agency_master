@@ -8,13 +8,13 @@ $this->breadcrumbs = array('验票', '验票');
             <div class="panel-heading">
                 <h4 class="panel-title">打印小票</h4>
                 <div class="inline-block" style="float:right; margin-top: -25px;">
-                    <a class="btn btn-primary btn-xs" onclick="setPrinter();return false;">
+                    <a class="btn btn-primary btn-xs clearPart" onclick="setPrinter();return false;">
                         <i class="fa fa-print"></i>
                         打印设置
                     </a>
                 </div>
                 <div class="inline-block" style="float:right; margin-top: -25px; margin-right: 10px;">
-                <a class="btn btn-primary btn-xs"  href="/check/check/setsimpleticket/" onclick="modal_jump(this);"  data-target=".modal-bank" data-toggle="modal">
+                <a class="btn btn-primary btn-xs clearPart"  href="/check/check/setsimpleticket/" onclick="modal_jump(this);"  data-target=".modal-bank" data-toggle="modal">
                    小票设置
                 </a>
                 </div>
@@ -127,7 +127,7 @@ $this->breadcrumbs = array('验票', '验票');
                 <?php endforeach; ?>
             </table>
             <div class="panel-body">
-                <button class="btn btn-primary" id='used' type="submit">使用门票</button>
+                <button class="btn btn-primary clearPart" id='used' type="submit">使用门票</button>
             </div>
         </form>
         <?php
@@ -206,14 +206,14 @@ $this->breadcrumbs = array('验票', '验票');
                                     printLodop(data.params,'正联');
                                     setTimeout(function() {
                                         printLodop(data.params,'副联');
-                                        alert('验证成功',function(){top.location.reload();});
+                                        alert('验证成功',function(){location.partReload();});
                                     }, 1000);
                                 }else{
                                     printLodop(data.params,'正联');
-                                    alert('验证成功',function(){top.location.reload();});
+                                    alert('验证成功',function(){location.partReload();});
                                 }
 	                    } else {
-	                        alert('验证成功',function(){top.location.reload();});
+	                        alert('验证成功',function(){location.partReload();});
 	                    }
 	                } else {
 	                    alert(data.msg);
@@ -303,6 +303,7 @@ foreach ($lists as $item):
 <?php endforeach; ?>
         });
 
+        $('.ui-spinner-button').addClass('clearPart');
 //小票设置
         $('[name=xiaopiao]').click(function() {
             $.cookie('xiaopiao', $(this).val(), {expires: 365});

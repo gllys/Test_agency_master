@@ -21,13 +21,18 @@ class OrganizationModel extends Base_Model_Api
     }
     
 	public function getInfo($org_id){
-        if(!$org_id)
+        if(!$org_id) {
             return false;
+        }
         $this->params = array('id'=>$org_id);
         $orgInfo = $this->request();
-        if(!$orgInfo || empty($orgInfo['body']))
-            return false;
-        return $orgInfo['body'];
+        if(!empty($orgInfo)) {
+            $orgInfo = json_decode($orgInfo, true);
+            if(!empty($orgInfo['body'])) {
+                return $orgInfo['body'];
+            }
+        }
+        return false;
     }
 
     public function getOrgIds($params) {

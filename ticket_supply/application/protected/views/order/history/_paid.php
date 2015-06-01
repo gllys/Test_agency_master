@@ -114,7 +114,7 @@ use common\huilian\utils\Format;
                                                 $landscapeName .= isset($landscape_lists[$landscapeId]) ? $landscape_lists[$landscapeId] : "";
                                             }
                                             ?>
-                                            <a style="color: #636e7b;cursor: pointer;cursor: hand;" title="<?php echo $landscapeName?>" readonly>
+                                            <a style="color: #636e7b;cursor: default;" class="clearPart" href="javascipt:void(0)" title="<?php echo $landscapeName?>" readonly>
                                                 <?php echo mb_strlen($landscapeName,'UTF8') > 15 ? mb_substr($landscapeName,0,14,'UTF8') . '...' : $landscapeName ?>
                                             </a> </td>
                                         <td style="width:6%"><?php echo $order['name'] ?></td>
@@ -123,8 +123,7 @@ use common\huilian\utils\Format;
                                         <td style="width:8%"><?php echo Format::date($order['created_at']) ?></td>
                                         <td style="width:8%"><?php echo $order['use_day'] ?></td>
                                         <td style="width:8%"><?php 
-                                        $verify_items = isset($order['verify_items']) ? $order['verify_items'] : array();
-                                        echo count($verify_items)>0?Format::date($verify_items[0]["use_time"]): '';
+                                         echo $order['use_time']?Format::date($order['use_time']):'';
                                     ?></td>
                                         <td style="width:6%"><?php echo $order['nums'] ?></td>
                                         <td style="width:6%"><?php echo $order['nums'] - $order['used_nums'] - $order['refunding_nums'] - $order['refunded_nums'] ?></td>

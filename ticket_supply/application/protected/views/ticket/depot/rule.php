@@ -35,7 +35,7 @@
                         var succss_msg = '<div class="alert alert-success"><button data-dismiss="alert" class="close" type="button">×</button><strong>操作成功</strong></div>';
                         $('#verify_return').html(succss_msg);
                         
-                        setTimeout("location.href='"+window.location.pathname+"'", '500');
+                        setTimeout("location.href= '/#'+'"+window.location.pathname+"'", '500');
                     }
             },'json');
          return false;   

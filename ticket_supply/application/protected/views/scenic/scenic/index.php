@@ -19,9 +19,10 @@ $this->breadcrumbs = array('景区管理', '景区列表');
 <div class="contentpanel">
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			<h4 class="panel-title">
-				景区查询
-			</h4>
+			<ul class="list-inline">
+				<li><h4 class="panel-title">景区查询</h4></li>
+				<li><a href="/order/history/help?#3" title="帮助文档" class="clearPart" target="_blank">查看帮助文档</a> </li>
+			</ul>
 		</div>
 
 		<div class="panel-body">
@@ -166,7 +167,7 @@ jQuery(document).ready(function() {
 
         function focusEnd(obj) {
             var value = obj.val();
-            obj.val('').focus().val(value);
+            obj.val('').focus().val('');
         }
         // 默认选中搜索框focus
         var $keyword = $('#keyword');
@@ -203,7 +204,7 @@ jQuery(document).ready(function() {
 
         $('#more-wrap input:checkbox').click(function(){
             if($('#form').submit()){
-                children.location.reload();
+                location.partReload();
             };
         });
     });

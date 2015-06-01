@@ -391,7 +391,7 @@ $this->breadcrumbs = array('订单', '订单详情');
     	}else{
     		$.post('/order/newdetail/finish', {id: id,used_nums: used_nums}, function(data) {
 	            if (data.error === 0) {
-	                alert('订单已确认',function(){setTimeout("location.href='/order/renwu/'", '1000');});
+	                alert('订单已确认',function(){setTimeout("location.href= '/#'+'/order/renwu/'", '1000');});
 	            } else {
 	                alert(data.msg);
 	            }

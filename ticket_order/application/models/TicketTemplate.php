@@ -28,7 +28,7 @@ class TicketTemplateModel extends Base_Model_Api{
         $productInfo = $productInfo['body'];
         $now = time();
         if(($productInfo['sale_start_time'] && $now < $productInfo['sale_start_time']) || ($productInfo[ 'sale_end_time'] && $now > $productInfo['sale_end_time'])) {
-            Tools::lsJson(false,'门票［'.$productInfo['name'].'］已下架');
+            $openMsg && Tools::lsJson(false,'门票［'.$productInfo['name'].'］已下架');
         }
 
         if(!in_array($productInfo['ota_type'],array("weixin"))){

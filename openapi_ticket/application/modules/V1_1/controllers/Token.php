@@ -18,7 +18,11 @@ class TokenController extends Base_Controller_Ota
                     $data = array();
                     $data["token"] = $this->sess->userinfo['token'];
                     $data["expires_at"] = $this->sess->userinfo['expires_at'];
-                    Lang_Msg::output($data);
+                    Lang_Msg::output(array(
+                        'code' => 200,
+                        'message' => '',
+                        'result' => $data,
+                    ));
                 }
             }
         }
@@ -35,7 +39,11 @@ class TokenController extends Base_Controller_Ota
             $this->sess->userinfo = $this->userinfo;
 
         } catch(Exception $e) {
-            Lang_Msg::error("ERROR_TOKEN_1");
+            Lang_Msg::output(array(
+                'code' => 400,
+                'message' => Lang_Msg::getLang('ERROR_TOKEN_1'),
+                'result' => array(),
+            ));
         }
 
         $data = array();
@@ -43,7 +51,11 @@ class TokenController extends Base_Controller_Ota
         $data["expires_at"] = date('Y-m-d H:i:s',time()+$this->sess->getMaxLifeTime());
 
         OtaAccountModel::model()->updateById($this->userinfo['id'], array('expires_at'=>$data["expires_at"]));
-        Lang_Msg::output($data);
+        Lang_Msg::output(array(
+            'code' => 200,
+            'message' => '',
+            'result' => $data,
+        ));
     }
 
 

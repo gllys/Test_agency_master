@@ -234,7 +234,7 @@ $action = isset($action)?$action:$this->getAction()->getId();
                 if($('#pwd').validationEngine('validate') === true){
                     $.post('/ticket/limitagency/save',$('#pwd').serialize(),function(data){
                         if(data.error==0){
-                            alert("保存成功！",function(){location.href = "/ticket/limitagency";});
+                            alert("保存成功！",function(){location.href = '/#'+ "/ticket/limitagency";});
                         }else{
                             alert("保存失败,"+data.msg);
                         }
@@ -249,7 +249,7 @@ $action = isset($action)?$action:$this->getAction()->getId();
 //                $('#s2id_distributor-select').find(".select2-chosen").text("请输入分销商名称");
 //                $('#select1 option,#select2 option').remove();
 //                $('input[name="note"],input[name="name"]').val("");
-                location.href = "/ticket/limitagency";
+                location.href = '/#'+ "/ticket/limitagency";
             });
 
         }()

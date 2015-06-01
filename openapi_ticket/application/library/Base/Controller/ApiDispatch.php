@@ -18,13 +18,11 @@ class Base_Controller_ApiDispatch extends Base_Controller_Ota{
         $action = $req->controller.ucfirst($req->action);
         $partner = isset($params['partner']) ? empty($params['partner']) : '';
 
+        //渠道分发
+        $config = Yaf_Registry::get('config');
         if(isset($params['source'])){
-            if($params['source'] == 1){
-                $req->module = 'Taobao';
-            }else if($params['source'] == 10){
-                $req->module = 'Qunar';
-            }else if ($params['source'] == 13){
-                $req->module = 'Way';
+            if(isset($config['agency_dispatch'][$params['source']])){
+                $req->module = $config['agency_dispatch'][$params['source']];
             }else{
                 $req->module = 'V1_1';
             }
@@ -35,8 +33,6 @@ class Base_Controller_ApiDispatch extends Base_Controller_Ota{
             $req->action => 'modules/'.$req->module.'/actions/'.$partner.'/'.$action.'.php',
         );
 
-//        self::echoLog('body', var_export($params, true), 'apidispatch_bee.log');
-//        self::echoLog('body', var_export($this->actions, true), 'apidispatch_bee.log');
         Util_Logger::getLogger('common')->info(__METHOD__,
             array('params' => $params, 'action' => $this->actions), '', 'apidispatch'
         );

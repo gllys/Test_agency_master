@@ -28,6 +28,11 @@ class SupplyController extends Controller {
             unset($params['end_date']);
         }
 
+        if(isset($_GET['supply_type']) && $_GET['supply_type'] !== '') {
+            // 是景区的情况下，再查询电子票务系统类型
+            $params['supply_type'] = $_GET['supply_type'];
+        }
+
         //列表
         $data = Organizations::api()->list($params);
         $lists = ApiModel::getLists($data);

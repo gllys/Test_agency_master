@@ -199,4 +199,12 @@ class Controller extends CController {
             parent::render($view, $data, $return);
         }
     }
+    
+    public function redirect($url, $terminate = true, $statusCode = 302) {
+        if (!empty($_GET['mod']) && $_GET['mod'] == 'part') {
+            $this->_end(200,$url);
+        } else {
+            parent::redirect($url, $terminate, $statusCode);
+        }
+    }
 }

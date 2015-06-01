@@ -19,6 +19,10 @@ class OrderItemModel extends Base_Model_Abstract
         'valid','max_buy','mini_buy','view_point','week_time','refund','remark','date_available',
         'price_type','price','user_id','user_account','user_name'
     );
+    /** 缓存前缀 */
+    const CACHE_PREFIX = 'OrderItem|OrderId_';
+    /** 缓存最大有效期 */
+    const CACHE_EXPIRE_MAX_TIME = 604800; //3600*24*7
 
     public function getTable() {
         return $this->tblname;
@@ -76,8 +80,10 @@ class OrderItemModel extends Base_Model_Abstract
         if($r){
             //添加票
             array_shift($data);
-            $r = TicketModel::model()->addNew($productInfo,$data);
-            if($r) return $data;
+            $r = TicketQueueModel::model()->saveTmpCache($order['id'], $productInfo, $data);
+            //$r = TicketModel::model()->addNew($productInfo,$data);
+            if($r)
+                return $data;
         }
         return false;
     }
@@ -118,7 +124,8 @@ class OrderItemModel extends Base_Model_Abstract
         if($r){
             //添加票
             array_shift($items);
-            $r = TicketModel::model()->addBatch($productInfos,$items);
+            $r = TicketQueueModel::model()->saveTmpBatchCache($productInfos, $items);
+            //$r = TicketModel::model()->addBatch($productInfos,$items);
             if($r) return $items;
         }
         return false;
@@ -261,5 +268,45 @@ class OrderItemModel extends Base_Model_Abstract
         return true;
     }
      * */
+
+
+    public function setCacheByOrderId($id, $items)
+    {
+        if(is_array($items))
+        {
+            $cacheKey = self::CACHE_PREFIX . $id;
+            $this->redis->push('hmset', array($cacheKey, $items));
+            $this->redis->push('expire', array($cacheKey, self::CACHE_EXPIRE_MAX_TIME));
+        }
+        return true;
+    }
+
+    public function deleteRedisCache($orderID)
+    {
+        return $this->redis->push('del',array(self::CACHE_PREFIX . $orderID));
+    }
+
+    public function getCacheByOrderId($id)
+    {
+        $cacheKey = self::CACHE_PREFIX .$id;
+        $items = $this->redis->hGetAll($cacheKey);
+        if(!empty($items) && is_array($items)) {
+            return $items;
+        }
+
+        if(empty($items)) {
+            $orderItems = $this->search(array('order_id' => $id));
+            if(empty($orderItems) || !is_array($orderItems)) {
+                Lang_Msg::error('订单异常请联系管理员');
+            }
+            $items = array();
+            foreach($orderItems as $value) {
+                $items[$value['id']] = $value['status'];
+            }
+            $this->redis->hmset($cacheKey, $items);
+            $this->redis->expire($cacheKey, self::CACHE_EXPIRE_MAX_TIME);
+        }
+        return $items;
+    }
 }
 

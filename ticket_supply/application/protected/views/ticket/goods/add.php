@@ -214,7 +214,7 @@
                             alert(data.msg);
                             $('#form-button').attr('disabled', false);
                         } else {
-                            alert('新增门票成功',function(){window.location.reload();});
+                            alert('新增门票成功',function(){window.location.partReload();});
                         }
                     }, 'json');
                 }

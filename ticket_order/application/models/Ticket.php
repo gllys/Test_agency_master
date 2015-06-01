@@ -49,7 +49,7 @@ class TicketModel extends Base_Model_Abstract {
                     $id = '2'.substr("{$orderItem['order_id']}", 1)."$idx";
                     $ticket = array();
                     $ticket['id'] = $id;
-                    $ticket['status'] = 0; //状态：0：不可使用 1：可使用 2已使用，支付后状态为1
+                    $ticket['status'] = 1; //状态：0：不可使用 1：可使用 2已使用，支付后状态为1   因异步，先支付所以直接为可用
                     $ticket['order_id'] = $orderItem['order_id'];
                     $ticket['ticket_template_id'] = $prodItem['base_id'];
                     $ticket['landscape_id'] = $prodItem['scenic_id'];
@@ -92,7 +92,7 @@ class TicketModel extends Base_Model_Abstract {
                     $id = '2'.substr("{$orderItem['order_id']}", 1)."$idx";
                     $ticket = array();
                     $ticket['id'] = $id;
-                    $ticket['status'] = 0; //状态：0：不可使用 1：可使用 2已使用，支付后状态为1
+                    $ticket['status'] = 1; //状态：0：不可使用 1：可使用 2已使用，支付后状态为1
                     $ticket['order_id'] = $orderItem['order_id'];
                     $ticket['ticket_template_id'] = $prodItem['base_id'];
                     $ticket['landscape_id'] = $prodItem['scenic_id'];

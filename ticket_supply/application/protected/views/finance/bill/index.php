@@ -18,7 +18,10 @@ $this->breadcrumbs = array('结算管理', '应收账款');
 
 	<div class="panel panel-default">
         <div class="panel-heading">
-            <h4 class="panel-title">应收账款</h4>
+			<ul class="list-inline">
+				<li><h4 class="panel-title">应收账款</h4></li>
+				<li><a href="/order/history/help?#6.2" title="帮助文档" class="clearPart" target="_blank">查看帮助文档</a> </li>
+			</ul>
         </div>
         <div class="panel-body">
             <form class="form-inline" method="post" action="/finance/bill/">
@@ -104,7 +107,7 @@ $this->breadcrumbs = array('结算管理', '应收账款');
 				<td class="text-danger">未收款</td>
 			<?php endif;?>
 			<td >
-			    <a class="btn btn-success btn-bordered btn-xs" href="/finance/detail?id=<?php echo $value['id']?>" data-toggle="modal">查看</a>
+			    <a class="btn btn-success btn-bordered btn-xs" href="/finance/detail?id=<?php echo $value['id']?>">查看</a>
 			</td>
 		  	</tr>
 			<?php endforeach;?>
@@ -113,7 +116,6 @@ $this->breadcrumbs = array('结算管理', '应收账款');
 		<?php endif;?>
 		</tbody>
 	  </table>
-	</div>
 	<div class="panel-footer pagenumQu" style="padding-top:15px;text-align:right;border:1px solid #ddd;border-top:0">
 		<?php
 		if (isset($lists['data'])) {
@@ -147,7 +149,9 @@ jQuery(document).ready(function() {
 			return false;
 		}
 		$('.is_export').attr('value', '1');
-		$('form').submit();
+		$('form').addClass('clearPart');
+        $('form').submit();
+		$('form').removeClass('clearPart');
 		$('.is_export').attr('value', '0');
 	});
 

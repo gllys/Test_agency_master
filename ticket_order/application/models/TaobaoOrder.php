@@ -21,7 +21,7 @@ class TaobaoOrderModel extends Base_Model_Api
             'order_id' => $order['source_id'],
             'verify_code' => $order['id'],
             'consume_num' => $num,
-            'used_num' => $order['used_nums'],
+            'used_num' => $order['used_nums']+$num,
             'num' => $order['nums'],
             'refunded_nums' => $order['refunded_nums'],
             'refunding_nums' => $order['refunding_nums'],

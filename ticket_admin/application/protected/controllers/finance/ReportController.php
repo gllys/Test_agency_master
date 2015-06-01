@@ -18,10 +18,10 @@ class ReportController extends Controller {
            {
              case 1:
                  //addCondition
-                $params["income"] = 'true';
+                $params["use_status"] = 1;
                  break;
              case 2:
-                 $params["refunded"] = 'true';
+                 $params["refund_status"] = 2;
                  break;
            }
         }

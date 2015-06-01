@@ -162,8 +162,10 @@ class SalestatController extends Base_Controller_Api
                 $stat = $iniStat;
                 $statArr = explode(',', $row['stat']);
                 foreach ($statArr as $st) {
-                    $st = explode('_', $st);
-                    $stat[$st[0]] = $st[1];
+                    if(!empty($st)) {
+                        $st = explode('_', $st);
+                        $stat[$st[0]] = $st[1];
+                    }
                 }
                 $stat['subtotal'] = $row['subtotal'];
                 $pieSubAmount += $row['subtotal'];
@@ -296,8 +298,10 @@ class SalestatController extends Base_Controller_Api
                 $stat = $iniStat;
                 $statArr = explode(',', $row['stat']);
                 foreach ($statArr as $st) {
-                    $st = explode('_', $st);
-                    $stat[$st[0]] = $st[1];
+                    if(!empty($st)) {
+                        $st = explode('_', $st);
+                        $stat[$st[0]] = $st[1];
+                    }
                 }
                 $stat['subtotal'] = $row['subtotal'];
                 $pieSubAmount += $row['subtotal'];

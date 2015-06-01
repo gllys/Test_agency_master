@@ -28,7 +28,14 @@ class Process_Async
 	public static function send($call, $params = array()) {
 		$data = serialize(array($call, $params));
 		Log_Base::save('async', 'send:'.var_export(array($call, $params), true));
-		Util_Queue::send(self::$queue, $data);
+		return Util_Queue::send(self::$queue, $data);
 	}
+
+	public static function presend($call, $params = array()) {
+		$data = serialize(array($call, $params));
+		Log_Base::save('async', 'presend:'.var_export(array($call, $params), true));
+		return Util_Queue::presend(self::$queue, $data);
+	}
+	
 }
 

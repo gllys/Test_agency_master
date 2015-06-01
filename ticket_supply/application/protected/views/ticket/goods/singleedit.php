@@ -8,9 +8,9 @@
         </div>
         <div class="media-body">
             <ul class="breadcrumb">
-                <li><a href="#"><i class="glyphicon glyphicon-home"></i></a></li>
-                <li><a href="#">门票管理</a></li>
-                <li><a href="#">编辑单票</a></li>
+                <li><a href="javascript:void(0)"><i class="glyphicon glyphicon-home"></i></a></li>
+                <li><a href="javascript:void(0)">门票管理</a></li>
+                <li><a href="javascript:void(0)">编辑单票</a></li>
             </ul>
         </div>
     </div><!-- media -->
@@ -222,7 +222,7 @@
 });
 jQuery(document).ready(function() {
  $('#btnreset').click(function(){
-            location.href = '/ticket/depot/';
+            location.href = '/#'+ '/ticket/depot/';
         });
     $('#distributor-select').ready(function(){
              var names =  $("#distributor-select").val();
@@ -298,7 +298,7 @@ jQuery(document).ready(function() {
 	                    $('#form-button').removeAttr('disabled');
                         return false;
                     } else {
-                      location.href = '/ticket/depot/';
+                      location.href = '/#'+ '/ticket/depot/';
                     }
                 }, 'json');
         } else {

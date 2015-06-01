@@ -50,7 +50,7 @@ class Base_Model_Api
         return Yaf_Registry::get($key);
     }
 
-    public function request($header = null, $timeout = 5) {
+    public function request($header = null, $timeout = 10) {
         $url = $this->getSrvUrl() . $this->url;
         $params = $this->params;
         $method = strtoupper($this->method);
@@ -78,5 +78,21 @@ class Base_Model_Api
         unset($params['sign']);
         ksort($params);
         return md5(http_build_query($params) . self::$appSecret);
+    }
+
+    public function customCache($cacheKey,$data=null,$expire=3600) {
+        $mc = Cache_Memcache::factory();
+        $cacheNs = $mc->get($this->preCacheKey.'NS');
+        $cacheData = $mc->get($cacheKey);
+        if(empty($cacheData) || $cacheData['cacheNS']!=$cacheNs) {
+            if($data==null) return null;
+            $res = $data;
+            if(!empty($res))
+                $mc->set($cacheKey,array('data'=>$res,'cacheNS'=>$cacheNs),$expire);
+        }
+        else {
+            $res = $cacheData['data'];
+        }
+        return $res;
     }
 }

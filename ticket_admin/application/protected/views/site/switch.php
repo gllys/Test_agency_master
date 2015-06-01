@@ -31,24 +31,33 @@
                     $('#mainpanel').html(data.msg);
                 } else if(data.error === 1) { 
                     $('#mainpanel').html(data.msg);
+                }else if(data.error === 200) { 
+                    location.href = data.msg;
                 }else { 
                     location.href = '/site/login/'
                 }
 
                 //所有mainpanel下part标签连接全部改变
-                $('#mainpanel').find('a:not(.clearPart)').each(function() {
+                $('#mainpanel').find('a:not(.clearPart)').not('[data-toggle=modal]').each(function() {
                     $(this).attr('href', '/site/switch/#' + $(this).attr('href'));
                 });
 
                 //改变选中菜单
                 $('#child_nav').find('li').removeClass('active');
-                $('#child_nav a[href="' + data.params + '"]').parent().addClass('active').parent().show();
+                 $('#child_nav a[href="' + data.params + '"]').parent().addClass('active').parent().show().parent().addClass('parent-focus');
+                
                 
                  clearTimeout($loading);
                 $('#mainpanel').removeLoad();
 				
                 //刷新后滚动
                 $('body').removeClass('modal-open');
+                
+                 //删除黑瓶
+                $('.modal-backdrop').remove();
+                
+                //共供初始化
+                 $('input, textarea').placeholder();
             }, 'json');
         }
         loadPart();
@@ -77,5 +86,13 @@
 			   loadPart() ;
 			}
 		});
+        
+        //get完成后初始化
+        $(document).ajaxComplete(function(event,request, settings) {
+             //共供初始化
+             if(typeof(settings) !== undefined && settings.type.toUpperCase() == 'GET'){
+                $('input, textarea').placeholder();
+            }
+         });
     });
 </script>   

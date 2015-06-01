@@ -45,8 +45,8 @@ class OrderController extends Base_Controller_Api {
             $time_type==0 && $where['created_at|>='] = strtotime($start_date);
             $time_type==1 && $where['use_day|>='] = $start_date;
             if($time_type==2){
-                $where['updated_at|>='] = strtotime($start_date);
-                $where['updated_at|exp'] = '>created_at';
+                $where['use_time|>='] = strtotime($start_date);
+                //$where['updated_at|exp'] = '>created_at';
                 $where['used_nums|>'] = 0;
             }
         }
@@ -57,10 +57,9 @@ class OrderController extends Base_Controller_Api {
         if($end_date){
             $time_type==0 && $where['created_at|<='] = strtotime($end_date." 23:59:59");
             $time_type==1 && $where['use_day|<='] = $end_date;
-            $time_type==2 && $where['updated_at|<='] = strtotime($end_date." 23:59:59");
             if($time_type==2){
-                $where['updated_at|<='] = strtotime($end_date." 23:59:59");
-                $where['updated_at|exp'] = '>created_at';
+                $where['use_time|<='] = strtotime($end_date." 23:59:59");
+                //$where['updated_at|exp'] = '>created_at';
                 $where['used_nums|>'] = 0;
             }
         }
@@ -1017,9 +1016,14 @@ class OrderController extends Base_Controller_Api {
                     $OrderModel->begin();  //再开始支付
                 }
                 $PaymentModel = new PaymentModel();
-                if($params[ 'payment' ]=='offline'){
+                if($params[ 'payment' ]=='offline') { //线下支付不生成支付单，直接改订单状态
                     if(!$PaymentModel->chgOrderStatusOnSucc($order['id'],array('status'=>'paid','pay_type'=>'offline','payment'=>'offline'))){
                         throw new Lang_Exception('ERROR_OPERATE_1');
+                    }
+                    //异步存入消息队列
+                    $r = TicketQueueModel::model()->sendOrderIds(array($order['id']));
+                    if ($r==false) {
+                        throw new Lang_Exception('增加订单内容失败');
                     }
                 } else {
                     $payInfo = $PaymentModel->addPayment(array(
@@ -1099,8 +1103,8 @@ class OrderController extends Base_Controller_Api {
                 $OrderModel->commit();
                 $order = $OrderModel->getById($order['id']);
 
-                if($params['is_sms']==1 && $order['source']!=2 && $order['local_source']!=2 && $order['message_open']==1 && empty($order['partner_type'])) {
-                    //自由行不发短信 , 大漠等码商合作伙伴此处不发短信，在异步通知下单成功后发短信
+                if($params['is_sms']==1 && !in_array($order['source'],[1,2]) && $order['local_source']!=2 && $order['message_open']==1 && empty($order['partner_type'])) {
+                    //自由行不发短信 , 淘宝、大漠等码商合作伙伴此处不发短信，在异步通知下单成功后发短信
                     $str = Sms::_getCreateOrderContent($order);
                     Sms::sendSMS($order['owner_mobile'],urlencode($str),1,$order['id']);
                 }
@@ -1148,14 +1152,51 @@ class OrderController extends Base_Controller_Api {
 
         Lang_Msg::output($productInfo);
     }
+    /**
+     * 获取数据相同的订单
+     * （门票名称， 游玩日期， 选择张数， 取票人名称）， （手机号，or 身份证）
+     * @Author:Joe
+     */
+    public function getDuplicateAction()
+    {
+        $where = [];
+        $product_id      = intval($this->body['product_id']); //商品ID
+        $distributor_id  = intval($this->body['distributor_id']); //商品ID
+        $extra           = json_decode(trim($this->body['extra']),true); //参数包
+
+        if (empty($product_id) || empty($distributor_id) || !is_array($extra)) {
+            return  Tools::lsJson(0, '请求参数不完整', []);
+        }
+        $Order = OrderModel::model();
+        $whereCondition = '';
+        foreach ($extra as $value) {
+            $whereCondition .= "(1=1";
+            foreach ($value as $k=>$v) {
+                if ($k=='use_day') {
+                    $use_day = $value['use_day'];
+                    continue;
+                }
+                $whereCondition .= ' and ' . $k .'=\''. $v.'\'';
+            }
+            $whereCondition .= ") or ";
+        }
+        $whereCondition = substr($whereCondition, 0, -4);
+        if (empty($use_day)) {
+            return Tools::lsJson(0, '请求参数不完整', []);
+        }
+        $sql = "select id,owner_mobile,owner_name,nums,use_day,created_at,product_id,name from ".$Order->getTable()." where ".
+        "product_id=".$product_id." and distributor_id=".$distributor_id." and use_day='".$use_day."'".
+        ' and ('.$whereCondition .") order by created_at desc";
+        $orders = $Order->db->selectBySql($sql);
+        Lang_Msg::output($orders);
+    }
 
     /**
      * 获取数据相同的订单
-	 *
+     * （门票名称， 游玩日期， 选择张数， 取票人名称）， （手机号，or 身份证）
      * @Author:Joe
      */
-
-    public function getDuplicateAction() {
+    public function getDuplicateBackAction() {
         $product_id      = intval($this->body['product_id']); //商品ID
         $distributor_id  = intval($this->body['distributor_id']); //商品ID
 		$extra           = json_decode(trim($this->body['extra']),true); //参数包

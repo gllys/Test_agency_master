@@ -74,6 +74,12 @@ class Util_Queue
 	public static function send($queue, $msg=''){
 		return self::redis()->lPush(self::$prefix.$queue, $msg);
 	}
+
+	public static function presend($queue, $msg=''){
+		self::redis()->push("lPush", array(self::$prefix.$queue, $msg));
+		return true;
+		// return self::redis()->lPush(self::$prefix.$queue, $msg);
+	}
 	
 	/**
 	 * [receive description]

@@ -1,0 +1,1 @@
+open_basedir="D:\SOURCE\openapi_ticket\;D:\WAMP\upupw\memcached\;D:\WAMP\upupw\phpmyadmin\;D:\WAMP\upupw\temp\;C:\Windows\Temp\"

@@ -16,6 +16,6 @@ $infotitle = isset($infotitle)?$infotitle:'infotitle2' ;
 window.setTimeout(function(){
    var $url = '<?php echo $url ?>' ;
    if($url=='javascript:history.go(-1);')javascript:history.go(-1);
-   else window.location.href = $url ;
+   else window.location.href = '/#'+ $url ;
 },2000);
 </script>

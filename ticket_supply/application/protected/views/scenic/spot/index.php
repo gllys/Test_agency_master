@@ -113,7 +113,7 @@ $this->breadcrumbs = array('景区管理', '景点管理');
                 //alert(data.msg);
                 var succss_msg = '<div class="alert alert-success"><button data-dismiss="alert" class="close" type="button">×</button><strong>'+data.msg+'</strong></div>';
                 $('#verify_return').html(succss_msg);
-                setTimeout("location.href='/scenic/Spot/?id="+$('#landscape_id').val()+"'", '2000');
+                setTimeout("location.href= '/#'+'/scenic/Spot/?id="+$('#landscape_id').val()+"'", '2000');
             }
         }, "json");
         return false;  

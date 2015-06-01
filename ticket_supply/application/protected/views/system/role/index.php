@@ -8,7 +8,12 @@
                         <a href="" class="panel-close tooltips" data-toggle="tooltip" title="隐藏面板"><i class="fa fa-times"></i></a>
                     </div>
                     <!-- panel-btns -->
-                    <h4 class="panel-title"><a class="btn btn-success btn-sm pull-right" href="/system/role/add/" style="color: #ffffff">新增</a>角色权限</h4>
+                    <ul class="list-inline">
+                        <li class="pull-right"> <a class="btn btn-success btn-sm" href="/system/role/add/" style="color: #ffffff">新增</a></li>
+                        <li><h4 class="panel-title">角色权限</h4></li>
+                        <li><a href="/order/history/help?#9.3" title="帮助文档" class="clearPart"
+                               target="_blank">查看帮助文档</a> </li>
+                    </ul>
                 </div>
                 <!-- panel-heading -->
 
@@ -38,7 +43,7 @@
                             <a href="/system/role/edit/?id=<?php echo $item['id'] ?>"  style="border-width: 1px">
                                 修改
                             </a>
-                            <a href="/system/role/del/?id=<?php echo $item['id'] ?>" class="del" style="color:#FF0000">删除</a>
+                            <a href="/system/role/del/?id=<?php echo $item['id'] ?>" class="del  clearPart" style="color:#FF0000">删除</a>
                         </td>
                     </tr>
                     <?php endforeach;?>
@@ -61,7 +66,7 @@
             var url = $(this).attr('href');
 			PWConfirm('确定要删除?',function(){
 			    $.post(url, function() {
-                window.location.reload();
+                window.location.partReload();
             });
         });
            

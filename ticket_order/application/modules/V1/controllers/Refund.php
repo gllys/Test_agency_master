@@ -132,7 +132,23 @@ class RefundController extends Base_Controller_Api {
         if (isset($this->body['source'])) {
             $where .= ' AND b.source = ' . intval($this->body['source']) . ' ';
         }
-        // 时间段
+        // 冗余时间筛选，代码统一
+        if(isset($this->body['time_type']) && $this->body['time_type']==0){//预定
+            $created_at_start = isset($this->body['start_date'])?strtotime(trim($this->body['start_date'])):0;
+            $created_at_end = isset($this->body['end_date'])?strtotime(trim($this->body['end_date']) . ' 23:59:59'):time();
+            $where .= ' AND b.created_at between ' . $created_at_start . ' AND ' . $created_at_end . ' ';
+        }
+        if(isset($this->body['time_type']) && $this->body['time_type']==1){//游玩
+            $use_day_start = isset($this->body['start_date'])?trim($this->body['start_date']):"1970-01-01";
+            $use_day_end = isset($this->body['end_date'])?trim($this->body['end_date']):date("Y-m-d");
+            $where .= ' AND b.use_day between \'' . $use_day_start . '\' AND \'' . $use_day_end . '\' ';
+        }
+        if(isset($this->body['time_type']) && $this->body['time_type']==2){//入园
+            $use_time_start = isset($this->body['start_date'])?strtotime(trim($this->body['start_date'])):0;
+            $use_time_end = isset($this->body['end_date'])?strtotime(trim($this->body['end_date']) . ' 23:59:59'):time();
+            $where .= ' AND b.use_time between ' . $use_time_start . ' AND ' . $use_time_end . ' ';
+        }
+        // 时间段 旧有时间段筛选 @tips 防止前端部分地方调用
         if (isset($this->body['created_at']) && $this->body['created_at']) {
             $created_at = explode(' - ', $this->body['created_at']);
             $created_at_start = strtotime(reset($created_at));
@@ -143,7 +159,7 @@ class RefundController extends Base_Controller_Api {
             $use_day = explode(' - ', $this->body['use_day']);
             $use_day_start = reset($use_day);
             $use_day_end = end($use_day);
-            $where .= ' AND b.use_day between ' . $use_day_start . ' AND ' . $use_day_end . ' ';
+            $where .= ' AND b.use_day between \'' . $use_day_start . '\' AND \'' . $use_day_end . '\' ';
         }
         if (isset($this->body['use_time']) && $this->body['use_time']) {
             $use_time = explode(' - ', $this->body['use_time']);
@@ -218,6 +234,22 @@ class RefundController extends Base_Controller_Api {
         // 来源
         if (isset($this->body['source'])) {
             $where['source'] = intval($this->body['source']);
+        }
+        // 冗余时间筛选，代码统一
+        if(isset($this->body['time_type']) && $this->body['time_type']==0){//预定
+            $created_at_start = isset($this->body['start_date'])?strtotime(trim($this->body['start_date'])):0;
+            $created_at_end = isset($this->body['end_date'])?strtotime(trim($this->body['end_date']) . ' 23:59:59'):time();
+            $where['created_at|BETWEEN'] = array($created_at_start,$created_at_end);
+        }
+        if(isset($this->body['time_type']) && $this->body['time_type']==1){//游玩
+            $use_day_start = isset($this->body['start_date'])?trim($this->body['start_date']):"1970-01-01";
+            $use_day_end = isset($this->body['end_date'])?trim($this->body['end_date']):date("Y-m-d");
+            $where['use_day|BETWEEN'] = array($use_day_start,$use_day_end);
+        }
+        if(isset($this->body['time_type']) && $this->body['time_type']==2){//入园
+            $use_time_start = isset($this->body['start_date'])?strtotime(trim($this->body['start_date'])):0;
+            $use_time_end = isset($this->body['end_date'])?strtotime(trim($this->body['end_date']) . ' 23:59:59'):time();
+            $where['use_time|BETWEEN'] = array($use_time_start,$use_time_end);
         }
         // 时间段
         if (isset($this->body['created_at']) && $this->body['created_at']) {

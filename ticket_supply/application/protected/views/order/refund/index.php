@@ -10,8 +10,12 @@ $this->breadcrumbs = array('订单', '退款管理');
     </style>
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h4 class="panel-title">退款管理</h4>
+            <ul class="list-inline">
+                <li><h4 class="panel-title">退款管理</h4></li>
+                <li><a href="/order/history/help?#5.2" title="帮助文档" class="clearPart" target="_blank">查看帮助文档</a> </li>
+            </ul>
         </div>
+
         <div class="panel-body">
             <form class="form-inline" method="get" action="/order/refund/index" onsubmit="return check();">
                 <div class="mb10">
@@ -63,7 +67,7 @@ $this->breadcrumbs = array('订单', '退款管理');
                 foreach ($list as $key=>$item):
                ?> 
                 <tr >
-                    <td data-target=".bs-example-modal-static"  onclick="point('<?php echo $item['order_id'];?>','<?php echo $item['id'];?>')"data-toggle="modal"><a href="#"><?php echo $key ?></a></td>
+                    <td data-target=".bs-example-modal-static"  onclick="point('<?php echo $item['order_id'];?>','<?php echo $item['id'];?>')"data-toggle="modal"><a  class="clearPart" href="javascript:void(0)"><?php echo $key ?></a></td>
                     <td><a href="/order/detail/?id=<?php echo $item['order_id'] ?>"><?php echo $item['order_id'];?></a></td>
                     <td><?php echo date('Y-m-d H:i:s',$item['created_at']);?></td>
                     <td><?php echo isset($org[$item['distributor_id']])?$org[$item['distributor_id']]:''; ?></td>
@@ -79,7 +83,9 @@ $this->breadcrumbs = array('订单', '退款管理');
                 <?php endif;?>
                     <td><?php echo isset($user[$item['op_id']])?$user[$item['op_id']]:''; ?></td>
                 <?php if($item['allow_status'] == 0):?>   
-                    <td data-target=".bs-example-modal-static"  onclick="point('<?php echo $item['order_id'];?>','<?php echo $item['id'];?>')"data-toggle="modal"><a href="#">处理</a></td>
+                    <td data-target=".bs-example-modal-static"  onclick="point('<?php echo
+                    $item['order_id'];?>',
+                        '<?php echo $item['id'];?>')"data-toggle="modal"><a href="javascript:void(0)" class="clearPart" >处理</a></td>
                 <?php else:?>
                 	<td></td>
                 <?php endif;?>

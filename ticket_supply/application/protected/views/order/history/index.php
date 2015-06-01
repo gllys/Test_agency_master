@@ -19,7 +19,11 @@ $this->breadcrumbs = array('订单', '订单管理');
                    data-original-title=""><i class="fa fa-times"></i></a>
             </div>
             <!-- panel-btns -->
-            <h4 class="panel-title">订单管理</h4>
+
+            <ul class="list-inline">
+                <li><h4 class="panel-title">订单管理</h4></li>
+                <li><a href="/order/history/help?#order" title="帮助文档" class="clearPart" target="_blank">查看帮助文档</a> </li>
+            </ul>
         </div>
         <div class="panel-body">
             <form class="form-inline" method="get" action="/order/history/view/menu/<?php echo $_GET['menu'] ?>">
@@ -54,7 +58,7 @@ $this->breadcrumbs = array('订单', '订单管理');
                                 //下拉列表
                                  foreach ($_querys as $key => $val) :
                                 ?>
-                                <li><a class="sec-btn" href="javascript:;" data-id="<?php echo $key ?>" id="" aria-labelledby="search_label"><?php echo $val; ?></a></li>
+                                <li><a class="sec-btn clearPart" href="javascript:;" data-id="<?php echo $key ?>" id="" aria-labelledby="search_label"><?php echo $val; ?></a></li>
                                 <?php endforeach; ?>
                             </ul>
                             <script>
@@ -200,7 +204,9 @@ $this->breadcrumbs = array('订单', '订单管理');
                 return false;
             }
             $('.is_export').attr('value', '1');
+            $('form').addClass('clearPart');
             $('form').submit();
+			$('form').removeClass('clearPart');
             $('.is_export').attr('value', '0');
         });
         // Tags Input

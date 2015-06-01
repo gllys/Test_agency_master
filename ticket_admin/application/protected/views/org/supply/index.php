@@ -35,7 +35,20 @@
                     <input placeholder="注册日期结束"  style="cursor: pointer;cursor: hand;background-color: #ffffff" name="end_date" id="end_date" class="form-control datepicker"  type="text" readonly="readonly" value="<?php echo isset($_GET['end_date']) ? $_GET['end_date'] : '' ?>">
                 </div>
                 <!--注册结束日期-->
-                
+
+                <!--可用状态开始-->
+                <div class="form-group" style="width: 55px;">
+                    可用状态
+                </div>
+                <div class="form-group" style="width: 120px;">
+                    <select style="width: 120px;" class="select2 col-sm-4" data-placeholder="Choose One" name="status">
+                        <option value="">所有状态</option>
+                        <option value="1">启用</option>
+                        <option value="disable" >禁用</option>
+                    </select>
+                </div>
+                <!--可用状态结束-->
+
                 <div></div>
                 <!--省开始-->
                 <div class="form-group" style="width: 100px;">
@@ -91,17 +104,7 @@
                 </div>
                 <!--县结束-->
 
-                <!--可用状态开始-->
-                <div class="form-group">可用状态</div>
-                <div class="form-group" style="width: 120px;">
-                    <select style="width: 120px;" class="select2 col-sm-4" data-placeholder="Choose One" name="status">
-                        <option value="">所有状态</option>
-                        <option value="1">启用</option>
-                        <option value="disable" >禁用</option>
-                    </select>
-                </div>
-                <!--可用状态结束-->
-                
+
                 <!--审核状态开始-->
                 <div class="form-group">审核状态</div>
                 <div class="form-group" style="width: 120px;">
@@ -117,6 +120,18 @@
                     </select>
                 </div>
                 <!--审核状态结束-->
+
+                <!--供应商类型-->
+                <div class="form-group" style="width: 65px;">
+                   供应商类型
+                </div>
+                <div class="form-group" style="width: 120px;">
+                    <select style="width: 120px;" class="select2 col-sm-4" data-placeholder="Choose One" name="supply_type">
+                        <option value="">请选择</option>
+                        <option value="0" <?php if(isset($_GET['supply_type']) && $_GET['supply_type'] === '0') echo 'selected="selected"';?>>批发商</option>
+                        <option value="1" <?php if(isset($_GET['supply_type']) && $_GET['supply_type'] === '1') echo 'selected="selected"';?>>景区</option>
+                    </select>
+                </div>
                 <div class="form-group">
                     <button class="btn btn-primary btn-sm" type="submit">查询</button>
                 </div>
@@ -138,7 +153,9 @@
                             <td>编号</td>
                             <!-- <td>旅行社类别</td> -->
                             <td>名称</td>
-                            <td>所在地</td>
+                            <td width="120px">所在地</td>
+                            <td>供应商类型</td>
+                            <td>电子票务系统</td>
                             <td>员工</td>
                             <td>注册日期</td>
                             <td>可用状态</td>
@@ -186,6 +203,17 @@
                                                 }
                                                 ?>
                                         <?php echo $value['address']; ?>
+                                    </td>
+                                    <td><?php echo ($value['supply_type']) ? '景区' : '批发商';?></td>
+                                    <td><?php
+                                        if(!$value['supply_type']) {
+                                            echo '未使用';
+                                        }else if($value['partner_type'] == 0) {
+                                            echo '票台';
+                                        }else if($value['partner_type'] == 1) {
+                                            echo '大漠';
+                                        }
+                                        ?>
                                     </td>
                                     <td class="icon">
                                         <a href="/org/supply/staff/id/<?php echo $value['id'] ?>/"><i class="fa fa-user"></i></a>

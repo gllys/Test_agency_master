@@ -21,7 +21,7 @@ class TicketQueueModel extends Base_Model_Abstract
 
     public static function send(array $data)
     {
-        return Process_Async::send(array(__CLASS__, 'rsync'), array($data));
+        return Process_Async::presend(array(__CLASS__, 'rsync'), array($data));
     }
 
     public static function rsync($data)
@@ -36,8 +36,13 @@ class TicketQueueModel extends Base_Model_Abstract
             //echo $data['productInfo']['id'], " ok ", PHP_EOL;
         } catch (Exception $e) {
             $model->rollback();
+            //echo $e->getMessage(), PHP_EOL;
             //echo $data['productInfo']['id'], " fail ", PHP_EOL;
-             $logs = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $logs = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            //保存参数并发邮件通知
+            $args = var_export($data, true);
+            $content = 'method: '.__METHOD__."\n message: ". $e->getMessage() ."\n params: {$args}";
+            MailModel::sendSrvGroup("下单异步操作失败", $content);
             Log_Base::save(self::$_prefix . "FailData", $logs);
         }
     }

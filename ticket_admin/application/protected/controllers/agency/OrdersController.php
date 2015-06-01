@@ -1,5 +1,14 @@
 <?php
+/**
+ * @link
+ */
 use common\huilian\models\Pay;
+use common\huilian\utils\Header;
+use common\huilian\utils\GET;
+
+/**
+ * 分销系统-订单管理
+ */
 class OrdersController extends Controller {
 
 	public function actionView($is_export = false) {
@@ -75,6 +84,7 @@ class OrdersController extends Controller {
 		$params['type'] = 0;
 		//$params['supplier_id'] = $org_id;
 		$params['time_type'] = isset($params['time_type']) ? $params['time_type'] : 0;
+		$params = GET::requiredAdd(['source', 'agency_name', ], $params);
 		$data = $this->getApiLists($params, $is_export, $data);
 		
 		$lans = $data['lists']['data'];
@@ -96,7 +106,9 @@ class OrdersController extends Controller {
 				$data['pages']->pageSize = $params['items'];
 			}
 		}
-		
+// 		Header::utf8();
+// 		var_dump($data['lists']);
+// 		exit;
 		$this->render('index', $data);
 	}
 	

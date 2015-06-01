@@ -84,7 +84,7 @@ class OpenApiPartnerModel extends Base_Model_Api
         if (!empty($response)) {
             $response = json_decode($response, true);
             if ($response !== false) {
-                if (array_key_exists('code', $response) && $response['code'] == '200') {
+                if (is_array($response) && array_key_exists('code', $response) && $response['code'] == '200') {
                     return $response;
                 }
             }

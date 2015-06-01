@@ -19,8 +19,12 @@ class ScenicController extends Base_Controller_Ota
             'response' => $response,
             'params' => $this->body,
         ));
-        if($response['code'] == 'fail'){
-            Lang_Msg::error($response['message']);
+        if ($response['code'] == 'fail') {
+            Lang_Msg::output(array(
+                'code' => 400,
+                'message' => $response['message'],
+                'result' => array(),
+            ));
         }
         
         $list = array();
@@ -34,7 +38,13 @@ class ScenicController extends Base_Controller_Ota
             'action' => 'scenic_list',
             'list' => $list,
         ));
-        Lang_Msg::output($list);
+        Lang_Msg::output(array(
+            'code' => 200,
+            'message' => '',
+            'result' => array(
+                'scenics' => $list,
+            ),
+        ));
     }
 
     /**
@@ -46,14 +56,21 @@ class ScenicController extends Base_Controller_Ota
      *  sign        是   string      参数签名。
      */
     public function detailAction(){
-
+        $required_params = array(
+            'id'
+        );
+        if(!Util_Common::checkParams($this->body,$required_params)) {
+            Lang_Msg::output(array(
+                'code' => 400,
+                'message' => '参数不完整',
+                'result' => array(),
+            ));
+        }
         $params = $this->body;
         Util_Logger::getLogger('openapi')->info(__METHOD__, array(
             'action' => 'scenic_detail',
             'params' => $this->body,
         ));
-        if(!isset($params['id']))
-            Lang_Msg::error('id错误');
 
         //调用接口查询 景点详情 数据
         $response = ApiOtaModel::model()->scenicDetail(array(
@@ -65,13 +82,21 @@ class ScenicController extends Base_Controller_Ota
             'response' => $response,
         ));
         if($response['code'] == 'fail'){
-            Lang_Msg::error($response['message']);
+            Lang_Msg::output(array(
+                'code' => 400,
+                'message' => $response['message'],
+                'result' => array(),
+            ));
         }else if($response['code'] == 'succ'){
             $data = array();
             if(isset($response['body']) && is_array($response['body'])) {
                 $data = $this->packScenic($response['body']);
             }
-            Lang_Msg::output($data);
+            Lang_Msg::output(array(
+                'code' => 200,
+                'message' => '',
+                'result' => $data
+            ));
         }
     }
 

@@ -42,7 +42,7 @@
                 $this->beginContent('//layouts/left');
                 $this->endContent();
                 ?>
-                <div class="mainpanel">
+                <div class="mainpanel" id="mainpanel">
                     
                     <?php echo $content; ?>
 

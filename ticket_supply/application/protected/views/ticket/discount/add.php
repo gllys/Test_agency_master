@@ -153,7 +153,7 @@ $action = isset($action) ? $action : $this->getAction()->getId();
                 if ($('#discount-form').validationEngine('validate') === true) {
                     $.post('/ticket/discount/save', $('#discount-form').serialize(), function (data) {
                         if (data.error == 0) {
-                            alert("保存成功！",function(){location.href = "/ticket/discount";});
+                            alert("保存成功！",function(){location.href = '/#'+ "/ticket/discount";});
                         } else {
                             alert("保存失败," + data.msg);
                         }
@@ -162,7 +162,7 @@ $action = isset($action) ? $action : $this->getAction()->getId();
             });
 
             $("#clear-discount-btn").click(function () {
-                location.href = "/ticket/discount";
+                location.href = '/#'+ "/ticket/discount";
                 //$('#s2id_distributor-select').find(".select2-chosen").text("请输入分销商名称");
             });
 
@@ -170,7 +170,7 @@ $action = isset($action) ? $action : $this->getAction()->getId();
 
         $('#distributor-select').change(function(){
             if($(this).val()=="-1"){
-                window.location.href = "/ticket/limitagency/add";
+                window.location.href = '/#'+ "/ticket/limitagency/add";
             }
         });
 

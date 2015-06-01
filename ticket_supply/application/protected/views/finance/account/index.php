@@ -22,8 +22,14 @@ $this->breadcrumbs = array('结算管理', '收款账号');
     <link rel="stylesheet" href="/css/validationEngine.jquery.css">
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h4 class="panel-title">
-                  <button id="add_card" class="btn btn-primary btn-xs pull-right" data-target=".modal-bank" data-toggle="modal">添加银行卡</button>我的银行卡</h4>
+            <ul class="list-inline">
+                <li class="pull-right"><button id="add_card" class="btn btn-primary btn-xs" data-target=".modal-bank"
+                             data-toggle="modal">添加银行卡</button>
+                </li>
+                <li><h4 class="panel-title">我的银行卡</h4></li>
+                <li><a href="/order/history/help?#6.1" title="帮助文档" class="clearPart" target="_blank">查看帮助文档</a> </li>
+            </ul>
+
         </div>
             <table class="table table-bordered table1">
                 <thead>
@@ -47,12 +53,12 @@ $this->breadcrumbs = array('结算管理', '收款账号');
                                 <td>
                                     <?php if ($bank_list['status'] == 'normal'): ?>默认账户
                                     <?php else: ?>
-                                        <a class="update_status" title="" href="/finance/account/updateBank/?id=<?php echo $bank_list['id'] ?>"><button class='btn  btn-success btn-xs'>设为默认</button></a>
+                                        <a class="update_status clearPart" title="" href="/finance/account/updateBank/?id=<?php echo $bank_list['id'] ?>"><button class='btn  btn-success btn-xs'>设为默认</button></a>
                                     <?php endif; ?>	
                                 </td>
                                 <td>
-                                    <a href=".bs-example-modal-lg"  onclick="edit('<?php echo $bank_list['id'] ?>')" data-toggle="modal" class="btn btn-success btn-bordered btn-xs" >修改</a>
-                                    <a title="删除" href="/finance/account/delBank/?id=<?php echo $bank_list['id'] ?>&account=<?php echo $bank_list['account'] ?>&account_name=<?php echo $bank_list['account_name'] ?>" class="del btn btn-xs btn-danger btn-bordered">删除</a>
+                                    <a href=".bs-example-modal-lg"  onclick="edit('<?php echo $bank_list['id'] ?>')" data-toggle="modal" class="btn btn-success btn-bordered btn-xs clearPart" >修改</a>
+                                    <a title="删除" href="/finance/account/delBank/?id=<?php echo $bank_list['id'] ?>&account=<?php echo $bank_list['account'] ?>&account_name=<?php echo $bank_list['account_name'] ?>" class="del btn btn-xs btn-danger btn-bordered clearPart">删除</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -288,7 +294,7 @@ $this->breadcrumbs = array('结算管理', '收款账号');
                     if (data.error === 0) {
 
                         setTimeout(function(){
-                            alert('添加银行卡成功',function(){window.location.reload();});
+                            alert('添加银行卡成功',function(){window.location.partReload();});
                         },500)
                     } else {
 
@@ -308,7 +314,7 @@ $this->breadcrumbs = array('结算管理', '收款账号');
                 if (data.error === 0) {
 
                     setTimeout(function(){
-                        alert('删除成功',function(){window.location.reload();});
+                        alert('删除成功',function(){window.location.partReload();});
                     },500)
                 } else {
 
@@ -327,18 +333,18 @@ $this->breadcrumbs = array('结算管理', '收款账号');
 			    $.post(_this.attr('href'), function(data) {
                 if (data.error == 0) {
                     //console.log(123);
-                    //alert('设置成功',function(){window.location.reload();});
+                    //alert('设置成功',function(){window.location.partReload();});
 
                     setTimeout(function(){
-                        alert('设置成功',function(){window.location.reload();});
+                        alert('设置成功',function(){window.location.partReload();});
                     },500)
 
                     //console.log(456);
-                    //window.location.reload();
+                    //window.location.partReload();
                 } else {
 
                     setTimeout(function(){
-                        //alert('设置成功',function(){window.location.reload();});
+                        //alert('设置成功',function(){window.location.partReload();});
                         alert(data.msg);
                     },500)
 

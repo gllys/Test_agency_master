@@ -10,7 +10,7 @@ require dirname(__FILE__) . '/Base.php';
 
 class Crontab_SaleStat extends Process_Base
 {
-    private $interval = 43200; //每次统计间隔12小时
+    private $interval = 3600; //每次间隔1小时
     private $start_time = 0;
     private $end_time = 0;
     private $year = 2015;
@@ -19,7 +19,8 @@ class Crontab_SaleStat extends Process_Base
 
     public function run()
     {
-        for ($month = 10; $month <= 12; $month++) { //统计历史数据
+        /*
+         * for ($month = 10; $month <= 12; $month++) { //统计历史数据
             $this->statYm(2014, $month);
         }
 
@@ -27,12 +28,18 @@ class Crontab_SaleStat extends Process_Base
         for ($month = 1; $month <= $currM; $month++) { //统计历史数据
             $this->statYm(2015, $month);
         }
+        */
 
         while (true) {
-            $this->OrderModel = new OrderModel();
-            $this->SaleStatModel = new SaleStatModel();
-            $this->statYestoday();
-            $this->sleep($this->interval);
+            $hour = intval(date("H")); //当前小时
+            $runTime = 0;
+            if($hour>=2 && $hour<=4) {
+                $this->OrderModel = new OrderModel();
+                $this->SaleStatModel = new SaleStatModel();
+                $this->statYestoday();
+                $runTime = 3600;
+            }
+            $this->sleep($this->interval+$runTime);
         }
     }
 

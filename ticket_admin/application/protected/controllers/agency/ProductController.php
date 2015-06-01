@@ -46,21 +46,37 @@ class ProductController extends Controller
 		// 注意目前供应商名称模糊查询,通过供应商接口,因Tickettemplate接口暂未提供该功能
 		if(!empty($params['organization_name'])) {
 			$datas = Organizations::api()->list(['name' => $params['organization_name'], 'items' => 1000, ]);
-			$lists = ApiModel::getLists($datas);
+			$orgLists = ApiModel::getLists($datas);
 			// 如果没有匹配到供应商，直接输出，不必再处理下去。注意，需加exit终止程序，执行。
-			if(!count($lists)) {
+			if(!count($orgLists)) {
 				$this->render('index', ['lists' => [], ]);
 				exit;
 			}
 			
 			$params['or_id'] = '';
-			foreach($lists as $list) {
+			foreach($orgLists as $list) {
 				$params['or_id'] .= $list['id'] .',';
 			}
 			$params['or_id'] = rtrim($params['or_id'], ', ');
 			unset($params['organization_name']);
 		}
-		
+
+        if(!empty($params['scenic_name'])) {
+            $datas = Landscape::api()->lists(array('status'=>1, 'take_from_poi'=>0, 'keyword'=>$params['scenic_name'], 'fields'=>'id', 'items'=>10000));
+            $scenicLists = ApiModel::getLists($datas);
+            // 如果没有匹配到景区，直接输出，不必再处理下去。注意，需加exit终止程序，执行。
+            if(!count($scenicLists)) {
+                $this->render('index', ['lists' => [], ]);
+                exit;
+            }
+            $params['scenic_id'] = '';
+            foreach($scenicLists as $list) {
+                $params['scenic_id'] .= $list['id'] .',';
+            }
+            $params['scenic_id'] = rtrim($params['scenic_id'], ', ');
+            unset($params['scenic_name']);
+        }
+
 		$params['p'] = isset($_GET['page']) ? $_GET['page'] : 1;
 		$datas = Tickettemplate::api()->lists($params);
 		$lists = ApiModel::getLists($datas);
@@ -69,8 +85,7 @@ class ProductController extends Controller
 		
 // 		Header::utf8();
 // 		var_dump($params);
-// 		var_dump($lists);
-// 		exit;
+ 		//echo "<pre>";print_r($lists) ;exit;
 		$pagination = ApiModel::getPagination($datas);
 		$pages = new CPagination($pagination['count']);
 		$pages->pageSize = 15; #每页显示的数目

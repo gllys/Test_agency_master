@@ -67,110 +67,112 @@ class PlatformController extends Controller
 	}
 
 	function actionFetchCashExport()
-	{
+    {
         Yii::import('application.extensions.PHPExcel');
         require_once "PHPExcel.php";
         require_once "PHPExcel/Autoloader.php";
-        Yii::registerAutoloader(array('PHPExcel_Autoloader','Load'), true);
-		$params = $_REQUEST;
-		$provider = array();
-		$org_id = Yii::app()->user->org_id;
-		if (intval($org_id) > 0) {
-            set_time_limit(180000) ;
+        Yii::registerAutoloader(array('PHPExcel_Autoloader', 'Load'), true);
+        $params = $_REQUEST;
+        $provider = array();
+        $org_id = Yii::app()->user->org_id;
+        if (intval($org_id) > 0) {
+            set_time_limit(180000);
             ini_set('memory_limit', '256M');
-            $path = YiiBase::getPathOfAlias('webroot') .'/assets';
+            $path = YiiBase::getPathOfAlias('webroot') . '/assets';
             if (!is_dir($path)) {
-                mkdir($path,0755,true);
+                mkdir($path, 0755, true);
             }
-            $objExcel = PHPExcel_IOFactory::load($path .'/export-platform-template.xls');
+            $objExcel = PHPExcel_IOFactory::load($path . '/export-platform-template.xls');
             $objExcel->setActiveSheetIndex(0);
             $sheet = $objExcel->getActiveSheet();
-			// Yii::import('ext.CSVExport');
-			$org = Yii::app()->user;
-			$data['status_labels'] = array('0' => '未打款', '1' => '已打款', '2' => '驳回');
-			if (isset($params['status']) && !in_array($params['status'], array_keys($data['status_labels'])) ) {
+            // Yii::import('ext.CSVExport');
+            $org = Yii::app()->user;
+            $data['status_labels'] = array('0' => '未打款', '1' => '已打款', '2' => '驳回');
+            if (isset($params['status']) && !in_array($params['status'], array_keys($data['status_labels']))) {
                 unset($params['status']);
             }
-			if (!isset($params['time']) || empty($params['time'])) {
+            if (!isset($params['time']) || empty($params['time'])) {
                 $params['time'] = date('Y-m');
             }
             $month = explode('-', $params['time']);
             $days = cal_days_in_month(CAL_GREGORIAN, $month[1], $month[0]);
             $params['start_date'] = $params['time'] . '-01';
-            $params['end_date'] = $params['time'] . '-'.$days;
-            
-                $params['org_ids'] = $org_id; //机构ID
-                //$params['org_name'] = $org->display_name; //分销商名字
-                $params['op_account'] = $org->account; //操作者账号	
-                $params['trade_type'] = '4'; //交易类型:1支付,2退款,3充值,4提现,5应收账款
-                $params['org_role'] = '1'; //机构角色：0分销售，1供应商
-                $params['current'] = isset($params['page']) ? $params['page'] : 1;
-                $params['items'] = 20; 
-                $result = Unionmoneyencash::api()->lists($params); 
-                if($result['body']['pagination']['count']=='0'){
-                    $flag['msg'] = '对不起,没有找到相关记录,无法导出!';
-                    echo '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />'."<script>alert('".$flag['msg']."');history.go(-1);</script>";
-                    exit; //json_encode($flag);
-                }
-                $provider_header[0] = array('id'=>'序列','created_at'=>'提现时间','apply_username'=>'操作人','apply_account'=>'用户账号','money'=>'金额',
-                                            'type'=>'交易类型','status'=>'交易状态','union_money'=>'账户总余额');
+            $params['end_date'] = $params['time'] . '-' . $days;
+
+            $params['org_ids'] = $org_id; //机构ID
+            //$params['org_name'] = $org->display_name; //分销商名字
+            $params['op_account'] = $org->account; //操作者账号	
+            $params['trade_type'] = '4'; //交易类型:1支付,2退款,3充值,4提现,5应收账款
+            $params['org_role'] = '1'; //机构角色：0分销售，1供应商
+            $params['current'] = isset($params['page']) ? $params['page'] : 1;
+            $params['items'] = 20;
+            $result = Unionmoneyencash::api()->lists($params);
+            if ($result['body']['pagination']['count'] == '0') {
+                $flag['msg'] = '对不起,没有找到相关记录,无法导出!';
+                echo '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />' . "<script>alert('" . $flag['msg'] . "');history.go(-1);</script>";
+                exit; //json_encode($flag);
+            }
+            $provider_header[0] = array('id' => '序列', 'created_at' => '提现时间', 'apply_username' => '操作人', 'apply_account' => '用户账号', 'money' => '金额', 'type' => '交易类型', 'status' => '交易状态', 'union_money' => '账户总余额');
             if ($result['code'] == 'succ') {
                 $last_row = count($result['body']['data']) + 2;
-                $i = 4;                
-                 foreach ($result['body']['data'] as $key => $value) {
+                $i = 4;
+                foreach ($result['body']['data'] as $key => $value) {
                     $value['union_money'] = intval(100 * $value['union_money'] - 100 * $value['money']) / 100;
-                    if($i<$last_row){
-                        if(0 != $i%2){
-                          $sheet->duplicateStyle($sheet->getStyle('A3:H3'),'A'.$i.':H'.$i);
-                        }else{
-                          $sheet->duplicateStyle($sheet->getStyle('A2:H2'),'A'.$i.':H'.$i);
+                    if ($i < $last_row) {
+                        if (0 != $i % 2) {
+                            $sheet->duplicateStyle($sheet->getStyle('A3:H3'), 'A' . $i . ':H' . $i);
+                        } else {
+                            $sheet->duplicateStyle($sheet->getStyle('A2:H2'), 'A' . $i . ':H' . $i);
                         }
-                      }
+                    }
                     foreach ($provider_header[0] as $k => $val) {
-                        if(in_array($k, array_keys($value) )){
-                            if($k=='created_at') 
-                                 $provider[$key][$k] =  date('Y年m月d日',$value[$k]);
-                            elseif($k=='money' || $k=='union_money') 
-                                 $provider[$key][$k] =  number_format($value[$k],2);
-                            elseif($k=='status' && $val=='1') 
-                                 $provider[][$k] = '-'. $data['status_labels'][$value[$k]];
-                            elseif($k=='status') 
-                                 $provider[$key][$k] =  $data['status_labels'][$value[$k]];
-                            else $provider[$key][$k] =  $value[$k];
+                        if (in_array($k, array_keys($value))) {
+                            if ($k == 'created_at')
+                                $provider[$key][$k] = date('Y年m月d日', $value[$k]);
+                            elseif ($k == 'money' || $k == 'union_money')
+                                $provider[$key][$k] = number_format($value[$k], 2);
+                            elseif ($k == 'status' && $val == '1')
+                                $provider[][$k] = '-' . $data['status_labels'][$value[$k]];
+                            elseif ($k == 'status')
+                                $provider[$key][$k] = $data['status_labels'][$value[$k]];
+                            else
+                                $provider[$key][$k] = $value[$k];
                         }
-                        if($k=='type' && isset($provider[$key]))
-                                 $provider[$key][$k] =  '提现';
+                        if ($k == 'type' && isset($provider[$key]))
+                            $provider[$key][$k] = '提现';
                     }
                     $i++;
-                 }
-               }  
-               // if(!empty($provider)) $provider = array_merge($provider_header,$provider);
-                $objExcel->getActiveSheet()->fromArray($provider, null, 'A2');
-                $objWriter = PHPExcel_IOFactory::createWriter($objExcel, 'Excel5');
-                // $csv = new ECSVExport($provider,true,false); 
-                // $content = $csv->toCSV();
-                if(isset($params['status'])&&isset($data['status_labels'][$params['status']])) {
-                    $filename = $params['time'].$data['status_labels'][$params['status']].'提现记录.xls'; 
-                }else{
-                $filename = $params['time'].'提现记录.xls'; 
                 }
-                $filename = iconv("UTF-8","GBK",$filename); 
-                // Yii::app()->getRequest()->sendFile($filename, $content . "\r\n", "text/csv", false);
-                header("Pragma: public");
-                header("Expires: 0");
-                header("Cache-Control:must-revalidate, post-check=0, pre-check=0");
-                header("Content-Type:application/force-download");
-                header("Content-Type: application/vnd.ms-excel;");
-                header("Content-Type:application/octet-stream");
-                header("Content-Type:application/download");
-                header("Content-Disposition:attachment;filename=".$filename);
-                header("Content-Transfer-Encoding:binary");
-                $objWriter->save("php://output");
-                exit();
+            }
+            // if(!empty($provider)) $provider = array_merge($provider_header,$provider);
+            $objExcel->getActiveSheet()->fromArray($provider, null, 'A2');
+            $objWriter = PHPExcel_IOFactory::createWriter($objExcel, 'Excel5');
+            // $csv = new ECSVExport($provider,true,false); 
+            // $content = $csv->toCSV();
+            if (isset($params['status']) && isset($data['status_labels'][$params['status']])) {
+                $filename = $params['time'] . $data['status_labels'][$params['status']] . '提现记录.xls';
+            } else {
+                $filename = $params['time'] . '提现记录.xls';
+            }
+            $filename = iconv("UTF-8", "GBK", $filename);
+            // Yii::app()->getRequest()->sendFile($filename, $content . "\r\n", "text/csv", false);
+            ob_end_clean();
+            header("Pragma: public");
+            header("Expires: 0");
+            header("Cache-Control:must-revalidate, post-check=0, pre-check=0");
+            header("Content-Type:application/force-download");
+            header("Content-Type: application/vnd.ms-excel;");
+            header("Content-Type:application/octet-stream");
+            header("Content-Type:application/download");
+            header("Content-Disposition:attachment;filename=" . $filename);
+            header("Content-Transfer-Encoding:binary");
+            $objWriter->save("php://output");
+            exit();
         }
-      return '';
-	}
-/**提取现金
+        return '';
+    }
+
+    /**提取现金
 org_id 	是 	Int 	机构ID
 apply_uid 	是 	Int 	申请者UID
 apply_account 	是 	string 	申请者账号

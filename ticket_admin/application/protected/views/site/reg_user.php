@@ -148,7 +148,7 @@
 			            <div class="pull-left">
 				            <div class="ckbox ckbox-primary mt5">
 					            <input name="RegisterForm[agree_term]" type="hidden" checked="checked" id="agree" value="1">
-					            <!--<label for="agree">勾选此选择框，即表示您同意 <a href="#">《软件许可及服务协议》</a></label>-->
+					            <!--<label for="agree">勾选此选择框，即表示您同意 <a href="javascript:void(0)">《软件许可及服务协议》</a></label>-->
 				            </div>
 			            </div>
 			            <div class="pull-right">

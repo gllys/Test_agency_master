@@ -97,11 +97,11 @@ $this->breadcrumbs = array('财务管理', '交易报表');
                                 <span class="caret"></span>
                             </button>
                             <ul class="dropdown-menu" role="menu">
-                                <li><a class="sec-btn" href="javascript:;" data-id="id" id="">订单号</a></li>
-                                <li><a class="sec-btn" href="javascript:;" data-id="landscape_name" id="">景区</a></li>
-                                <li><a class="sec-btn" href="javascript:;" data-id="product_name" id="" aria-labelledby="search_label">门票名称</a></li>
-                                <li><a class="sec-btn" href="javascript:;" data-id="distributor_name" id="">分销商</a></li>
-                                <li><a class="sec-btn" href="javascript:;" data-id="supplier_name" id="">供应商</a></li>
+                                <li><a class="sec-btn clearPart" href="javascript:;" data-id="id" id="">订单号</a></li>
+                                <li><a class="sec-btn clearPart" href="javascript:;" data-id="landscape_name" id="">景区</a></li>
+                                <li><a class="sec-btn clearPart" href="javascript:;" data-id="product_name" id="" aria-labelledby="search_label">门票名称</a></li>
+                                <li><a class="sec-btn clearPart" href="javascript:;" data-id="distributor_name" id="">分销商</a></li>
+                                <li><a class="sec-btn clearPart" href="javascript:;" data-id="supplier_name" id="">供应商</a></li>
                             </ul>
                             <script>
                                 $('.sec-btn').click(function() {

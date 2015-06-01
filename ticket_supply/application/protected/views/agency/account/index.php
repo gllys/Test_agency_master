@@ -2,7 +2,10 @@
 
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h4 class="panel-title">添加分销商</h4>
+            <ul class="list-inline">
+                <li><h4 class="panel-title">添加分销商</h4></li>
+                <li><a href="/order/history/help?#7.1" title="帮助文档" class="clearPart" target="_blank">查看帮助文档</a> </li>
+            </ul>
         </div>
         <div class="panel-body">
             <div class="row">

@@ -8,7 +8,12 @@
                         <a href="" class="panel-close tooltips" data-toggle="tooltip" title="隐藏面板"><i class="fa fa-times"></i></a>
                     </div>
                     <!-- panel-btns -->
-                    <h4 class="panel-title"><a class="btn btn-success btn-sm pull-right" href="/system/staff/add/" style="color: #ffffff">新增</a>员工管理</h4>
+                    <ul class="list-inline">
+                        <li class="pull-right"><a class="btn btn-success btn-sm" href="/system/staff/add/" style="color: #ffffff">新增</a></li>
+                        <li><h4 class="panel-title">员工管理</h4></li>
+                        <li><a href="/order/history/help?#9.2" title="帮助文档" class="clearPart"
+                               target="_blank">查看帮助文档</a> </li>
+                    </ul>
                 </div>
                 <!-- panel-heading -->
 
@@ -54,11 +59,11 @@
                         <td><?php echo $item['mobile']; ?></td>
                         <td><?php echo $item['status'] ? '<font color="green">启用</font>' : '<font color="red">禁用</font>' ?></td>
                         <td>
-                            <a title="修改" href="/system/staff/edit/?id=<?php echo $item['id'] ?>">
+                            <a  title="修改" href="/system/staff/edit/?id=<?php echo $item['id'] ?>">
                                 修改
                             </a>
                             <?php if (!$item['is_super']): ?>
-                                <a title="删除" style="color:#FF0000" data-name="<?php echo $item['name']?>" data-id="<?php echo $item['id'] ?>" href="javascript:;" class="del">
+                                <a title="删除" style="color:#FF0000" data-name="<?php echo $item['name']?>" data-id="<?php echo $item['id'] ?>" href="javascript:;" class="del  clearPart">
                                     删除
                                 </a>
                             <?php endif ?>
@@ -89,11 +94,11 @@
                 if (data.error) {
                     var warn_msg = '<div class="alert alert-danger"><button data-dismiss="alert" class="close" type="button">×</button><i class="icon-warning-sign"></i>'+data.msg+'</div>';
                     $('#show_msg').html(warn_msg);
-                    location.href='#show_msg';
+                    location.href= '/#'+'#show_msg';
                 } else {
                     var succss_msg = '<div class="alert alert-success"><strong>删除成功</strong></div>';
                     $('#show_msg').html(succss_msg);
-                    window.location.reload();
+                    window.location.partReload();
                 }
 			},'json');
         });

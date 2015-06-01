@@ -12,7 +12,7 @@ class CheckController extends Controller {
     public function actionIndex() {
         //如果是景区用户，则直接跳转
         if (Yii::app()->user->lan_id && empty($_GET['landscape_id'])) {
-            $this->redirect('/check/check/?landscape_id=' . Yii::app()->user->lan_id);
+            Yii::app()->runController('/check/check/index/landscape_id/' . Yii::app()->user->lan_id);
         }
 
         //景点查询
@@ -81,6 +81,7 @@ class CheckController extends Controller {
 // 		var_dump($lists);
 // 		var_dump($landscapes);
 // 		exit;
+        
         $this->render('index', compact('lists', 'pages', 'landscapes', 'pois', 'totalNums', 'orderNums'));
     }
 
@@ -173,8 +174,8 @@ class CheckController extends Controller {
     public function actionSetsimpleticket() {
         $user = Users::model()->findByPk(Yii::app()->user->uid);
         if (Yii::app()->request->isPostRequest) {
-            $user->print_type = $_POST['print_type'];
-            if ($user->save()) {
+            $flag = Users::model()->updateByPk(Yii::app()->user->uid, array('print_type'=>$_POST['print_type'])) ;
+            if ($flag) {
                 $this->_end(0, '设置小票打印成功！');
             } else {
                 $this->_end(1, '设置小票打印失败！');

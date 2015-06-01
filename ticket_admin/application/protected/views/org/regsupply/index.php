@@ -42,7 +42,7 @@
                                     <div class="form-group">
                                         <label class="col-sm-2 control-label"><span class="text-danger">*</span> 机构名称</label>
                                         <div class="col-sm-6">
-                                            <input type="text" placeholder=""  tag="机构名称" class="form-control validate[required,custom[chinese],minSize[4], maxSize[40]]" maxlength="40" name="name"  />
+                                            <input type="text" placeholder=""  tag="机构名称" class="form-control validate[required,custom[chiMark],minSize[4], maxSize[40]]" maxlength="40" name="name"  />
                                         </div>
                                     </div>
 

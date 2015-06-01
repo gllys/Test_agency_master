@@ -36,7 +36,7 @@ try{
 			
 			$("#operations").show()
 			.find("button[name=home]").click(function() {
-				window.location.href = window.location.protocol+'//'+window.location.hostname;
+				window.location.href = '/#'+ window.location.protocol+'//'+window.location.hostname;
 			}).end()
 			.find("button[name=back]").click(function() {
 				history.go(-1);

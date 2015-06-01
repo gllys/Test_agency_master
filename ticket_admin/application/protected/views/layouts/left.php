@@ -1,6 +1,6 @@
 <div class="leftpanel">
     <!--<div class="media profile-left">
-        <a href="#" class="pull-left profile-thumb">
+        <a href="javascript:void(0)" class="pull-left profile-thumb">
             <img alt="" src="/img/profile.png" class="img-circle">
         </a>
         <div class="media-body">

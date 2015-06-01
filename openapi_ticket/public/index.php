@@ -1,5 +1,5 @@
 <?php
-
+echo 1111; die;
 $env = getenv('APP_ENV');
 if($env === 'product') {
     error_reporting(0);

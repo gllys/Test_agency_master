@@ -56,9 +56,9 @@
                 </div>
             </th>
             <th width="200">
-                <a class="btn btn-primary btn-sm" id="delete-all"> 删除</a>
+                <a class="btn btn-primary btn-sm  clearPart" id="delete-all"> 删除</a>
                 <?php if($read_time != 1 && $is_allow != 1) {?>
-                <a class="btn btn-primary btn-sm" id="update-all" style="margin-left: 20px"> 设为已读</a>
+                <a class="btn btn-primary btn-sm  clearPart" id="update-all" style="margin-left: 20px"> 设为已读</a>
                 <?php }?>
             </th>
             <th width="450"></th>
@@ -97,7 +97,7 @@
                             ?>
                         </p>
 
-                        <div class="modal fade msg_body<?php echo $message['id']?>">
+                        <div class="modal fade clearPart_body msg msg_body<?php echo $message['id']?>">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
@@ -133,7 +133,7 @@
                     <?php endif;?>
                 </td>
                 <td><?php echo date('Y-m-d',$message['created_at'])?></td>
-                <td><a href="javascript:;" data-id="<?php echo $message['id']?>" class="text-danger setDeleted">删除</a></td>
+                <td><a href="javascript:;" data-id="<?php echo $message['id']?>" class="text-danger setDeleted  clearPart">删除</a></td>
             </tr>
         <?php endforeach;?>
         <?php else:?>
@@ -171,7 +171,7 @@
 
 
         <div class="modal-content">
-            <form method="post" action="/system/message/preview" target="_blank">
+            <form method="post" class="clearPart" action="/system/message/preview" target="_blank">
             <div class="modal-header">
                 <div id="report"></div>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -182,7 +182,7 @@
                 <div class="form-group">
                     <label class="col-sm-2 control-label">主题：</label>
                     <div class="col-sm-4">
-                        <input maxlength="20" name="title" type="text" class="form-control" placeholder="">
+                        <input maxlength="20" name="title" type="text" class="form-control" placeholder="" />
                     </div>
                 </div>
 
@@ -202,12 +202,12 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <img id="loader" src="/img/select2-spinner.gif" style="display: none" alt=""/>
-                <input id="preview" type="submit" class="btn btn-primary" value="预览">
+                <img id="loader" src="/img/select2-spinner.gif" style="display: none" alt="" />
+                <input id="preview" type="submit" class="btn btn-primary" value="预览" />
                 <button type="button" class="btn btn-success" id="send_advice">发送</button>
             </div>
-        </div>
         </form>
+        </div>
     </div>
 <!-- 发送公告结束 -->
 </div>
@@ -226,19 +226,57 @@
 <!--到期提醒处理开始-->
 <div id='verify-modal' class="modal fade modal-bank" tabindex="-1" role="dialog"></div>
 
+<!--到期提醒处理结束-->
+<script  charset="utf-8" src="/js/kindeditor-4.1.10/kindeditor.js"></script>
+<script  charset="utf-8" src="/js/kindeditor-4.1.10/lang/zh_CN.js"></script>
+<script  charset="utf-8" src="/js/kindeditor.create.js"></script>
+<script  charset="utf-8" src="/js/message.js"></script>
 <script>
     function modal_jump(obj) {
+        
+        var url = $(obj).attr('href');        
+        //到期提醒未读数量减一
+        if($(obj).parent().parent().parent().hasClass('no-read') && url.indexOf("ticket_id=") != -1){            
+            var msg_id = parseInt($(obj).parent().attr('data-id'));
+            $.post('/system/message/read', {
+                'id': msg_id
+            }, function (data) {
+                if (data.error == 0) {
+                    var num;
+                    var read_num;
+                    var unread;
+                    num = $('#unread_num').text();
+                    unread = $('#unread').text();
+                    read_num = $('#read_num').text();
+                    //未读消息的累减
+                    if (Number(num) > 0) {
+                        num = num - 1;
+                    }
+                    if (Number(num) == 0) {
+                        $('#unread_num').remove();
+                    } else {
+                        $('#unread_num').text(num);
+                    }
+                    //标签内未读消息累减
+                    if (Number(unread) > 0) {
+                        unread = unread - 1;
+                    }
+                    if (Number(unread) == 0) {
+                        $('#unread').remove();
+                    } else {
+                        $('#unread').text(unread);
+                    }
+                    $('#setRead' + msg_id).removeClass('font-bold');
+                    $('#readAdvice' + msg_id).removeClass('font-bold');
+                    $('#sender' + msg_id).removeAttr('style');                    
+                } 
+            }, 'json');
+        }
         document.getElementById('verify-modal').innerHTML = '';
         $.get($(obj).attr('href'), function(data) {
             $('#verify-modal').html(data);
         });
     }
-</script>
-<!--到期提醒处理结束-->
-<script  charset="utf-8" src="/js/kindeditor-4.1.10/kindeditor.js"></script>
-<script  charset="utf-8" src="/js/kindeditor-4.1.10/lang/zh_CN.js"></script>
-<script  charset="utf-8" src="/js/kindeditor.create.js"></script>
-<script>
 jQuery(document).ready(function() {
 	
 	//　预览，本处对公告的完整性进行检测
@@ -276,7 +314,7 @@ jQuery(document).ready(function() {
         }, function(data) {
             if (data.error == 0) {
                 $('#message' + id).remove();
-                top.location.reload();
+                location.partReload();
             } else {
                 alert(data.msg);
             }
@@ -359,7 +397,7 @@ jQuery(document).ready(function() {
                     alert(data.msg);
                 } else {
                     alert(data.msg);
-                    setTimeout("window.location.reload();",2000);
+                    setTimeout("window.location.partReload();",2000);
                 }
             },'json');
         });
@@ -388,7 +426,7 @@ jQuery(document).ready(function() {
                     alert(data.msg);
                 } else {
                     alert(data.msg);
-                    setTimeout("window.location.reload();",2000);
+                    setTimeout("window.location.partReload();",2000);
                 }
             },'json');
         });
@@ -417,13 +455,13 @@ jQuery(document).ready(function() {
                 if (data.error) {
                     var warn_msg = '<div class="alert alert-danger"><button data-dismiss="alert" class="close" type="button">×</button><i class="icon-warning-sign"></i>' + data.msg + '</div>';
                     $('#report').html(warn_msg);
-                    location.href = '#report';
+                    location.href = '/#'+ '#report';
                     $('#send_advice').show();
                     $('#loader').hide();
                 } else {
                     var succss_msg = '<div class="alert alert-success"><strong>发送成功!</strong></div>';
                     $('#report').html(succss_msg);
-                    top.location.reload();
+                    location.partReload();
                 }
         },'json');
     })

@@ -35,7 +35,10 @@ $this->breadcrumbs = array('结算管理','平台资产');
           <div class="panel-heading">
             <div class="panel-btns" style="display: none;"> <a title="" data-toggle="tooltip" class="panel-minimize tooltips" href="" data-original-title="Minimize Panel"><i class="fa fa-minus"></i></a> <a title="" data-toggle="tooltip" class="panel-close tooltips" href="" data-original-title="Close Panel"><i class="fa fa-times"></i></a> </div>
             <!-- panel-btns -->
-            <h4 class="panel-title">平台资产</h4>
+              <ul class="list-inline">
+                  <li><h4 class="panel-title">平台资产</h4></li>
+                  <li><a href="/order/history/help?#6.3" title="帮助文档" class="clearPart" target="_blank">查看帮助文档</a> </li>
+              </ul>
           </div>
           <div class="panel-body"> <span>可用余额：<b class="red"><?php if(isset($total['total_union_money'])) $union_money = $total['total_union_money']; else $union_money = 0; echo $union_money;?></b></span> <span>冻结金额：<b class="orange"><?php if(isset($total['total_frozen_money'])) $frozen_money = $total['total_frozen_money']; else $frozen_money = 0; echo $frozen_money; ?></b></span> <span>合计总额：<b class="blue"><?php echo $union_money +$frozen_money; ?></b></span> </div>
           <!-- panel-body --> 
@@ -156,7 +159,7 @@ $this->breadcrumbs = array('结算管理','平台资产');
                   <input type="hidden" name="trade_type" value="4" />
                   <input type="hidden" name="frozen_type" value="1" />
                   <input id="yan" type="hidden" name="yan" value="1" />
-                	<button type="button"  data-toggle="modal"  class="btn btn-primary mr20" data-target=".modal-bank"  href=".modal-bank" id="fetch_cash">提交提现</button>
+                	<button type="button"  data-toggle="modal"  class="btn btn-primary mr20 clearPart" data-target=".modal-bank"  href=".modal-bank" id="fetch_cash">提交提现</button>
                         <button class="btn btn-default" type="button" onclick="history.back()">取消返回</button>
                 </div>
               </div>
@@ -313,9 +316,9 @@ $this->breadcrumbs = array('结算管理','平台资产');
  function fetch(){
                   if($('#tixian').validationEngine('validate')==true){
                         $.post('/finance/platform/fetchapply',$('#tixian').serialize(),function(data){
-                           // alert(data.msg,function(){location.href = '/finance/platform/index/tab/2' ;});
-                            if(data.error==0) alert('error',function(){location.href = '/finance/platform/index/tab/2' ;});
-                            else alert(data.msg,function(){location.href = '/finance/platform/index/tab/2' ;});
+                           // alert(data.msg,function(){location.href = '/#'+ '/finance/platform/index/tab/2' ;});
+                            if(data.error==0) alert('error',function(){location.href = '/#'+ '/finance/platform/index/tab/2' ;});
+                            else alert(data.msg,function(){location.href = '/#'+ '/finance/platform/index/tab/2' ;});
                       },"json");
                     }
         }
@@ -361,7 +364,9 @@ $('#fetch_cash').click(function(){
           if($('#tixianForm').validationEngine('validate')==true){
             var url = "/finance/platform/fetchCashExport"; 
             $("#tixianForm").attr("action", url);
+			$("#tixianForm").addClass('clearPart');
             $("#tixianForm").submit();
+			$("#tixianForm").removeClass('clearPart');
           }
         });
 

@@ -28,7 +28,8 @@ class TicketPolicyModel extends Base_Model_Abstract
 
     public function getDetail($id,$distributor_id=0){
         if(!$id) return false;
-        $detail = reset($this->search(array('id'=>$id)));
+        $data = $this->search(array('id'=>$id));
+        $detail = empty($data)? false:reset($data);
         if(!$detail) return false;
         $where = array('policy_id'=>$id);
         $distributor_id && $where['distributor_id']= $distributor_id;

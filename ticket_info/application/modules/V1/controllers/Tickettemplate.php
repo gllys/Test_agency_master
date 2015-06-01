@@ -26,6 +26,19 @@ class TickettemplateController extends Base_Controller_Api
             $where['partner_type'] = $partner_type;
         }
 
+        if(isset($this->body['is_group_once_verificate'])){
+            $where['is_group_once_verificate'] = intval($this->body['is_group_once_verificate']);
+        }
+        if(isset($this->body['is_group_once_taken'])){
+            $where['is_group_once_taken'] = intval($this->body['is_group_once_taken']);
+        }
+        if(isset($this->body['is_fat_once_verificate'])){
+            $where['is_fat_once_verificate'] = intval($this->body['is_fat_once_verificate']);
+        }
+        if(isset($this->body['is_fat_once_taken'])){
+            $where['is_fat_once_taken'] = intval($this->body['is_fat_once_taken']);
+        }
+
         $partner_product_code = trim(Tools::safeOutput($this->body['partner_product_code']));
         if(!empty($partner_product_code)) {
             $where['FIND_IN_SET|EXP'] = "('".$partner_product_code."',partner_product_code)";
@@ -282,7 +295,9 @@ class TickettemplateController extends Base_Controller_Api
 
             if($return['policy_id']) { //检查分销商是否有权限订购
                 $return['can_buy'] = true;
-                $payment = explode(',',$return['payment']);
+                $payment = array('1','2','3','4');
+                $dis_credit = $dis_advance = false;
+
                 $policyInfo = TicketPolicyModel::model()->getDetail($return['policy_id'],$distributor_id);
                 if($policyInfo) { //有分销策略
                     //获取供应商绑定的分销商
@@ -300,8 +315,8 @@ class TickettemplateController extends Base_Controller_Api
                             $return['group_discount'] = doubleval($policyInfo['items']['group_price']);
                             //$policyInfo['items']['credit_flag'] && array_push($payment,2);
                             //$policyInfo['items']['advance_flag'] && array_push($payment,3);
-                            !$policyInfo['items']['credit_flag'] && $payment = array_diff($payment,array('2'));
-                            !$policyInfo['items']['advance_flag'] && $payment = array_diff($payment,array('3'));
+                            !$policyInfo['items']['credit_flag'] && $dis_credit=true;
+                            !$policyInfo['items']['advance_flag'] && $dis_advance=true;
                         }
                     } else if (in_array($distributor_id,$distributorIds)) {
 						if($policyInfo['new_blackname_flag']) {
@@ -311,8 +326,8 @@ class TickettemplateController extends Base_Controller_Api
 							$return['group_discount'] = doubleval($policyInfo['new_group_price']);
 							//$policyInfo['other_credit_flag'] && array_push($payment,2);
 							//$policyInfo['other_advance_flag'] && array_push($payment,3);
-							!$policyInfo['new_credit_flag'] && $payment = array_diff($payment,array('2'));
-							!$policyInfo['new_advance_flag'] && $payment = array_diff($payment,array('3'));
+							!$policyInfo['new_credit_flag'] && $dis_credit=true;
+							!$policyInfo['new_advance_flag'] && $dis_advance=true;
 						}
 					} else if($policyInfo['other_blackname_flag']) {
                         $return['can_buy'] = false;
@@ -321,12 +336,12 @@ class TickettemplateController extends Base_Controller_Api
                         $return['group_discount'] = doubleval($policyInfo['other_group_price']);
                         //$policyInfo['other_credit_flag'] && array_push($payment,2);
                         //$policyInfo['other_advance_flag'] && array_push($payment,3);
-                        !$policyInfo['other_credit_flag'] && $payment = array_diff($payment,array('2'));
-                        !$policyInfo['other_advance_flag'] && $payment = array_diff($payment,array('3'));
+                        !$policyInfo['other_credit_flag'] && $dis_credit=true;
+                        !$policyInfo['other_advance_flag'] && $dis_advance=true;
                     }
                 }
-                sort($payment);
-                $payment = array_unique($payment);
+                if($dis_credit===true) $payment = array_diff($payment,array('2'));
+                if($dis_advance===true) $payment = array_diff($payment,array('3'));
                 $return['payment'] = implode(',',$payment);
             }
 
@@ -496,7 +511,7 @@ class TickettemplateController extends Base_Controller_Api
         if(isset($this->body[ 'sms_template'])) $args[ 'sms_template' ] = trim($this->body['sms_template']);
 
         // 团客描述
-        if(isset($this->body['group_description']) && Validate::isString($this->body['group_description'])){
+        if(isset($this->body['group_description'])){
             $args['group_description'] = trim($this->body['group_description']);
         }
         // 团客提前预定时间
@@ -512,7 +527,7 @@ class TickettemplateController extends Base_Controller_Api
             $args['is_group_once_taken'] = intval($this->body['is_group_once_taken']);
         }
         // 散客描述
-        if(isset($this->body['fat_description']) && Validate::isString($this->body['fat_description'])){
+        if(isset($this->body['fat_description'])){
             $args['fat_description'] = trim($this->body['fat_description']);
         }
         // 散客提前预定时间
@@ -582,7 +597,19 @@ class TickettemplateController extends Base_Controller_Api
             {
                 SubscribesModel::model()->sendMsg( $id, $or_id, $args , $return );
             }
+
             $TicketTemplateModel->commit();
+            //产品变动异步通知
+            $agencyProducts = AgencyProductModel::model()->search(array('product_id'=>$id));
+            if(!empty($agencyProducts)){
+                foreach($agencyProducts as $v){
+                    Process_Async::send(
+                        array("OtaCallbackModel","productChangedAsync"),
+                        array(array('product_id'=>$v,'code'=>$v['code'],'source'=>$v['source']))
+                    );
+                }
+            }
+
             Tools::lsJson(true,Lang_Msg::getLang('ERROR_OPERATE_0'));
 		}
 		else
@@ -682,6 +709,22 @@ class TickettemplateController extends Base_Controller_Api
             }
             if( $r )
             {
+                //产品变动异步通知
+                $agencyProducts = AgencyProductModel::model()->search(array('product_id|in'=>$ids));
+                if(!empty($agencyProducts)){
+                    foreach($agencyProducts as $v){
+                        Process_Async::send(
+                            array("OtaCallbackModel","productChangedAsync"),
+                            array(array(
+                                'product_id'=>$v,
+                                'code'=>$v['code'],
+                                'source'=>$v['source'],
+                                'is_sale'=>($args['state']==1?1:0)
+                            ))
+                        );
+                    }
+                }
+
                 Tools::lsJson(true,$msg);
             }else{
                 Tools::lsJson(true,'操作失败');
@@ -1243,6 +1286,9 @@ class TickettemplateController extends Base_Controller_Api
                 }
             }
 
+            $use_day = trim($this->body['use_day']);
+            $use_day = preg_match("/^\d{4}-\d{2}-\d{2}$/",$use_day) ? $use_day : '';
+            $ruleIds = array();
             foreach ($data as $k => $v) {
                 if ($show_scenicname && $secnicList) {
                     $v['scenic_id'] = explode(',', $v['scenic_id']);
@@ -1258,7 +1304,54 @@ class TickettemplateController extends Base_Controller_Api
                 }
                 $data[$k]['favor'] = in_array($v['id'], $favorProdIds) ? 1 : 0;
                 $data[$k]['sub'] = in_array($v['id'], $subProdIds) ? 1 : 0;
+
+                if($use_day && $agency_id>0 && $v['rule_id']>0) {
+                    $ruleIds[] = $v['rule_id'];
+                }
             }
+
+            $rules = array();
+            if(!empty($ruleIds) && $use_day) {
+                $ruleItems = TicketRuleItemModel::model()->search(array('rule_id|in'=>$ruleIds,'date'=>$use_day));
+                if(!empty($ruleItems)) {
+                    foreach($ruleItems as $riv) {
+                        $rules[$riv['rule_id']] = array(
+                            'day_fat_price'=>$riv['fat_price'],
+                            'day_group_price'=>$riv['group_price'],
+                            'day_reserve'=>$riv['reserve'],
+                        );
+                    }
+                }
+            }
+            if(!empty($rules) && $use_day) {
+                $cacheRedis = Cache_Redis::factory();
+                foreach ($data as $k => $v) {
+                    if($v['rule_id']>0 && isset($rules[$v['rule_id']])) {
+                        $ruleInfo = $rules[$v['rule_id']];
+                        $ticketDayUsedReserveKey = 'TicketRuleItem|'.$v['id'].'|'.$v['rule_id'].'|'.$use_day;
+                        $ticketDayUsedReserve = $cacheRedis->get($ticketDayUsedReserveKey);
+                        $ruleInfo['used_reserve'] = intval($ticketDayUsedReserve);
+                        $ruleInfo['remain_reserve'] = $ruleInfo['day_reserve']>0 ? $ruleInfo['day_reserve']-$ruleInfo['used_reserve']:-1;
+                        $ruleInfo['price'] = $ticket_type>0 ? $v['fat_price']+$ruleInfo['day_fat_price'] : $v['group_price']+$ruleInfo['day_group_price'];
+                        $ruleInfo['price'] = $ruleInfo['price'] <0 ?0:$ruleInfo['price'];
+                    } else {
+                        $ruleInfo = array(
+                            'day_fat_price'=>0,
+                            'day_group_price'=>0,
+                            'day_reserve'=>0,
+                            'remain_reserve'=>-1,
+                            'price'=> $ticket_type>0 ? $v['fat_price'] : $v['group_price'],
+                        );
+                    }
+                    $data[$k] = array_merge($data[$k],$ruleInfo);
+                }
+            }
+
+            /*$ticketDayUsedReserveKey = 'TicketRuleItem|'.$ticket_id.'|'.$return['rule_id'].'|'.$use_day;
+            $ticketDayUsedReserve = Cache_Redis::factory()->get($ticketDayUsedReserveKey);
+            $return[ 'day_reserve' ] = $ruleInfo[ 'reserve' ];
+            $return[ 'used_reserve' ] = intval($ticketDayUsedReserve);
+            $return[ 'remain_reserve' ] = $ruleInfo[ 'reserve' ]-$return[ 'used_reserve' ];*/
 
             $show_items = intval($this->body['show_items']);
             if ($show_items && $data) {
@@ -1277,6 +1370,230 @@ class TickettemplateController extends Base_Controller_Api
             print_r($e);
             Tools::lsJson(true, 'ok', array('data'=>array(),'pagination'=>array('count'=>0)));
         }
+    }
+	
+    /**
+     * 分销商门票预订列表
+     */
+    public function agency_reserve_listAction() {
+		$now = time();
+		$where = array(
+			'is_del' => 0,
+			'ota_type' => 'system',
+			'expire_end|>=' => $now,
+			'sale_start_time|<=' => $now,
+			'sale_end_time|exp'=>'=0 OR sale_end_time>='.$now,
+		);
+
+		$organization_id = intval($this->body['organization_id']);
+		$organization_id = $organization_id ? $organization_id : $this->body['or_id'];
+		preg_match("/^[\d,]+$/",$organization_id) && $where['organization_id|in'] = explode(',',$organization_id);
+
+		if (isset($this->body['p']) && $this->body['p'] >= 0)
+			$this->current = intval($this->body['p']);
+		// 地区
+		$scenic_name = trim(Tools::safeOutput($this->body['scenic_name']));
+		$scenic_id = trim($this->body['scenic_id']);
+		$view_point = trim($this->body['view_point']);
+		$province_id = trim($this->body['province_id']);
+		$city_id = trim($this->body['city_id']);
+		$district_id = trim($this->body['district_id']);
+		$piWhere = array();
+		if ($scenic_name) {
+			$piWhere['sceinc_name|like'] = array("%{$scenic_name}%");
+		}
+		if ($scenic_id && preg_match("/^[\d,]+$/", $scenic_id)) {
+			$piWhere['scenic_id|in'] = explode(',', $scenic_id);
+		}
+		if ($view_point && preg_match("/^[\d,]+$/", $view_point)) {
+			foreach (explode(',', $view_point) as $poi) {
+				$piWhere['FIND_IN_SET|EXP'] = "({$poi},view_point)";
+			}
+		}
+		if ($province_id && preg_match("/^[\d,]+$/", $province_id)) {
+			$piWhere['province_id|in'] = explode(',', $province_id);
+		}
+		if ($city_id && preg_match("/^[\d,]+$/", $city_id)) {
+			$piWhere['city_id|in'] = explode(',', $city_id);
+		}
+		if ($district_id && preg_match("/^[\d,]+$/", $district_id)) {
+			$piWhere['district_id|in'] = explode(',', $district_id);
+		}
+		if ($piWhere) {
+			$productItems = TicketTemplateItemModel::model()->search($piWhere, "product_id");
+			$productIds = array();
+			foreach ($productItems as $iv) {
+				$productIds[] = $iv['product_id'];
+			}
+			$productIds && $where['id|in'] = $productIds;
+			!$productIds && Lang_Msg::output(array('data' => array(), 'pagination' => array('count' => 0)));
+		}
+
+		if (isset($this->body['state']) && in_array(intval($this->body['state']), array(0, 1)))       // 上下架
+			$where['state'] = intval($this->body['state']);
+		if (isset($this->body['type']) && intval(in_array($this->body['type'], array(0, 1))))        // 类型 电子票 任务单
+			$where['type'] = intval($this->body['type']);
+
+		$is_union = intval($this->body[ 'is_union' ]);
+		(isset($this->body[ 'is_union' ]) && $is_union>=0) && $where['is_union'] = $is_union>0?1:0;
+
+		$name = trim(Tools::safeOutput($this->body['name']));
+		$name && $where['name|like'] = array("%{$name}%");
+
+		$partner_type = intval($this->body['partner_type']);
+		if(isset($this->body['partner_type'])) {
+			$where['partner_type'] = $partner_type;
+		}
+
+		$partner_product_code = trim(Tools::safeOutput($this->body['partner_product_code']));
+		if(!empty($partner_product_code)) {
+			$where['FIND_IN_SET|EXP'] = "('".$partner_product_code."',partner_product_code)";
+		}
+
+		if (isset($this->body['is_fit']))       // 散客筛选
+			$where['is_fit'] = intval($this->body['is_fit']) ? 1 : 0;
+		if (isset($this->body['is_full']))        // 团客筛选
+			$where['is_full'] = intval($this->body['is_full']) ? 1 : 0;
+
+		$agency_id = intval($this->body['agency_id']);
+		if ($agency_id) {  //分销商查询相关可用票
+			$orgInfo = ApiOrganizationModel::model()->orgInfo($agency_id); //机构详情
+			if ($orgInfo) {
+				$supplierIds = ApiOrganizationModel::model()->supplierIdsOfAgency($agency_id);
+				$TicketPolicyItemModel = new TicketPolicyItemModel();
+				$where['or'] = array('policy_id' => 0);
+				if(!empty($supplierIds)) {
+					$where['or']['or'] = array(
+						'and'=>array(
+							'or'=>array(
+								'policy_id|exp' => "in(SELECT policy_id FROM " . $TicketPolicyItemModel->getTable() . " WHERE distributor_id=" . $agency_id . " AND blackname_flag=0)",
+								'and'=>array(
+									'policy_id|in' => "(SELECT id FROM " . TicketPolicyModel::model()->getTable() . " WHERE new_blackname_flag=0)",
+									'policy_id|not in'=>"(SELECT policy_id FROM " . $TicketPolicyItemModel->getTable() . " WHERE distributor_id=" . $agency_id . ")",
+								),
+							),
+							'organization_id|in'=>$supplierIds,
+						),
+					);
+				}
+				$where['or']['and']= array(
+					'policy_id|in' => "(SELECT id FROM " . TicketPolicyModel::model()->getTable() . " WHERE other_blackname_flag=0)",
+					'policy_id|not in' => "(SELECT policy_id FROM " . $TicketPolicyItemModel->getTable() . " WHERE distributor_id=" . $agency_id . " AND blackname_flag=1)",
+				);
+
+				if ((intval($this->body['is_fit']) && !$orgInfo['is_distribute_person']) || (intval($this->body['is_full']) && !$orgInfo['is_distribute_group'])) { //散客票
+					$where['organization_id|in'] = $supplierIds;
+				}
+			}
+		}
+
+		$org_name = trim(Tools::safeOutput($this->body['org_name']));
+		if($org_name){
+			$orgs = ApiOrganizationModel::model()->listByName($org_name,'supply','id');
+			if($orgs){
+				$orgIds = array_keys($orgs);
+				$where['organization_id|in'] = $orgIds;
+			}
+			else {
+				Lang_Msg::output(array('data'=>array(),'pagination'=>array('count'=>0)));
+			}
+		}
+		
+		$source = intval($this->body['source']);
+		empty($source) && Lang_Msg::error("缺少渠道参数");
+		$agencyProducts = AgencyProductModel::model()->search(['agency_id'=>$organization_id,'delete_at'=>0,'source'=>$source], 'id,product_id');
+		if (!empty($agencyProducts)) { // 过滤已发布的商品
+			$pids = [];
+			foreach ($agencyProducts as $k=>$v) {
+				$pids[$k] = $v['product_id'];
+			}
+			$where['id|not in'] = $pids;
+		}
+
+		$TicketTemplateModel = new TicketTemplateModel();
+		$this->count = $TicketTemplateModel->countResult($where);
+		$this->pagenation();
+		$data = $this->count > 0 ? $TicketTemplateModel->search($where, $this->getFields(), $this->getSortRule(), $this->limit) : array();
+		
+		$show_scenicname = intval($this->body['show_scenic_name']);
+		$show_poiname = intval($this->body['show_poi_name']);
+		$secnicList = $poiList = array();
+		if ($show_scenicname || $show_poiname) {
+			$scenicIds = $poiIds = array();
+			foreach ($data as $v) {
+				$show_scenicname && $v['scenic_id'] && $scenicIds[] = $v['scenic_id'];
+				$show_poiname && $v['view_point'] && $poiIds[] = $v['view_point'];
+			}
+			if ($show_scenicname) {
+				$scenicIds = array_unique(explode(',', implode(',', $scenicIds)));
+				sort($scenicIds);
+				$scenics = ScenicModel::model()->getScenicList(array('ids' => implode(',', $scenicIds), 'items' => count($scenicIds)));
+				if (isset($scenics['body']['data'])) {
+					foreach ($scenics['body']['data'] as $sv) {
+						$secnicList[$sv['id']] = $sv['name'];
+					}
+				}
+			}
+			if ($show_poiname) {
+				$poiIds = array_unique(explode(',', implode(',', $poiIds)));
+				sort($poiIds);
+				$pois = ScenicModel::model()->getPoiList(array('ids' => implode(',', $poiIds), 'items' => count($poiIds), 'fields' => 'id,name', 'sort_by' => 'id:asc'));
+				if (isset($pois['body']['data'])) {
+					foreach ($pois['body']['data'] as $sv) {
+						$poiList[$sv['id']] = $sv['name'];
+					}
+				}
+			}
+		}
+
+
+		$productIds = array_keys($data);
+		$ticket_type = !empty($where['is_fit']) ? 1 : (!empty($where['is_full']) ? 0 : 1);
+
+		if($productIds){
+			$favorList = FavoritesModel::model()->search(array('ticket_id|in' => $productIds, 'organization_id' => $agency_id, 'type' => $ticket_type));
+			$favorProdIds = array();
+			foreach ($favorList as $fv) {
+				$favorProdIds[] = $fv['ticket_id'];
+			}
+
+			$subList = SubscribesModel::model()->search(array('ticket_id|in' => $productIds, 'organization_id' => $agency_id, 'type' => $ticket_type));
+			$subProdIds = array();
+			foreach ($subList as $fv) {
+				$subProdIds[] = $fv['ticket_id'];
+			}
+		}
+
+		foreach ($data as $k => $v) {
+			if ($show_scenicname && $secnicList) {
+				$v['scenic_id'] = explode(',', $v['scenic_id']);
+				sort($v['scenic_id']);
+				$data[$k]['scenic_id'] = implode(',', $v['scenic_id']);
+				$data[$k]['scenic_name'] = implode(',', array_intersect_key($secnicList, array_flip($v['scenic_id'])));
+			}
+			if ($show_poiname && $poiList) {
+				$v['view_point'] = explode(',', $v['view_point']);
+				sort($v['view_point']);
+				$data[$k]['view_point'] = implode(',', $v['view_point']);
+				$data[$k]['poi_name'] = implode(',', array_intersect_key($poiList, array_flip($v['view_point'])));
+			}
+			$data[$k]['favor'] = in_array($v['id'], $favorProdIds) ? 1 : 0;
+			$data[$k]['sub'] = in_array($v['id'], $subProdIds) ? 1 : 0;
+		}
+
+		$show_items = intval($this->body['show_items']);
+		if ($show_items && $data) {
+			$productItems = TicketTemplateItemModel::model()->search(array('product_id|in' => $productIds));
+			foreach ($productItems as $piv) {
+				$data[$piv['product_id']]['items'][] = $piv;
+			}
+		}
+
+		$result = array(
+			'data' => array_values($data),
+			'pagination' => array('count' => $this->count, 'current' => $this->current, 'items' => $this->items, 'total' => $this->total)
+		);
+		Tools::lsJson(true, 'ok', $result);
     }
 
     // 门票快到期

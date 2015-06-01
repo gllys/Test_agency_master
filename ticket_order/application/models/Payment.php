@@ -244,6 +244,11 @@ class PaymentModel extends Base_Model_Abstract
                         'content'=>Lang_Msg::getLang('INFO_PAYMENT_1',array('id'=>$data['id'],'order_ids'=>$data['order_ids']))
                     )
                 );
+                //异步存入消息队列
+                $r = TicketQueueModel::model()->sendOrderIds($params['order_ids']);
+                if ($r==false) {
+                    throw new Lang_Exception('增加订单内容失败');
+                }
                 return $data;
             }
         }
@@ -258,12 +263,12 @@ class PaymentModel extends Base_Model_Abstract
         if(!OrderItemModel::model()->update(array('payment'=>$upData['payment'],'status'=>1),array('order_id'=>$orderId))){
             return false;
         }
-        if(!TicketModel::model()->update(array('status'=>1),array('order_id'=>$orderId))){
+        /*if(!TicketModel::model()->update(array('status'=>1),array('order_id'=>$orderId))){
             return false;
         }
         if(!TicketItemModel::model()->update(array('status'=>1),array('order_id'=>$orderId))){
             return false;
-        }
+        }*/
         return true;
     }
 }

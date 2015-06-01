@@ -218,4 +218,22 @@ class Util_Common
     	return date($format, $mt);
     }
     
+    /**
+     * 检测参数
+     * @param array $input_params
+     * @param array $required_params
+     * @return boolean
+     */
+    public static function checkParams($input_params = array(), $required_params = array()) {
+        $result = true;
+        if($required_params) {
+            foreach($required_params as $param) {
+                if(!array_key_exists($param,$input_params)) {
+                    $result = false;
+                    break;                
+                }
+            }
+        }
+        return $result;
+    }
 }

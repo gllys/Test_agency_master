@@ -17,13 +17,14 @@ class ApiOrderModel extends Base_Model_Api
     {
         if (!$user_id)
             return false;
-        $r = Cache_Memcache::factory()->get('cartCount_'.$user_id);
-        if(empty($r)) {
-            $this->url = '/v1/cart/count';
-            $this->params = array('user_id' => $user_id);
-            $r = json_decode($this->request(), true);
-            Cache_Memcache::factory()->set('cartCount_'.$user_id,$r,3);
-        }
+        $this->preCacheKey = 'cache|cartModel|';
+
+        $this->url = '/v1/cart/count';
+        $this->params = array('user_id' => $user_id);
+
+        $r = $this->customCache('cartCount_'.$user_id);
+        if($r==null) $r = $this->customCache('cartCount_'.$user_id,json_decode($this->request(), true));
+
         if (!$r || empty($r['body']['pagination']))
             return false;
         return $r['body']['pagination']['count'];

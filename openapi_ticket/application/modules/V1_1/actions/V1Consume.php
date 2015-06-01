@@ -39,18 +39,35 @@ class ConsumeAction extends Yaf_Action_Abstract{
             ));            
         }
 
-        $params['action'] = 'consume'; //通知OTA这是核销操作
+        $final_params = array(
+            'action' => 'consume', //通知OTA这是核销操作
+            'order_id' => $params['order_id'],
+            'verify_code' => $params['verify_code'],
+            'consume_num' => $params['consume_num'],
+            'posid' => $params['posid'],
+            'serial_num' => $params['serial_num'],
+        );
+        Util_Logger::getLogger('openapi')->info(__METHOD__, array(
+            'action' => 'noticeRefund',
+            'final_params' => $final_params,
+        ));
         $notify_url = $user_model['notify_url'];
-        $notify_result = Tools::curl($notify_url,'POST',http_build_query($params));
+        $notify_result = Tools::curl($notify_url,'POST',http_build_query($final_params));
 
         Util_Logger::getLogger('openapi')->info(__METHOD__, array(
             'action' => 'noticeRefund',
             'source' => $params['source'],
             'notify_result' => $notify_result,
         ));
+        $code = 200;
+        $message = '';
+        if(isset($notify_result['code'])) {
+           $code = $notify_result['code']; 
+           $message = $notify_result['message'];
+        }
         Lang_Msg::output(array(
-            'code' => 200,
-            'code_msg' => '退款通知成功',
+            'code' => $code,
+            'code_msg' => $message,
         ));
     }
 

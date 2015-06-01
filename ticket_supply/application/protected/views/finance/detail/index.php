@@ -48,6 +48,7 @@
 							<th>支付金额</th>
 							<th>退款金额</th>
 							<th>结款金额</th>
+                                                        
 						</tr>
 					</thead>
 					<tbody>
@@ -91,7 +92,7 @@
 							<div class="dropzone">
 								<div class="fallback" <?php echo $detail['payed_img'] ?  '' : 'disabled'?> >
 									<a target="_blank" href="<?php echo $detail['payed_img'] ?  $detail['payed_img'] : '/img/nopic
-									.png'?>" rel="prettyPhoto[gallery]" class="item-media" >
+									.png'?>" rel="prettyPhoto[gallery]" class="item-media clearPart" >
 										<img  src="<?php echo $detail['payed_img']?   $detail['payed_img'] :'/img/nopic.png' ?>" >
 									</a>
 								</div>
@@ -110,14 +111,13 @@
 		
 		
 </div>
-<script type="text/javascript" src="/js/jquery-1.11.1.min.js"></script>
 <script>
 jQuery(document).ready(function() {
 	$('#bill_finish').click(function(){
 		$('bill_finish').attr('disabled',true);
 		$.post('/finance/detail/finish',{ id: $('input[type=hidden]').val()},function(data){
 			if(data.error===0){
-                    alert(data.msg,function(){window.location.href = '/finance/bill';});
+                    alert(data.msg,function(){window.location.href = '/#'+ '/finance/bill';});
                 }else{
                     alert(data.msg);
                 }

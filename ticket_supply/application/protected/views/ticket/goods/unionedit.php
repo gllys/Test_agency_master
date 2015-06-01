@@ -8,9 +8,9 @@
         </div>
         <div class="media-body">
             <ul class="breadcrumb">
-                <li><a href="#"><i class="glyphicon glyphicon-home"></i></a></li>
-                <li><a href="#">门票管理</a></li>
-                <li><a href="#">发布联票</a></li>
+                <li><a href="javascript:void(0)"><i class="glyphicon glyphicon-home"></i></a></li>
+                <li><a href="javascript:void(0)">门票管理</a></li>
+                <li><a href="javascript:void(0)">发布联票</a></li>
             </ul>
         </div>
     </div><!-- media -->
@@ -286,7 +286,7 @@ if ($ticket['refund'] == 0) {
     });
     jQuery(document).ready(function() {
         $('#btnreset').click(function() {
-            location.href = '/ticket/depot/index/type/2';
+            location.href = '/#'+ '/ticket/depot/index/type/2';
         });
 
 
@@ -376,7 +376,7 @@ if ($ticket['refund'] == 0) {
                     if (data.error) {
                         alert(data.msg);
                     } else {
-                        location.href = '/ticket/depot/index/type/2';
+                        location.href = '/#'+ '/ticket/depot/index/type/2';
                     }
                 }, 'json');
             }

@@ -15,9 +15,9 @@ class Qunar_Service{
     protected $application = '去哪儿门票.Menpiao.Agent';
     protected $processor = 'SupplierDataExchangeProcessor';
     protected $version = 'V1.0.0';
-    protected $create_user = 'MEIJINGTEST2';
-    protected $supplier_identity = 'MEIJINGTEST2';
-    protected $signedKey='MEIJINGTESTSIGN';
+    protected $create_user = '';
+    protected $supplier_identity = '';
+    protected $signedKey='';
     
     protected $type = 'default';
     protected $time;
@@ -35,7 +35,7 @@ class Qunar_Service{
 
     protected $service_type = 0; //0:request  1:response
     protected $smarty;
-    protected $xml;
+    public $xml;
 
     /*response所需属性*/
     protected $response_xml;

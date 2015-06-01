@@ -150,11 +150,11 @@
 				if (data.error) {
 					var warn_msg = '<div class="alert alert-danger"><button data-dismiss="alert" class="close" type="button">×</button><i class="icon-warning-sign"></i>'+data.msg+'</div>';
 					$('#show_msg').html(warn_msg);
-					location.href='#show_msg';
+					location.href= '/#'+'#show_msg';
 				} else {
 					var succss_msg = '<div class="alert alert-success"><strong>'+ data.msg +'</strong></div>';
 					$('#show_msg').html(succss_msg);
-					location.href = '/system/role/';
+					location.href = '/#'+ '/system/role/';
 				}
 			},'json');
 		}

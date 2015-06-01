@@ -271,7 +271,7 @@ $this->breadcrumbs = array('单票管理', '设置单票模板');
             if ($(this).validationEngine('validate') === true) {
                 $.post('#', $(this).serialize(), function(data) {
                     if(data.error==0){
-                         alert('保存成功',function(){ window.location.reload();});
+                         alert('保存成功',function(){ window.location.partReload();});
                     }else{
                     alert('保存失败');
                     }

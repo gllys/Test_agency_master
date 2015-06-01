@@ -137,10 +137,10 @@ class VerificationController extends  Base_Controller_Api
                 TicketRecordModel::model()->insert( $record );
                 $record['id'] = TicketRecordModel::model()->getInsertId();
 
-                $OrderModel->useTicket($order_id, $landscape_id, $poi_id, $nums);
+                $use_num = $OrderModel->useTicket($orderInfo, $order_id, $landscape_id, $poi_id, $nums);
 
-                $orderInfo2 = $OrderModel->get(array('id'=>$order_id));
-                $use_num = $orderInfo2['used_nums']-$orderInfo['used_nums']; //核销产品份数
+                // $orderInfo2 = $OrderModel->get(array('id'=>$order_id));
+                // $use_num = $orderInfo2['used_nums']-$orderInfo['used_nums']; //核销产品份数
 
                 // 此处硬编码判断订单是否来自淘宝, 需与淘宝订单状态保持一致.
                 if ($use_num>0 && $orderInfo['local_source'] == 1) { //实际针对所有ota
@@ -152,7 +152,8 @@ class VerificationController extends  Base_Controller_Api
                     {
                         $device = array('id' => 'common');
                     }
-                    if(!TaobaoOrderModel::model()->verificate($orderInfo2, $use_num, $record, $device,$landscape_id)) {
+
+                    if(!TaobaoOrderModel::model()->verificate($orderInfo, $use_num, $record, $device,$landscape_id)) {
                         $OrderModel->rollback();
                         throw new Lang_Exception('无法核销');
                     }
@@ -199,13 +200,37 @@ class VerificationController extends  Base_Controller_Api
             $where['cancel_status'] = 0; //分销商不统计撤销的核销记录
         }
 
-        if( $this->body[ 'p' ] )
-        {
-            $this->body[ 'current' ] = $this->body[ 'p' ];
+        if(isset($this->body['cancel_status'])) { //是否按撤销状态查询
+            $cancel_status = intval($this->body['cancel_status']);
+            if($cancel_status>=0 && $cancel_status<2) {
+                $where['cancel_status'] = $cancel_status>0?1:0;
+            }
         }
+
+        $scenic_name = trim(Tools::safeOutput($this->body['scenic_name'])); //按景区名称查询
+        if(!empty($scenic_name)) {
+            $scenicIds = LandscapeModel::model()->getIdsByName($scenic_name);
+            if($scenicIds!==false){
+                $where['landscape_id|in'] = $scenicIds;
+            } else {
+                Lang_Msg::output(array('data'=>array(),'pagination'=>array('count'=>0),'order_nums'=>0,'total_nums'=>0));
+            }
+        }
+
+        $supply_name = trim(Tools::safeOutput($this->body['supply_name'])); //按供应商名称查询
+        if(!empty($supply_name)) {
+            $supplyIds = OrganizationModel::model()->getIdsByName($supply_name,'supply');
+            if($supplyIds!==false){
+                $where['supplier_id|in'] = $supplyIds;
+            }
+            else{
+                Lang_Msg::output(array('data'=>array(),'pagination'=>array('count'=>0),'order_nums'=>0,'total_nums'=>0));
+            }
+        }
+        
         $this->count = TicketRecordModel::model()->countResult($where);
         $this->pagenation();
-        $tmp= $this->count > 0 ? TicketRecordModel::model()->search( $where, '*', ' id desc ', $this->limit ):array();
+        $tmp= $this->count > 0 ? TicketRecordModel::model()->search( $where, '*', $this->getSortRule(), $this->limit ):array();
         $sort = array();
         foreach( $tmp as $key => $value )
         {
@@ -224,7 +249,7 @@ class VerificationController extends  Base_Controller_Api
         $data['pagination'] = array(
             'count'	=>$this->count,
             'current'=>$this->current,
-            'items' => $this->limit,
+            'items' => $this->items,
             'total' => $this->total,
         );
         Tools::lsJson(true,'ok',$data);
@@ -245,23 +270,28 @@ class VerificationController extends  Base_Controller_Api
         $id = intval($this->body['id']);
         $supplier_id = intval($this->body['supplier_id']);
         $landscape_id = intval($this->body['landscape_id']);
-        $cancel_time = intval($this->body['cancel_time']);
-        if($cancel_time<=0) $cancel_time=300;
+        $is_force = intval($this->body['is_force']);
+        $cancel_source = intval($this->body['cancel_source'])?intval($this->body['cancel_source']):0;
+        $cancel_uid = intval($this->body['cancel_uid']);
+        $cancel_account = trim($this->body['cancel_account'])?trim($this->body['cancel_account']):"";
+        $cancel_name = $this->body['cancel_name']?trim($this->body['cancel_name']):$cancel_account;
+        $now = time();
+
         //查找该条记录
         $record = TicketRecordModel::model()->getById($id);
         if (!$record) {
             Lang_Msg::error('不存在该条记录');
         }
 
-        if ($record['supplier_id']!=$supplier_id && $record['landscape_id']!=$landscape_id) { //供应商或景区有权撤销
+        /*if ($record['supplier_id']!=$supplier_id && $record['landscape_id']!=$landscape_id) { //供应商或景区有权撤销
             Lang_Msg::error('非该供应商记录，不能撤销');
-        }
+        }*/
 
         if ($record['cancel_status'] == 1) {
             Lang_Msg::error('已撤销');
         }
 
-        if (time() - $record['created_at'] > $cancel_time) {
+        if ($is_force<=0 && ($now - $record['created_at']) > 300) {
             Lang_Msg::error('撤销时间已过期');
         }
 
@@ -274,10 +304,24 @@ class VerificationController extends  Base_Controller_Api
             $orderInfo = $OrderModel->get(array('id'=>$record['code']));
             if (!$orderInfo) {
                 throw new Lang_Exception('订单不存在');
+            } else if($orderInfo['status']=='billed' || ($orderInfo['billed_nums']>0 && $orderInfo['billed_nums']>=$orderInfo['nums']-$orderInfo['refunding_nums']-$orderInfo['refunded_nums'])) {
+                throw new Lang_Exception('该订单已结算，不能撤销验票记录');
+            } else if($orderInfo['source']>0 && in_array($orderInfo['source'], OtaAccountModel::model()->sourceOfDisCancel)) {
+                throw new Lang_Exception('该订单不允许撤销验票记录');
             }
 
             $OrderModel->cancelTicket($record['code'], $landscape_id, $poi_id, $record['num']);
-            TicketRecordModel::model()->updateByAttr(array('cancel_status' =>1 , 'updated_at' => time()), array('id' => $id));
+            TicketRecordModel::model()->updateByAttr(
+                array(
+                    'cancel_status' =>1 ,
+                    'updated_at' => $now,
+                    'cancel_source'=>$cancel_source,
+                    'cancel_uid' => $cancel_uid,
+                    'cancel_account' => $cancel_account,
+                    'cancel_name' => $cancel_name,
+                ),
+                array('id' => $id)
+            );
 
             $orderInfo2 = $OrderModel->get(array('id'=>$record['code']),"used_nums");
             $use_num = $orderInfo['used_nums'] - $orderInfo2['used_nums']; //核销产品份数

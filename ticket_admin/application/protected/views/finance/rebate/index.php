@@ -43,7 +43,7 @@ $this->breadcrumbs = array('财务管理','充值优惠');
                                 <td><?php echo $item['num']; ?></td>
                                 <td><?php echo $item['coupon'];?></td>
                                 <td> 
-                                    <a href="#" class="changeedit" onclick="changeEdit('<?php echo  $item['id'] ?>','<?php echo $item['status']?>');
+                                    <a href="javascript:void(0)" class="changeedit" onclick="changeEdit('<?php echo  $item['id'] ?>','<?php echo $item['status']?>');
                                         return false;" <?php if($item['status'] ==1 ){ echo "style = 'color:red'";}?>><?php echo $item['status'] == 1 ?'开启':"关闭";?></a>
                                 </td>
                             </tr>

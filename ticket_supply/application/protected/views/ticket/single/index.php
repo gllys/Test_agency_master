@@ -56,10 +56,15 @@ use common\huilian\utils\Format;
 <div class="contentpanel">
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			<h4 class="panel-title">
-				<button class="btn btn-primary btn-sm pull-right" onclick="modal_jump_add();" data-target=".modal-bank" data-toggle="modal">新建产品</button>
-				产品管理
-			</h4>
+
+            <ul class="list-inline">
+                <li><h4 class="panel-title">产品管理</h4></li>
+                <li class="pull-right"><button class="btn btn-primary btn-sm" onclick="modal_jump_add();" data-target=".modal-bank"
+                             data-toggle="modal">新建产品</button>
+                </li>
+                <li><a href="/order/history/help?#4.3" title="帮助文档" class="clearPart" target="_blank">查看帮助文档</a> </li>
+            </ul>
+
 		</div>
 		<div class="panel-body">
 			<form action="/ticket/single/" class="form-inline">
@@ -104,6 +109,7 @@ use common\huilian\utils\Format;
 							<label for="checkbox-allcheck" class="allcheck">全选</label>
 						</div>
 					</th>
+                    <th style="width:7%;">产品ID</th>
 					<th style="width:11%;">景区</th>
                     <th style="width:15%;">产品名称</th>
                     <th style="width:5%;">状态</th>
@@ -111,8 +117,8 @@ use common\huilian\utils\Format;
 					<th style="width:5%;">团队价</th>
 					<th style="width:9%;">销售起始</th>
 					<th style="width:9%;">销售结束</th>
-					<th style="width:11%;">日库存设置</th>
-					<th style="width:15%;">分销策略</th>
+					<th style="width:9%;">日库存设置</th>
+					<th style="width:10%;">分销策略</th>
 					<th style="width:8%;">操作</th>
 				</tr>
 			</thead>
@@ -128,16 +134,21 @@ use common\huilian\utils\Format;
 							<label for="checkbox<?= $key ?>"></label>
 						</div>
 					</td>
+                    <td style="width:7%;">
+                        <?= $item['id'] ?>
+                    </td>
 					<td style="width:11%;">
 						<?php if(mb_strlen($item['lan_name'],'UTF8') > 6):?>
-                            <a style="color: #636e7b;cursor: pointer;cursor: hand;" title="<?php echo $item['lan_name']?>"><?php echo mb_substr($item['lan_name'],0,6,'UTF8') . '...'?></a>
+                            <a style="color: #636e7b;cursor: pointer;cursor:default;" class="clearPart" href="javascript:void(0)" title="<?php echo $item['lan_name']?>"><?php echo mb_substr($item['lan_name'],0,6,'UTF8') . '...'?></a>
                         <?php else:?>
-                            <a style="color: #636e7b;cursor: pointer;cursor: hand;" title="<?php echo $item['lan_name']?>"><?php echo $item['lan_name']?></a>
+                            <a style="color: #636e7b;cursor: pointer;cursor:default;" class="clearPart" href="javascript:void(0)" title="<?php echo $item['lan_name']?>"><?php echo $item['lan_name']?></a>
                         <?php endif;?>
                     </td>
 					<td style="width:15%;">
 						<div class="rules">
-							<span class="pull-left" style="margin-top: 5px"><?= mb_strlen($item['name'],'utf8')>15?mb_substr($item['name'], 0, 15,'utf8').'...':$item['name'] ?></span>
+							<span class="pull-left" style="margin-top: 5px">
+                                <a class="clearPart" style="cursor: hand; cursor: pointer;" data-target=".modal-bank" data-toggle="modal" href_delay="/ticket/single/detail?ticket_id=<?php echo $item['id'] ?>" onclick="modal_jump_delay(this)"><?= mb_strlen($item['name'],'utf8')>15?mb_substr($item['name'], 0, 15,'utf8').'...':$item['name'] ?></a>
+                            </span>
 						</div>
 					</td>
 					<td style="width:5%;">
@@ -153,16 +164,16 @@ use common\huilian\utils\Format;
 					<td style="width:5%;"><?= $item['group_price'] ?></td>
 					<td style="width:9%;"><?= $item['sale_start_time'] ? Format::date($item['sale_start_time']) : '不限制' ?></td>
 					<td style="width:9%;"><?= $item['sale_end_time'] ? Format::date($item['sale_end_time']) : '不限制' ?></td>
-					<td style="width:11%;">
-						<a style="cursor: pointer; cursor: hand;" data-target=".modal-bank" data-toggle="modal" href_delay="/ticket/single/inventory/?id=<?= $item['id']?>&rid=<?= $item['rule_id']?>&name=<?= $item['name']; ?>" onclick="modal_jump_delay(this);"><?= empty($item['rule_id']) ? '' : '已' ?>设置</a>
+					<td style="width:9%;">
+						<a  class="clearPart" style="cursor: pointer; cursor: hand;" data-target=".modal-bank" data-toggle="modal" href_delay="/ticket/single/inventory/?id=<?= $item['id']?>&rid=<?= $item['rule_id']?>&name=<?= $item['name']; ?>" onclick="modal_jump_delay(this);"><?= empty($item['rule_id']) ? '' : '已' ?>设置</a>
 						<?php if(!empty($item['rule_id'])) { ?>
-						<a style="cursor: pointer;cursor: hand;color:black;" class="pull-center" href="#" onclick="clearDailyStock(<?= $item['id'] ?>)">[清空]</a>
+						<a style="cursor: pointer;cursor: hand;color:black;" class="pull-center clearPart" href="javascript:void(0)" onclick="clearDailyStock(<?= $item['id'] ?>)">[清空]</a>
 						<?php } ?>
 					</td>
-					<td style="width:15%;">
-						<a style="cursor: pointer;cursor: hand;"  data-target=".modal-bank" data-toggle="modal" href_delay="/ticket/single/policy/?id=<?= $item['id'] ?>&policy_id=<?= $item['policy_id'] ?>" onclick="modal_jump_delay(this);"><?= empty($item['policy_name']) ? '设置分销商策略' : $item['policy_name'] ?></a>
+					<td style="width:10%;">
+						<a class="clearPart" style="cursor: pointer;cursor: hand;"  data-target=".modal-bank" data-toggle="modal" href_delay="/ticket/single/policy/?id=<?= $item['id'] ?>&policy_id=<?= $item['policy_id'] ?>" onclick="modal_jump_delay(this);"><?= empty($item['policy_name']) ? '设置分销商策略' : $item['policy_name'] ?></a>
 						<?php if(!empty($item['policy_name'])) {?>
-						<a style="cursor: pointer;cursor: hand;color:black;" class="pull-center" href="#" onclick="clearPoli(<?php echo $item['id']?>);">[清空]</a>
+						<a style="cursor: pointer;cursor: hand;color:black;" class="pull-center clearPart" href="javascript:void(0)" onclick="clearPoli(<?php echo $item['id']?>);">[清空]</a>
 						<?php }?>
 					</td>
 					<td style="white-space:nowrap;">						
@@ -173,9 +184,11 @@ use common\huilian\utils\Format;
 							<?php if($item['force_out'] != 1) { ?>
 							<a onclick="up(<?php echo $item['id'] ?>);return false;" style="cursor: pointer;cursor: hand;">上架</a>
 							<?php } ?>
-							<a style="cursor: pointer;cursor: hand;" style="margin-left: 10px;" href="/ticket/single/edit/?ticket_id=<?php echo $item['id'] ?>" onclick="modal_jump(this);"  data-target=".modal-bank" data-toggle="modal">修改
+							<a  class="clearPart" style="cursor: pointer;cursor: hand;"
+                               href="/ticket/single/edit/?ticket_id=<?php echo $item['id'] ?>" onclick="modal_jump(this);"  data-target=".modal-bank" data-toggle="modal">修改
 							</a>
-							<a style="cursor: pointer;cursor: hand;" style="margin-left: 10px;" href="#" onclick="del(<?php echo $item['id'] ?>); return false;" class="del">删除</a>
+							<a style="cursor: pointer;cursor: hand;" href="javascript:void(0)" onclick="del
+                                (<?php echo $item['id'] ?>); return false;" class="del clearPart">删除</a>
 						<?php endif; ?>
 					</td>
 				</tr>
@@ -188,9 +201,9 @@ use common\huilian\utils\Format;
 <!--			<div class="ckbox ckbox-primary" style="display: inline-block; margin: 0 17px; vertical-align: middle;">-->
 <!--				<input type="checkbox" class="ids" id="checkbox-allcheck1" value=""> <label for="checkbox-allcheck1" class="allcheck">全选</label>-->
 <!--			</div>-->
-			<a href="#" onclick="delAll();return false;" class="btn btn-default btn-bordered btn-sm">全部删除</a> 
-			<a href="#" onclick="upAll();return false;" class="btn btn-default btn-bordered btn-sm">全部上架</a> 
-			<a href="#" onclick="downAll();return false;" class="btn btn-default btn-bordered btn-sm">全部下架</a>
+			<a href="javascript:void(0)" onclick="delAll();return false;" class="btn btn-default btn-bordered btn-sm  clearPart">全部删除</a> 
+			<a href="javascript:void(0)" onclick="upAll();return false;" class="btn btn-default btn-bordered btn-sm  clearPart">全部上架</a> 
+			<a href="javascript:void(0)" onclick="downAll();return false;" class="btn btn-default btn-bordered btn-sm  clearPart">全部下架</a>
 		</div>
 		<div class="pull-right">
 			
@@ -279,7 +292,7 @@ use common\huilian\utils\Format;
             } else {
                 
                 setTimeout(function(){
-                    alert('产品删除成功',function(){window.location.reload();});
+                    alert('产品删除成功',function(){window.location.partReload();});
                 },500);
             }
         }, 'json');
@@ -297,7 +310,7 @@ use common\huilian\utils\Format;
             if (data.error) {
                 alert(data.msg);
             } else {
-                alert('产品下架成功',function(){window.location.reload();});
+                alert('产品下架成功',function(){window.location.partReload();});
             }
         }, 'json');
     }
@@ -314,7 +327,7 @@ use common\huilian\utils\Format;
             if (data.error) {
                 alert(data.msg);
             } else {
-                alert('产品上架成功',function(){window.location.reload();});
+                alert('产品上架成功',function(){window.location.partReload();});
             }
         }, 'json');
     }
@@ -342,7 +355,7 @@ use common\huilian\utils\Format;
             	}, 2000);
             } else {
             	setTimeout(function() {
-                	alert(data.msg,function(){window.location.reload();});
+                	alert(data.msg,function(){window.location.partReload();});
             	}, 2000);
             }
         }, 'json');
@@ -367,7 +380,7 @@ use common\huilian\utils\Format;
             if (data.error) {
                 alert(data.msg);
             } else {
-                alert(data.msg,function(){window.location.reload();});
+                alert(data.msg,function(){window.location.partReload();});
             }
         }, 'json');
     }
@@ -389,7 +402,7 @@ use common\huilian\utils\Format;
             if (data.error) {
                 alert(data.msg);
             } else {
-                alert(data.msg,function(){window.location.reload();});
+                alert(data.msg,function(){window.location.partReload();});
             }
         }, 'json');
     }
@@ -416,7 +429,7 @@ use common\huilian\utils\Format;
             if (data.error) {
                 alert(data.message);
             } else {
-                alert(data.message,function(){window.location.reload();});
+                alert(data.message,function(){window.location.partReload();});
             }
         }, 'json');
     }
@@ -426,7 +439,7 @@ use common\huilian\utils\Format;
             if (data.error) {
                 alert(data.msg);
             } else {
-                alert(data.msg,function(){window.location.reload();});
+                alert(data.msg,function(){window.location.partReload();});
             }
         }, 'json');
     }
@@ -434,9 +447,9 @@ use common\huilian\utils\Format;
             var s_price = $("#s_price").val();
             var g_price = $("#g_price").val();
             var day_storage = $("#day_storage").val();
-            if ((isNaN(s_price) || s_price <= 0)
-                    && (isNaN(g_price) || g_price <= 0)
-                    && (isNaN(day_storage) || day_storage <= 0)) {
+            if (isNaN(s_price) || s_price < 0
+                    || isNaN(g_price) || g_price < 0
+                    || isNaN(day_storage) || day_storage < 0) {
                 $("#day_storage").val('');
                 $('.show_prompt').PWShowPrompt('请设置一个有效的加减价或库存限制'); 
                 return false;
@@ -512,7 +525,7 @@ use common\huilian\utils\Format;
 			   if (data.error) {
 	               alert(data.msg);
 	           } else {
-	               alert('已清空日库存',function(){window.location.reload();});
+	               alert('已清空日库存',function(){window.location.partReload();});
 	           }
          }, 'json');
 	}

@@ -1,6 +1,5 @@
-var editor;
-KindEditor.ready(function(K) {
-    editor = K.create('#remark', {
+$(function(){
+    window.editor = KindEditor.create('#remark', {
         resizeType : 1,
         allowPreviewEmoticons : false,
         allowImageUpload : false,

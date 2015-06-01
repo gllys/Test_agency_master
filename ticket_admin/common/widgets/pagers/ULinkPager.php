@@ -168,7 +168,7 @@ class ULinkPager extends CBasePager {
             $url = $buttons[count($buttons)-1];
             $url = substr($url,strpos($url,'href="')+strlen('href="'));
             $url = substr($url,0,strpos($url,'/page/'));
-            $url = substr($url,0,strpos($url,'/mod/'));
+            $url = str_replace('/mod/part', '', $url);
             
             //如果ajax加载分页
             if(!empty($_GET['mod'])&&$_GET['mod']=='part'){

@@ -459,6 +459,7 @@ class TickettemplatebaseController extends Base_Controller_Api
                 $item['num_by_card'] = (isset($item['num_by_card']) && $item['enter_by_card']) ? intval($item['num_by_card']):0; //使用身份证可购买张数,0不限
                 $item['enter_by_qrcode'] = (isset($item['enter_by_qrcode']) && $item['mult_enter'] && intval($item['enter_by_qrcode'])) ? 1:0;; //是否允许使用二维码入园:0否1是
                 $item['poi_enter_num'] = (isset($item['poi_enter_num']) && $item['mult_enter'] && intval($item['poi_enter_num'])) ? intval($item['poi_enter_num']):1; //每个景点在使用有效期内可使用次数
+                $item['enter_by_palm'] = (isset($item['mult_enter']) && $item['enter_by_palm']) ? intval($item['enter_by_palm']):0; //掌纹
 
                 $item['id'] && $upItems[$item['id']] = $item;
                 !$item['id'] && $addItems[] = $item;
@@ -487,6 +488,7 @@ class TickettemplatebaseController extends Base_Controller_Api
                 $tmp['num_by_card'] = $item['num_by_card'];
                 $tmp['enter_by_qrcode'] = $item['enter_by_qrcode'];
                 $tmp['poi_enter_num'] = $item['poi_enter_num'];
+                $tmp['enter_by_palm'] = $item['enter_by_palm'];
 
 
                 $r = $TicketTemplateBaseModel->update($tmp,array('id'=>$item['id']));
@@ -511,6 +513,7 @@ class TickettemplatebaseController extends Base_Controller_Api
                     $tmpN['num_by_card'] = $item['num_by_card'];
                     $tmpN['enter_by_qrcode'] = $item['enter_by_qrcode'];
                     $tmpN['poi_enter_num'] = $item['poi_enter_num'];
+                    $tmpN['enter_by_palm'] = $item['enter_by_palm'];
 
                     $newData[] = $tmpN;
                 }

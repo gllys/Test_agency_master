@@ -329,6 +329,7 @@ abstract class Base_Model_Abstract
     public function commit() {
         $this->memcache->commit();
         $this->redis->commit();
+        Cache_Redis::factory('queue')->commit();
         return $this->db->commit();
     }
     

@@ -65,6 +65,8 @@ class BillModel extends Base_Model_Abstract
     private function genOnlineBill() {
         try { //份成两部分统计：订单全部票，订单部分票
             $status = array('paid','finish');
+
+            /*
             //可退，未用抵用券，结算已使用的产品数的金额(产品数*单价)
             $sql1 = " SELECT oi.order_id,o.payment,o.supplier_id,o.supplier_name,o.distributor_id,o.distributor_name,o.nums,o.use_day";
             $sql1 .= " ,o.owner_name,owner_mobile,o.name,o.payed,o.refunded,o.activity_paid,o.created_at, sum(oi.price) as amount,0 as whole_order";
@@ -74,6 +76,35 @@ class BillModel extends Base_Model_Abstract
             $sql1 .= " AND o.refund=1 AND (o.activity_paid=0 OR o.activity_paid IS NULL) AND oi.use_time>0 AND oi.use_time<{$this->cancelTime}";
             $sql1 .= " GROUP BY oi.order_id";
             $orders1 = $this->OrderModel->db->selectBySql($sql1);
+            */
+
+            $orders1 = array();
+            $orderList1 = $this->OrderModel->search(
+                array(
+                    'supplier_id'=> $this->supplier_id,         'ota_type'=> 'system',
+                    'payment|in'=> $this->online_pay_types,     'status|in'=> $status,
+                    'price|>'=>0,       'refund'=>1,
+                    'use_time|>'=>0,    'use_time|<'=>$this->cancelTime,
+                    'or'=>array('activity_paid'=>0,'activity_paid|exp'=>'is null'),
+                ),
+                "id,payment,supplier_id,supplier_name,distributor_id,distributor_name,nums,use_day,owner_name,owner_mobile,name,payed,refunded,activity_paid,created_at"
+            );
+            if(!empty($orderList1)) {
+                $order1Ids = array_keys($orderList1);
+                $orderItems1 = $this->OrderItemModel->setGroupBy('order_id')->search(
+                    array( 'order_id|in'=>$order1Ids, 'bill_time'=>0, 'use_time|>'=>0, 'use_time|<'=>$this->cancelTime ),
+                    "id,order_id,sum(price) as amount,0 as whole_order"
+                );
+
+                foreach($orderItems1 as $oiv){
+                    if(isset($orderList1[$oiv['order_id']])) {
+                        $tmp = array_merge($orderList1[$oiv['order_id']],$oiv);
+                        unset($tmp['id']);
+                        $orders1[] = $tmp;
+                    }
+                }
+            }
+
             //$sql .= " UNION ";
             //1.不可退，2.可退、使用抵用券、已有使用。结算整个订单金额(金额不用考虑抵用券)
             $sql2 = " SELECT id as order_id,payment,supplier_id,supplier_name,distributor_id,distributor_name,nums,use_day";
@@ -100,6 +131,7 @@ class BillModel extends Base_Model_Abstract
         try { //份成两部分统计：订单全部票，订单部分票
             $status = $payment=="advance" ? array('paid') : array('paid','finish');
             //可退，未用抵用券，结算已使用的产品数的金额(产品数*单价)
+            /*
             $sql1 = " SELECT oi.order_id,o.payment,o.supplier_id,o.supplier_name,o.distributor_id,o.distributor_name,o.nums,o.use_day";
             $sql1 .= " ,o.owner_name,owner_mobile,o.name,o.payed,o.refunded,o.activity_paid,o.created_at, sum(oi.price) as amount,0 as whole_order";
             $sql1 .= " FROM ".$this->OrderItemModel->getTable()." oi left join ".$this->OrderModel->getTable()." o ON(oi.order_id=o.id)";
@@ -108,6 +140,37 @@ class BillModel extends Base_Model_Abstract
             $sql1 .= " AND o.refund=1 AND (o.activity_paid=0 OR o.activity_paid IS NULL) AND oi.use_time>0 AND oi.use_time<{$this->cancelTime}";
             $sql1 .= " GROUP BY oi.order_id";
             $orders1 = $this->OrderModel->db->selectBySql($sql1);
+
+            print_r($orders1);exit;
+            */
+
+            $orders1 = array();
+            $orderList1 = $this->OrderModel->search(
+                array(
+                    'supplier_id'=> $this->supplier_id, 'distributor_id'=>$this->distributor_id,    'ota_type'=> 'system',
+                    'payment'=> $payment,     'status|in'=> $status,
+                    'price|>'=>0,       'refund'=>1,
+                    'use_time|>'=>0,    'use_time|<'=>$this->cancelTime,
+                    'or'=>array('activity_paid'=>0,'activity_paid|exp'=>'is null'),
+                ),
+                "id,payment,supplier_id,supplier_name,distributor_id,distributor_name,nums,use_day,owner_name,owner_mobile,name,payed,refunded,activity_paid,created_at"
+            );
+            if(!empty($orderList1)) {
+                $order1Ids = array_keys($orderList1);
+                $orderItems1 = $this->OrderItemModel->setGroupBy('order_id')->search(
+                    array( 'order_id|in'=>$order1Ids, 'bill_time'=>0, 'use_time|>'=>0, 'use_time|<'=>$this->cancelTime ),
+                    "id,order_id,sum(price) as amount,0 as whole_order"
+                );
+
+                foreach($orderItems1 as $oiv){
+                    if(isset($orderList1[$oiv['order_id']])) {
+                        $tmp = array_merge($orderList1[$oiv['order_id']],$oiv);
+                        unset($tmp['id']);
+                        $orders1[] = $tmp;
+                    }
+                }
+            }
+
             //$sql .= " UNION ";
             //1.不可退，2.可退、使用抵用券、已有使用。结算整个订单金额(金额不用考虑抵用券)
             $sql2 = " SELECT id as order_id,payment,supplier_id,supplier_name,distributor_id,distributor_name,nums,use_day";

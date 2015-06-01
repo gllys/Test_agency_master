@@ -232,13 +232,16 @@ class TicketruleController extends Base_Controller_Api {
         $info = $TicketRuleItemModel->search(array('rule_id'=>$rule_id,'date'=>$date));
         if(!$info) Lang_Msg::error("ERROR_TKT_RULE_4");
         $info = reset($info);
-        if($nums>$info['reserve']-$info['used_reserve']){
-            Lang_Msg::error("ERROR_TKT_RULE_6"); //购票张数不能超出当日库存剩余数
-        }
+
         $ticketDayUsedReserveKey = 'TicketRuleItem|'.$ticket_id.'|'.$rule_id.'|'.$date;
         $ticketDayUsedReserve = Cache_Redis::factory()->get($ticketDayUsedReserveKey);
         $info['used_reserve'] = intval($ticketDayUsedReserve);
+        if($is_refund==0 && $info['reserve']>0 && $nums>$info['reserve']-$info['used_reserve']){
+            Lang_Msg::error("ERROR_TKT_RULE_6"); //购票张数不能超出当日库存剩余数
+        }
+
         $info['used_reserve'] = $is_refund ? $info['used_reserve']-$nums : $info['used_reserve']+$nums;
+        $info['used_reserve'] = $info['used_reserve']<0 ? 0 :$info['used_reserve'];
         $r = Cache_Redis::factory()->setex($ticketDayUsedReserveKey,172800,$info['used_reserve']);
         if($r){
             Lang_Msg::output( $info );

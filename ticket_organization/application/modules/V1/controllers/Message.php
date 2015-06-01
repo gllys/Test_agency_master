@@ -615,17 +615,26 @@ class MessageController extends Base_Controller_Api
         $this->body['receiver_organization']=$orgId;
 
         //消息统计
-        $msgCount = Cache_Memcache::factory()->get('topBarMessageCount_'.$orgId);
-        if(empty($msgCount)) {
+        $msgCount = MessageModel::model()->customCache('topBarMessageCount_'.$orgId);
+        if($msgCount==null) $msgCount = MessageModel::model()->customCache('topBarMessageCount_'.$orgId,$this->countAction(true,true));
+
+        /*$MessageCacheNs = MessageModel::model()->getCacheNS();
+        $msgCountData = Cache_Memcache::factory()->get('topBarMessageCount_'.$orgId);
+        if(empty($msgCountData) || $msgCountData['cacheNS']!=$MessageCacheNs) {
             $msgCount =  $this->countAction(true,true);
-            Cache_Memcache::factory()->set('topBarMessageCount_'.$orgId,$msgCount,1);
+            Cache_Memcache::factory()->set('topBarMessageCount_'.$orgId,array('data'=>$msgCount,'cacheNS'=>$MessageCacheNs),3600);
+        } else {
+            $msgCount = $msgCountData['data'];
         }
         //公告
         $noticeList = Cache_Memcache::factory()->get('topBarNoticeList_'.$orgId);
         if(empty($noticeList)) {
             $noticeList = $this->listAction(true);
             Cache_Memcache::factory()->set('topBarNoticeList_'.$orgId,$noticeList,1);
-        }
+        }*/
+
+        $noticeList = MessageModel::model()->customCache('topBarNoticeList_'.$orgId);
+        if($noticeList==null) $noticeList = MessageModel::model()->customCache('topBarNoticeList_'.$orgId,$this->listAction(true));
 
         if($organization['type']=='agency') {
             $userId = intval($this->body['user_id']); //用户UID
@@ -647,6 +656,7 @@ class MessageController extends Base_Controller_Api
                 'message_count'=>$msgCount,
             );
         }
+        //$ret['cacheNs'] = $MessageCacheNs;
         Tools::lsJson(true, 'ok', $ret);
     }
 

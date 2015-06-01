@@ -43,9 +43,17 @@ class ApiProductModel extends Base_Model_Api
         return $r;
     }
 
-    //获取日库存设置
+    //获取日库存设置（由供应商商设置）
     public function getTicketRule($params){
         $this->url = '/v1/ticketrule/detail';
+        $this->params = $params;
+        $r = json_decode($this->request(),true);
+        return $r;
+    }
+
+    //获取日库存设置（由分销商设置）
+    public function getAgencyRule($params){
+        $this->url = '/v1/Agencypdrule/items';
         $this->params = $params;
         $r = json_decode($this->request(),true);
         return $r;

@@ -17,8 +17,9 @@ $this->breadcrumbs = array('景区管理', '设备管理');
 					</div>
 					<!-- panel-heading -->
 					<div id="show_msg"></div>
+                                        <form class="form-horizontal" id="equipement_update" method="post" action="/scenic/managequip/upEquip">
+                                            <input type="hidden" name="id" value="<?php echo $_GET['id'] ?>" />
 					<div class="panel-body nopadding">
-						<form class="form-horizontal" id="equipement_update" method="post" action="/scenic/managequip/upEquip">
 							<div class="row">
 								<div class="form-group">
 									<label class="col-sm-2 control-label">绑定供应商：</label>
@@ -103,7 +104,7 @@ $this->breadcrumbs = array('景区管理', '设备管理');
 								</div>
 							</div>
 							<div class="panel-footer" style="padding-left:10%">
-								<input type="hidden" name="id" value="<?php echo $equipment['id']; ?>">
+								<input type="hidden" name="id" value="<?php echo $equipment['id']; ?>" />
 								<button class="btn btn-primary mr20" id="equip-edit"  style="width: 100px;">更新</button>
 								<img src="/img/select9-spinner.gif" class="load2" style="display: none;position:relative;left:30px;top:-33px;" >
 								<!--button class="btn btn-default" >取消返回</button-->
@@ -118,7 +119,6 @@ $this->breadcrumbs = array('景区管理', '设备管理');
 		</div>
 		<!-- row -->
 	</div>
-</div>
 <!-- contentpanel -->
 <script>
 	jQuery(document).ready(function() {

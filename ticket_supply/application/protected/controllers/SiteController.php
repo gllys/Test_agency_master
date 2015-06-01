@@ -31,8 +31,8 @@ class SiteController extends Controller {
         if (empty($redirectChild['params'])) {
             $this->onUnauthorizedAccess('');
         }
-        $url = $redirectChild['params']['href'];
-        $this->redirect($url);
+        $redirectUrl = '/#'.$redirectChild['params']['href'] ;
+        $this->render('index',  compact('redirectUrl'));
     }
 
     public function actionHeader($index) {
@@ -203,6 +203,10 @@ class SiteController extends Controller {
             $this->redirect('/');
         }
         
+        if(!isset($_POST['ajax']) && !isset($_POST['ULoginForm'])&&Yii::app()->request->getIsAjaxRequest()){
+            $this->_end(3,'你已经退出') ;
+        }
+        
         $rec = Recommend::api()->lists(array('pos_id'=>1,'expire_time'=>'true','status'=>1,'items'=>10000),true,30);
         $rec = $rec['body']['data'];
         
@@ -320,8 +324,8 @@ class SiteController extends Controller {
             }
             $code_err = null;
 			$password_err = null;
-			if(strlen($password) != 6) {
-                $password_err = '密码必须为6位';
+			if(strlen($password) < 6 || strlen($password) > 16) {
+                $password_err = '密码必须为6-16位';
 			} else {            
 				if ($code != '' && $code == Yii::app()->redis->get('code_for_reset:' . $account)) {
 					$user['password'] = $password;

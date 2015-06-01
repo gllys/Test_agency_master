@@ -33,7 +33,7 @@ $this->breadcrumbs = array('产品', '限制分销商');
                             <a title="编辑" style="margin-left: 10px;" href="/ticket/limitagency/edit?id=<?php echo $limit['id']; ?>">
                                 <span class="glyphicon glyphicon-edit"></span>
                             </a>
-                            <a title="删除" style="margin-left: 10px;" href="javascript:void(0);" onclick="delLimit('<?php echo $limit['id']; ?>');" class="del">
+                            <a title="删除" style="margin-left: 10px;" href="javascript:void(0);" onclick="delLimit('<?php echo $limit['id']; ?>');" class="del  clearPart">
                                 <span class="glyphicon glyphicon-trash"></span>
                             </a>
                             <a href="/ticket/limitagency/copy?id=<?php echo $limit['id']; ?>" title="复制" style="margin-left: 10px;"><span class="fa fa-copy"
@@ -71,7 +71,7 @@ $this->breadcrumbs = array('产品', '限制分销商');
 		PWConfirm('确定要删除清单?',function(){
 			      $.post('/ticket/limitagency/del',{id:id},function(data){
                 if(data.error==0){
-                    alert("删除成功",function(){location.reload();});
+                    alert("删除成功",function(){location.partReload();});
                 }else{
                     alert("删除失败,"+data.msg);
                 }

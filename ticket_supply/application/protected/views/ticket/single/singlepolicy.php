@@ -9,7 +9,7 @@
                 <form class="form-horizontal form-bordered" id="polform">
                     <div class="panel-body nopadding">
                         <div class="form-group">
-                            <a class="btn btn-primary btn-lg pull-right" href="/ticket/policy/">新建分销商策略</a>
+                            <a class="btn btn-primary btn-lg pull-right" href="/#/ticket/policy/">新建分销商策略</a>
                         </div>
                         <input type="hidden" id="ptid" name="ptid" value="<?php echo $id; ?>">
                         <div class="form-group">
@@ -69,7 +69,7 @@ $('#savePolicyBtn').click(function() {
                         alert(data.msg);
                         $('#savePolicyBtn').attr('disabled', false);
                     } else {
-                        alert('设置策略成功',function(){window.location.reload();});
+                        alert('设置策略成功',function(){window.location.partReload();});
                     }
                 }, 'json');
     }

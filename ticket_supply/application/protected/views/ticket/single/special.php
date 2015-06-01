@@ -71,8 +71,8 @@ $this->breadcrumbs = array('单票', '设定特定日期的'.$labels[$type]);
 			<div class="panel panel-primary">
 				<div class="panel-heading <?php echo $color?>">
 					<div class="panel-btns" style="display: none;">
-						<a href="#" class="panel-minimize tooltips" data-toggle="tooltip" title="" data-original-title=""><i class="fa fa-minus"></i></a>
-						<a href="#" class="panel-close tooltips" data-toggle="tooltip" title="" data-original-title=""><i class="fa fa-times"></i></a>
+						<a href="javascript:void(0)" class="panel-minimize tooltips" data-toggle="tooltip" title="" data-original-title=""><i class="fa fa-minus"></i></a>
+						<a href="javascript:void(0)" class="panel-close tooltips" data-toggle="tooltip" title="" data-original-title=""><i class="fa fa-times"></i></a>
 					</div><!-- panel-btns -->
 					<h3 class="panel-title"><?php echo $number?></h3>
 				</div>
@@ -162,7 +162,7 @@ $this->breadcrumbs = array('单票', '设定特定日期的'.$labels[$type]);
 			});
 			if (date.length > 0 && quantity > 0) {
 				$.post('/ticket/single/special_bind', {t_id: <?php echo $id?>, type: '<?php echo $type?>', quantity: quantity, date: date.join(',')}, function(result) {
-					location.reload();
+					location.partReload();
 				});
 			}
 			console.log(date)

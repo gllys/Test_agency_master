@@ -113,6 +113,8 @@ class Crontab_RefundChange extends Process_Base
             $limit = " LIMIT " . $this->startNums . "," . $this->limit;
             $this->orders = $this->OrderModel->db->selectBySql($fields . $from . $where . $orderBy . $limit);
             if (!$this->orders) return true;
+
+            $this->RefundApplyModel->begin();
             $handlerApplyRefundOrderIds = array();
             foreach ($this->orders as $order) {
                 $row = array(
@@ -138,7 +140,6 @@ class Crontab_RefundChange extends Process_Base
                     if($order['partner_type']>0 && $order['partner_product_code']!='' && $order['partner_order_id']!='') { //合作伙伴的订单先在合作伙伴退票
                         $r = OpenApiPartnerModel::model()->partnerRefundOrder($order,$row['nums']);
                         if($r===false){
-                            $this->RefundApplyModel->rollback();
                             echo "该订单[{$order['id']}]是合作伙伴订单，在合作伙伴退票失败，无法继续操作！\n\n";
                         } else { //合作伙伴退票成功后，自动审核
                             $r = $this->RefundApplyModel->checkApply(array(
@@ -168,6 +169,7 @@ class Crontab_RefundChange extends Process_Base
             }
             $this->startNums += $this->limit - count($handlerApplyRefundOrderIds);
             echo "Handle Expired Orders: " . implode(' , ', $handlerApplyRefundOrderIds) . "\n\n";
+            $this->RefundApplyModel->commit();
         }
         return true;
     }
@@ -241,6 +243,7 @@ class Crontab_RefundChange extends Process_Base
                     'remark' => $refund_apply_id,
                 ));
                 if (!$r || $r['code'] == 'fail') {
+                    $this->RefundApplyModel->rollBack();
                     return false;
                 }
             }
@@ -263,6 +266,12 @@ class Crontab_RefundChange extends Process_Base
     private function checkRefundApply($data, $refund_apply)
     {
         try {
+            $errN = Cache_Redis::factory()->get('Crontab_RefundChange|Failed|'.$refund_apply['order_id']);
+            if($errN>5) {
+                $err = Cache_Redis::factory()->get('RefundChange|Failed|'.$refund_apply['order_id'].'|Err');
+                echo 'Order '.$refund_apply['order_id'].' fail, Error:'.$err."\n";
+                return false;
+            }
             //$now = time();
             // 获取需审核的退款order_items
             $this->RefundApplyModel->begin();
@@ -270,6 +279,7 @@ class Crontab_RefundChange extends Process_Base
             $tmp_refund_info = reset($tmp_refund_info);
             if($tmp_refund_info['allow_status'] == 1){
                 // 这边可能被手动审核掉了，需要重新检测
+                $this->RefundApplyModel->rollBack();
                 return false;
             }
             $refund = array();
@@ -289,23 +299,37 @@ class Crontab_RefundChange extends Process_Base
             $refunding_nums = $orderInfo['refunding_nums'] - $refund_apply['nums'];
             // 允许
             $refund['status'] = 1;
-            $r = $this->allow($orderInfo, $refund_apply, $refunding_nums, $data, $order_items_ids);
-            if(!$r){
-                echo 'order'.$refund_apply['order_id'].'fail'."\n";
-                return false;
-            }
-            if($orderInfo['local_source'] == 1) { //实际针对所有ota
+
+            if($orderInfo['local_source'] == 1) { //实际针对所有ota，通知OTA退票，返回成功后继续退款操作
                 if(!OtaCallbackModel::model()->refund($orderInfo, $refund_apply, true)) {
+                    $this->RefundApplyModel->rollBack();
+                    echo "OtaCallbackModel->refund failed [{$orderInfo['id']}]\n";
                     return false;
                 }
+            }
+
+            $r = $this->allow($orderInfo, $refund_apply, $refunding_nums, $data, $order_items_ids);
+            if(!$r){
+                echo 'Order '.$refund_apply['order_id'].' fail'."\n";
+                $this->RefundApplyModel->rollBack();
+                return false;
             }
             $this->RefundApplyModel->updateByAttr($refund, array('id' => $data['id']));
             $this->RefundApplyModel->commit();
             return true;
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             // 回滚事务
             $this->RefundApplyModel->rollBack();
-            print_r($e->errorInfo);
+            //print_r($e->errorInfo);
+            echo 'Order '.$refund_apply['order_id'].' fail'." (Exception)\n";
+            $errN = Cache_Redis::factory()->get('RefundChange|Failed|'.$refund_apply['order_id']);
+            if(empty($errN)) {
+                $errN=0;
+            }
+            Cache_Redis::factory()->setex('RefundChange|Failed|'.$refund_apply['order_id'],172800,++$errN);
+            if($errN>3) {
+                Cache_Redis::factory()->setex('RefundChange|Failed|'.$refund_apply['order_id'].'|Err',172800,var_export($e->errorInfo,true));
+            }
             return false;
         }
     }

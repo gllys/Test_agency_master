@@ -142,8 +142,8 @@ class V1Controller extends Base_Controller_ApiDispatch {
 
             $productInfos[$key]['validType'] = $product['valid_flag'] == 0 ? 'BETWEEN_USE_DATE_AND_N_DAYSAFTER' : 'BETWEEN_USE_DATE_START_AND_END';
             $date_available = explode(',',$product['date_available']);
-            $start  = isset($date_available[0]) && is_int($date_available[0]) ? date('Y-m-d',$date_available[0]) : '';
-            $end    = isset($date_available[1]) && is_int($date_available[1]) ? date('Y-m-d',$date_available[1]) : ''; 
+            $start  = isset($date_available[0]) ? date('Y-m-d',$date_available[0]) : '';
+            $end    = isset($date_available[1]) ? date('Y-m-d',$date_available[1]) : '';
 
             //日历票模式
             if($productInfos[$key]['validType'] == 'BETWEEN_USE_DATE_AND_N_DAYSAFTER'){
@@ -162,7 +162,7 @@ class V1Controller extends Base_Controller_ApiDispatch {
                 //按有效日期，构造日历票数据
                 for($now = date('Y-m-d',time()); strtotime($now) <= strtotime($end); $now = date("Y-m-d",strtotime("$now +1 day"))){
                     $calendarPrice['useDate']       = $now;
-                    $calendarPrice['marketPrice']   = floatval($product['listed_price2']) * 100;
+                    $calendarPrice['marketPrice']   = $product['listed_price2'] != 0 ? floatval($product['listed_price2']) * 100 : floatval($product['listed_price']) * 100 ;
                     $calendarPrice['sellPrice']     = floatval($product['price']) * 100;
                     $calendarPrice['minimum']       = 1;
                     $calendarPrice['maximum']       = 100;
@@ -179,6 +179,7 @@ class V1Controller extends Base_Controller_ApiDispatch {
                         $calendarPrice['sellstock']     = 9999;
                     }
                     $calendarPrices[] = $calendarPrice;
+                    if(count($calendarPrices) > 60) break;
                 }
                 $productInfos[$key]['calendarPrices'] = $calendarPrices;
             }
@@ -354,7 +355,7 @@ class V1Controller extends Base_Controller_ApiDispatch {
             } else {
                 $id = $item['body']['id'];
                 $status = $req_status . '_SUCCESS';
-                $this->sendCodeNoticeAsync($id, 'TRUE');
+                $this->sendCodeNoticeAsync($id, $params['distributor_id'], 'TRUE');
             }
         }
         $this->setHeader($item, __METHOD__);
@@ -597,10 +598,11 @@ class V1Controller extends Base_Controller_ApiDispatch {
     /**
      * 发码通知
      */
-    private function sendCodeNoticeAsync($id, $status = 'TRUE') {
+    private function sendCodeNoticeAsync($id, $distributor_id, $status = 'TRUE') {
         //$id = '166558779596696' ; 
         try {
             $data = array(
+                'distributor_id' => $distributor_id,
                 'partnerorderId' => $id,
                 'eticketNo' => $id,
                 'eticketSended' => $status,

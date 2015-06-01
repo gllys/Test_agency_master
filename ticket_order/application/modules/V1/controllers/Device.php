@@ -110,13 +110,12 @@ class DeviceController extends Base_Controller_Device {
             //如果是不是南平票
             if ($order_id != '166129187502183') {
                 if ($ticket_id) {
-                    $flag = $OrderModel->useTicket($ticket_id, $landscape_id, $poi_id, $num, 2);
+                    $use_num = $OrderModel->useTicket($order, $ticket_id, $landscape_id, $poi_id, $num, 2);
                 } else{
-                    $flag = $OrderModel->useTicket($order_id, $landscape_id, $poi_id, $num);
+                    $use_num = $OrderModel->useTicket($order, $order_id, $landscape_id, $poi_id, $num);
                 }
                     
             } else { //如果是南平票
-                $flag = false;
                 $OrderModel->updateById($order_id, array('used_nums' => $order['used_nums'] + 1, 'updated_at' => $now));
                 OrderItemModel::model()->setTable($order_id)->updateByAttr(array('used_nums' => $order['used_nums'] + 1, 'updated_at' => $now), array('order_id' => $order_id));
             }
@@ -138,8 +137,8 @@ class DeviceController extends Base_Controller_Device {
             TicketRecordModel::model()->insert($log);
             $log['id'] = TicketRecordModel::model()->getInsertId();
 
-            $orderInfo2 = $OrderModel->get(array('id'=>$order_id));
-            $use_num = $orderInfo2['used_nums']-$order['used_nums']; //核销产品份数
+            // $orderInfo2 = $OrderModel->get(array('id'=>$order_id));
+            // $use_num = $orderInfo2['used_nums']-$order['used_nums']; //核销产品份数
 
             // 此处硬编码判断订单是否来自淘宝, 需与淘宝订单状态保持一致.
             if ($use_num>0 && $order['local_source'] ==1) {
@@ -151,7 +150,7 @@ class DeviceController extends Base_Controller_Device {
                 {
                     $device = array('id' => 'common');
                 }
-                if(!TaobaoOrderModel::model()->verificate($orderInfo2, $use_num, $log, $device)) {
+                if(!TaobaoOrderModel::model()->verificate($order, $use_num, $log, $device)) {
                     $OrderModel->rollback();
                     throw new Lang_Exception('无法核销');
                 }

@@ -51,10 +51,14 @@ $this->breadcrumbs = array('产品', '分销策略');
 <div class="contentpanel">
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h4 class="panel-title">
-                <button class="btn btn-primary btn-sm pull-right" data-target=".bs-example-modal-static" data-toggle="modal" onclick="add_rule(0)">新建分销策略</button>
-                分销策略
-            </h4>
+
+            <ul class="list-inline">
+                <li class="pull-right">
+                    <button class="btn btn-primary btn-sm" data-target=".bs-example-modal-static" data-toggle="modal" onclick="add_rule(0)">新建分销策略</button>
+                </li>
+                <li><h4 class="panel-title">分销策略</h4></li>
+                <li><a href="/order/history/help?#4.5" title="帮助文档" class="clearPart" target="_blank">查看帮助文档</a> </li>
+            </ul>
         </div>
 
     </div>
@@ -74,8 +78,8 @@ $this->breadcrumbs = array('产品', '分销策略');
                         <td><?= $rule['name']; ?></td>
                         <td><?= $rule['note']; ?></td>
                         <td>
-                            <a title="编辑" style="margin-left: 5px; border-width: 1px" href="javascript:;" onclick="edit_rule('<?= $rule['id'] ?>')" data-target=".bs-example-modal-static" data-toggle="modal" class="btn btn-success btn-bordered btn-xs" >编辑</a>
-                            <a class="btn btn-bordered btn-xs btn-danger del" title="删除" style="margin-left: 5px;border-width: 1px"  onclick="del('<?= $rule['id'] ?>')" data-target="" data-toggle="modal"  >删除</a>
+                            <a title="编辑" style="margin-left: 5px; border-width: 1px" href="javascript:;" onclick="edit_rule('<?= $rule['id'] ?>')" data-target=".bs-example-modal-static" data-toggle="modal" class="btn btn-success btn-bordered btn-xs clearPart" >编辑</a>
+                            <a class="btn btn-bordered btn-xs btn-danger del  clearPart" title="删除" style="margin-left: 5px;border-width: 1px"  onclick="del('<?= $rule['id'] ?>')" data-target="" data-toggle="modal"  >删除</a>
                         </td>
                     </tr>
                 <?php endforeach;
@@ -202,7 +206,7 @@ $this->breadcrumbs = array('产品', '分销策略');
                 </div>
                 <div class="modal-footer">
                     <button id="rule_add" type="button" class="btn btn-success">保存</button>
-                    <a class="btn btn-default" href="/ticket/policy">取消</a>
+                    <button class="cancel btn btn-default" data-dismiss="modal" type="button">取消</button>
                 </div>
             </form>
         </div>
@@ -212,6 +216,7 @@ $this->breadcrumbs = array('产品', '分销策略');
 
 <script>
     jQuery(document).ready(function() {
+        $('body').removeClass('modal-open');
         var spinnerDay = jQuery('.spinner-day').spinner({'min': 1});
         spinnerDay.spinner('value', 1);
     });
@@ -223,7 +228,11 @@ $this->breadcrumbs = array('产品', '分销策略');
             PWConfirm('确认删除此条策略?', function() {
                 $.post('/ticket/policy/del', {id: id}, function(data) {
                     if (data.error == 0) {
-                        location.href = "/ticket/policy";
+                        setTimeout(function() {
+                            alert('删除成功',function(){
+                                location.partReload();
+                            });
+                        }, 500)
                     } else {
                         setTimeout(function() {
                             alert(data.message);
@@ -414,7 +423,9 @@ $this->breadcrumbs = array('产品', '分销策略');
                     $('#rule_add').show();
                     $('#loader').hide();
                 } else {
-                    location.href = '/ticket/policy/';
+					alert('保存成功',function(){
+						 location.partReload();
+					});
                 }
             }, 'json');
         } else {

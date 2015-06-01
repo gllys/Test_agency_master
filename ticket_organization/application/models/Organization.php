@@ -41,7 +41,7 @@ class OrganizationModel extends Base_Model_Abstract
             'certificate_license' => isset($organization['certificate_license'])?$organization['certificate_license']:'',
             'agency_type' => isset($organization['agency_type'])?intval($organization['agency_type']):0,
             'supply_type' => isset($organization['supply_type'])?intval($organization['supply_type']):0,
-            'partner_type' => (isset($organization['partner_type']) && intval($organization['supply_type'])>0)?intval($organization['partner_type']):0,  //供应商为景区角色时的类型，0景旅通（默认）,1大漠
+            'partner_type' => (isset($organization['partner_type']) && intval($organization['supply_type'])>0)?intval($organization['partner_type']):-1,  //供应商为景区角色时的类型，0景旅通（默认）,1大漠
             'verify_status' => $organization['verify_status'],
             'verify_by' => $organization['verify_status']== 'checked'?intval($organization['uid']):0,
             'verify_at' => $organization['verify_status']== 'checked'?$now:0,

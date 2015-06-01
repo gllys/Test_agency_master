@@ -10,7 +10,7 @@
         <div class="header-left">
             <a class="logo" href="/ticket/sale" id="title" title="首页"></a>
             <div class="pull-right">
-                <a class="menu-collapse" href="#">
+                <a class="menu-collapse" href="javascript:void(0)">
                     <i class="fa fa-bars"></i>
                 </a>
             </div>

@@ -26,4 +26,11 @@ class ApiScenicModel extends Base_Model_Api
         $r = json_decode($this->request(),true);
         return $r;
     }
+
+    public function imgLists($params){
+        $this->url = '/v1/landscapeimage/lists';
+        $this->params = $params;
+        $r = json_decode($this->request(),true);
+        return $r;
+    }
 }

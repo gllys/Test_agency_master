@@ -173,7 +173,15 @@ class OrganizationsController extends Base_Controller_Api
         if(isset($this->body['id'])) $where['id|in'] = explode(',',$this->body['id']);
         if($this->body['name']) $where['name|like'] = array('%'.$this->body['name'].'%');
         if($this->body['verify_status']) $where['verify_status'] = $this->body['verify_status'];
-		
+        if(array_key_exists('agency_type', $this->body)) {
+            $where['agency_type'] = intval($this->body['agency_type']);
+        }
+        if(array_key_exists('supply_type', $this->body)) {
+            $where['supply_type'] = intval($this->body['supply_type']);
+        }
+        if(!empty($this->body['partner_type']) || $this->body['partner_type'] === '0'){
+            $where['partner_type'] = $this->body['partner_type'];
+        }
         $where['is_del'] = 0;
         Tools::walkArray($where,'trim');
         // 分页
@@ -311,9 +319,9 @@ class OrganizationsController extends Base_Controller_Api
         //供应商为景区角色时的合作伙伴类型，0景旅通（默认）,1大漠
         if(isset($this->body['partner_type'])) {
             if( isset($data['supply_type']) ) {
-                $data['partner_type'] = $data['supply_type']>0 ? $partner_type : 0;
+                $data['partner_type'] = $data['supply_type']>0 ? $partner_type : -1;
             } else {
-                $data['partner_type'] = $organization['supply_type']>0 ? $partner_type : 0;
+                $data['partner_type'] = $organization['supply_type']>0 ? $partner_type : -1;
             }
         }
         $data['updated_at'] = $this->now;

@@ -134,7 +134,7 @@ $this->breadcrumbs = array(
 							<?php endif;?>
 						</td>
 					<td><?php echo date('Y-m-d H:i:s',$equipment['updated_at']);?></td>
-					<td><a class="btn btn-success btn-bordered btn-xs " href="/scenic/managequip/edit?id=<?php echo $equipment['id']?>">编辑</a> <a class="btn btn-danger btn-bordered btn-xs " href="javascript:;" onclick="delEquip(<?php echo $equipment['id']?>)">删除</a></td>
+					<td><a class="btn btn-success btn-bordered btn-xs " href="/scenic/managequip/edit?id=<?php echo $equipment['id']?>">编辑</a> <a class="btn btn-danger btn-bordered btn-xs clearPart" href="javascript:;" onclick="delEquip(<?php echo $equipment['id']?>)">删除</a></td>
 				</tr>
 				<?php endforeach;?>
 			<?php else:?>
@@ -214,7 +214,7 @@ $this->breadcrumbs = array(
 				}else{
                     setTimeout(function(){
                         alert('删除成功!', function() {
-                            location.href='/site/switch/#/scenic/managequip/';
+                            location.partReload();
                         });
                     }, 500);
 				}

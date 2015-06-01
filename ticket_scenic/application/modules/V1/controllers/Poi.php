@@ -246,8 +246,9 @@ Class PoiController extends Base_Controller_Api {
 				'landscape_id' => $landscape_id,
 				'date'		   => date('Y-m-d'),
 				'in_num'       => $num>0 ? $num: 0,
-				'out_num'      => $num<0 ? $num: 0,
+				'out_num'      => $num<0 ? abs($num): 0,
 				'hour'         => date('H'),
+				'created_at'   => time()
 			]);
 		} else {
 			$pv = current($pv);
@@ -256,6 +257,7 @@ Class PoiController extends Base_Controller_Api {
 			} else {
 				$update['out_num'] = $pv['out_num']+abs($num);
 			}
+			$update['updated_at'] = time();
 			$Pv->update($update, ['id' => $pv['id']]);
 		}
 

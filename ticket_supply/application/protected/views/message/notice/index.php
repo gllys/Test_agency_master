@@ -56,9 +56,9 @@
                 </div>
             </th>
             <th width="200">
-                <a class="btn btn-primary btn-sm" id="delete-all"> 删除</a>
+                <a class="btn btn-primary btn-sm  clearPart" id="delete-all"> 删除</a>
                 <?php if($read_time!=1): ?>
-                <a class="btn btn-primary btn-sm" id="update-all" style="margin-left: 20px"> 设为已读</a>
+                <a class="btn btn-primary btn-sm  clearPart" id="update-all" style="margin-left: 20px"> 设为已读</a>
                 <?php endif;?>
             </th>
             <th width="450"></th>
@@ -133,7 +133,7 @@
                     <?php endif;?>
                 </td>
                 <td><?php echo date('Y-m-d',$message['created_at'])?></td>
-                <td><a href="javascript:;" data-id="<?php echo $message['id']?>" class="text-danger setDeleted">删除</a></td>
+                <td><a href="javascript:;" data-id="<?php echo $message['id']?>" class="text-danger setDeleted  clearPart">删除</a></td>
             </tr>
         <?php endforeach;?>
         <?php else:?>
@@ -276,7 +276,7 @@ jQuery(document).ready(function() {
         }, function(data) {
             if (data.error == 0) {
                 $('#message' + id).remove();
-                top.location.reload();
+                location.partReload();
             } else {
                 alert(data.msg);
             }
@@ -359,7 +359,7 @@ jQuery(document).ready(function() {
                     alert(data.msg);
                 } else {
                     alert(data.msg);
-                    setTimeout("window.location.reload();",2000);
+                    setTimeout("window.location.partReload();",2000);
                 }
             },'json');
         });
@@ -388,7 +388,7 @@ jQuery(document).ready(function() {
                     alert(data.msg);
                 } else {
                     alert(data.msg);
-                    setTimeout("window.location.reload();",2000);
+                    setTimeout("window.location.partReload();",2000);
                 }
             },'json');
         });
@@ -417,13 +417,13 @@ jQuery(document).ready(function() {
                 if (data.error) {
                     var warn_msg = '<div class="alert alert-danger"><button data-dismiss="alert" class="close" type="button">×</button><i class="icon-warning-sign"></i>' + data.msg + '</div>';
                     $('#report').html(warn_msg);
-                    location.href = '#report';
+                    location.href = '/#'+ '#report';
                     $('#send_advice').show();
                     $('#loader').hide();
                 } else {
                     var succss_msg = '<div class="alert alert-success"><strong>发送成功!</strong></div>';
                     $('#report').html(succss_msg);
-                    top.location.reload();
+                    location.partReload();
                 }
         },'json');
     })

@@ -96,7 +96,7 @@ $item = current($items);
                         alert(data.msg);
                         $('#form-button').attr('disabled', false);
                     } else {
-                        alert('修改门票成功',function(){ window.location.reload();}); 
+                        alert('修改门票成功',function(){ window.location.partReload();}); 
                     }
                 }, 'json');
             }

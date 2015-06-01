@@ -174,6 +174,8 @@ class OrderModel extends Base_Model_Abstract
             in_array($key,$this->productFields) && $order[$key] = $v;
         }
 
+        $order['product_name'] = !empty($params['product_name']) ? $params['product_name']:$order['name']; //自定义产品名称
+
         if($params['productInfo']['valid_flag']){ //不限制游玩时间则用产品有效期
             $order['expire_start'] = $params['productInfo']['expire_start'];
             $order['expire_end'] = $params['productInfo']['expire_end'];
@@ -183,10 +185,6 @@ class OrderModel extends Base_Model_Abstract
         }
 
         $params['productInfo']['order_id'] = $order['id'];
-
-        if(!empty($params['product_name'])) { //自定义产品名称
-            $order['name'] = $params['product_name'];
-        }
 
         //把产品的短信模版解析后保存redis
         SmsModel::model()->setOrderSmsTemplateMap($params['productInfo'],$order);
@@ -435,6 +433,8 @@ class OrderModel extends Base_Model_Abstract
                     in_array($key,$this->productFields) && $order[$key] = $vv;
                 }
 
+                $order['product_name'] = !empty($v['product_name']) ? $v['product_name']:$order['name']; //自定义产品名称
+
                 if($productInfos[$order['id']]['valid_flag']){ //不限制游玩时间则用产品有效期
                     $order['expire_start'] = $productInfos[$order['id']]['expire_start'];
                     $order['expire_end'] = $productInfos[$order['id']]['expire_end'];
@@ -523,6 +523,49 @@ class OrderModel extends Base_Model_Abstract
     public function getOrderByCard($card) {
         $cacheKey = $this->cardPreCacheKey.$card;
         return $this->redis->hgetall($cacheKey);
+    }
+
+    /**
+     * @param $landscape_id
+     * @param $poi_id
+     * @param $ids
+     * @param $order_id
+     * @param $order
+     */
+    public function async($landscape_id, $poi_id, $ids, $order_id, $order)
+    {
+// STEP 1 更新验票点
+        $this->updateTicketItem($ids, $landscape_id, $poi_id);
+        $tickets = array();
+        $products = array();
+        $ticket_items = TicketItemsModel::model()->search(array('ticket_id|in' => $ids));
+        foreach ($ticket_items as $value) {
+            $tickets[$value['status']][$value['ticket_id']] = $value['ticket_id'];
+            $products[$value['status']][$value['order_item_id']] = $value['order_item_id'];
+        }
+        // STEP 2 更新票
+        $this->updateTicket($tickets);
+        // STEP 3 更新ORDERITEM
+        $this->updateOrderItem($products);
+        // STEP 4 更新ORDER
+        $left_nums = $this->updateOrder($order_id, $order);
+        // 团客票多余得票申请退票(需产品是可退的)
+        if ($left_nums > 0 && $order['source'] == 0 && $order['refund'] == 1) {
+            $order_items = OrderItemModel::model()->search(array('order_id' => $order_id, 'status' => 1));
+            if (!empty($order_items)) {
+                $order_item0 = reset($order_items);
+                if ($order_item0['price_type'] == 1) { //团客票多余票申请退票
+                    RefundApplyModel::model()->refundOrder($order, $order_items, array(), array(
+                        'remark' => '核销后自动退票',
+                        'nums' => $left_nums,
+                        'u_id' => $this->body['user_id'] ? $this->body['user_id'] : $order['user_id'],
+                        'user_id' => $this->body['user_id'] ? $this->body['user_id'] : $order['user_id'],
+                        'user_account' => $this->body['user_account'] ? $this->body['user_account'] : $order['user_account'],
+                        'user_name' => $this->body['user_name'] ? $this->body['user_name'] : $order['user_name'],
+                    ));
+                }
+            }
+        }
     }
 
     private function groupById($ids) {
@@ -736,10 +779,11 @@ class OrderModel extends Base_Model_Abstract
      * @param  integer $nums         核销的数量
      * @return [type]                [description]
      */
-    public function useTicket($code, $landscape_id = 0, $poi_id = 0, $nums = 1, $type=0) {
+    public function useTicket(&$order, $code, $landscape_id = 0, $poi_id = 0, $nums = 1, $type=0) {
         $r = Util_Lock::lock($code); //对相同订单核销时加锁
         if(!$r) Lang_Msg::error('操作正在进行中，请稍等再尝试！');
         $where = array();
+        $ticket_id = 0;
         //是否有新产品核销
         //$flag = false;
         if ($landscape_id) $where['landscape_id'] = $landscape_id;
@@ -752,7 +796,7 @@ class OrderModel extends Base_Model_Abstract
                     throw new Lang_Exception('没有可核销的门票');
                 }
                 $order_id = $ticket_info['order_id'];
-                $where['ticket_id'] = $code;
+                $where['ticket_id'] = $ticket_id = $code;
                 break;
             case 3:
                 //产品号
@@ -765,30 +809,173 @@ class OrderModel extends Base_Model_Abstract
                 break;
             default:
                 //订单号
-                $order = $this->getById($code);
-                if (!$order) {
-                    throw new Lang_Exception('没有可核销的门票');
-                }
+                // $order = $this->getById($code);
+                // if (!$order) {
+                //     throw new Lang_Exception('没有可核销的门票');
+                // }
                 $order_id = $code;
                 break;
         }
         $where['order_id'] = $order_id;
-        !$order && $order = $this->getById($order_id);
+        // !$order && $order = $this->getById($order_id);
         // 订单产品
         $this->checkEnable($order, 1);
+
+        //获取当前景点未使用的票
+        // list($ticket_codes,$order_codes) = TicketItemsModel::model()->getTicketList($where);
+        // $ticket_codes = $ticket_codes[1];
+        // if (!$ticket_codes) {
+        //     throw new Lang_Exception('没有可核销的门票');
+        // }
+        // if (count($ticket_codes)<$nums){
+        //     throw new Lang_Exception('门票不足');//票不足
+        // }
+
+        // 顺序使用指定数量的票
+        // ksort($ticket_codes);
+        // $ids = array_slice(array_keys($ticket_codes), 0, $nums);
+
+        //核销REDIS中得TICKET_ITEMS
+        $tickets = array();
+        $ticket_items = array();
+        $order_items = array();
+        $id_map = array();
+        $rows = TicketItemModel::model()->getCacheByOrderId($order_id);
+        foreach($rows as $id=>$tmp) {
+            //设置产品核销状态
+            if ($tmp['status']==0) {
+                $order_items[$tmp['order_item_id']] = $tmp['status'];
+            }elseif($tmp['status']==2) {
+                if ($order_items[$tmp['order_item_id']]!==0) $order_items[$tmp['order_item_id']] = $tmp['status'];
+            }else {
+                if ($order_items[$tmp['order_item_id']]!==0 && $order_items[$tmp['order_item_id']]!==2) $order_items[$tmp['order_item_id']] = $tmp['status'];
+            }
+            $id_map[$tmp['order_item_id']][$tmp['id']] = $tmp['id'];
+            if($tmp && $tmp['status'] == 1
+             && ($landscape_id<=0 || $landscape_id == $tmp['landscape_id'])
+             && ($poi_id<=0 || $poi_id == $tmp['poi_id'])
+             && ($ticket_id <= 0 || $ticket_id == $tmp['ticket_id'])) {
+                $tickets[$tmp['ticket_id']] = $tmp['ticket_id'];
+                $ticket_items[$id] = $tmp;
+            }
+        }
+        if (!$tickets) {
+            throw new Lang_Exception('没有可核销的门票');
+        }
+        if (count($tickets)<$nums){
+            throw new Lang_Exception('门票不足');//票不足
+        }
+
+        $used_num = count(array_keys($order_items, 2));
+
+        // 顺序使用指定数量的票
+        ksort($tickets);
+        $ids = array_slice(array_keys($tickets), 0, $nums);
+        $update_ticket_items = array();
+        foreach ($ticket_items as $id=>$tmp) {
+            if( in_array($tmp['ticket_id'], $ids)
+             && ($poi_id<=0 || $poi_id == $tmp['poi_id'])
+             && ($ticket_id <= 0 || $ticket_id == $tmp['ticket_id'])) {
+                $tmp['status'] = 2;
+                $update_ticket_items[$id] = json_encode($tmp);
+                $order_items[$tmp['order_item_id']] = 2;
+            }
+        }
+
+        // 团客票多余得票申请退票(需产品是可退的)
+        $left_nums = count(array_keys($order_items, 1));
+        if($left_nums>0 && $order['source']==0 && $order['refund']==1
+            && $order['partner_type']==0 && $order['is_once_verificate']==1) {
+            foreach($order_items as $key=>$value) {
+                if($value==1) {
+                    //退产品
+                    $order_items[$key] = 0;
+                    //退产品下的票
+                    $ids = $id_map[$key];
+                    if($ids) {
+                        foreach($ids as $id) {
+                            $rows[$id]['status'] = 0;
+                            $update_ticket_items[$id] = json_encode($rows[$id]);
+                        }
+                    }
+                }
+            }
+        }
+
+        //更新REDIS中得TICKET_ITEMS & ORDER_ITEMS
+        TicketItemModel::model()->setCacheByOrderId($order_id, $update_ticket_items);
+        OrderItemModel::model()->setCacheByOrderId($order_id, $order_items);
+        //异步执行RDS核销
+        Process_Async::presend(array("OrderModel","useTicketAsync"),array($code, $landscape_id, $poi_id, $nums, $type, $this->body));
+        // self::useTicketAsync($code, $landscape_id, $poi_id, $nums, $type, $this->body);
+        //计算新核销的产品数
+        $new_used_num = count(array_keys($order_items, 2));
+        $use_num = $new_used_num - $used_num;
+        $order['used_num'] = $new_used_num;
+        $order['refunding_nums'] = count(array_keys($order_items, 0));
+
+        return $use_num;
+
+    }
+
+    public static function useTicketAsync($code, $landscape_id = 0, $poi_id = 0, $nums = 1, $type=0, $body = array()) {
+        $OrderModel = OrderModel::model();
+        $OrderModel->begin();
+        try{
+
+        // $r = Util_Lock::lock($code); //对相同订单核销时加锁
+        // if(!$r) Lang_Msg::error('操作正在进行中，请稍等再尝试！');
+        $where = array();
+        //是否有新产品核销
+        //$flag = false;
+        if ($landscape_id) $where['landscape_id'] = $landscape_id;
+        if ($poi_id) $where['poi_id'] = $poi_id;
+        switch ($type) {
+            case 2:
+                //票号
+                $ticket_info = TicketModel::model()->getById($code);
+                // if (!$ticket_info) {
+                //     throw new Lang_Exception('没有可核销的门票');
+                // }
+                $order_id = $ticket_info['order_id'];
+                $where['ticket_id'] = $code;
+                break;
+            case 3:
+                //产品号
+                $item_info = OrderItemModel::model()->getById($code);
+                // if (!$item_info) {
+                //     throw new Lang_Exception('没有可核销的门票');
+                // }
+                $order_id = $item_info['order_id'];
+                $where['order_item_id'] = $code;
+                break;
+            default:
+                //订单号
+                $order = $OrderModel->getById($code);
+                // if (!$order) {
+                //     throw new Lang_Exception('没有可核销的门票');
+                // }
+                $order_id = $code;
+                break;
+        }
+        $where['order_id'] = $order_id;
+        !$order && $order = $OrderModel->getById($order_id);
+        // 订单产品
+        // $OrderModel->checkEnable($order, 1);
         //获取当前景点未使用的票
         list($ticket_codes,$order_codes) = TicketItemsModel::model()->getTicketList($where);
         $ticket_codes = $ticket_codes[1];
-        if (!$ticket_codes) {
-            throw new Lang_Exception('没有可核销的门票');
-        }
-        if (count($ticket_codes)<$nums){
-            throw new Lang_Exception('门票不足');//票不足
-        }
+        // if (!$ticket_codes) {
+        //     throw new Lang_Exception('没有可核销的门票');
+        // }
+        // if (count($ticket_codes)<$nums){
+        //     throw new Lang_Exception('门票不足');//票不足
+        // }
 
         // 顺序使用指定数量的票
         ksort($ticket_codes);
         $ids = array_slice(array_keys($ticket_codes), 0, $nums);
+
         if($order['is_once_taken'] == 1){
             $arr_order_item_ids = array();
             foreach($ids as $v){
@@ -797,11 +984,12 @@ class OrderModel extends Base_Model_Abstract
             $tmp_ids = TicketModel::model()->search(array('order_item_id|in'=>$arr_order_item_ids));
             $ids = array_keys($tmp_ids);
             // STEP 1 一次取票更新验票点
-            $this->updateTicketItem($ids, null, null);
+            $OrderModel->updateTicketItem($ids, null, null);
         }else {
             // STEP 1 更新验票点
-            $this->updateTicketItem($ids, $landscape_id, $poi_id);
+            $OrderModel->updateTicketItem($ids, $landscape_id, $poi_id);
         }
+
         $tickets = array();
         $products = array();
         $ticket_items = TicketItemsModel::model()->search(array('ticket_id|in'=>$ids));
@@ -810,11 +998,11 @@ class OrderModel extends Base_Model_Abstract
             $products[$value['status']][$value['order_item_id']] = $value['order_item_id'];
         }
         // STEP 2 更新票
-        $this->updateTicket($tickets);
+        $OrderModel->updateTicket($tickets);
         // STEP 3 更新ORDERITEM
-        $this->updateOrderItem($products);
+        $OrderModel->updateOrderItem($products);
         // STEP 4 更新ORDER
-        $left_nums = $this->updateOrder($order_id, $order);
+        $left_nums = $OrderModel->updateOrder($order_id, $order);
         // 团客票多余得票申请退票(需产品是可退的)
         if($left_nums>0 && $order['source']==0 && $order['refund']==1 && $order['partner_type']==0) {
             $order_items = OrderItemModel::model()->search(array('order_id'=>$order_id,'status'=>1));
@@ -824,15 +1012,27 @@ class OrderModel extends Base_Model_Abstract
                     RefundApplyModel::model()->refundOrder($order, $order_items, array(), array(
                         'remark'=>'核销后自动退票',
                         'nums'=>$left_nums,
-                        'u_id'=>$this->body['user_id']?$this->body['user_id']:$order['user_id'],
-                        'user_id'=>$this->body['user_id']?$this->body['user_id']:$order['user_id'],
-                        'user_account'=>$this->body['user_account']?$this->body['user_account']:$order['user_account'],
-                        'user_name'=>$this->body['user_name']?$this->body['user_name']:$order['user_name'],
+                        'u_id'=>$body['user_id']?$body['user_id']:$order['user_id'],
+                        'user_id'=>$body['user_id']?$body['user_id']:$order['user_id'],
+                        'user_account'=>$body['user_account']?$body['user_account']:$order['user_account'],
+                        'user_name'=>$body['user_name']?$body['user_name']:$order['user_name'],
                     ));
                 }
             }
         }
-        //return $flag;
+        $OrderModel->commit();
+
+        } catch(Exception $e) {
+            $OrderModel->rollback();
+            $args = func_get_args();
+            $logs = json_encode($args, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $time = date("Y-m-d H:i:s");
+            Log_Base::save("useTicketAsync.log", "[{$time}]{$code}|{$logs}");
+            //保存参数并发邮件通知
+            $msg = $e->getMessage();
+            $content = 'method: '.__METHOD__."\n message: {$msg}\n params: ".var_export($args, true);
+            MailModel::sendSrvGroup("核消异步操作失败", $content);
+        }
     }
 
     /**
@@ -918,26 +1118,30 @@ class OrderModel extends Base_Model_Abstract
         if ($flag == 0) { //核销
             if ($left_nums<=0) $save['status'] = 'finish';
         } else { //撤销
-            if ($order['status'] == 'finish') $save['status'] = 'paid';
-            //检查是否有未处理退票申请，有则取消退票
-            $refundApplyModel = new RefundApplyModel();
-            $refundApplys = $refundApplyModel->search(array('order_id'=>$order_id,'allow_status'=>0,'status'=>0,'audited_by'=>0,'is_del'=>0),"id");
-            if($refundApplys){
-                $user_id = intval($this->body['user_id']);
-                $user_account = trim(Tools::safeOutput($this->body['user_account']));
-                $user_name = trim(Tools::safeOutput($this->body['user_name']));
-                foreach($refundApplys as $ra){
-                    $refundParams = array(
-                        'id'=>$ra['id'],
-                        'allow_status'=>3,
-                        'reject_reason'=>'撤销核销自动驳回退票申请',
-                        'user_id'=> $user_id?$user_id:$order['user_id'],
-                        'user_account'=> $user_account?$user_account:$order['user_account'],
-                        'user_name'=> $user_name?$user_name:$order['user_name'],
-                    );
-                    $cancelOk = $refundApplyModel->checkApply($refundParams);
-                    if($cancelOk){
-                        $refundApplyModel->deleteById($ra['id']);
+            if ($order['status'] == 'finish') {
+                $save['status'] = 'paid';
+            }
+            if ($order['is_once_verificate']==1) { //是否一次验票
+                //检查是否有未处理退票申请，有则取消退票
+                $refundApplyModel = new RefundApplyModel();
+                $refundApplys = $refundApplyModel->search(array('order_id' => $order_id, 'allow_status' => 0, 'status' => 0, 'audited_by' => 0, 'is_del' => 0), "id");
+                if ($refundApplys) {
+                    $user_id = intval($this->body['user_id']);
+                    $user_account = trim(Tools::safeOutput($this->body['user_account']));
+                    $user_name = trim(Tools::safeOutput($this->body['user_name']));
+                    foreach ($refundApplys as $ra) {
+                        $refundParams = array(
+                            'id' => $ra['id'],
+                            'allow_status' => 3,
+                            'reject_reason' => '撤销核销自动驳回退票申请',
+                            'user_id' => $user_id ? $user_id : $order['user_id'],
+                            'user_account' => $user_account ? $user_account : $order['user_account'],
+                            'user_name' => $user_name ? $user_name : $order['user_name'],
+                        );
+                        $cancelOk = $refundApplyModel->checkApply($refundParams);
+                        if ($cancelOk) {
+                            $refundApplyModel->deleteById($ra['id']);
+                        }
                     }
                 }
             }
@@ -996,6 +1200,9 @@ class OrderModel extends Base_Model_Abstract
             $tickets[$value['status']][$value['ticket_id']] = $value['ticket_id'];
             $products[$value['status']][$value['order_item_id']] = $value['order_item_id'];
         }
+        //清除缓存
+        OrderItemModel::model()->deleteRedisCache($order_id);
+        TicketItemModel::model()->deleteRedisCache($order_id);
         // STEP 2 更新票
         $this->updateTicket($tickets, 1);
         // STEP 3 更新ORDERITEM

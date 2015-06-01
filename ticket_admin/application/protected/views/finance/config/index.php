@@ -130,9 +130,9 @@ $this->breadcrumbs = array('结算管理', '结算配置');
                                 <td><?php echo date('Y-m-d H:i:s', $item['updated_at']) ?></td>
                                 <td><?php echo $item['admin_name'] ?></td>
                                 <td style="width:60px;">
-                                    <a href="#" class="edit btn btn-primary btn-bordered btn-xs" onclick="singleEdit(<?php echo $item['org_id'] ?>,this);return false;">编辑</a> 
-                                    <a href="#" class="save btn btn-success btn-bordered btn-xs" style="display:none;"  onclick="singleSave(<?php echo $item['org_id'] ?>);return false;">保存</a> 
-                                    <a href="#" class="btn btn-danger btn-bordered btn-xs clearPart" onclick="singleDel(<?php echo $item['org_id'] ?>);return false;">删除</a>
+                                    <a href="javascript:void(0)" class="edit clearPart" onclick="singleEdit(<?php echo $item['org_id'] ?>,this);return false;">编辑</a> 
+                                    <a href="javascript:void(0)" class="save clearPart" style="display:none;"  onclick="singleSave(<?php echo $item['org_id'] ?>);return false;">保存</a> 
+                                    <a href="javascript:void(0)" class="clearPart" onclick="singleDel(<?php echo $item['org_id'] ?>);return false;">删除</a>
                                 </td> 
                         <input type="hidden" name="supply_id" value="<?php echo $item['org_id'] ?>" />
                         </tr>

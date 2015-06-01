@@ -378,4 +378,19 @@ abstract class Base_Model_Abstract
         $this->cd = $sec;
         return $this;
     }
+
+    public function customCache($cacheKey,$data=null,$expire=3600) {
+        $cacheNs = $this->getCacheNS();
+        $cacheData = $this->memcache->get($cacheKey);
+        if(empty($cacheData) || $cacheData['cacheNS']!=$cacheNs) {
+            if($data==null) return null;
+            $res = $data;
+            if(!empty($res))
+                $this->memcache->set($cacheKey,array('data'=>$res,'cacheNS'=>$cacheNs),$expire);
+        }
+        else {
+            $res = $cacheData['data'];
+        }
+        return $res;
+    }
 }

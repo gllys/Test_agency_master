@@ -7,7 +7,11 @@
                         <a href="" class="panel-minimize tooltips" data-toggle="tooltip" title="折叠"><i class="fa fa-minus"></i></a>
                         <a href="" class="panel-close tooltips" data-toggle="tooltip" title="隐藏面板"><i class="fa fa-times"></i></a>
                     </div><!-- panel-btns -->
-                    <h4 class="panel-title">添加分销商</h4>
+                    <ul class="list-inline">
+                        <li><h4 class="panel-title">添加分销商</h4></li>
+                        <li><a href="/order/history/help?#7.1" title="帮助文档" class="clearPart"
+                               target="_blank">查看帮助文档</a> </li>
+                    </ul>
                 </div><!-- panel-heading -->
 
                 <div class="panel-body nopadding">                  
@@ -37,7 +41,7 @@
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label"><span class="text-danger">*</span>公司名称</label>
                                     <div class="col-sm-6">
-                                        <input type="text" placeholder="" class="form-control validate[required,custom[chinese],minSize[4],maxSize[40]]" maxlength="40" tag="公司名称" name="name"/>
+                                        <input type="text" placeholder="" class="form-control validate[required,custom[chiMark],minSize[4],maxSize[40]]" maxlength="40" tag="公司名称" name="name"/>
                                     </div>
                                 </div>
                                 <!-- form-group -->
@@ -216,8 +220,7 @@
 
 		<!-- jquery.validationEngine-zh-CN.js 为配置文件，可根据需求自行调整或增加，也可以更换为其他语言配置文件 --> 
 		<script>
-            $(document).ready(function () {
-                
+            $(document).ready(function () {                
                 // 表单验证
                 $('#agencyadd').validationEngine('attach', {
                     promptPosition: 'topRight',
@@ -248,21 +251,17 @@
 								$('#agencyadd [name=agencyname]').PWShowPrompt(data.msg); 
 							} else {
                                 alert('保存成功');
-                                location.href = '/agency/manager/';
+                                location.href = '/#'+ '/agency/manager/';
                             }
                         }, 'json');
 
-                    }
-                    ;
+                    };
                     return false;
                 });
+                $('#agencyname').val(' ');
+                setTimeout(function(){$('#agencyname').val($('#agencyname').val().trim());},50);
             });
-		</script>
 
-
-
-
-		<script>
             jQuery(document).ready(function () {
                 // Tags Input
                 jQuery('#tags').tagsInput({width: 'auto'});

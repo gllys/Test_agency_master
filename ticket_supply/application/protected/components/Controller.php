@@ -58,7 +58,7 @@ class Controller extends CController {
     //  检测权限
     protected function beforeAction($action) {
         #post请求全部通过
-        if (Yii::app()->request->isPostRequest||Yii::app()->request->isAjaxRequest) {
+        if ((Yii::app()->request->isPostRequest||Yii::app()->request->isAjaxRequest)&&(empty($_GET['mod'])||$_GET['mod']!='part')) {
             return true;
         }
 
@@ -219,4 +219,29 @@ class Controller extends CController {
         Yii::app()->end();
     }
 
+    
+      //解决Html 太多加载问题bug
+    public function _htmlEnd($error, $msg, $params = array()) {
+        $json = new Services_JSON();
+        echo $json->encode(array('error' => $error, 'msg' => $msg, 'params' => $params));
+        Yii::app()->end();
+    }
+    
+    public function render($view, $data = null, $return = false) {
+        if(!empty($_GET['mod'])&&$_GET['mod']=='part'){
+            PublicFunHelper::forbidCache();
+            $data = $this->renderPartial($view, $data, true);
+            $this->_htmlEnd(0, $data,'/#'.$this->childNav) ;
+        }else{
+            parent::render($view, $data, $return);
+        }
+    }
+    
+    public function redirect($url, $terminate = true, $statusCode = 302) {
+        if (!empty($_GET['mod']) && $_GET['mod'] == 'part') {
+            $this->_end(200,$url);
+        } else {
+            parent::redirect($url, $terminate, $statusCode);
+        }
+    }
 }

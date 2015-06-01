@@ -37,7 +37,7 @@ if ($info['allow_status'] == 0) { ?>
     $("#agree").click(function() {
         $.get('/order/refund/point1', {"idnum": 1, "id":"<?php echo $id; ?>"}, function(data) {
             if (data.error == 0) {
-                alert('退款成功',function(){window.location.reload();});
+                alert('退款成功',function(){window.location.partReload();});
             }else{
                 alert(data.msg);
             }
@@ -49,7 +49,7 @@ if ($info['allow_status'] == 0) { ?>
 
         $.get('/order/refund/point1', {'reject_reason': $("#reject").val(),'id':"<?php echo $id; ?>",'reject': 1}, function(data) {
             if (data.error == 0) {
-                alert('驳回成功',function(){window.location.reload();}); 
+                alert('驳回成功',function(){window.location.partReload();}); 
             }else{
 
                 alert(data.msg);

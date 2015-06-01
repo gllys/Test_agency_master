@@ -6,6 +6,17 @@ class Tools {
 	const FLAG_NO_NUMERIC = 2;
 	const FLAG_ALPHANUMERIC = 3;
 
+    public static function pr()
+    {
+        $tag = PHP_SAPI == 'cli' ? PHP_EOL : '<pre>';
+        $args = func_get_args();
+        foreach ($args as $arg) {
+            echo $tag;
+            print_r($arg);
+            echo $tag;
+        }
+        echo $tag == '' ? PHP_EOL : '<br>';
+    }
 	/**
 	 * 生成随机密码
 	 *

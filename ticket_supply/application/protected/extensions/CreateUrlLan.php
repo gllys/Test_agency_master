@@ -23,7 +23,7 @@ class CreateUrlLan {
                 continue;
 
             $title = $this->createTitle($i);
-            
+
             if (empty($title))
                 continue;
             $html .= sprintf('<li class="parent">%s<ul class="children">%s</ul></li>', $title, $list);
@@ -31,7 +31,7 @@ class CreateUrlLan {
 
         return $html;
     }
-    
+
     public function createHeader() {
         $count = count($this->titles);
         $html = '';
@@ -39,8 +39,8 @@ class CreateUrlLan {
         for ($i = 0; $i < $count; $i++) {
             $list = $this->createList($i);
             if (empty($list))
-                continue; 
-            
+                continue;
+
             $html .= sprintf('<li id="nav_%s"><div class="m-t-small">%s</div></li>', $i, $this->createTitle($i));
         }
 
@@ -109,7 +109,7 @@ class CreateUrlLan {
         echo $string;
     }
 
-     // 菜单标题
+    // 菜单标题
     public function createTitle($index) {
         if (!isset($this->titles[$index]))
             return null;
@@ -135,7 +135,11 @@ class CreateUrlLan {
                 continue;
             $html .= '<li><a';
             foreach ($item['params'] as $key => $value) {
-                $html .= sprintf(' %s="%s"', $key, $value);
+                 if ($key == 'href') {
+                    $html .= sprintf(' %s="/#%s"', $key, $value);
+                } else {
+                    $html .= sprintf(' %s="%s"', $key, $value);
+                }
             }
             $html .= sprintf('>%s</a></li>', $item['content']);
         }
@@ -185,7 +189,7 @@ class CreateUrlLan {
         }
 
         #得到用户权限
-        $permissions = array('/check/used/','/check/check/','/check/order/','/message/notice/');
+        $permissions = array('/check/used/', '/check/check/', '/check/order/', '/message/notice/');
         if ($this->inArray($item['params']['href'], $permissions)) {
             return true;
         }
@@ -216,7 +220,7 @@ class CreateUrlLan {
         }
         return false;
     }
-    
+
     public $TitleIndexs = array(
         'check' => 0,
         'message' => 1,
@@ -227,20 +231,20 @@ class CreateUrlLan {
     }
 
     public $titles = array(
-        array('params' => array('class' => 'fa fa-fw fa-credit-card'), 'content' => '验票'),
-        array('params' => array('class' => 'fa fa-fw fa-credit-card'), 'content' => '消息'),
+        array('params' => array('class'=>'part','class' => 'fa fa-fw fa-credit-card'), 'content' => '验票'),
+        array('params' => array('class'=>'part','class' => 'fa fa-fw fa-credit-card'), 'content' => '消息'),
     );
     public $lists = array(
         array(
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/check/used/'), 'content' => '验票'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/check/check/'), 'content' => '验票记录'),
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/check/order/'), 'content' => '订单管理'),
+            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('class'=>'part','href' => '/check/used/'), 'content' => '验票'),
+            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('class'=>'part','href' => '/check/check/'), 'content' => '验票记录'),
+            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('class'=>'part','href' => '/check/order/'), 'content' => '订单管理'),
         ),
         array(
-            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('href' => '/message/notice/view/type/all/'), 'content' => '公告信息'),
+            array('auth' => '', 'paramIcos' => array("class" => "fa fa-user"), 'params' => array('class'=>'part','href' => '/message/notice/view/type/all/'), 'content' => '公告信息'),
         ),
     );
-    
+
     public function getChildNav($controllerId) {
         return null;
     }
