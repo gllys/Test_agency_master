@@ -50,7 +50,7 @@ class TicketItemModel extends Base_Model_Abstract
             $view_point = explode(',', $ticket['poi_list']);
             foreach($view_point as $poi_id){
                 $i++;
-                $id = '5'.substr("{$ticket['order_id']}", 1)."$i";
+                $id = '5'.substr("{$ticket['order_id']}", 1)."{$i}".mt_rand(10,99);
                 $data = array();
                 $data['id'] = $id;
                 $data['ticket_id'] = $ticket['id'];

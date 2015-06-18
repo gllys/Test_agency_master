@@ -109,7 +109,14 @@ $this->breadcrumbs = array(
 					<td><?php echo $equipment['id'];?></td>
 					<td><?php echo $equipment['code'];?></td>
 					<td><?php echo $equipment['name'];?></td>
-					<td><?php echo $equipment['type']==0?"手持验票机":"闸机";?></td>
+					<td><?php
+						foreach($type as $_k =>$_v){
+							if($equipment['type'] == $_k){
+								echo $_v;
+								break;
+							}
+						}
+						?></td>
 					<td><?php echo $equipment['scene']==0?"未选择":($equipment['scene']==1?"入园":"出园");?></td>
 					<td><a href="/scenic/managequip/supply/?id=<?php echo $equipment['id'];?>">
 								<?php

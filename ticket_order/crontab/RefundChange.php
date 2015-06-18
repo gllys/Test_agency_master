@@ -247,6 +247,8 @@ class Crontab_RefundChange extends Process_Base
                     return false;
                 }
             }
+            OrderItemModel::model()->deleteRedisCache($order['id']);
+            TicketItemModel::model()->deleteRedisCache($order['id']);
             $this->RefundApplyModel->commit();
             return $refund_apply_id;
         } catch (PDOException $e) {
@@ -300,12 +302,16 @@ class Crontab_RefundChange extends Process_Base
             // 允许
             $refund['status'] = 1;
 
-            if($orderInfo['local_source'] == 1) { //实际针对所有ota，通知OTA退票，返回成功后继续退款操作
-                if(!OtaCallbackModel::model()->refund($orderInfo, $refund_apply, true)) {
+            if($orderInfo['local_source'] == 1) { //实际针对所有ota，异步通知OTA退票
+                Process_Async::presend(
+                    array("OtaCallbackModel","refundAsync"),
+                    array($orderInfo, $refund_apply, true)
+                );
+                /*if(!OtaCallbackModel::model()->refund($orderInfo, $refund_apply, true)) {
                     $this->RefundApplyModel->rollBack();
                     echo "OtaCallbackModel->refund failed [{$orderInfo['id']}]\n";
                     return false;
-                }
+                }*/
             }
 
             $r = $this->allow($orderInfo, $refund_apply, $refunding_nums, $data, $order_items_ids);
@@ -315,6 +321,8 @@ class Crontab_RefundChange extends Process_Base
                 return false;
             }
             $this->RefundApplyModel->updateByAttr($refund, array('id' => $data['id']));
+            OrderItemModel::model()->deleteRedisCache($refund_apply['order_id']);
+            TicketItemModel::model()->deleteRedisCache($refund_apply['order_id']);
             $this->RefundApplyModel->commit();
             return true;
         } catch (Exception $e) {
@@ -351,7 +359,8 @@ class Crontab_RefundChange extends Process_Base
         $orderParams = array(
             'refunding_nums' => $refunding_nums,
             'refunded_nums' => $refunded_nums,
-            'refunded' => $refunded
+            'refunded' => $refunded,
+            'updated_at' => $this->now,
         );
         if($refunded>$orderInfo['amount']){
             return false;

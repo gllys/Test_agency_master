@@ -37,9 +37,9 @@
 			}
             $.post('/agency/product/forceOut', {id:id,force_out:1, force_out_remark:forceOutRemark}, function(data) {
             	 if (data.error) {
-	  	               alert('强制下架成功', function(){window.location.partReload();});
+	  	               alert('强制下架成功', function(){window.location.reload();});
 	  	           } else {
-	  	               alert(data.msg, function(){window.location.partReload();});
+	  	               alert(data.msg, function(){window.location.reload();});
 	  	           }
             }, 'json');
         });

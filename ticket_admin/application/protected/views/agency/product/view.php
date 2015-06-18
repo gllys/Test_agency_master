@@ -35,22 +35,60 @@ use common\huilian\utils\Time;
 					<td style="width:10%;">产品名称:</td>
 					<td><?= $product['name'] ?></td>
 				</tr>
+				<?php if($product['is_fit']) { ?>
 				<tr>
 					<td>散客结算价:</td>
-					<td><?= $product['fat_price'] ?></td>
+					<td>
+						<?= $product['fat_price'] ?>
+                        <span style="margin-left:30px;">是否一次验票:</span>
+                        <span style=""><?= $product['is_fat_once_verificate'] ? '是' : '否'; ?></sapn>
+                        <?php if(count($product['landscapes']) > 1) { // 当景区为1个时候，不必显示是否一次取票 ?>
+                        <span style="margin-left:30px;">是否一次取票:</span>
+                        <span style=""><?= $product['is_fat_once_taken'] ? '是' : '否'; ?></span>
+                        <?php } ?>
+					</td>
+				</tr>
+				<?php } ?>
+				<tr>
+					<?php $parts = Time::seconds($product['fat_scheduled_time']); ?>
+					<td>提前预定时间：</td>
+					<td>需在入园前<?= $parts['days'] ?>天<?= Time::prefixZero($parts['hours']) ?>:<?= Time::prefixZero($parts['minutes']) ?>以前购买</td>
+				</tr>
+				<tr>
+					<td>散客产品说明:</td>
+					<td><?= $product['fat_description'] ?></td>
 				</tr>
 				<tr>
 					<td>团队结算价:</td>
-					<td><?= $product['group_price'] ?> &nbsp;&nbsp;&nbsp;&nbsp; 最少订票<?= $product['mini_buy'] ?>张</td>
+					<td>
+						<?= $product['group_price'] ?> 
+						<span style="margin-left:30px;">最少订票<?= $product['mini_buy'] ?>张</span>
+						<span style="margin-left:30px;">是否一次验票:</span>
+                        <span style=""><?= $product['is_group_once_verificate'] ? '是' : '否'; ?></sapn>
+                        <?php if(count($product['landscapes']) > 1) { // 当景区为1个时候，不必显示是否一次取票 ?>
+                        <span style="margin-left:30px;">是否一次取票:</span>
+                        <span style=""><?= $product['is_group_once_taken'] ? '是' : '否'; ?></span>
+                        <?php } ?>
+					</td>
+				</tr>
+				<tr>
+					<?php $parts = Time::seconds($product['group_scheduled_time']); ?>
+					<td>提前预定时间：</td>
+					<td>需在入园前<?= $parts['days'] ?>天<?= Time::prefixZero($parts['hours']) ?>:<?= Time::prefixZero($parts['minutes']) ?>以前购买</td>
+				</tr>
+				<tr>
+					<td>团队产品说明:</td>
+					<td><?= $product['group_description'] ?></td>
 				</tr>
 				<tr>
 					<td>是否允许退票:</td>
-					<td><?= $product['refund'] ? '是' : '否' ?></td>
-				</tr>
-				<tr>
-					<?php $parts = Time::seconds($product['scheduled_time']); ?>
-					<td>提前预定时间：</td>
-					<td>需在入园前<?= $parts['days'] ?>天<?= Time::prefixZero($parts['hours']) ?>:<?= Time::prefixZero($parts['minutes']) ?>以前购买</td>
+					<td>
+						<?= $product['refund'] ? '是' : '否' ?>
+						<span style="margin-left:30px;">是否允许短信:</span>
+						<span style=""><?= $product['message_open'] ? '是' : '否'; ?></sapn>
+						<span style="margin-left:30px;">是否门票验证:</span>
+						<span style=""><?= $product['checked_open'] ? '是' : '否'; ?></sapn>
+					</td>
 				</tr>
 				<tr>
 					<td>产品销售日期：</td>
@@ -80,9 +118,9 @@ use common\huilian\utils\Time;
 					</td>
 				</tr>
 				<tr>
-					<td>产品说明：</td>
+					<td>短信模板：</td>
 					<td>
-						<?= $product['remark'] ?>
+						<?= $product['sms_template'] ?: '未设置' ?>
 					</td>
 				</tr>
 			</table>

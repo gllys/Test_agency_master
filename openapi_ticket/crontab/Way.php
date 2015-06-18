@@ -8,8 +8,16 @@ require dirname(__FILE__) . '/Base.php';
  * @author wfdx1_000
  */
 class Crontab_Way extends Process_Base {
+    
+    /**
+     *
+     * @var Util_Logger
+     */
+    private $logger;
 
     public function run() {
+        $this->logger = Util_Logger::getLogger('way');
+        
         $config = Yaf_Registry::get('config');
 
         foreach ($config['way']['account'] as $account) {
@@ -20,16 +28,28 @@ class Crontab_Way extends Process_Base {
     private function syncOrders($account) {
         $config = Yaf_Registry::get('config');
         $config = $config['way'];
-        $fromTime = time() - 3600 * 24;
+        $fromTime = time() - 3600 * 12;
         $toTime = 0;
         
         $list = ApiWayModel::getOrders($fromTime, $toTime, $account);
+        
+        $cache = Cache_Redis::factory('cache');
 
         foreach ($list as $row) {
             // 只处理已成交的订单
             if (!in_array($row['OrderStatus'], array(6, 7))) {
                 continue;
             }
+            
+            $cacheKey = __METHOD__ . $row['OrderId'];
+            
+            $cacheVal = $cache->get($cacheKey);
+            if ($cacheVal !== false) {
+                if (($cacheVal == 'create' && $row['OrderStatus'] == 6) || ($cacheVal == 'cancel' && $row['OrderStatus'] == 7)) {
+                    continue;
+                }
+            }
+            
             $productCode = $row['GroupProductId'];
 
             $product = ApiProductModel::model()->getProductByCode(array(
@@ -63,6 +83,8 @@ class Crontab_Way extends Process_Base {
                     $r = ApiOrderModel::model()->cancelAndRefund($params);
                     
                     $logger->info(__METHOD__, $row, $r, '订单退款',  $row['OrderId']);
+                    
+                    $cache->set($cacheKey, 'cancel');
                 }
                 continue;
             }
@@ -113,6 +135,12 @@ class Crontab_Way extends Process_Base {
 
             $response = ApiOrderModel::model()->create($params);
             if ($response && $response['code'] == 'succ') {
+                
+                $this->logger->info(__METHOD__, $row, $response, '创建订单', $row['OrderId']);
+                
+                // 将同步过的订单放在缓存中，下次不同步该订单
+                $cache->set($cacheKey, 'create');
+                
                 $toOta = array(
                     'order_id' => $params['source_id'],
                     'verify_code' => $response['body']['id'],
@@ -125,10 +153,10 @@ class Crontab_Way extends Process_Base {
                 try {
                     ApiWayModel::consume($toOta, ApiWayModel::CONSUME_INIT, $account);
                 } catch (Exception $ex) {
-                    $logger->error(__METHOD__, $row, $ex->getMessage(), '订单', $row['OrderId']);
+                    $logger->error(__METHOD__, $row, $ex->getMessage(), '发码', $row['OrderId']);
                 }
             } else {
-                $logger->error(__METHOD__, $response, '', '订单', $row['OrderId']);
+                $logger->error(__METHOD__, $response, '', '创建订单', $row['OrderId']);
             }
         }
     }

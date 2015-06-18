@@ -1,4 +1,4 @@
-<div class="modal-dialog" style="width:700px !important;">
+ <div class="modal-dialog" style="width:700px !important;">
     <div class="modal-content" style="padding-left: 10px;padding-right: 10px;">
         <div class="modal-header">
             <button aria-hidden="true" data-dismiss="modal" class="close" type="button">&times;</button>
@@ -32,6 +32,11 @@
 
                     <div class="col-sm-4" style="margin-top:5px"><?php echo $ticket['name']; ?></div>
                 </div>
+                
+                <?php
+                //是否是单票
+                $productIds = array_filter(PublicFunHelper::arrayKey($ticket['items'],'scenic_id'));
+                ?>
                 <?php if (!empty($ticket['is_fit'])): ?>
                     <div class="form-group">
                         <div class="col-sm-2 control-label">散客结算价:</div>
@@ -42,10 +47,14 @@
                         <div class="col-sm-2 control-label">是否一次验票:</div>
                         <div class="col-sm-1"
                              style="margin-top:5px"><?php echo empty($ticket['is_fat_once_verificate']) ? '否' : '是'; ?></div>
-                        <div class="col-sm-2 control-label">是否一次取票:</div>
-                        <div class="col-sm-1"
-                             style="margin-top:5px"><?php echo empty($ticket['is_fat_once_taken']) ? '否' : '是'; ?>
-                        </div>
+                        <?php
+                                if (count($productIds) > 1) {
+                                    ?>
+                                    <div class="col-sm-2 control-label">是否一次取票:</div>
+                                    <div class="col-sm-1"
+                                         style="margin-top:5px"><?php echo empty($ticket['is_fat_once_taken']) ? '否' : '是'; ?>
+                                    </div>
+                                <?php } ?>
                         <?php endif;?>
                     </div>
                     <div class="form-group">
@@ -74,10 +83,14 @@
                         <div class="col-sm-2 control-label">是否一次验票:</div>
                         <div class="col-sm-1"
                              style="margin-top:5px"><?php echo empty($ticket['is_group_once_verificate']) ? '否' : '是'; ?></div>
+                        <?php
+                        if (count($productIds) > 1) {
+                        ?>
                         <div class="col-sm-2 control-label">是否一次取票:</div>
                         <div class="col-sm-1"
                              style="margin-top:5px"><?php echo empty($ticket['is_group_once_taken']) ? '否' : '是'; ?>
                         </div>
+                        <?php }?>
                         <?php endif;?>
                         <div class="col-sm-2" style="margin-top:5px">最少订票<span
                                 class="text-danger"><?php echo $ticket['mini_buy']; ?></span>张
@@ -124,8 +137,7 @@
                 <div class="form-group">
                     <div class="col-sm-2 control-label">产品销售有效期:</div>
                     <div class="col-sm-10 text-danger" style="margin-top:5px">
-                        <?php if ($ticket['sale_start_time']) echo date('Y-m-d', $ticket['sale_start_time']); ?>
-                        ~ <?php if ($ticket['sale_end_time']) echo date('Y-m-d', $ticket['sale_end_time']); ?>
+                        <?= $ticket['sale_start_time'] ? date('Y-m-d', $ticket['sale_start_time']) . '~' . date('Y-m-d', $ticket['sale_end_time']) : '不限' ?>
                     </div>
                 </div>
 
@@ -133,7 +145,7 @@
                     <div class="col-sm-2 control-label">使用有效期:</div>
                     <?php list($val_start_time, $val_end_time) = explode(',', $ticket['date_available']); ?>
                     <div class="col-sm-10 text-danger" style="margin-top:5px">
-                        <?php echo date('Y-m-d', $val_start_time) . ' ~ ' . date('Y-m-d', $val_end_time); ?>
+                    	<?= $ticket['sale_start_time'] ? date('Y-m-d', $val_start_time) . '~' . date('Y-m-d', $val_end_time) : '不限' ?>
                     </div>
                 </div>
 

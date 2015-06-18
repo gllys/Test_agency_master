@@ -44,7 +44,7 @@ class UsedController extends Controller {
                 }
 
                 if ($v) {
-                    $param['datas'][$k] = $v;
+                    $param['datas'][$k] = $v*$param['ticketSum'][$k];
                 }
             }
             if (!$param['datas']) {

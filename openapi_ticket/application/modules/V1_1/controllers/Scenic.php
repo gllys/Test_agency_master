@@ -6,7 +6,7 @@
  * Time: 下午6:04
  */
 
-class ScenicController extends Base_Controller_Ota
+class ScenicController extends Base_Controller_OtaNew
 {
 
     public function listAction(){
@@ -24,7 +24,7 @@ class ScenicController extends Base_Controller_Ota
                 'code' => 400,
                 'message' => $response['message'],
                 'result' => array(),
-            ));
+            ),200,JSON_UNESCAPED_UNICODE);
         }
         
         $list = array();
@@ -44,7 +44,7 @@ class ScenicController extends Base_Controller_Ota
             'result' => array(
                 'scenics' => $list,
             ),
-        ));
+        ),200,JSON_UNESCAPED_UNICODE);
     }
 
     /**
@@ -64,7 +64,7 @@ class ScenicController extends Base_Controller_Ota
                 'code' => 400,
                 'message' => '参数不完整',
                 'result' => array(),
-            ));
+            ),200,JSON_UNESCAPED_UNICODE);
         }
         $params = $this->body;
         Util_Logger::getLogger('openapi')->info(__METHOD__, array(
@@ -86,7 +86,7 @@ class ScenicController extends Base_Controller_Ota
                 'code' => 400,
                 'message' => $response['message'],
                 'result' => array(),
-            ));
+            ),200,JSON_UNESCAPED_UNICODE);
         }else if($response['code'] == 'succ'){
             $data = array();
             if(isset($response['body']) && is_array($response['body'])) {
@@ -96,7 +96,7 @@ class ScenicController extends Base_Controller_Ota
                 'code' => 200,
                 'message' => '',
                 'result' => $data
-            ));
+            ),200,JSON_UNESCAPED_UNICODE);
         }
     }
 

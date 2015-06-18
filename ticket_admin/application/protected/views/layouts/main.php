@@ -17,6 +17,7 @@
         <link href="<?php echo Yii::app()->versionUrl->changeUrl('/css/bootstrap-wysihtml5.css') ?>" rel="stylesheet">
         <link href="<?php echo Yii::app()->versionUrl->changeUrl('/css/marquee.css') ?>" rel="stylesheet">
         <script src="<?php echo Yii::app()->versionUrl->changeUrl('/js/jquery-1.11.1.min.js') ?>"></script>
+        <script charset="utf-8" src="<?php echo Yii::app()->versionUrl->changeUrl('/js/kindeditor-4.1.10/kindeditor.js') ?>"></script>
 
 
         

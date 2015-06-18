@@ -46,7 +46,7 @@
         </ul>
         <div id="show_msg"></div>
 <div class="table-responsive" style="margin-bottom:30px;">
-    <table class="table table-bordered">
+    <table class="table table-bordered clearPart_body">
         <thead>
         <tr>
             <th width="100">
@@ -63,12 +63,12 @@
             </th>
             <th width="450"></th>
             <th width="100"></th>
-            <th width="80"></th>
+            <th width="80"><input type="hidden" id="idlog" value="m" /></th>
         </tr>
         </thead>
         <tbody id="staff-body">
         <?php if (isset($lists) && !empty($lists)) : foreach ($lists as $message) : ?>
-            <tr class="<?php echo $message['read_time'] == 0 ? 'no-read' : ''?>">
+            <tr id="tr<?php echo $message['id']?>" class="<?php echo $message['read_time'] == 0 ? 'no-read' : ''?>">
                 <td>
                     <div class="ckbox ckbox-primary" style="margin-left: 17px;">
                         <input type="checkbox" class="ids" id="checkbox<?php echo $message['id']?>" value="<?php echo $message['id']?>">
@@ -124,7 +124,7 @@
                                     </div>
 
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-default" data-dismiss="modal" id="close_advice">关闭</button>
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
                                     </div>
                                 </div><!-- /.modal-content -->
                             </div><!-- /.modal-dialog -->
@@ -234,43 +234,49 @@
 <script>
     function modal_jump(obj) {
         
-        var url = $(obj).attr('href');        
+        var url = $(obj).attr('href'); 
+        var idlog = $('#idlog').val();        
         //到期提醒未读数量减一
         if($(obj).parent().parent().parent().hasClass('no-read') && url.indexOf("ticket_id=") != -1){            
             var msg_id = parseInt($(obj).parent().attr('data-id'));
-            $.post('/system/message/read', {
-                'id': msg_id
-            }, function (data) {
-                if (data.error == 0) {
-                    var num;
-                    var read_num;
-                    var unread;
-                    num = $('#unread_num').text();
-                    unread = $('#unread').text();
-                    read_num = $('#read_num').text();
-                    //未读消息的累减
-                    if (Number(num) > 0) {
-                        num = num - 1;
-                    }
-                    if (Number(num) == 0) {
-                        $('#unread_num').remove();
-                    } else {
-                        $('#unread_num').text(num);
-                    }
-                    //标签内未读消息累减
-                    if (Number(unread) > 0) {
-                        unread = unread - 1;
-                    }
-                    if (Number(unread) == 0) {
-                        $('#unread').remove();
-                    } else {
-                        $('#unread').text(unread);
-                    }
-                    $('#setRead' + msg_id).removeClass('font-bold');
-                    $('#readAdvice' + msg_id).removeClass('font-bold');
-                    $('#sender' + msg_id).removeAttr('style');                    
-                } 
-            }, 'json');
+            //已减一的不再减       
+            $('#tr' + msg_id).removeClass('no-read');
+            if(idlog.indexOf(msg_id+'m') != -1){
+                $('#idlog').val(idlog+msg_id+'m');                
+                $.post('/system/message/read', {
+                    'id': msg_id
+                }, function (data) {
+                    if (data.error == 0) {
+                        var num;
+                        var read_num;
+                        var unread;
+                        num = $('#unread_num').text();
+                        unread = $('#unread').text();
+                        read_num = $('#read_num').text();
+                        //未读消息的累减
+                        if (Number(num) > 0) {
+                            num = num - 1;
+                        }
+                        if (Number(num) == 0) {
+                            $('#unread_num').remove();
+                        } else {
+                            $('#unread_num').text(num);
+                        }
+                        //标签内未读消息累减
+                        if (Number(unread) > 0) {
+                            unread = unread - 1;
+                        }
+                        if (Number(unread) == 0) {
+                            $('#unread').remove();
+                        } else {
+                            $('#unread').text(unread);
+                        }
+                        $('#setRead' + msg_id).removeClass('font-bold');
+                        $('#readAdvice' + msg_id).removeClass('font-bold');
+                        $('#sender' + msg_id).removeAttr('style');
+                    } 
+                }, 'json');
+            }
         }
         document.getElementById('verify-modal').innerHTML = '';
         $.get($(obj).attr('href'), function(data) {

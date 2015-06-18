@@ -142,8 +142,8 @@ cursor: pointer;
 				<td><?= $channel['op_user'] ?></td>
 				<td>
 					<div class="rules">
-						<span><?= mb_strlen($channel['remark']) > 15 ? mb_substr($channel['remark'], 0, 15) . '...' : $channel['remark'] ?></span>
-						<?php if(mb_strlen($channel['remark']) > 15) { ?>
+						<span><?= mb_strlen($channel['remark'],'utf8') > 15 ? mb_substr($channel['remark'], 0, 15,'utf8') . '...' : $channel['remark'] ?></span>
+						<?php if(mb_strlen($channel['remark'],'utf8') > 15) { ?>
 						<div class="table-responsive">
 							<table class="table table-bordered mb30"><?= $channel['remark'] ?></table>
 						</div>

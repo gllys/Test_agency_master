@@ -20,4 +20,36 @@ class SmsController extends Base_Controller_Api {
         !$res && Lang_Msg::error('ERROR_SMSSEND_3');
         Tools::lsJson(true,'ok');
     }
+
+    /**
+     * 设置预警
+     * author : yinjian
+     */
+    public function editWarningMoneyAction()
+    {
+        if(isset($this->body['sms_warning_money'])) {
+            $data['config_value'] = doubleval($this->body['sms_warning_money']);
+            $data['config_value']<0 && Lang_Msg::error('余额不能小于零');
+            ConfigModel::model()->updateByAttr($data,array('config_key'=>'sms_warning_money'));
+        }
+        if(isset($this->body['sms_warning_send_email'])) {
+            $data['config_value'] = trim($this->body['sms_warning_send_email']);
+            ConfigModel::model()->updateByAttr($data,array('config_key'=>'sms_warning_send_email'));
+        }
+        Lang_Msg::output();
+    }
+
+    /**
+     * 获取预警
+     * author : yinjian
+     */
+    public function showWarningMoneyAction()
+    {
+        $sms_warning_money = ConfigModel::model()->get(array('config_key'=>'sms_warning_money'));
+        $sms_warning_send_email = ConfigModel::model()->get(array('config_key'=>'sms_warning_send_email'));
+        Lang_Msg::output(array(
+            'sms_warning_money' => $sms_warning_money['config_value'],
+            'sms_warning_send_email' => $sms_warning_send_email['config_value'],
+        ));
+    }
 }

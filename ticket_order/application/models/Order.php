@@ -29,15 +29,54 @@ class OrderModel extends Base_Model_Abstract
     }
 
     public function setTable($id = 0) {
-    	// if (!$id) $this->tblname = $this->basename . date('Ym');
-    	// else  $this->tblname = $this->basename . Util_Common::uniqid2date($id);
-    	return $this;
+        // if (!$id) $this->tblname = $this->basename . date('Ym');
+        // else  $this->tblname = $this->basename . Util_Common::uniqid2date($id);
+        return $this;
     }
 
     public function share($ts = 0) {
         // if (!$ts) $ts = time();
         // $this->tblname = $this->basename . date('Ym', $ts);
         return $this;
+    }
+
+    //检查游玩时间
+    private function checkUseDay($productInfo,$use_day,$price_type=0) {
+        if(!empty($productInfo) && !empty($use_day)) {
+            $scheduled_time = $price_type==1?$productInfo['group_scheduled_time']:$productInfo['fat_scheduled_time'];
+            $days = intval($scheduled_time / 86400); //提前天数
+            $preSec = $scheduled_time % 86400; //预定提前时分秒时间戳
+            $nowTime = time();
+            $nowDay = strtotime(date("Y-m-d")); //当天0点时间戳
+            $nowSec = $nowTime-$nowDay; //当天时分秒时间戳
+            $useDayTime = strtotime($use_day); //游玩日期0点时间戳
+            $preHM = date("H:i",$nowDay+$preSec);
+            //echo $scheduled_time." | ".$days." | ".$preSec." | ".$nowTime." | ".$nowDay." | ".$nowSec." | ".$useDayTime." | ".$preHM."\n";
+
+            //预定时间大于游玩时间
+            if(strtotime($use_day.' 23:59:59')<$nowTime) {
+                Lang_Msg::error('ERROR_USEDAY_3');
+            } else if($useDayTime<$nowDay+($days+(($preSec>0 && $nowSec>$preSec)?1:0))*86400 ) {
+                Tools::lsJson(false,'该产品['.$productInfo['name'].']需在入园前 '.$days.' 天的 '.$preHM.' 以前购买');
+            }
+        } else {
+            Tools::lsJson(false,'缺少产品ID或游玩日期参数');
+        }
+    }
+
+    //检查预定张数限制
+    private function checkNumLimit($productInfo,$nums,$price_type=0) {
+        if(!empty($productInfo)) {
+            if (!$nums) {
+                Lang_Msg::error('ERROR_TK_NUMS_1');
+            } else if ($price_type == 1 && $nums < $productInfo['mini_buy']) {
+                Tools::lsJson(false, '团客购买下限不能小于' . $productInfo['mini_buy']);
+            } else if ($nums > $productInfo['max_buy']) {
+                Tools::lsJson(false, '购买上限不能大于' . $productInfo['max_buy']);
+            }
+        } else {
+            Tools::lsJson(false,'缺少产品ID参数');
+        }
     }
 
     //添加单条订单，参数$returnProdInfo：是否一起返回产品信息
@@ -64,9 +103,9 @@ class OrderModel extends Base_Model_Abstract
 
         $nowtime = time();
 
-        // 团体票限定人数 预定时间大于游玩时间
-        if(strtotime($params['use_day'].' 23:59:59')<$nowtime) Lang_Msg::error('ERROR_USEDAY_3');
-        if( $params['price_type']==1 && ($params['nums']<$params['productInfo']['mini_buy']|| $params['nums'] >$params['productInfo']['max_buy'])) Lang_Msg::error('ERROR_ORDER_14');
+        $this->checkUseDay($params['productInfo'],$params['use_day'],$params['price_type']); //检查游玩时间
+        $this->checkNumLimit($params['productInfo'],$params['nums'],$params['price_type']); //检查预定张数限制
+
         $custome = true;
         if (!array_key_exists('is_checked', $params) || !$params['is_checked'])
         {
@@ -79,28 +118,22 @@ class OrderModel extends Base_Model_Abstract
         $visitors = array();
         if($params['visitors']){
             $params['visitors'] = json_decode($params['visitors'],true);
-            if($params['visitors']) {
-                foreach($params['visitors'] as $v){
-                    !empty($v['visitor_mobile']) && !Validate::isMobilePhone($v['visitor_mobile']) && Lang_Msg::error('ERROR_SMSSEND_1');
-                    array_push($visitors,$v);
-                }
-                $count = count($visitors);
-                if($params['nums'] > count($visitors)) {
-                    for($i = 0; $i < $params['nums']; $i++)
-                    {
-                        if(array_key_exists($i, $visitors))
-                        {
-                            continue;
-                        }
-                        $index = $i % $count;
-                        $visitors[] = $visitors[$index];
+            OrderItemModel::model()->checkVisitors($params['visitors'],$params['productInfo']['name'],$params['productInfo']['need_idcard'],$params['nums']);
+            $visitors = array_values($params['visitors']);
+            $count = count($visitors);
+            if($params['nums'] > count($visitors)) {
+                for($i = 0; $i < $params['nums']; $i++) {
+                    if(array_key_exists($i, $visitors)) {
+                        continue;
                     }
-                } elseif($params['nums'] < count($visitors)) {
-                    $visitors = array_slice($visitors, 0, $params['nums']);
+                    $index = $i % $count;
+                    $visitors[] = $visitors[$index];
                 }
-
+            } elseif($params['nums'] < count($visitors)) {
+                $visitors = array_slice($visitors, 0, $params['nums']);
             }
-            else Lang_Msg::error('游客信息数与票数不一致！');
+        } else if(!empty($params['productInfo']['need_idcard'])) {
+            Tools::lsJson(false,'该产品［'.$params['productInfo']['name'].'］旅客姓名和身份证必填');
         }
 
 
@@ -108,12 +141,15 @@ class OrderModel extends Base_Model_Abstract
         $order = array(
             'id'=>$params['order_id'], //参数1，订单
             'type'=>$params['productInfo']['type'],
-            'kind'=>$params['productInfo']['is_union']==0?1:2, //种类:1单票2联票3套票
+            'kind'=>1, //种类:1单票2联票3套票
             'status'=>'unpaid',
             'created_by'=>$params['user_id'],
             'created_at'=>$nowtime,
             'updated_at'=>$nowtime
         );
+        if(count($params['productInfo']['items'])>1) {
+            $order['kind'] = 3;
+        }
 
         // 一次验票一次取票
         if($params['price_type']==1){
@@ -190,7 +226,7 @@ class OrderModel extends Base_Model_Abstract
         SmsModel::model()->setOrderSmsTemplateMap($params['productInfo'],$order);
         //根据phone, card 添加到redis
         $this->setPhoneCardMap( $order['owner_mobile'], $order['owner_card'] ,$order[ 'id' ]);
-        if($visitors){
+        if(!empty($visitors)){
             foreach($visitors as $visitor){
                 $this->setPhoneCardMap( $visitor['visitor_mobile'], $visitor['visitor_card'] ,$order[ 'id' ]);
             }
@@ -206,7 +242,7 @@ class OrderModel extends Base_Model_Abstract
         return false;
     }
 
-    /**
+    /** （废弃 zqf 2016-06-15）
      * 订单，订单明细，支付单，支付单明细，订单的票跟子景点关联，生成票号，生成流水
      * 新建拉手订单并完成支付
      * author : yinjian
@@ -314,15 +350,15 @@ class OrderModel extends Base_Model_Abstract
             TransactionFlowModel::model()->add($transflowParam);
             // log_order
             Log_Payment::model()->add(array(
-                    'type' => 1,
-                    'num' => 1,
-                    'payment_id' => $paymentInfo['id'],
-                    'order_ids' => $order_id,
-                    'content' => Lang_Msg::getLang('INFO_PAYMENT_1',array(
-                        'id' => $paymentInfo['id'],
-                        'order_ids' => $order_id
-                    ))
-                ));
+                'type' => 1,
+                'num' => 1,
+                'payment_id' => $paymentInfo['id'],
+                'order_ids' => $order_id,
+                'content' => Lang_Msg::getLang('INFO_PAYMENT_1',array(
+                    'id' => $paymentInfo['id'],
+                    'order_ids' => $order_id
+                ))
+            ));
             $this->commit();
             return $order_id;
         } catch (PDOException $e) {
@@ -335,7 +371,7 @@ class OrderModel extends Base_Model_Abstract
 
     //批量添加订单
     public function addBatchOrder($params) {
-        $orders = $productInfos= $orgIds = array();
+        $orders = $productInfos= $orgIds = $visitorsArr = array();
         $nowtime = time();
         foreach($params['cartTicketList'] as $v) {
             isset($v['ticket_template_id']) && $v['product_id'] = $v['ticket_template_id'];
@@ -350,7 +386,7 @@ class OrderModel extends Base_Model_Abstract
                 ($v['use_day'] && !preg_match("/^\d{4}-\d{2}-\d{2}$/",$v['use_day'])) &&  $v['use_day'] = date("Y-m-d",$v['use_day']);
 
                 (!$v['use_day'] || !preg_match("/^\d{4}-\d{2}-\d{2}$/",$v['use_day'])) && Lang_Msg::error('ERROR_USEDAY_1'); //游玩日期不能为空，且格式为xxxx-xx-xx
-                !$v['nums'] && Lang_Msg::error('ERROR_TK_NUMS_1');
+
                 !$v['owner_name'] && Lang_Msg::error('ERROR_OWNER_1');
                 !$v['owner_mobile'] && Lang_Msg::error('ERROR_OWNER_2');
                 !Validate::isMobilePhone($v['owner_mobile']) && Lang_Msg::error('ERROR_SMSSEND_1');
@@ -390,6 +426,9 @@ class OrderModel extends Base_Model_Abstract
                 !$productInfos[$order['id']] && Lang_Msg::error('ERROR_TKT_4',array('ticket_name'=>empty($v['ticket_name'])?'票ID:'.$v['product_id']:$v['ticket_name']));
                 isset($productInfos[$order['id']]['code']) && $productInfos[$order['id']]['code']=='fail' && Lang_Msg::error($productInfos[$order['id']]['message']);
 
+                $this->checkUseDay($productInfos[$order['id']],$v['use_day'],$v['price_type']); //检查游玩时间
+                $this->checkNumLimit($productInfos[$order['id']],$v['nums'],$v['price_type']); //检查预定张数限制
+
                 if(empty($productInfos[$order['id']]['payment'])) { //如果未获取到产品支付方式，则重新获取
                     $productInfos[$order['id']] = TicketTemplateModel::model()->getInfo($v['product_id'],$v['price_type'],$params['distributor_id'],$v['use_day'],$v['nums']);
                     !$productInfos[$order['id']] && Lang_Msg::error('ERROR_TKT_4',array('ticket_name'=>empty($v['ticket_name'])?'票ID:'.$v['product_id']:$v['ticket_name']));
@@ -401,6 +440,30 @@ class OrderModel extends Base_Model_Abstract
                     }
                 }
 
+                //旅客信息
+                $visitors = array();
+                if($v['visitors']){
+                    $v['visitors'] = json_decode($v['visitors'],true);
+                    OrderItemModel::model()->checkVisitors($v['visitors'],$productInfos[$order['id']]['name'],$productInfos[$order['id']]['need_idcard'],$v['nums']);
+                    $visitors = array_values($v['visitors']);
+                    $count = count($visitors);
+                    if($v['nums'] > count($visitors)) {
+                        for($i = 0; $i < $v['nums']; $i++) {
+                            if(array_key_exists($i, $visitors)) {
+                                continue;
+                            }
+                            $index = $i % $count;
+                            $visitors[] = $visitors[$index];
+                        }
+                    } elseif($v['nums'] < count($visitors)) {
+                        $visitors = array_slice($visitors, 0, $v['nums']);
+                    }
+                } else if(!empty($productInfos[$order['id']]['need_idcard'])) {
+                    Tools::lsJson(false,'该产品［'.$productInfos[$order['id']]['name'].'］旅客姓名和身份证必填');
+                }
+                if(!empty($visitors)) {
+                    $visitorsArr[$order['id']] = $visitors;
+                }
 
                 // @TODO 优化建议：可将订单属性单独出一个函数（方便单独下单和批量下单调用）
                 // 团散客一次验票一次取票
@@ -416,7 +479,7 @@ class OrderModel extends Base_Model_Abstract
                     $order['ticket_template_remark'] = $productInfos[$order['id']]['fat_description'];
                 }
                 $order['type'] = $productInfos[$order['id']]['type'];
-                $order['kind'] = $productInfos[$order['id']]['is_union']==0?1:2; //种类:1单票2联票3套票
+                $order['kind'] = 1; //种类:1单票2联票3套票
                 $order['supplier_id'] = $productInfos[$order['id']]['organization_id'];
                 $order['landscape_ids'] = $productInfos[$order['id']]['scenic_id'];
                 $order['amount'] = $v['nums'] * $productInfos[$order['id']]['price']; //订单结算金额
@@ -428,6 +491,9 @@ class OrderModel extends Base_Model_Abstract
                 $order['product_payment'] = $productInfos[$order['id']]['payment']; //支付方式：1在线支付，2信用支付，3储值支付，4平台储值支付
                 $order['ticket_infos']= json_encode($productInfos[$order['id']]['items'],JSON_UNESCAPED_UNICODE); //产品门票信息
 
+                if(count($productInfos[$order['id']]['items'])>1) {
+                    $order['kind'] = 3;
+                }
 
                 foreach ($productInfos[$order['id']] as $key=>$vv) {
                     in_array($key,$this->productFields) && $order[$key] = $vv;
@@ -456,6 +522,11 @@ class OrderModel extends Base_Model_Abstract
                 SmsModel::model()->setOrderSmsTemplateMap($productInfos[$order['id']],$order);
                 //根据phone, card 添加到redis
                 OrderModel::model()->setPhoneCardMap( $order['owner_mobile'], $order['owner_card'] ,$order[ 'id' ]);
+                if(!empty($visitors)) {
+                    foreach($visitors as $visitor){
+                        $this->setPhoneCardMap( $visitor['visitor_mobile'], $visitor['visitor_card'] ,$order[ 'id' ]);
+                    }
+                }
             }
         }
         if($orgIds){
@@ -475,7 +546,7 @@ class OrderModel extends Base_Model_Abstract
 
         $r = $this->add($orders);
         if($r) {
-            $r = OrderItemModel::model()->addBatch($orderArr,$productInfos);
+            $r = OrderItemModel::model()->addBatch($orderArr,$productInfos,$visitorsArr);
             if($r) return $orderArr;
         }
         return false;
@@ -484,8 +555,7 @@ class OrderModel extends Base_Model_Abstract
 
     //添加一条记录
     public function setPhoneCardMap( $phone, $card, $order_id ,$code='')
-    {	
-        $now = time();
+    {
         !$code && $code = $order_id;
         if($phone){
             $cacheKey = $this->phonePreCacheKey.$phone;
@@ -498,9 +568,9 @@ class OrderModel extends Base_Model_Abstract
             $this->redis->push('hset', array($cacheKey , $code,  $order_id));
         }
     }
-    
 
-	//删除一个ORDER_IDA
+
+    //删除一个ORDER_IDA
     public  function delPhoneCardMap( $phone, $card, $code )
     {
         if($phone){
@@ -585,11 +655,11 @@ class OrderModel extends Base_Model_Abstract
      * @param  integer $supplier_id  供应商ID
      * @return [type]                [description]
      */
-	public function getOrderList($codes ,$poi_id=0, $landscape_id = 0,$supplier_id=0)
+    public function getOrderList($codes ,$poi_id=0, $landscape_id = 0,$supplier_id=0)
     {
         $return = array();
-    	$tmp = array();
-    	if (!is_array($codes)) $codes = explode(',', $codes);
+        $tmp = array();
+        if (!is_array($codes)) $codes = explode(',', $codes);
         //获取产品订单
         $orders = $this->setTable(reset($codes))->search(array('code|in'=>$codes, 'status|in'=>array('cancel')));
         if(is_array($orders) && count($orders)==1){
@@ -636,6 +706,14 @@ class OrderModel extends Base_Model_Abstract
             $tmp['used_nums'] = $used_nums;
             $tmp['price'] = $order['price'];
             $tmp['price_type'] = $order['price_type'];
+            $tmp['ticket_infos']=json_decode($order['ticket_infos'],true);
+            $tmp['per_num'] = 0; //每份产品可过人数
+            foreach($tmp['ticket_infos'] as $base) {
+                if($landscape_id>0 && $base['scenic_id']==$landscape_id) {
+                    $tmp['per_num'] += $base['num'];
+                }
+            }
+
             $return[$order_id] = $tmp;
         }
         return $return;
@@ -852,9 +930,9 @@ class OrderModel extends Base_Model_Abstract
             }
             $id_map[$tmp['order_item_id']][$tmp['id']] = $tmp['id'];
             if($tmp && $tmp['status'] == 1
-             && ($landscape_id<=0 || $landscape_id == $tmp['landscape_id'])
-             && ($poi_id<=0 || $poi_id == $tmp['poi_id'])
-             && ($ticket_id <= 0 || $ticket_id == $tmp['ticket_id'])) {
+                && ($landscape_id<=0 || $landscape_id == $tmp['landscape_id'])
+                && ($poi_id<=0 || $poi_id == $tmp['poi_id'])
+                && ($ticket_id <= 0 || $ticket_id == $tmp['ticket_id'])) {
                 $tickets[$tmp['ticket_id']] = $tmp['ticket_id'];
                 $ticket_items[$id] = $tmp;
             }
@@ -874,8 +952,8 @@ class OrderModel extends Base_Model_Abstract
         $update_ticket_items = array();
         foreach ($ticket_items as $id=>$tmp) {
             if( in_array($tmp['ticket_id'], $ids)
-             && ($poi_id<=0 || $poi_id == $tmp['poi_id'])
-             && ($ticket_id <= 0 || $ticket_id == $tmp['ticket_id'])) {
+                && ($poi_id<=0 || $poi_id == $tmp['poi_id'])
+                && ($ticket_id <= 0 || $ticket_id == $tmp['ticket_id'])) {
                 $tmp['status'] = 2;
                 $update_ticket_items[$id] = json_encode($tmp);
                 $order_items[$tmp['order_item_id']] = 2;
@@ -923,104 +1001,104 @@ class OrderModel extends Base_Model_Abstract
         $OrderModel->begin();
         try{
 
-        // $r = Util_Lock::lock($code); //对相同订单核销时加锁
-        // if(!$r) Lang_Msg::error('操作正在进行中，请稍等再尝试！');
-        $where = array();
-        //是否有新产品核销
-        //$flag = false;
-        if ($landscape_id) $where['landscape_id'] = $landscape_id;
-        if ($poi_id) $where['poi_id'] = $poi_id;
-        switch ($type) {
-            case 2:
-                //票号
-                $ticket_info = TicketModel::model()->getById($code);
-                // if (!$ticket_info) {
-                //     throw new Lang_Exception('没有可核销的门票');
-                // }
-                $order_id = $ticket_info['order_id'];
-                $where['ticket_id'] = $code;
-                break;
-            case 3:
-                //产品号
-                $item_info = OrderItemModel::model()->getById($code);
-                // if (!$item_info) {
-                //     throw new Lang_Exception('没有可核销的门票');
-                // }
-                $order_id = $item_info['order_id'];
-                $where['order_item_id'] = $code;
-                break;
-            default:
-                //订单号
-                $order = $OrderModel->getById($code);
-                // if (!$order) {
-                //     throw new Lang_Exception('没有可核销的门票');
-                // }
-                $order_id = $code;
-                break;
-        }
-        $where['order_id'] = $order_id;
-        !$order && $order = $OrderModel->getById($order_id);
-        // 订单产品
-        // $OrderModel->checkEnable($order, 1);
-        //获取当前景点未使用的票
-        list($ticket_codes,$order_codes) = TicketItemsModel::model()->getTicketList($where);
-        $ticket_codes = $ticket_codes[1];
-        // if (!$ticket_codes) {
-        //     throw new Lang_Exception('没有可核销的门票');
-        // }
-        // if (count($ticket_codes)<$nums){
-        //     throw new Lang_Exception('门票不足');//票不足
-        // }
-
-        // 顺序使用指定数量的票
-        ksort($ticket_codes);
-        $ids = array_slice(array_keys($ticket_codes), 0, $nums);
-
-        if($order['is_once_taken'] == 1){
-            $arr_order_item_ids = array();
-            foreach($ids as $v){
-                $arr_order_item_ids[] = $ticket_codes[$v]['order_item_id'];
+            // $r = Util_Lock::lock($code); //对相同订单核销时加锁
+            // if(!$r) Lang_Msg::error('操作正在进行中，请稍等再尝试！');
+            $where = array();
+            //是否有新产品核销
+            //$flag = false;
+            if ($landscape_id) $where['landscape_id'] = $landscape_id;
+            if ($poi_id) $where['poi_id'] = $poi_id;
+            switch ($type) {
+                case 2:
+                    //票号
+                    $ticket_info = TicketModel::model()->getById($code);
+                    // if (!$ticket_info) {
+                    //     throw new Lang_Exception('没有可核销的门票');
+                    // }
+                    $order_id = $ticket_info['order_id'];
+                    $where['ticket_id'] = $code;
+                    break;
+                case 3:
+                    //产品号
+                    $item_info = OrderItemModel::model()->getById($code);
+                    // if (!$item_info) {
+                    //     throw new Lang_Exception('没有可核销的门票');
+                    // }
+                    $order_id = $item_info['order_id'];
+                    $where['order_item_id'] = $code;
+                    break;
+                default:
+                    //订单号
+                    $order = $OrderModel->getById($code);
+                    // if (!$order) {
+                    //     throw new Lang_Exception('没有可核销的门票');
+                    // }
+                    $order_id = $code;
+                    break;
             }
-            $tmp_ids = TicketModel::model()->search(array('order_item_id|in'=>$arr_order_item_ids));
-            $ids = array_keys($tmp_ids);
-            // STEP 1 一次取票更新验票点
-            $OrderModel->updateTicketItem($ids, null, null);
-        }else {
-            // STEP 1 更新验票点
-            $OrderModel->updateTicketItem($ids, $landscape_id, $poi_id);
-        }
+            $where['order_id'] = $order_id;
+            !$order && $order = $OrderModel->getById($order_id);
+            // 订单产品
+            // $OrderModel->checkEnable($order, 1);
+            //获取当前景点未使用的票
+            list($ticket_codes,$order_codes) = TicketItemsModel::model()->getTicketList($where);
+            $ticket_codes = $ticket_codes[1];
+            // if (!$ticket_codes) {
+            //     throw new Lang_Exception('没有可核销的门票');
+            // }
+            // if (count($ticket_codes)<$nums){
+            //     throw new Lang_Exception('门票不足');//票不足
+            // }
 
-        $tickets = array();
-        $products = array();
-        $ticket_items = TicketItemsModel::model()->search(array('ticket_id|in'=>$ids));
-        foreach($ticket_items as $value) {
-            $tickets[$value['status']][$value['ticket_id']] = $value['ticket_id'];
-            $products[$value['status']][$value['order_item_id']] = $value['order_item_id'];
-        }
-        // STEP 2 更新票
-        $OrderModel->updateTicket($tickets);
-        // STEP 3 更新ORDERITEM
-        $OrderModel->updateOrderItem($products);
-        // STEP 4 更新ORDER
-        $left_nums = $OrderModel->updateOrder($order_id, $order);
-        // 团客票多余得票申请退票(需产品是可退的)
-        if($left_nums>0 && $order['source']==0 && $order['refund']==1 && $order['partner_type']==0) {
-            $order_items = OrderItemModel::model()->search(array('order_id'=>$order_id,'status'=>1));
-            if (!empty($order_items)) {
-                $order_item0 = reset($order_items);
-                if ($order['is_once_verificate']==1){ //是否一次验票
-                    RefundApplyModel::model()->refundOrder($order, $order_items, array(), array(
-                        'remark'=>'核销后自动退票',
-                        'nums'=>$left_nums,
-                        'u_id'=>$body['user_id']?$body['user_id']:$order['user_id'],
-                        'user_id'=>$body['user_id']?$body['user_id']:$order['user_id'],
-                        'user_account'=>$body['user_account']?$body['user_account']:$order['user_account'],
-                        'user_name'=>$body['user_name']?$body['user_name']:$order['user_name'],
-                    ));
+            // 顺序使用指定数量的票
+            ksort($ticket_codes);
+            $ids = array_slice(array_keys($ticket_codes), 0, $nums);
+
+            if($order['is_once_taken'] == 1){
+                $arr_order_item_ids = array();
+                foreach($ids as $v){
+                    $arr_order_item_ids[] = $ticket_codes[$v]['order_item_id'];
+                }
+                $tmp_ids = TicketModel::model()->search(array('order_item_id|in'=>$arr_order_item_ids));
+                $ids = array_keys($tmp_ids);
+                // STEP 1 一次取票更新验票点
+                $OrderModel->updateTicketItem($ids, null, null);
+            }else {
+                // STEP 1 更新验票点
+                $OrderModel->updateTicketItem($ids, $landscape_id, $poi_id);
+            }
+
+            $tickets = array();
+            $products = array();
+            $ticket_items = TicketItemsModel::model()->search(array('ticket_id|in'=>$ids));
+            foreach($ticket_items as $value) {
+                $tickets[$value['status']][$value['ticket_id']] = $value['ticket_id'];
+                $products[$value['status']][$value['order_item_id']] = $value['order_item_id'];
+            }
+            // STEP 2 更新票
+            $OrderModel->updateTicket($tickets);
+            // STEP 3 更新ORDERITEM
+            $OrderModel->updateOrderItem($products);
+            // STEP 4 更新ORDER
+            $left_nums = $OrderModel->updateOrder($order_id, $order);
+            // 团客票多余得票申请退票(需产品是可退的)
+            if($left_nums>0 && $order['source']==0 && $order['refund']==1 && $order['partner_type']==0) {
+                $order_items = OrderItemModel::model()->search(array('order_id'=>$order_id,'status'=>1));
+                if (!empty($order_items)) {
+                    $order_item0 = reset($order_items);
+                    if ($order['is_once_verificate']==1){ //是否一次验票
+                        RefundApplyModel::model()->refundOrder($order, $order_items, array(), array(
+                            'remark'=>'核销后自动退票',
+                            'nums'=>$left_nums,
+                            'u_id'=>$body['user_id']?$body['user_id']:$order['user_id'],
+                            'user_id'=>$body['user_id']?$body['user_id']:$order['user_id'],
+                            'user_account'=>$body['user_account']?$body['user_account']:$order['user_account'],
+                            'user_name'=>$body['user_name']?$body['user_name']:$order['user_name'],
+                        ));
+                    }
                 }
             }
-        }
-        $OrderModel->commit();
+            $OrderModel->commit();
 
         } catch(Exception $e) {
             $OrderModel->rollback();
@@ -1049,7 +1127,7 @@ class OrderModel extends Base_Model_Abstract
         if ($poi_id) $where['poi_id'] = $poi_id;
         if ($flag == 0) {
             $attr = array('status' => 2,'updated_at'=>time());
-        } else { 
+        } else {
             // 撤销
             $attr = array('status' => 1,'updated_at'=>time());
         }
@@ -1065,13 +1143,13 @@ class OrderModel extends Base_Model_Abstract
         $now = time();
         if ($flag == 0) {
             if ($tickets[2]) {
-                TicketModel::model()->update(array('status'=>2), array('id|in'=>$tickets[2]));    
-                TicketModel::model()->update(array('use_time'=>$now), array('id|in'=>$tickets[2],'use_time'=>0)); 
+                TicketModel::model()->update(array('status'=>2), array('id|in'=>$tickets[2]));
+                TicketModel::model()->update(array('use_time'=>$now), array('id|in'=>$tickets[2],'use_time'=>0));
             }
         } else {
             //撤销
             if ($tickets[1]) {
-                TicketModel::model()->update(array('status'=>1,'use_time'=>0), array('id|in'=>$tickets[1]));  
+                TicketModel::model()->update(array('status'=>1,'use_time'=>0), array('id|in'=>$tickets[1]));
             }
         }
     }
@@ -1085,13 +1163,13 @@ class OrderModel extends Base_Model_Abstract
         $now = time();
         if ($flag == 0) {
             if ($products[2]) {
-                OrderItemModel::model()->update(array('status'=>2), array('id|in'=>$products[2]));    
+                OrderItemModel::model()->update(array('status'=>2), array('id|in'=>$products[2]));
                 OrderItemModel::model()->update(array('use_time'=>$now), array('id|in'=>$products[2],'use_time'=>0));
             }
         } else {
             //撤销
             if ($products[1]) {
-                OrderItemModel::model()->update(array('status'=>1,'use_time'=>0), array('id|in'=>$products[1]));    
+                OrderItemModel::model()->update(array('status'=>1,'use_time'=>0), array('id|in'=>$products[1]));
             }
         }
     }
@@ -1107,14 +1185,19 @@ class OrderModel extends Base_Model_Abstract
         $order_items = OrderItemModel::model()->search(array('order_id'=>$order_id));
         $now = time();
         $products = array();
-        $lastUseTime = 0;
+        $useTimeArr =array();
+        $firstUseTime = 0;
         foreach($order_items as $value) {
             $products[$value['status']][$value['id']] = $value;
-            if($value['use_time']>$lastUseTime) $lastUseTime = $value['use_time'];
+            if($value['use_time']>0) $useTimeArr[] = $value['use_time'];
+            //if($value['use_time']>$lastUseTime) $lastUseTime = $value['use_time'];
+        }
+        if(!empty($useTimeArr)) {
+            $firstUseTime = min($useTimeArr);
         }
         $used_nums = $products[2] ? count($products[2]) : 0;
         $left_nums = $products[1] ? count($products[1]) : 0;
-        $save = array('used_nums'=>$used_nums,'updated_at'=>$now, 'use_time'=>$lastUseTime, 'use_status'=>$used_nums>0?1:0);
+        $save = array('used_nums'=>$used_nums,'updated_at'=>$now, 'use_time'=>$firstUseTime, 'use_status'=>$used_nums>0?1:0);
         if ($flag == 0) { //核销
             if ($left_nums<=0) $save['status'] = 'finish';
         } else { //撤销
@@ -1190,7 +1273,7 @@ class OrderModel extends Base_Model_Abstract
         // 顺序撤销指定数量的票
         ksort($ticket_codes);
         $ids = array_slice(array_keys($ticket_codes), 0, $nums);
-       
+
         // STEP 1 更新验票点
         $this->updateTicketItem($ids,$landscape_id,$poi_id, 1);
         $tickets = array();
@@ -1212,6 +1295,14 @@ class OrderModel extends Base_Model_Abstract
         return true;
     }
 
+    public function update($data, $where = null)
+    {
+        $result = parent::update($data, $where);
+        if ($result) {
+            OrderEventModel::send($where);
+        }
+        return $result;
+    }
 }
 
 

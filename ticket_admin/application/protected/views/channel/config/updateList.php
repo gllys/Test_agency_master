@@ -42,9 +42,7 @@
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default" id="cancel" style="margin: 0 10%;">取消</button>
-				<button type="button" class="btn btn-default" style="margin: 0 10%;">
-					<a id="preview" href="/channel/config/preview?id=0" target="_blank">预览</a>
-				</button>
+				<a class="btn btn-default clearPart" id="preview" href="/channel/config/preview?id=0" target="_blank">预览</a>
 				<button type="button" class="btn btn-success" id="update" style="margin: 0 10%;">上传</button>
 			</div>
 		</form>

@@ -32,10 +32,10 @@ class RefundApplyModel extends Base_Model_Abstract
         $order_item_ids = array_keys($order_item);
         // order
         if ($order_item_ids) {
-            OrderModel::model()->updateByAttr(array('refunding_nums' => $refunding_nums,'refund_status'=>1), array('id' => $order['id']));
-            OrderItemModel::model()->updateByAttr(array('status' => 0), array('id|in' => $order_item_ids));
-            TicketModel::model()->updateByAttr(array('status' => 0), array('order_item_id|in' => $order_item_ids));
-            TicketItemsModel::model()->updateByAttr(array('status' => 0), array('order_item_id|in' => $order_item_ids));
+            OrderModel::model()->updateByAttr(array('refunding_nums' => $refunding_nums,'refund_status'=>1,'updated_at'=>$now), array('id' => $order['id']));
+            OrderItemModel::model()->updateByAttr(array('status' => 0,'updated_at'=>$now), array('id|in' => $order_item_ids));
+            TicketModel::model()->updateByAttr(array('status' => 0,'updated_at'=>$now), array('order_item_id|in' => $order_item_ids));
+            TicketItemsModel::model()->updateByAttr(array('status' => 0,'updated_at'=>$now), array('order_item_id|in' => $order_item_ids));
         }
         // refund_apply
         $refund_apply_id = Util_Common::payid(2);  
@@ -56,6 +56,7 @@ class RefundApplyModel extends Base_Model_Abstract
             'landscape_id' => $order['landscape_ids'],
             'refund_items' => json_encode($order_item_ids),
             'created_by' => $data['user_id'],
+            'created_name' => $data['user_name'],
             'created_at' => $now,
             'updated_at' => $now,
             'ticket_status' => 3,
@@ -82,6 +83,9 @@ class RefundApplyModel extends Base_Model_Abstract
                 return false;
             }
         }
+        //清除缓存
+        OrderItemModel::model()->deleteRedisCache($order['id']);
+        TicketItemModel::model()->deleteRedisCache($order['id']);
         return $refund_apply_id;
     }
 
@@ -216,13 +220,17 @@ class RefundApplyModel extends Base_Model_Abstract
             $orderInfo = reset(OrderModel::model()->search(array('id'=>$refund_apply['order_id'])));
             $refunding_nums = $orderInfo['refunding_nums'] - $refund_apply['nums'];
 
-            if($orderInfo['local_source'] == 1) { //实际针对所有ota，通知OTA退票，返回成功后继续退款操作
+            if($orderInfo['local_source'] == 1) { //实际针对所有ota，异步通知OTA退票
                 if($data['allow_status'] == 3) {
                     $refund_apply['reject_reason'] = $data['reject_reason'];
                 }
-                if(!OtaCallbackModel::model()->refund($orderInfo, $refund_apply, $refund['allow_status']==3 ? false : true)) {
+                Process_Async::presend(
+                    array("OtaCallbackModel","refundAsync"),
+                    array($orderInfo, $refund_apply, $refund['allow_status']==3 ? false : true)
+                );
+                /*if(!OtaCallbackModel::model()->refund($orderInfo, $refund_apply, $refund['allow_status']==3 ? false : true)) {
                     return false;
-                }
+                }*/
             }
 
             // 订单表判断
@@ -240,6 +248,8 @@ class RefundApplyModel extends Base_Model_Abstract
                 return false;
             }
             $this->updateByAttr($refund, array('id' => $data['id']));
+            OrderItemModel::model()->deleteRedisCache($refund_apply['order_id']);
+            TicketItemModel::model()->deleteRedisCache($refund_apply['order_id']);
             $this->commit();
             return true;
         } catch (PDOException $e) {
@@ -266,7 +276,8 @@ class RefundApplyModel extends Base_Model_Abstract
         $orderParams = array(
             'refunding_nums' => $refunding_nums,
             'refunded_nums' => $refunded_nums,
-            'refunded' => $refunded
+            'refunded' => $refunded,
+            'updated_at'=>$now,
         );
         if($refunded>$orderInfo['amount']){
             return false;
@@ -359,9 +370,9 @@ class RefundApplyModel extends Base_Model_Abstract
             $change_order_attr['refund_status'] = 1;
         }
         OrderModel::model()->updateByAttr($change_order_attr, array('id' => $refund_apply['order_id']));
-        OrderItemModel::model()->updateByAttr(array('status' => 1), array('id|in' => $order_items_ids));
-        TicketModel::model()->updateByAttr(array('status' => 1), array('order_item_id|in' => $order_items_ids));
-        TicketItemsModel::model()->updateByAttr(array('status' => 1), array('order_item_id|in' => $order_items_ids));
+        OrderItemModel::model()->updateByAttr(array('status' => 1,'updated_at'=>$now), array('id|in' => $order_items_ids));
+        TicketModel::model()->updateByAttr(array('status' => 1,'updated_at'=>$now), array('order_item_id|in' => $order_items_ids));
+        TicketItemsModel::model()->updateByAttr(array('status' => 1,'updated_at'=>$now), array('order_item_id|in' => $order_items_ids));
         //平台支付的退票处理
         if (in_array($orderInfo['payment'], $this->online_pay_types)) {
             $unionParams = array(
@@ -439,7 +450,7 @@ class RefundApplyModel extends Base_Model_Abstract
             if (!$refund_apply_id) {
                 throw new Exception("ERROR_REFUNDAPPLY_8");
             }
-            if($order['partner_type']>0 && $order['partner_product_code']!='') { //合作伙伴的订单先在合作伙伴退票
+            if($order['partner_type']>0 && $order['partner_product_code']!='' && $order['partner_order_id']!='') { //合作伙伴的订单先在合作伙伴退票
                 $r = OpenApiPartnerModel::model()->partnerRefundOrder($order,$params['nums']);
                 if($r===false){
                     $ticketModel->rollback();
@@ -571,13 +582,14 @@ class RefundApplyModel extends Base_Model_Abstract
         try {
             $now = time();
             $orderParams = $calcApply['orderParams'];
+            $orderParams['updated_at'] = $now;
             $refund_apply_id = $calcApply['refund_apply_id'];
             $money = $calcApply['money'];
             // order
             OrderModel::model()->updateByAttr($orderParams, array('id' => $order['id']));
-            OrderItemModel::model()->updateByAttr(array('status' => 0), array('id|in' => $order_item_ids));
-            TicketModel::model()->updateByAttr(array('status' => 0), array('order_item_id|in' => $order_item_ids));
-            TicketItemsModel::model()->updateByAttr(array('status' => 0), array('order_item_id|in' => $order_item_ids));
+            OrderItemModel::model()->updateByAttr(array('status' => 0,'updated_at'=>$now), array('id|in' => $order_item_ids));
+            TicketModel::model()->updateByAttr(array('status' => 0,'updated_at'=>$now), array('order_item_id|in' => $order_item_ids));
+            TicketItemsModel::model()->updateByAttr(array('status' => 0,'updated_at'=>$now), array('order_item_id|in' => $order_item_ids));
             // refund_apply
             $refund_apply = array(
                 'id' => $refund_apply_id,
@@ -653,9 +665,9 @@ class RefundApplyModel extends Base_Model_Abstract
                 }
                 $r = ApiUnionMoneyModel::model()->unionInout(array(
                     'org_id' => $order['distributor_id'],
-                    'user_id' => $data['user_id'] ? $data['user_id'] : $this->body['user_id'],
-                    'user_account' => $data['user_account'] ? $data['user_account'] : $this->body['user_account'],
-                    'user_name' => $data['user_name'] ? $data['user_name'] : $this->body['user_name'],
+                    'user_id' => $data['user_id'] ? $data['user_id'] : 1,
+                    'user_account' => $data['user_account'] ? $data['user_account'] : 'system',
+                    'user_name' => $data['user_name'] ? $data['user_name'] : 'system',
                     'money' => $money,
                     'in_out' => 1,
                     'trade_type' => 2,
@@ -695,6 +707,8 @@ class RefundApplyModel extends Base_Model_Abstract
                     throw new Lang_Exception($r['message']);
                 }
             }
+            OrderItemModel::model()->deleteRedisCache($order['id']);
+            TicketItemModel::model()->deleteRedisCache($order['id']);
             $this->commit();
             return true;
         } catch (Exception $e) {

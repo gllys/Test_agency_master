@@ -85,6 +85,9 @@ use common\huilian\utils\Format;
                                                 <?php endforeach; ?>
 					</select>
 				</div>
+                            <div class="form-group">
+                                <input type="text" name="name" style="width:200px;" value="<?php if (!empty($_GET['name'])) echo $_GET['name']; ?>" placeholder="请输入产品名称" class="form-control">
+                            </div>
 				<div class="form-group">
 					<div class="ckbox ckbox-primary pull-left mr20">
 						<input type="checkbox" name="down" value="1" id="checkboxPrimary1" <?php if (!isset($_GET['scenic_id']) || !empty($_GET['down'])): ?>checked="checked"<?php endif ?>> <label for="checkboxPrimary1">下架产品</label>
@@ -149,6 +152,9 @@ use common\huilian\utils\Format;
 							<span class="pull-left" style="margin-top: 5px">
                                 <a class="clearPart" style="cursor: hand; cursor: pointer;" data-target=".modal-bank" data-toggle="modal" href_delay="/ticket/single/detail?ticket_id=<?php echo $item['id'] ?>" onclick="modal_jump_delay(this)"><?= mb_strlen($item['name'],'utf8')>15?mb_substr($item['name'], 0, 15,'utf8').'...':$item['name'] ?></a>
                             </span>
+                            <?php if(mb_strlen($item['name'],'utf8')>15){?>
+                            <div class="table-responsive"><?= $item['name']; ?> </div>
+                            <?php }?>
 						</div>
 					</td>
 					<td style="width:5%;">
@@ -187,8 +193,7 @@ use common\huilian\utils\Format;
 							<a  class="clearPart" style="cursor: pointer;cursor: hand;"
                                href="/ticket/single/edit/?ticket_id=<?php echo $item['id'] ?>" onclick="modal_jump(this);"  data-target=".modal-bank" data-toggle="modal">修改
 							</a>
-							<a style="cursor: pointer;cursor: hand;" href="javascript:void(0)" onclick="del
-                                (<?php echo $item['id'] ?>); return false;" class="del clearPart">删除</a>
+							<a style="cursor: pointer;cursor: hand;" href="javascript:void(0)" onclick="del(<?php echo $item['id'] ?>); return false;" class="del clearPart">删除</a>
 						<?php endif; ?>
 					</td>
 				</tr>
@@ -435,13 +440,17 @@ use common\huilian\utils\Format;
     }
     //取消分销商策略设置
     function clearPoli(id){
-        $.post('/ticket/single/savePolicy/', {ptid: id, selpol: 0}, function(data) {
-            if (data.error) {
-                alert(data.msg);
-            } else {
-                alert(data.msg,function(){window.location.partReload();});
-            }
-        }, 'json');
+        PWConfirm('确定要清空该门票的分销策略？',function() {
+            $.post('/ticket/single/savePolicy/', {ptid: id, selpol: 0}, function (data) {
+                if (data.error) {
+                    alert(data.msg);
+                } else {
+                    alert(data.msg, function () {
+                        window.location.partReload();
+                    });
+                }
+            }, 'json');
+        });
     }
     $(document).on('click','#setinvBtn',function() {
             var s_price = $("#s_price").val();
@@ -485,7 +494,7 @@ use common\huilian\utils\Format;
             json1['rid'] = $("#pid").val();
             json1['name'] = $('#name').val();
             json1['desc'] = $('#desc').val();
-            var wrap = $('#configWrap').html();
+            var wrap = '<button class="btn btn-primary mr5" id="setinvBtn">设置</button><br />';//$('#saveWrap').html();
             $.ajax({
                 url: "/ticket/single/commit",
                 type: "POST",
@@ -533,4 +542,7 @@ use common\huilian\utils\Format;
     $('body').on('click','.confirmation-modal .close',function(){
 		$('#saveBtn').css('display', 'none');
     })
+    jQuery(document).ready(function() {
+        $('body').removeClass('modal-open');
+    });
 </script>

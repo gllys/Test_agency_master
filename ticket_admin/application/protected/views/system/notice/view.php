@@ -54,8 +54,10 @@
 		</div>
 		<div class="modal-footer">
 			<?php $disabled = ((isset($is_allow) && $is_allow != 0)); ?>
+			<?php if($is_allow != 2) { ?>
 			<a class="btn btn-warning" onclick="pubNotice(<?php echo $get['id'];?>, 2)" <?php echo $disabled ? 'disabled="disabled"' : "" ?>>驳回</a>
 			<a class="btn btn-success" onclick="pubNotice(<?php echo $get['id'];?>, 1)" <?php echo $disabled || $get['type']==2 ? 'disabled="disabled"' : "" ?>>同意发布</a>
+            <?php } ?>
             <button class="btn btn-default" aria-hidden="true" data-dismiss="modal" class="close" type="button">取消</button>
 		</div>
 	</div>
@@ -79,11 +81,10 @@
 			} 
 			$.post('/system/notice/pub', postdata, function(data){
 				if (data.code == 'succ') {
-					var type_msg, redirect;
-					type_msg = name;
-					redirect = '/site/switch/#/system/notice/';
-					alert(type_msg+'成功!', function() {
-                        location.href = '/site/switch/#/system/notice/';
+					alert('驳回公告成功!', function() {
+						setTimeout(function() {
+							location.reload();
+						}, 500)
                     });
 				} else {
 					var tmp_errors = '';

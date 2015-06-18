@@ -68,6 +68,17 @@ class TwoDimensionalArray {
 	}
 	
 	/**
+	 * 挑选出二维数组中的一维数组某元素组成一个新的数组，然后在连接该数组,该数组的元素用引号括起来
+	 * @param string $quote 引号，默认是单引号
+	 * @param string $glue 连接符，默认,
+	 * @return string
+	 */
+	public static function implodeQuoteColumns(array $arr, $k, $quote= '"', $glue = ',') {
+		$columns = self::columns($arr, $k);
+		return $quote . implode($quote.$glue.$quote, $columns) . $quote;
+	}
+	
+	/**
 	 * 挑选二维数组中某一行的key和value等于给定的$k, $v
 	 * @return Mixed Null or Array
 	 */

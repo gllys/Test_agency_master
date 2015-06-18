@@ -56,6 +56,9 @@
         <div class="col-sm-6"><span>可发送短信剩余条数：<b class="red"><span class="text-danger"><?php echo !empty($remainder)
                             ? $remainder : 0
                         ?></span></b>条</span></div>
+        <div class="col-sm-2"><button class="btn btn-primary btn-sm" data-target=".bs-example-modal-static"
+                                      data-toggle="modal" onclick="add_rule()">预警通知设置</button>
+        </div>
     </div>
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -140,6 +143,39 @@
             ?>
         </div>
     </div>
+
+    <div class="modal fade bs-example-modal-static in"  tabindex="-1" data-backdrop="static" role="dialog" aria-hidden="false" >
+        <div id="modal1" class="modal-dialog">
+            <div class="modal-content">
+                <form class="form-horizontal form-bordered" id="repass-form">
+                    <div class="modal-body">
+                        <div class="form-group" style="overflow: inherit;">
+                            <label class="col-sm-3 control-label">短信当前余额低于</label>
+                            <div class="col-sm-3">
+                                <input type="text" tag="短信提醒时余额"  class="form-control validate[required,number]" value=""
+                                       id="money" name="money">
+                            </div>
+                            <label class="control-label">元</label>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">提醒邮箱地址:</label>
+                            <div class="col-sm-8">
+                                <textarea tag="提醒邮箱地址" class="form-control validate[required,email]" rows="5" id="emails" name="emails"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="text-danger">
+                                <span>提醒：发送多用户邮件,邮箱地址可用“;”符号进行区分。</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="sendSms" type="button" class="btn btn-success">保存</button>
+                        <button class="cancel btn btn-default" data-dismiss="modal" type="button">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div></div>
 </div><!-- contentpanel -->
 <script>
     jQuery(document).ready(function() {
@@ -205,6 +241,25 @@
         })
 
         $('#state_link').select2('val',<?php echo isset($get['state']) && !empty($get['state']) ? $get['state'] : 0?>);
+    });
+
+    //新增分销策略
+    function add_rule() {
+        $('#verify-modal').html();
+    }
+
+    //预警短信设置
+    $("#sendSms").click(function(){
+        var obj = $('#repass-form');
+        if (obj.validationEngine('validate') == true) {
+            $.post('/agency/sms/smsWarn', obj.serialize(), function (data) {
+                if(data.error == 0){
+                    alert(data.msg); return false;
+                }else{
+                    alert(data.msg);
+                }
+            }, 'json');
+        }
     });
 </script>
 

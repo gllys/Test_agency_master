@@ -15,7 +15,7 @@ class RefundedAction extends Yaf_Action_Abstract{
 
         //异步调用ota退款接口
         $params = $ctrl->body;
-        Util_Logger::getLogger('openapi')->info(__METHOD__, $params);
+        Util_Logger::getLogger('openapi')->info(__METHOD__, $params,'','退款通知-接收参数');
         
         //id: order_id
         //user_id
@@ -28,22 +28,22 @@ class RefundedAction extends Yaf_Action_Abstract{
                 'action' => 'noticeRefund',
                 'source' => $params['source'],
                 'message' => '无法获取该OTA的账户信息',
-            ));
+            ),'','退款通知-获取OTA账户信息',$params['source']);
             Lang_Msg::output(array(
                 'code' => 400,
                 'code_msg' => '通知失败[无法获知OTA账户信息]', 
-            ));            
+            ),200,JSON_UNESCAPED_UNICODE);            
         }
         if(!$user_model['notify_url']) {
             Util_Logger::getLogger('openapi')->error(__METHOD__, array(
                 'action' => 'noticeRefund',
                 'source' => $params['source'],
                 'message' => '无法获取该OTA的回调地址',
-            ));
+            ),'','退款通知-获取OTA回调地址',$params['source']);
             Lang_Msg::output(array(
                 'code' => 400,
                 'code_msg' => '通知失败[无法获知OTA地址]', 
-            ));            
+            ),200,JSON_UNESCAPED_UNICODE);            
         }
 
         $final_params = array(
@@ -57,7 +57,7 @@ class RefundedAction extends Yaf_Action_Abstract{
         Util_Logger::getLogger('openapi')->info(__METHOD__, array(
             'action' => 'noticeRefund',
             'final_params' => $final_params,
-        ));
+        ),'','退款通知-通知OTA退款信息',$params['refund_id']);
         $notify_url = $user_model['notify_url'];
         $notify_result = Tools::curl($notify_url,'POST',http_build_query($final_params));
 
@@ -65,7 +65,7 @@ class RefundedAction extends Yaf_Action_Abstract{
             'action' => 'noticeRefund',
             'source' => $params['source'],
             'notify_result' => $notify_result,
-        ));
+        ),'','退款通知-通知回调',$params['refund_id']);
         $code = 200;
         $message = '';
         if(isset($notify_result['code'])) {
@@ -75,6 +75,6 @@ class RefundedAction extends Yaf_Action_Abstract{
         Lang_Msg::output(array(
             'code' => $code,
             'code_msg' => $message,
-        ));
+        ),200,JSON_UNESCAPED_UNICODE);
     }
 }

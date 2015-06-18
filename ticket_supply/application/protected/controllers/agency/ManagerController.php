@@ -3,6 +3,12 @@
 class ManagerController extends Controller {
 
     public function actionIndex() {
+
+        // 获取机构的信用和储值状态
+        $isCredit = Organizations::api()->show(array('id'=>Yii::app()->user->org_id,'fields'=>"is_credit,is_balance"));
+        $data['isShow'] = ApiModel::getData($isCredit);
+
+
         $name = isset($_GET['name']) ? $_GET['name'] : "";
         $page = isset($_GET['page']) ? $_GET['page'] : 1;
 
@@ -55,6 +61,12 @@ class ManagerController extends Controller {
     }
 
     public function actionIndex2() {
+
+        // 获取机构的信用和储值状态
+        $isCredit = Organizations::api()->show(array('id'=>Yii::app()->user->org_id,'fields'=>"is_credit,is_balance"));
+        $data['isShow'] = ApiModel::getData($isCredit);
+
+
         $name = isset($_GET['name']) ? $_GET['name'] : "";
         $page = isset($_GET['page']) ? $_GET['page'] : 1;
         $param = array('supplier_id' => Yii::app()->user->org_id, 'name' => $name,'source'=>'2', 'p' => $page);

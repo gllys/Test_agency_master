@@ -19,6 +19,11 @@ class OpenApiPartnerModel extends Base_Model_Api
     protected $method = 'POST';
     protected $version = 'v1';
 
+    public $partnerTypes = array(
+        1=>'大漠',
+        2=>'计调通',
+    );
+
     //将支付后的订单添加至redis列队，以便定时脚本通知大漠
     public function orderToRds($order) {
         if(empty($order['partner_type']) || empty($order['partner_product_code'])) {
@@ -99,7 +104,7 @@ class OpenApiPartnerModel extends Base_Model_Api
      * @return bool
      * */
     public function partnerRefundOrder($order,$nums=0){
-        if(empty($order['supplier_id']) || empty($order['partner_type'])  || empty($order['id']) || empty($order['partner_product_code']) || $nums<1) {
+        if(empty($order['supplier_id']) || empty($order['partner_type'])  || empty($order['id']) || empty($order['partner_product_code']) || empty($order['partner_order_id']) || $nums<1) {
             Log_Base::save('OpenApiPartner', '[' . date('Y-m-d H:i:s') . '] [refundOrder] 参数不全: '.var_export($order,true)."\n");
             return false;
         }
@@ -120,6 +125,7 @@ class OpenApiPartnerModel extends Base_Model_Api
                 'partner_product_code' => $order['partner_product_code'],
                 'nums' => $nums,
                 'order_id' => $order['id'],
+                'partner_order_id' => $order['partner_order_id'], //外部订单号
             ),JSON_UNESCAPED_UNICODE),
         );
 

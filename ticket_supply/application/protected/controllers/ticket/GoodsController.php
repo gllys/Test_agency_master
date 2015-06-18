@@ -30,7 +30,11 @@ class GoodsController extends Controller {
         $param['p'] = isset($_GET['page']) ? $_GET['page'] : 1;
         $param['items'] = 15;
         $param['show_group'] = 1;
-
+        
+        if(!empty($_GET['name'])){
+            $param['name'] = trim($_GET['name']);
+        }
+        
         if (!empty($_GET['scenic_id'])) {
             $param['scenic_id'] = $_GET['scenic_id'];
             if(in_array($param['scenic_id'], $lanIds)){
@@ -49,6 +53,7 @@ class GoodsController extends Controller {
             if ($_lanIds) {
                 $param['scenic_id'] = implode(',', $_lanIds);
             } else {
+                $param['scenic_id'] = '99999999999999999';
                 $param['organization_id'] = Yii::app()->user->org_id;
             }
         }
@@ -103,6 +108,10 @@ class GoodsController extends Controller {
         $param['items'] = 15;
         $param['show_group'] = 1;
 
+        if(!empty($_GET['name'])){
+            $param['name'] = trim($_GET['name']);
+        }
+        
         if (!empty($_GET['scenic_id'])) {
             $param['scenic_id'] = $_GET['scenic_id'];
             if(!in_array($param['scenic_id'], $lanIds)){
@@ -113,6 +122,7 @@ class GoodsController extends Controller {
             if ($_lanIds=$lanIds) {
                 $param['scenic_id'] = implode(',', $_lanIds);
             } else {
+                $param['scenic_id'] = '9999999999999';
                 $param['organization_id'] = Yii::app()->user->org_id;
             }
         }

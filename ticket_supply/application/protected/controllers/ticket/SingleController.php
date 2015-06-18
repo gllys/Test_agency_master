@@ -25,6 +25,10 @@ class SingleController extends Controller {
             $param['scenic_id'] = $_GET['scenic_id'];
         }
 
+         if (!empty($_GET['name'])) {
+            $param['name'] = $_GET['name'];
+        }
+        
         if (!empty($_GET['up']) && empty($_GET['down'])) {
             $param['state'] = 1;
         }

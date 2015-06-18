@@ -1,6 +1,10 @@
 <?php
 $this->breadcrumbs = array('订单', '订单详情');
 ?>
+
+<?php if(empty($detail)) { ?>
+<div class="contentpanel">不存在该订单</div>
+<?php } else { ?>
 <div class="contentpanel">
 <!--<?php if(isset($landscape)):?>
 	<h4 class="lg-title"><?php echo $landscape['name']?></h4>
@@ -180,6 +184,7 @@ $this->breadcrumbs = array('订单', '订单详情');
 				<button id="complexConfirm" class="btn btn-primary btn-xs ml10" <?php if($detail['message_open']===0): ?>style="display:none;"<?php endif; ?> type="button">重发短信</button></td>
 			  <?php  }  ?>
 			</td>
+                        <td style=" font-weight: bold;<?php if($detail['message_open']===0): ?>display:none;<?php endif; ?>">是否发送成功：<?php echo $detail['send_sms_nums']>0?'<font color="green">成功</font>':'<font color="red">失败</font>'?></td>
 			<td>取票人身份证号码：<?php echo $detail['owner_card']?></td>
 		  </tr>
 		</tbody>
@@ -250,13 +255,16 @@ $this->breadcrumbs = array('订单', '订单详情');
                 <tr>
                     <th>景点</th><th>未使用张数</th><th>已使用张数</th>
                 </tr>
-                <?php foreach ((array)$infos['poi_counts'][$item['scenic_id']] as $poi){?>
+                <?php 
+                if(isset($infos['poi_counts'])) {
+                foreach ((array)$infos['poi_counts'][$item['scenic_id']] as $poi){?>
                 <tr>
                     <td><?php echo $infos['poi_names'][$poi['poi_id']];?></td>
                     <td><?php echo $poi['unuse_num'];?></td>
                     <td><?php echo $poi['used_num'];?></td>
                 </tr>
                 <?php }?>
+                <?php } ?>
             </table>
         </div>
         <?php } }else{ echo '该景区已被删除';}?>
@@ -581,4 +589,4 @@ function total(){
     </div>
 </div>
 </form>
-
+<?php } ?>

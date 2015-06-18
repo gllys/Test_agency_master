@@ -118,7 +118,7 @@ Header::utf8();
                 <div class="form-group">
                     <label class="col-sm-2 control-label"><div class="pull-right"><span class="text-danger">*</span>产品名称:</div></label>
                     <div class="col-sm-4">
-                        <input type="text" placeholder="请输入产品名称" maxlength="20" tag="产品名称" class="validate[required] form-control" name="name" value="<?php echo $ticket['name']?>">
+                        <input type="text" placeholder="请输入产品名称" maxlength="30" tag="产品名称" class="validate[required] form-control" name="name" value="<?php echo $ticket['name']?>">
                     </div>
                 </div><!-- form-group -->
 
@@ -145,6 +145,7 @@ Header::utf8();
                             <label for="is_fat_once_verificate0">否</label>
                         </div>
                     </div>
+                    <div class="once">
                     <label class="col-sm-1 control-label"><div class="pull-right"><span class="text-danger pull-left">*</span>是否一次取票:</div></label>
                     <div class="col-sm-2">
                         <div class="rdio rdio-default inline-block">
@@ -158,6 +159,7 @@ Header::utf8();
                         <i style="cursor:pointer" animation="true" class="fa fa-question-circle text-muted popovers" title=""  data-original-title="" data-container="body" data-toggle="popover"  data-trigger="hover" data-placement="top" data-html="true" data-content="一次验票：为了防止倒票，您可以开启此功能，开启后一张包含多个门票的订单第一次验票后，所有未使用的门票都会自动退款而不能被使用。
 <br/>一次取票：对于线下有实体票的联票，为了防止在A景区换实体票后再去B
 景区扫二维码入园，您可以开启此功能，开启后，在A景区验证换实体票后，其他景区不可以再扫二维码。"></i>
+                    </div>
                     </div>
                     <?php endif;?>
 
@@ -201,7 +203,7 @@ Header::utf8();
                         <input type="text" placeholder="请输入价格" readonly tag="团队结算价"  class=" form-control onlyMoney" name="group_price" id="tg_price" value="<?php echo $ticket['group_price']?>">
                     </div>
 
-                    <?php  if($orgInfo['partner_type'] < 1):?>
+                    <?php  if($orgInfo['partner_type'] < 1):?> 
                     <label class="col-sm-1 control-label"><div class="pull-right"><span class="text-danger pull-left">*</span>是否一次验票:</div></label>
                     <div class="col-sm-2">
                         <div class="rdio rdio-default inline-block">
@@ -213,6 +215,7 @@ Header::utf8();
                             <label for="is_group_once_verificate0">否</label>
                         </div>
                     </div>
+                     <div class="once">
                     <label class="col-sm-1 control-label"><div class="pull-right"><span class="text-danger pull-left">*</span>是否一次取票:</div></label>
                     <div class="col-sm-2">
                         <div class="rdio rdio-default inline-block">
@@ -223,6 +226,7 @@ Header::utf8();
                             <input type="radio" value="0" name="is_group_once_taken" id="is_group_once_taken0" <?php if($ticket['is_group_once_taken'] == 0) {echo 'checked="checked"';}?>>
                             <label for="is_group_once_taken0">否</label>
                         </div>
+                    </div>
                     </div>
                     <?php endif ;?>
 
@@ -894,6 +898,20 @@ Header::utf8();
                $('input[name="sale_start_time"]').removeAttr("readonly").addClass('validate[required]').css('background-color','#ffffff');
                $('input[name="sale_end_time"]').removeAttr("readonly").addClass('validate[required]').css('background-color','#ffffff');
             }
+            
+            //一次性取票是否显示
+            var _lanCount = [];
+            $('select.lan').each(function(){
+                if($(this).val()){
+                    _lanCount.push($(this).val());
+                }
+            });
+           _lanCount = unique(_lanCount);
+           if(_lanCount.length>1){
+               $('.once').show();
+           }else{
+               $('.once').hide();
+           }
         }, 200);
 
         //散团客点击后默认
@@ -986,7 +1004,9 @@ Header::utf8();
                         alert(data.msg);
                         $('#form-button').attr('disabled', false);
                     } else {
-                        alert('修改产品成功',function(){window.location.partReload();});
+                        alert('修改产品成功',function(){
+                           setTimeout(function(){location.partReload();},1000);
+                        });
                     }
                 }, 'json');
             }

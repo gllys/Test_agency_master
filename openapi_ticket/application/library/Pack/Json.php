@@ -10,8 +10,12 @@ class Pack_Json
 	 * @param  [type] $data [description]
 	 * @return [type]       [description]
 	 */
-	public static function encode($data) {
-		return json_encode($data);
+	public static function encode($data, $type = NULL) {
+        if($type){
+            return json_encode($data, $type);
+        }else{
+            return json_encode($data);
+        }
 	}
 	
 	/**

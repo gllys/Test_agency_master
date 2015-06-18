@@ -6,7 +6,7 @@
  * Time: 下午1:18
  */
 
-class TokenController extends Base_Controller_Ota
+class TokenController extends Base_Controller_OtaNew
 {
     //获取Token
     public function createAction(){
@@ -43,7 +43,7 @@ class TokenController extends Base_Controller_Ota
                 'code' => 400,
                 'message' => Lang_Msg::getLang('ERROR_TOKEN_1'),
                 'result' => array(),
-            ));
+            ),200,JSON_UNESCAPED_UNICODE);
         }
 
         $data = array();

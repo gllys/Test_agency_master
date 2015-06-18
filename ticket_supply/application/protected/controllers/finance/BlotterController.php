@@ -7,6 +7,10 @@ class BlotterController extends Controller {
     }
 
     public function actionIndex() {
+        // 获取机构的信用和储值状态
+        $isCredit = Organizations::api()->show(array('id'=>Yii::app()->user->org_id,'fields'=>"is_credit,is_balance"));
+        $data['isShow'] = ApiModel::getData($isCredit);
+
         $params = $_REQUEST;
         $data['status_labels'] = array( '3' => '充值', '4' => '提现', '5' => '应收账款');
         $data['status_class'] = array('1' => 'success', '2' => 'danger', '3' => 'warnning', '4' => 'info','5' => 'info');

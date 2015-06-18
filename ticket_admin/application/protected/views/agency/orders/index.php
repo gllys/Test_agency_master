@@ -14,84 +14,6 @@ if (!isset($_GET['menu'])) {
         <div class="panel-heading">
             <h4 class="panel-title">订单管理</h4>
         </div>
-        <div class="panel-body">
-            <form class="form-inline" method="get" action="/agency/orders/view/menu/<?php echo $_GET['menu'] ?>">
-            	<!-- 
-                <div class="form-group" style="margin-right: 0;">
-                    <select class="select2" name="time_type" style="width:150px;padding:0 10px;">
-                        <?php foreach ($timeTypes as $k => $v) { ?>
-                            <option value="<?= $k ?>"<?= $k == $time_type ? ' selected' : '' ?>><?= $v ?></option>
-                        <?php } ?>
-                    </select>
-                </div>
-                <div class="form-group " style="width: 270px;">
-                    <input style="cursor: pointer;cursor: hand;background-color: #ffffff" name="start_date" class="form-control datepicker" value="<?php echo isset($get['start_date']) ? $get['start_date'] :date('Y-m-d',time()); ?>" placeholder="<?php echo isset($get['start_date']) ? $get['start_date'] :date('Y-m-d',time()); ?>" type="text" readonly="readonly"> ~
-                    <input style="cursor: pointer;cursor: hand;background-color: #ffffff" name="end_date" class="form-control datepicker" value="<?php echo isset($get['end_date']) ? $get['end_date'] : date('Y-m-d',time()); ?>" placeholder="<?php echo isset($get['end_date']) ? $get['end_date'] :date('Y-m-d',time()); ?>" type="text" readonly="readonly">
-				</div>
-
-                <div class="form-group">
-                    <select name="status" id="status_link" class="select2" data-placeholder="Choose One" style="width:150px;padding:0 10px;">
-                        <option value="">订单状态</option>
-                        <?php foreach ($status_labels as $status => $label) : ?>
-                            <option <?php echo isset($get['status']) && $status == $get['status'] ? 'selected="selectd"' : '' ?> value="<?php echo $status ?>"><?php echo $label ?></option>
-                        <?php
-                        endforeach;
-                        unset($status, $label)
-                        ?>
-                    </select>
-                </div>
-                 -->
-
-                <!--订单查询开始-->
-                <div class="form-group">
-                    <div class="input-group input-group-sm" style=" position: relative; top: -2px;">
-                        <div class="input-group-btn">
-                            <button id="search_label" type="button" class="btn btn-default" tabindex="-1">
-                                <?php
-                                //左边显示的名称
-                                $_querys = array('id' => '订单号', 'product_name' => '门票名称', 'owner_name' => '取票人', 'owner_mobile' => '手机号', 'owner_card' => '身份证');
-                                
-                                //当前选择的name
-                                $_queryName = 'id';
-                                foreach ($_querys as $key => $val) {
-                                    if (isset($get[$key])) {
-                                        $_queryName =  $key;
-                                        break;
-                                    }
-                                }
-                                
-                                echo $_querys[$_queryName] ;
-                            ?>
-                            </button>
-                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
-                                    tabindex="-1">
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu" role="menu">
-                                 <?php
-                                //下拉列表
-                                 foreach ($_querys as $key => $val) :
-                                ?>
-                                <li><a class="sec-btn clearPart" href="javascript:;" data-id="<?php echo $key ?>" id="" aria-labelledby="search_label"><?php echo $val; ?></a></li>
-                                <?php endforeach; ?>
-                            </ul>
-                            <script>
-                                $('.sec-btn').click(function() {
-                                    $('#search_label').text($(this).text());
-                                    $('#search_field').attr('name', $(this).attr('data-id'));
-                                });
-                            </script>
-                        </div>
-                        <!-- input-group-btn -->
-                        <input id="search_field" name="<?php echo $_queryName ?>" value="<?php echo empty($get[$_queryName])?'':$get[$_queryName] ?>" type="text" class="form-control" style="z-index: 0"/>
-                    </div>
-                </div>
-                <!--订单查询结束-->
-                <div class="form-group">
-                    <button class="btn btn-primary btn-sm" type="submit">查询</button>
-                </div>
-            </form>
-        </div>
         <!-- panel-body -->
     </div>
 
@@ -102,14 +24,14 @@ if (!isset($_GET['menu'])) {
         <?php
         //公共url参数拼接
        //公共url参数拼接
-        $_urlParam =  $_queryName.(empty($get[$_queryName])?'//':'/'.$get[$_queryName].'/');
-        if(!empty($get['landscape_id'])){
+        $_urlParam = ''; //$_queryName.(empty($get[$_queryName])?'//':'/'.$get[$_queryName].'/');
+        /*if(!empty($get['landscape_id'])){
             $_urlParam .= 'landscape_id/'.$get['landscape_id'].'/';
         }
         
         if(!empty($get['distributor_id'])){
             $_urlParam .= 'distributor_id/'.$get['distributor_id'].'/';
-        }
+        }*/
         
         foreach ($menus as $key => $item) :
             ?>

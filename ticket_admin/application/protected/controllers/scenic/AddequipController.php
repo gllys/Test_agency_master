@@ -8,8 +8,8 @@ class AddequipController extends Controller {
      * xujuan
      */
     public function actionIndex() {
-
-        $this->render('index');
+        $type = array('手持','闸机','小票打印机(蓝牙)','小票打印机(USB)','身份证阅读器','扫码枪','二维码打印机','掌纹录入机');
+        $this->render('index',compact('type'));
     }
 
     /*

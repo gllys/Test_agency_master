@@ -271,8 +271,9 @@ class DeviceController extends Base_Controller_Api
      	$args[ 'name' ]		 = addslashes( $this->body[ 'name' ] );
 		$args[ 'scene' ]     = intval($this->body['scene']);//设备类型属性
 		
-     	if(  !in_array( $args[ 'type' ], array(0 ,1 ) ) ) Lang_Msg::error( 'ERROR_SB_1' );
-     	if( null ==( $args[ 'code' ] ) || is_null( $args[ 'code' ] )  ) Lang_Msg::error( 'ERROR_SB_2' );
+     	if(  !in_array( $args[ 'type' ], array(0 ,1 ,2,3,4,5,6,7) ) ) Lang_Msg::error( 'ERROR_SB_1' );
+     	if(($args[ 'type' ]==0 ||$args[ 'type' ]==1) 
+                &&( null ==( $args[ 'code' ] ) || is_null( $args[ 'code' ] ) ) ) Lang_Msg::error( 'ERROR_SB_2' );
      	//自动补全
      
      	$args[ 'created_at' ]	= time();

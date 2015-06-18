@@ -26,7 +26,46 @@
 
                 <!--分销商名称开始-->
                 <div class="form-group">
-                    <input class="form-control" name="name" value="<?php if(!empty($_GET['name'])){ echo $_GET['name'] ;}?>" placeholder="分销商名称" type="text" style="width:150px;">
+                    <div class="input-group input-group-sm" style="position: relative; top: -2px;">
+                        <div class="input-group-btn">
+                            <button id="search_label" type="button" class="btn btn-default" tabindex="-1">
+                                <?php
+                                //左边显示的名称
+                                $_querys = array('names' => '分销商名称', 'organization_name' => '供应商名称');
+
+                                //当前选择的name
+                                $_queryName = 'names';
+                                foreach ($_querys as $key => $val) {
+                                    if (isset($get[$key])) {
+                                        $_queryName =  $key;
+                                        break;
+                                    }
+                                }
+
+                                echo $_querys[$_queryName] ;
+                                ?>
+                            </button>
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" tabindex="-1">
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                                <?php
+                                //下拉列表
+                                foreach ($_querys as $key => $val) :
+                                    ?>
+                                    <li><a class="sec-btn clearPart" href="javascript:;" data-id="<?php echo $key ?>" id="" aria-labelledby="search_label"><?php echo $val; ?></a></li>
+                                <?php endforeach; ?>
+                            </ul>
+                            <script>
+                                $('.sec-btn').click(function() {
+                                    $('#search_label').text($(this).text());
+                                    $('#search_field').attr('name', $(this).attr('data-id'));
+                                });
+                            </script>
+                        </div>
+                        <!-- input-group-btn -->
+                        <input id="search_field" name="<?php echo $_queryName ?>" value="<?php echo empty($get[$_queryName])?'':$get[$_queryName] ?>" type="text" class="form-control" style="z-index: 0" />
+                    </div>
                 </div>
                 <!--分销商名称结束-->
                 
@@ -146,22 +185,19 @@
                                                 ?>
                                                 <?php echo $value['address']; ?>
                                     </td>
-                                    <td>
+                                    <td>&nbsp;
                                                 <?php if ($value['is_distribute_person'] == '1'): ?>散客√ <?php endif; ?>
                                                 <?php if ($value['is_distribute_group'] == '1'): ?>团体√ <?php endif; ?>
                                             </td>
                                             <td>
                                                 <?php
                                                // $result = Credit::api()->listbyxf(array('distributor_id' =>$value['id']));
-                                                //print_r($result);
-                                                if (isset($result['body']['data']) && !empty($result['body']['data'])) {
-                                                    //如果存在所属供应商
-                                                    $_attachs = $result['body']['data'];
-                                                    foreach ($_attachs as $attach) {
-                                                        if($value['id'] == $attach['distributor_id'])
-                                                         echo $attach['supplier_name'] . '&nbsp;&nbsp;';
-                                                    }
-                                                }
+                                               if(!empty($value['supplier_name'])){
+                                                   foreach($value['supplier_name'] as $item){
+                                                            echo $item."&nbsp;&nbsp;";
+                                                   }
+                                               }
+
                                                 ?>
                                             </td>
                                             <td>
@@ -248,7 +284,7 @@
 jQuery(document).ready(function() {    
     jQuery('.datepicker').datepicker();
     jQuery('.select2').select2({
-            minimumResultsForSearch: -1
+            //minimumResultsForSearch: -1
     });
     $('#province,#city,#area').select2();
  });    

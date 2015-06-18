@@ -47,12 +47,12 @@ class Lang_Msg
             )));
     }
 
-    public static function output($data = null, $code = 200) {
+    public static function output($data = null, $code = 200, $type = NULL) {
         if (!headers_sent()) {
             header("Content-Type: application/json; charset=utf-8");
             header("HTTP/1.1 $code");
         }
-        exit(Pack_Json::encode($data));
+        exit(Pack_Json::encode($data, $type));
     }
 
 }

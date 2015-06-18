@@ -199,7 +199,7 @@ class AgencypdruleController extends Base_Controller_Api
                     'num' => count($days),
                     'content' => '删除了渠道产品日价格和日库存记录'
                         . '【code:' . $code . ',agency_id:' . $agency_id
-                        . ',product_id:' . $product_id . ',source:' . $source . ',days:' . implode(',', $days) . '】'
+                        . ',product_id:' . $product_id . ',source:' . $source . (empty($days)?'':',days:' . implode(',', $days)) . '】'
                 )
             );
             Tools::lsJson(true, '操作成功',array('has_rule'=> empty($num)?0:1 ));

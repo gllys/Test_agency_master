@@ -11,3 +11,4 @@ state.bin
 .project
 .settings/
 nbproject/
+/application/protected/views/scenic/scenic/view.php.rej

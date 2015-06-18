@@ -114,6 +114,7 @@ class AgencyproductController extends Base_Controller_Api {
             $result['extra'] = unserialize($result['extra']);
             foreach($data as $v){
                 $result['extras'][$v['source']] = unserialize($v['extra']);
+                $result['extras'][$v['source']]['id'] = $v['id'];
             }
         } else {
             $result = [];
@@ -372,11 +373,6 @@ class AgencyproductController extends Base_Controller_Api {
                 if(isset($chan['listed_price2']))   $data['listed_price2'] = $chan['listed_price2'];
                 if(isset($chan['price']))           $data['price'] = $chan['price'];
 
-                foreach($chan as $fk=>$fv) {
-                    if(is_string($fv)) {
-                        $chan[$fk]= addslashes($fv);
-                    }
-                }
 
                 list($usec, $sec) = explode(' ', microtime());
                 $data['code']  = md5($data['agency_id'] .'|'. $data['product_id'] .'|'. $data['source'] .'|'. $now .'|'. substr($usec, 3, 2) . rand(100000, 9999999)); //对接码
@@ -462,17 +458,14 @@ class AgencyproductController extends Base_Controller_Api {
             }
 
             $upValues = $newValues = array();
+            $newData = reset($records);
+            unset($newData['id']);
             foreach($channelData as $source=>$chan){
                 $data['source'] = $source;
                 if(isset($chan['product_name']))    $data['product_name'] = $chan['product_name'];
                 if(isset($chan['listed_price2']))   $data['listed_price2'] = $chan['listed_price2'];
                 if(isset($chan['price']))           $data['price'] = $chan['price'];
 
-                foreach($chan as $fk=>$fv) {
-                    if(is_string($fv)) {
-                        $chan[$fk]= addslashes($fv);
-                    }
-                }
 
                 if(!empty($chan['id'])) {
                     $tmp = $chan;
@@ -483,16 +476,36 @@ class AgencyproductController extends Base_Controller_Api {
                 } else {
                     list($usec, $sec) = explode(' ', microtime());
                     $data['code']  = md5($data['agency_id'] .'|'. $data['product_id'] .'|'. $data['source'] .'|'. $now .'|'. substr($usec, 3, 2) . rand(100000, 9999999)); //对接码
-                    $chan = array_merge($ext,$chan);
-                    $data['extra'] = serialize($chan);
-                    $newValues[] = $data;
+                    $tmp = $chan;
+                    unset($tmp['id']);
+                    $tmp = array_merge($ext,$tmp);
+                    $data['extra'] = serialize($tmp);
+                    $newValues[] = array_merge($newData,$data,array('create_at'=>$now));
                 }
             }
+
             if(!empty($upValues)) {
                 foreach($upValues as $id=>$v) {
                     $r = $AgencyProductModel->updateById($id,$v);
                     if(!$r) {
                         Tools::lsJson(false, '操作失败');
+                    }
+
+                    if(!empty($records[$id]['code']) && !empty($records[$id]['agency_id']) && !empty($v['source'])) {
+                        //产品变动异步通知
+                        $params = array(
+                            'product_id' => $records[$id]['product_id'],
+                            'code' => $records[$id]['code'],
+                            'agency_id' => $records[$id]['agency_id'],
+                            'source' => $v['source'],
+                        );
+                        if(isset($v['is_sale'])) {
+                            $params['is_sale'] = $v['is_sale']>0 ? 1:0;
+                        }
+                        Process_Async::send(
+                            array("OtaCallbackModel","productChangedAsync"),
+                            array($params)
+                        );
                     }
                 }
             }

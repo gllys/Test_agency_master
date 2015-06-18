@@ -28,7 +28,10 @@ $this->breadcrumbs = array('景区管理', '景区列表');
 		<div class="panel-body">
 			<form action="/scenic/scenic/" id="searchForm" class="form-inline">
 					<div class="form-group">
-						<input class="form-control" placeholder="请输入景区名称" type="text" name="keyword" id="keyword" maxlength="100" style="width:318px;" value="<?php if (isset($_REQUEST['keyword'])) echo $_REQUEST['keyword']; ?>">
+						请输入景区名称:
+					</div>
+					<div class="form-group">
+						<input class="form-control" type="text" name="keyword" id="keyword" maxlength="100" style="width:318px;" value="<?php if (isset($_REQUEST['keyword'])) echo $_REQUEST['keyword']; ?>">
 					</div>
 
 					<div class="form-group">
@@ -171,7 +174,7 @@ jQuery(document).ready(function() {
         }
         // 默认选中搜索框focus
         var $keyword = $('#keyword');
-        focusEnd($keyword);
+        //focusEnd($keyword);
 
         // 搜索框模糊查询自动补全
         $keyword.autocomplete({

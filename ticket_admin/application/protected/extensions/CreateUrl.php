@@ -244,13 +244,14 @@ class CreateUrl {
             array('params' => array('class'=>'part','href' => '/agency/orders/'), 'content' => '订单管理'),
             array('params' => array('class'=>'part','href' => '/agency/sms/'), 'content' => '短信日志'),
             array('params' => array('class'=>'part','href' => '/agency/product/'), 'content' => '供应商产品'),
-            array('params' => array('class'=>'part','href' => '/supply/sales/'), 'content' => '供应商销量'),
+        	array('params' => array('class'=>'part','href' => '/agency/sales/'), 'content' => '销量统计'),
         	array('params' => array('class'=>'part','href' => '/agency/verification/'), 'content' => '验票记录'),
         ),
         array(
             array('params' => array('class'=>'part','href' => '/ticket/ticket/'), 'content' => '景区门票'),
             array('params' => array('class'=>'part','href' => '/ticket/stats/'), 'content' => '景区统计'),
-            array('params' => array('class'=>'part','href' => '/ticket/template/'), 'content' => '打印模板')
+            array('params' => array('class'=>'part','href' => '/ticket/template/'), 'content' => '打印模板'),
+            array('params' => array('class'=>'part','href' => '/ticket/synchro/'), 'content' => '落地同步'),
         ),
         array(
             array('params' => array('class'=>'part','href' => '/org/supply/'), 'content' => '供应商管理'),

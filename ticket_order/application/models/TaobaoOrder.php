@@ -33,8 +33,9 @@ class TaobaoOrderModel extends Base_Model_Api
             'landscape_id' => $landscape_id,
 			'order_items' => json_encode($orderItems, JSON_UNESCAPED_UNICODE),
         );
+        Log_Base::save('Taobao_Verificate_Response',"[".date('Y-m-d H:i:s')."] OrderId [".$order['id']."] [Require] Url:".$this->getSrvUrl() . $this->url."\nParams: ".var_export($this->params,true));
         $response = $this->request();
-        Log_Base::save('Taobao_Verificate_Response','['.date('Y-m-d H:i:s').'] OrderId ['.$order['id'].']'.$response);
+        Log_Base::save('Taobao_Verificate_Response',"[".date('Y-m-d H:i:s')."] OrderId [".$order['id']."] [Response] ".$response);
         if(!empty($response))
         {
             $response = json_decode($response,true);
@@ -58,8 +59,9 @@ class TaobaoOrderModel extends Base_Model_Api
             'posid' => $device['id'],
             'consume_serial_num' => $record['id']
         );
+        Log_Base::save('Taobao_Cancel_Response',"[".date('Y-m-d H:i:s')."] OrderId [".$order['id']."] [Require] Url:".$this->getSrvUrl() . $this->url."\nParams: ".var_export($this->params,true));
         $response = $this->request();
-        Log_Base::save('Taobao_Cancel_Response','['.date('Y-m-d H:i:s').'] OrderId ['.$order['id'].']'.$response);
+        Log_Base::save('Taobao_Cancel_Response',"[".date('Y-m-d H:i:s')."] OrderId [".$order['id']."] [Response] ".$response);
         if(!empty($response))
         {
             $response = json_decode($response,true);

@@ -3,17 +3,18 @@
 class BillController extends Controller
 {
 	public function actionIndex()
-	{
+	{	
 		$org_id = Yii::app()->user->org_id;
 		if(!empty($org_id) && intval($org_id) > 0){
 			$param = $_REQUEST;
+			$param['is_export'] = empty($param['is_export']) ? false : true;
 			$param['supply_id'] = $org_id;
 			if(isset($param['agency_name']) && trim($param['agency_name']) == '汇联' && strlen(trim($param['agency_name'])) == 6){
 				$param['agency_name'] = '-';
 			}
 			$param['current'] = isset($param['page']) ? $param['page'] : 1;
 			$param['items'] = $param['is_export'] ==true?1000:20;
-
+			
 			$data = $this->getApiLists($param,$param['is_export'],$data = array());  //导出数据处理
 			if ($data['lists']['result']['code'] == 'succ') {
 				if($param['is_export'] != true) {
@@ -22,12 +23,13 @@ class BillController extends Controller
 				}
 			}
 		}
+		
 		$this->render('index',$data);
 	}
 
 
 	private function getApiLists($param,$is_export,$data)
-	{
+	{     
 		$pagination =null;
 		$result = null;
 		if($is_export==true)

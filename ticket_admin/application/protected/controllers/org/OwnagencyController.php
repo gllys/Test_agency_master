@@ -4,7 +4,16 @@ class OwnagencyController extends Controller {
     public function actionIndex() {
         //搜索条件
         $params = array_filter($_GET); //过滤掉空值
-        $params['type'] = 'agency';
+        $get = $params;
+        if(isset($params['names']) && !empty($params['names'])){
+            $params['search_type'] = 'agency';
+            $params['name'] = $params['names'];
+        }
+        if(isset($params['organization_name']) && !empty($params['organization_name'])){
+            $params['search_type'] = 'supply';
+            $params['name'] = $params['organization_name'];
+        }
+
         $params['current'] = isset($params['page']) ? $params['page'] : 1;
 
         if (empty($params['start_date']) && !empty($params['end_date'])) {
@@ -22,12 +31,12 @@ class OwnagencyController extends Controller {
         }
 
         //列表
-        $data = Organizations::api()->list($params);
+        $data = Organizations::api()->getAgencyList($params);
         $lists = ApiModel::getLists($data);
 
         //属于供应商 查找
-        $distributor_id = array_unique(ArrayColumn::i_array_column($lists, 'id'));
-        $result= Credit::api()->listbyxf(array('distributor_id'=>implode(',',$distributor_id),'items' => 1000));
+       // $distributor_id = array_unique(ArrayColumn::i_array_column($lists, 'id'));
+       // $result= Credit::api()->listbyxf(array('distributor_id'=>implode(',',$distributor_id),'items' => 1000));
 
       //  $result = Credit::api()->listbyxf(array('distributor_id' => $value['id']));
 
@@ -36,7 +45,7 @@ class OwnagencyController extends Controller {
         $pages = new CPagination($pagination['count']);
         $pages->pageSize = 15; #每页显示的数目
 
-        $this->render('index', compact('lists', 'pages','result'));
+        $this->render('index', compact('lists', 'pages','get'));
     }
 
     public function actionGetAttach() {//获得用户所属的供应商及所有供应商列表
@@ -58,7 +67,7 @@ class OwnagencyController extends Controller {
     public function actionSaveAttach() {
         $agency_id = $_POST['agency_id'];
         $ids = $_POST['ids'];
-        $rs = Organizations::api()->bind_agency_batch(array('supply_ids' => $ids, 'agency_id' => $agency_id));
+        $rs = Organizations::api()->bind_agency_batch(array('supply_ids' => $ids, 'agency_id' => $agency_id,'source'=>2));
         if ($rs['code'] == "succ") {
             $data['error'] = 1;
             $data['message'] = "保存成功";

@@ -76,7 +76,7 @@
 							<marketPrice>{{$product.marketPrice}}</marketPrice>
 							<sellPrice>{{$product.sellPrice}}</sellPrice>
                             <settlePrice>{{$product.settlePrice}}</settlePrice>
-							<sellstock></sellstock>
+							<sellstock>{{$product.sellstock}}</sellstock>
 							<minimum></minimum>
 							<maximum></maximum>
 						</periodPrice>
@@ -103,8 +103,8 @@
 						<telephone></telephone>
 						<salePeriods>
 							<salePeriod>
-								<saleStartTime></saleStartTime>
-								<saleEndTime></saleEndTime>
+								<saleStartTime>{{$product.saleStartTime}}</saleStartTime>
+								<saleEndTime>{{$product.saleEndTime}}</saleEndTime>
 							</salePeriod>
 						</salePeriods>
 						<smsTemplet>{{$product.smsTemplet}}</smsTemplet>

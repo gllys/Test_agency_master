@@ -21,6 +21,7 @@ class TicketQueueModel extends Base_Model_Abstract
 
     public static function send(array $data)
     {
+        // return static::rsync($data);
         return Process_Async::presend(array(__CLASS__, 'rsync'), array($data));
     }
 
@@ -30,8 +31,10 @@ class TicketQueueModel extends Base_Model_Abstract
         $model = TicketModel::model();
         $model->begin();
         try {
-            // Tools::pr($data);
-            $model->addNew($data['productInfo'], $data['orderItem']);
+            $result = $model->addNew($data['productInfo'], $data['orderItem']);
+            if (!$result) {
+                throw new Exception("操作失败 message: ".var_export($result, true));
+            }
             $model->commit();
             //echo $data['productInfo']['id'], " ok ", PHP_EOL;
         } catch (Exception $e) {
@@ -44,12 +47,14 @@ class TicketQueueModel extends Base_Model_Abstract
             $content = 'method: '.__METHOD__."\n message: ". $e->getMessage() ."\n params: {$args}";
             MailModel::sendSrvGroup("下单异步操作失败", $content);
             Log_Base::save(self::$_prefix . "FailData", $logs);
+            return false;
         }
+        return true;
     }
 
     public function getTmpCacheByOrderID($orderID)
     {
-        $key = $this->_getKey(":tmp:{$orderID}");
+        /*$key = $this->_getKey(":tmp:{$orderID}");
         $data = $this->redis->get($key);
         if(!$data) {
            return false;
@@ -57,16 +62,26 @@ class TicketQueueModel extends Base_Model_Abstract
         $data = json_decode($data, true);
         if (!$data) {
             return false;
+        }*/
+        $order = OrderModel::model()->getById($orderID);
+        $orderItem = OrderItemModel::model()->search(['order_id'=>$orderID]);
+        if (!$order || !$orderItem) {
+            throw new Lang_Exception("该订单不存在");
         }
+        $data = [
+            'productInfo'=>[
+                'id'=>$order['product_id'],
+                'items'=>json_decode($order['ticket_infos'], true)
+            ],
+            'orderItem'=>$orderItem,
+        ];
         return $data;
     }
 
     public function saveTmpCache($orderID, $productInfo, $orderItem)
     {
-        $data = json_encode(array(
-            'productInfo' => $productInfo,
-            'orderItem' => $orderItem,
-        ), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        return true;
+        $data = $orderID;
         $redis = $this->getRedis();
         $key = $this->_getKey(":tmp:{$orderID}");
         return $redis->setex($key, self::EXPIREAT_TIME, $data);
@@ -74,6 +89,7 @@ class TicketQueueModel extends Base_Model_Abstract
 
     public function saveTmpBatchCache(array $productInfos, array $orderItems)
     {
+        return true;
         $data = array();
         foreach($orderItems as $orderItem) {
             $orderID = $orderItem['order_id'];

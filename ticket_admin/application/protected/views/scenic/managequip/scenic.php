@@ -52,10 +52,10 @@
                     <td><?php
                         $getName = Organizations::api()->list(array('type'=>'supply','id'=>$equipment['organization_id']));
                         $names = ApiModel::getLists($getName);
-                        echo $equipment ? $names[$equipment['organization_id']]['name'] : '无';
+                        echo $equipment ? "<a href='/scenic/managequip/supply/id/$equipment[id]'>". $names[$equipment['organization_id']]['name']."</a>": '无';
                         ?></td>
                     <td>绑定景区</td>
-                    <td><?php echo $landscape ? $landscape['name'] : '无';?></td>
+                    <td><?php echo $landscape ? "<a href='/scenic/managequip/landscape/id/$equipment[id]'>" .$landscape['name']."</a>" : '无';?></td>
                     <td>安装位置</td>
                     <td><?php echo $poi ? $poi['name'] : '全部';?></td>
                 </tr>

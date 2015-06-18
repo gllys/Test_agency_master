@@ -74,7 +74,9 @@ $this->breadcrumbs = array('产品', '基础票管理');
                     </select>
                 </div>
 
-
+                <div class="form-group">
+                    <input type="text" name="name" style="width:200px;" value="<?php if(!empty($_GET['name']))echo $_GET['name']; ?>" placeholder="请输入门票名称" class="form-control">
+                </div>
                 <div class="form-group">
                     <button  type="submit" class="btn btn-primary btn-sm pull-left">查询</button>
                 </div>
@@ -155,7 +157,7 @@ $this->breadcrumbs = array('产品', '基础票管理');
                                 <td> 
                                     <a title="查看" class="clearPart" href="/ticket/goods/view/?gid=<?php echo $item['gid'] ?>" onclick="modal_jump(this);"  data-target=".modal-bank" data-toggle="modal">查看</a>
                                     <?php
-                                    if (in_array($item['scenic_id'], $lanIds)):
+                                    if (in_array($item['scenic_id'], $lanIds,true)):
                                         ?>
                                         <a  class='clearPart' title="修改" style="margin-left: 10px;" href="/ticket/goods/edit/?gid=<?php echo $item['gid'] ?>" onclick="modal_jump(this);"  data-target=".modal-bank" data-toggle="modal">
                                             修改

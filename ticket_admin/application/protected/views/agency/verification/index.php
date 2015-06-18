@@ -55,6 +55,7 @@ use common\huilian\utils\TwoDimensionalArray;
                 <th style="width:12%">订单编号</th>
                 <th style="width:10%">验证时间</th>
                 <th style="width:10%">验证数量</th>
+				<th style="width:10%">验证张（套）数</th>
                 <th style="width:10%">供应商</th>
                 <th style="width:10%">景区</th>
                 <th style="width:10%">验证景点</th>
@@ -66,11 +67,13 @@ use common\huilian\utils\TwoDimensionalArray;
             </tr>
         </thead>
         <tbody>
-			<?php foreach($verifications as $verification) { ?>
+			<?php foreach($verifications as $verification) { 
+			?>
 			<tr>
 				<td><?= $verification['record_code'] ?></td>
 				<td><?= date('Y-m-d H:i:s', $verification['created_at']) ?></td>
 				<td><?= $verification['num'] ?></td>
+				<td style="width:10%"><?php if($verification['per_num'])echo intval($verification['num']/$verification['per_num']) ?></td>
 				<td><?= empty($verification['organization'][0]['name']) ? '' :  $verification['organization'][0]['name'] ?></td>
 				<td>
 				<?php

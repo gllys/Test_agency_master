@@ -23,6 +23,8 @@ class OtaCallbackModel extends Base_Model_Api
         $this->params = $params = array(
             'refund_id' => $refundApplyInfo['id'],
             'order_id' => $order['id'],
+            'product_id' => $order['product_id'],
+            'distributor_id' => $order['distributor_id'],
             'source_id' => $order['source_id'],
             'status' => $succ==true ? 'success' : 'failed',
             'nums' => $refundApplyInfo['nums'],
@@ -46,8 +48,9 @@ class OtaCallbackModel extends Base_Model_Api
             $this->params['refund_fee'] = doubleval($otaProductInfo['extra']['refund_fee']);
         }
 
+        Log_Base::save('OtaCallback_Refund', "[".date('Y-m-d H:i:s')."] [Require] Url:".$this->getSrvUrl() . $this->url."\nParams: " . var_export($this->params, true));
         $response = $this->request(null,10);
-        Log_Base::save('OtaCallback_Refund', "[".date('Y-m-d H:i:s')."]Params: ".var_export($params,true)."\nResult: " . $response);
+        Log_Base::save('OtaCallback_Refund', "[".date('Y-m-d H:i:s')."] [Response] " . $response);
         if (!empty($response)) {
             $response = json_decode($response, true);
             if ($response !== false) {
@@ -56,6 +59,12 @@ class OtaCallbackModel extends Base_Model_Api
             }
         }
         return false;
+    }
+
+    //异步执行通知接口
+    public static function refundAsync($order, $refundApplyInfo, $succ = true)
+    {
+        OtaCallbackModel::model()->refund($order, $refundApplyInfo, $succ);
     }
 
 }

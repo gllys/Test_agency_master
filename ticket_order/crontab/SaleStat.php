@@ -19,16 +19,9 @@ class Crontab_SaleStat extends Process_Base
 
     public function run()
     {
-        /*
-         * for ($month = 10; $month <= 12; $month++) { //统计历史数据
-            $this->statYm(2014, $month);
-        }
+        $this->mc = Cache_Memcache::factory();
 
-        $currM = date("n");
-        for ($month = 1; $month <= $currM; $month++) { //统计历史数据
-            $this->statYm(2015, $month);
-        }
-        */
+        $this->runInit();
 
         while (true) {
             $hour = intval(date("H")); //当前小时
@@ -40,6 +33,22 @@ class Crontab_SaleStat extends Process_Base
                 $runTime = 3600;
             }
             $this->sleep($this->interval+$runTime);
+        }
+    }
+
+    public function runInit() { //初始化，只执行一次
+        //$this->mc->set('Crontab_SaleStat_Init',0);
+        $a = $this->mc->get('Crontab_SaleStat_Init');
+        if(empty($a)) {
+            for ($month = 10; $month <= 12; $month++) { //统计历史数据
+                $this->statYm(2014, $month);
+            }
+
+            $currM = date("n");
+            for ($month = 1; $month <= $currM; $month++) { //统计历史数据
+                $this->statYm(2015, $month);
+            }
+            $this->mc->set('Crontab_SaleStat_Init',1);
         }
     }
 
@@ -76,7 +85,7 @@ class Crontab_SaleStat extends Process_Base
     {
         $fields = "id,supplier_id AS supply_id,distributor_id AS agency_id,product_id,price_type,
             ticket_infos,price,nums,used_nums,activity_paid,refund,use_time,created_at,updated_at,
-            supplier_name AS supply_name,distributor_name AS agency_name,name AS product_name";
+            supplier_name AS supply_name,distributor_name AS agency_name,name AS product_name,landscape_ids";
         $where = "((refund=1 AND used_nums>0 AND use_time>{$this->start_time} AND use_time<{$this->end_time} )
 	        OR (refund=0 AND updated_at>{$this->start_time} AND updated_at<{$this->end_time})) AND product_id>0";
         $orderby = "created_at ASC";
@@ -102,7 +111,10 @@ class Crontab_SaleStat extends Process_Base
                         'supply_name' => $order['supply_name'],
                         'agency_name' => $order['agency_name'],
                         'product_name' => $order['product_name'],
+                        'scenic_id' => $order['landscape_ids'],
                     );
+
+                    $result[$key]['scenic_name'] = $this->getScenicNameByIds($order['landscape_ids']);
                 }
                 $result[$key]['order_nums'] += 1;
                 $nums = 0;
@@ -129,6 +141,24 @@ class Crontab_SaleStat extends Process_Base
                 array_unshift($result, array_keys(reset($result)));
                 $this->SaleStatModel->replace($result);
             }
+        }
+    }
+
+    private function getScenicNameByIds($scenic_ids='') {
+        if(empty($scenic_ids)) return '';
+        $r = LandscapeModel::model()->getList(array(
+            'ids'=>$scenic_ids,
+            'fields'=>'name',
+            'items'=>count(explode(',',$scenic_ids)),
+        ));
+        if(empty($r) || empty($r['data'])) {
+            return '';
+        } else {
+            $scenic_names = array();
+            foreach($r['data'] as $v) {
+                $scenic_names[] = $v['name'];
+            }
+            return implode(',',$scenic_names);
         }
     }
 }

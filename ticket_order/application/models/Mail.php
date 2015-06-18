@@ -19,7 +19,17 @@ class MailModel extends Base_Model_Api
     	$tos = ['address'=>'srv@ihuilian.com'];
     	$from = 'sa@ihuilian.com';
     	$from_name = 'sa';
+        //$content = ""
     	return Mail::sendTextMail($subject, $tos, $from, $from_name, $content);
+    }
+
+    public static function sendTicketDevGroup($subject, $content)
+    {
+        $tos = ['address'=>'ticketdev@ihuilian.com'];
+        $from = 'sa@ihuilian.com';
+        $from_name = 'sa';
+        //$content = ""
+        return Mail::sendTextMail($subject, $tos, $from, $from_name, $content);
     }
 
     public static function sendTo($address, $subject, $content)

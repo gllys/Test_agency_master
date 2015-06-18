@@ -34,6 +34,12 @@ class SalestatController extends Base_Controller_Api
         $district_id = intval($this->body['district_id']);
         $all_agency = intval($this->body['all_agency']); //统计是否包含所有分销商，1是，0否（只限制合作分销商）
 
+        $supply_name = trim($this->body['supply_name']); //供应商名称
+        $agency_name = trim($this->body['agency_name']); //分销商名称
+        $product_name = trim($this->body['product_name']); //产品名称
+        $scenic_id = intval($this->body['scenic_id']); //景区ID
+        $scenic_name = trim($this->body['scenic_name']); //景区名称
+
         $type = intval($this->body['type']); //统计类型：1入园人次，2销售额，3门票销售张数
         $type <= 0 && $type = 1;
         $x_axis_type = intval($this->body['x_axis_type']); //x轴刻度：0月（默认），1日
@@ -67,6 +73,21 @@ class SalestatController extends Base_Controller_Api
             }
         }
 
+        if(preg_match("/\S+/",$supply_name)) {
+            $where .= " AND supply_name LIKE '%{$supply_name}%'";
+        }
+        if(preg_match("/\S+/",$agency_name)) {
+            $where .= " AND agency_name LIKE '%{$agency_name}%'";
+        }
+        if(preg_match("/\S+/",$product_name)) {
+            $where .= " AND product_name LIKE '%{$product_name}%'";
+        }
+        if($scenic_id>0) {
+            $where .= " AND FIND_IN_SET(".$scenic_id.",scenic_id)";
+        }
+        if(preg_match("/\S+/",$scenic_name)) {
+            $where .= " AND scenic_name LIKE '%{$scenic_name}%'";
+        }
 
         $SaleStatModel = new SaleStatModel();
         $SaleStatModel->getDb()->exec("SET SESSION  group_concat_max_len=10240;"); //设置group_concat字节限制
@@ -227,6 +248,12 @@ class SalestatController extends Base_Controller_Api
         $agency_id = trim($this->body['agency_id']); //分销商ID
         $product_id = trim($this->body['product_id']); //产品ID，多个逗号分割
 
+        $supply_name = trim($this->body['supply_name']); //供应商名称
+        $agency_name = trim($this->body['agency_name']); //分销商名称
+        $product_name = trim($this->body['product_name']); //产品名称
+        $scenic_id = intval($this->body['scenic_id']); //景区ID
+        $scenic_name = trim($this->body['scenic_name']); //景区名称
+
         $type = intval($this->body['type']); //统计类型：1入园人次，2销售额，3门票销售张数
         $type <= 0 && $type = 1;
         $x_axis_type = intval($this->body['x_axis_type']); //x轴刻度：0月（默认），1日
@@ -258,6 +285,22 @@ class SalestatController extends Base_Controller_Api
                         $where .= " AND agency_id NOT IN (" . implode(',', $agency_ids) . ")";
                 }
             }
+        }
+
+        if(preg_match("/\S+/",$supply_name)) {
+            $where .= " AND supply_name LIKE '%{$supply_name}%'";
+        }
+        if(preg_match("/\S+/",$agency_name)) {
+            $where .= " AND agency_name LIKE '%{$agency_name}%'";
+        }
+        if(preg_match("/\S+/",$product_name)) {
+            $where .= " AND product_name LIKE '%{$product_name}%'";
+        }
+        if($scenic_id>0) {
+            $where .= " AND FIND_IN_SET(".$scenic_id.",scenic_id)";
+        }
+        if(preg_match("/\S+/",$scenic_name)) {
+            $where .= " AND scenic_name LIKE '%{$scenic_name}%'";
         }
 
         $SaleStatModel = new SaleStatModel();

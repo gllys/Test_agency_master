@@ -87,16 +87,31 @@ Class LandscapeController extends Base_Controller_Api {
             $data = $this->count > 0 ? $LandscapeModel->search($where, $this->getFields(), $this->getSortRule(), $this->limit) : array();
             if (!empty($data)) {
                 $poiList = array();
+                $devList = array();
+                $landscapeIdArr = array_keys($data);
                 if ($params['show_poi'] > 0) {
                     $poiWhere = array();
-                    $poiWhere['landscape_id|IN'] = array_keys($data);
+                    $poiWhere['landscape_id|IN'] = $landscapeIdArr;
                     if (!$params['show_poi_flag']) $poiWhere['status'] = 1;
                     $pois = PoiModel::model()->search($poiWhere, "id,name,landscape_id");
                     foreach ($pois as $pv) {
                         $poiList[$pv['landscape_id']][] = array('poi_id' => $pv['id'], 'poi_name' => $pv['name']);
                     }
                 }
-
+                //获取landscape对应绑定的设备,可能是多个
+                if(count($landscapeIdArr)>0){
+                    $devWhere = array();
+                    $devWhere['landscape_id|IN'] = $landscapeIdArr;
+                    $devs = EquipmentModel::model()->search($devWhere,"id,type,landscape_id");
+                    foreach($devs as $one){
+                        if(isset($devList[$one['landscape_id']][$one['type']])){
+                            $devList[$one['landscape_id']][$one['type']]['num'] += 1;
+                        }else{
+                            $devList[$one['landscape_id']][$one['type']]['num'] = 1;
+                        }     
+                        $devList[$one['landscape_id']][$one['type']]['device_type'] = $one['type'];
+                    }
+                }
                 // 是否已绑定供应商 @todo
                 /*$list_LandscapeOrganization = array();
                 $LandscapeOrganization = LandscapeOrganizationModel::model()->search('landscape_id in ('.implode(',',array_keys($data)).') group by landscape_id','id,landscape_id');
@@ -111,6 +126,7 @@ Class LandscapeController extends Base_Controller_Api {
                     if ($params['show_poi'] > 0) {
                         $data[$k]['poi_list'] = isset($poiList[$v['id']]) ? $poiList[$v['id']] : array();
                     }
+                    $data[$k]['dev_list'] = isset($devList[$v['id']]) ? $devList[$v['id']] : array();
 
                     if ($v['district_id']>0) {
                         $districtIds[] = $v['district_id'];
@@ -419,6 +435,8 @@ Class LandscapeController extends Base_Controller_Api {
         $result['images'] = $images;
         $result['landscape_organization'] = $landscape_organization;
         $result['partner_type']= $detail['partner_type'];
+        $result['panorama_id']= $detail['panorama_id'];//全景ID
+        $result['feature']= $detail['feature'];//景区主题 
 
         $areaIds = array();
         $result['province_id'] && $areaIds[] = $result['province_id'];
@@ -462,17 +480,17 @@ Class LandscapeController extends Base_Controller_Api {
         $data['lng'] = trim(Tools::safeOutput($this->body['lng'])); //维度
         $data['api_channel_id'] = intval($this->body['api_channel_id']); //对接渠道编号
         $data['created_by'] = $operator['user_id']; //操作者uid
+        $data['py'] = trim(Pinyin::utf8_to($data['name'],1))?trim(Pinyin::utf8_to($data['name'],1)):'';
+        $data['pinyin'] = trim(Pinyin::utf8_to($data['name']))?trim(Pinyin::utf8_to($data['name'])):'';
+        $data['panorama_id'] = trim(Tools::safeOutput($this->body['panorama_id'])); //全景ID
+        $data['feature'] = trim(Tools::safeOutput($this->body['feature'])); //景区主题
 
+        //只检查数据表必填字段
         !$data['name'] &&  Lang_Msg::error("ERROR_LANDSCAPE_2"); //景区名称不能为空
-        !$data['landscape_level_id']  &&  Lang_Msg::error("ERROR_LANDSCAPE_3"); //请选择景区级别
+        if($data['landscape_level_id'] < 0){
+            Lang_Msg::error("ERROR_LANDSCAPE_3"); //请选择景区级别
+        }
         !$data['province_id'] &&  Lang_Msg::error("ERROR_DISTRICT_1");
-        !$data['hours'] &&  Lang_Msg::error("ERROR_HOURS_1");
-        !$data['phone'] &&  Lang_Msg::error("ERROR_PHONE_1");
-        !$data['address'] &&  Lang_Msg::error("ERROR_ADDRESS_1");
-        !$data['exaddress'] &&  Lang_Msg::error("ERROR_EXADDRESS_1");
-        !$data['biography'] &&  Lang_Msg::error("ERROR_BIOGRAPHY_1");
-        !$data['note'] &&  Lang_Msg::error("ERROR_NOTE_1");
-        !$data['transit'] &&  Lang_Msg::error("ERROR_TRANSIT_1");
 
         $LandscapeModel = new LandscapeModel();
         $has = $LandscapeModel->search(array('name'=>$data['name']));
@@ -556,12 +574,14 @@ Class LandscapeController extends Base_Controller_Api {
         $data['deleted_at'] = $noVal===true ? $detail['deleted_at'] : $value['deleted_at'];
         $data['lat'] = $noVal===true ? $detail['lat'] : $value['latitude'];
         $data['lng'] = $noVal===true ? $detail['lng'] : $value['longitude'];
+        $data['panorama_id'] = $noVal===true ? $detail['panorama_id'] : $value['panorama_id'];
+        $data['feature'] = $noVal===true ? $detail['feature'] : $value['feature'];
 
         $data['on_shelf'] = isset($detail['on_shelf'])?intval($detail['on_shelf']):1;
 
         $now = date("Y-m-d H:i:s");
 
-        //$name = trim(Tools::safeOutput($this->body['name']));
+        $name = trim(Tools::safeOutput($this->body['name']));
         $landscape_level_id = intval($this->body['landscape_level_id']);
         $province_id = intval($this->body['province_id']);
         $city_id = intval($this->body['city_id']);
@@ -582,6 +602,8 @@ Class LandscapeController extends Base_Controller_Api {
         $api_channel_id = intval($this->body['api_channel_id']); //对接渠道编号
         $on_shelf = intval($this->body['on_shelf']);
         $deleted = intval($this->body['deleted']);
+        $panorama_id = trim(Tools::safeOutput($this->body['panorama_id'])); //全景ID
+        $feature = trim(Tools::safeOutput($this->body['feature'])); //景区主题
 
         //isset($_POST['name']) && !$name &&  Lang_Msg::error("ERROR_LANDSCAPE_2"); //景区名称不能为空
         //isset($_POST['landscape_level_id']) && !$landscape_level_id &&  Lang_Msg::error("ERROR_LANDSCAPE_3"); //请选择景区级别
@@ -595,7 +617,7 @@ Class LandscapeController extends Base_Controller_Api {
         isset($_POST['address']) && empty($address) && empty($value['address']) &&  Lang_Msg::error("ERROR_ADDRESS_1");
         //isset($_POST['biography']) && empty($biography) && empty($value['description']) &&  Lang_Msg::error("ERROR_BIOGRAPHY_1");
 
-        //isset($_POST['name']) && $data['name']= $name;
+        isset($_POST['name']) && $data['name']= $name;
         isset($_POST['province_id']) && $data['province_id']= $province_id;
         isset($_POST['city_id']) && $data['city_id']= $city_id;
         isset($_POST['district_id']) && $data['district_id']= $district_id;
@@ -623,6 +645,8 @@ Class LandscapeController extends Base_Controller_Api {
         isset($_POST['lng']) && $data['lng'] = $lng;
         isset($_POST['api_channel_id']) && $data['api_channel_id']= $api_channel_id;
         isset($_POST['on_shelf']) && $data['on_shelf']= $on_shelf?1:0;
+        isset($_POST['panorama_id']) && $data['panorama_id'] = $panorama_id;
+        isset($_POST['feature']) && $data['feature'] = $feature;
 
         isset($_POST['landscape_level_id']) && (
             $data['landscape_level_id']= (($isLocal || $noVal===true)?$landscape_level_id:$value['level'])
@@ -642,6 +666,8 @@ Class LandscapeController extends Base_Controller_Api {
                 (($biography!='' || $noVal===true) ? $biography : $value['description']) :
                 (($noVal===false && $value['description']) ? $value['description'] : $biography)
         );
+        $data['py'] = trim(Pinyin::utf8_to($data['name'],1))?trim(Pinyin::utf8_to($data['name'],1)):'';
+        $data['pinyin'] = trim(Pinyin::utf8_to($data['name']))?trim(Pinyin::utf8_to($data['name'])):'';
 
         if($status){ //更改审核状态
             !in_array($status,array('normal','unaudited','failed')) && Lang_Msg::error("ERROR_UPDATE_2"); //状态参数有错

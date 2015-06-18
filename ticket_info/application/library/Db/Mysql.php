@@ -228,10 +228,16 @@ class Db_Mysql
             $fields = implode('`, `', array_keys($data));
             $values = '('. implode(',', $data) . ')';
         } else {
-            $fields = implode('`, `', array_shift($data));
-            $values = array();
-            foreach ($data as $row) {
-                $values[] = "('". implode("','", $row) . "')";
+            $tmp_fields = array_shift($data);
+            $fields = implode('`, `', $tmp_fields);
+            for($i = 0;$i<count($data);$i++){
+                for($j = 0;$j<count($tmp_fields);$j++){
+                    $bind_param = $tmp_fields[$j];
+                    $tmp_values[] = ':'.$bind_param.$i;
+                    $params[$bind_param.$i] = $data[$i][$bind_param];
+                }
+                $values[] = "(". implode(", ", $tmp_values) . ")";
+                unset($tmp_values);
             }
             $values = implode(',', $values);
         }

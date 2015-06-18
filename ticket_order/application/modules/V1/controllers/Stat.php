@@ -112,37 +112,53 @@ class StatController extends Base_Controller_Api
     public function plateform_listAction()
     {
         $date = trim($this->body['date']);
-        !Validate::isString($date) && Lang_Msg::error('日期不能为空');
-        !in_array($this->body['type'],array('whole','scenic')) && Lang_Msg::error('类型不正确');
-        !in_array($this->body['date_type'],array(1,2,3)) && Lang_Msg::error('日期类型不正确');
-        $start_date = reset(explode(' - ',$date));
-        $start_date = strtotime($start_date);
-        $end_date = end(explode(' - ',$date));
-        $end_date = strtotime($end_date.' 23:59:59');
+//        !Validate::isString($date) && Lang_Msg::error('日期不能为空');
+        !in_array($this->body['type'],array('whole','scenic','agency')) && Lang_Msg::error('类型不正确');
+//        !in_array($this->body['date_type'],array(1,2,3)) && Lang_Msg::error('日期类型不正确');
+        $start_date = isset($this->body['start_date'])?$this->body['start_date']:reset(explode(' - ',$date));
+        $start_date = $start_date?strtotime($start_date):0;
+        $end_date = isset($this->body['end_date'])?$this->body['end_date']:end(explode(' - ',$date));
+        $end_date = $end_date?strtotime($end_date.' 23:59:59'):time();
         $type = $this->body['type'];
+        $fields = 'COUNT(*) order_num,SUM(nums) person_num,SUM(used_nums) used_person_num,SUM(nums-used_nums-refunded_nums) unused_person_num,SUM(refunded_nums) refunded_person_num,SUM(amount) amount,SUM(amount-refunded) receive_amount,SUM(refunded) refunded';
         if($type == 'whole'){
             // 供应商
             $supplier_id = trim($this->body['supplier_id']);
-            $fields = 'supplier_id,COUNT(*) order_num,SUM(nums) person_num,SUM(used_nums) used_person_num,SUM(nums-used_nums-refunded_nums) unused_person_num,SUM(refunded_nums) refunded_person_num,SUM(amount) amount,SUM(amount-refunded) receive_amount,SUM(refunded) refunded';
+            $fields_whole = 'supplier_id,';
             $where = '`status` IN (\'paid\',\'finish\',\'billed\') AND ';
             if($supplier_id) $where .= 'supplier_id in ('.$supplier_id.') AND ';
-            $where .= ' nums>=used_nums+refunding_nums+refunded_nums AND `created_at` BETWEEN '.$start_date.' AND '.$end_date.' GROUP BY `supplier_id`';
-            $count = reset(OrderModel::model()->db->selectBySql('SELECT count(*) COUNT FROM (SELECT COUNT(*) COUNT FROM orders WHERE '.$where.') a'));
+            $where .= ' nums>=used_nums+refunding_nums+refunded_nums AND `created_at` BETWEEN '.$start_date.' AND '.$end_date;
+            $group_by = ' GROUP BY `supplier_id`';
+            $count = reset(OrderModel::model()->db->selectBySql('SELECT count(*) COUNT FROM (SELECT COUNT(*) COUNT FROM orders WHERE '.$where.$group_by.') a'));
             $this->count = reset($count);
             $this->pagenation();
-            $data['data'] = OrderModel::model()->search($where,$fields,null,$this->limit,'supplier_id');
+            $data['data'] = OrderModel::model()->search($where.$group_by,$fields_whole.$fields,null,$this->limit,'supplier_id');
         }elseif($type == 'scenic'){
             // 景区
             $landscape_ids = trim($this->body['landscape_ids']);
-            $fields = 'landscape_ids,COUNT(*) order_num,SUM(nums) person_num,SUM(used_nums) used_person_num,SUM(nums-used_nums-refunded_nums) unused_person_num,SUM(refunded_nums) refunded_person_num,SUM(amount) amount,SUM(amount-refunded) receive_amount,SUM(refunded) refunded';
+            $fields_scenic = 'landscape_ids,';
             $where = 'kind=1 AND `status` IN (\'paid\',\'finish\',\'billed\') AND ';
             if($landscape_ids) $where .= 'landscape_ids in ('.$landscape_ids.') AND ';
-            $where .= ' nums>=used_nums+refunding_nums+refunded_nums AND `created_at` BETWEEN '.$start_date.' AND '.$end_date.' GROUP BY `landscape_ids`';
-            $count = reset(OrderModel::model()->db->selectBySql('SELECT count(*) COUNT FROM (SELECT COUNT(*) COUNT FROM orders WHERE '.$where.') a'));
+            $where .= ' nums>=used_nums+refunding_nums+refunded_nums AND `created_at` BETWEEN '.$start_date.' AND '.$end_date;
+            $group_by = ' GROUP BY `landscape_ids`';
+            $count = reset(OrderModel::model()->db->selectBySql('SELECT count(*) COUNT FROM (SELECT COUNT(*) COUNT FROM orders WHERE '.$where.$group_by.') a'));
             $this->count = reset($count);
             $this->pagenation();
-            $data['data'] = OrderModel::model()->search($where,$fields,null,$this->limit,'landscape_ids');
+            $data['data'] = OrderModel::model()->search($where.$group_by,$fields_scenic.$fields,null,$this->limit,'landscape_ids');
+        }elseif($type == 'agency'){
+            // 分销商
+            $distributor_id = trim($this->body['distributor_id']);
+            $fields_agency = 'distributor_id,';
+            $where = '`status` IN (\'paid\',\'finish\',\'billed\') AND ';
+            if($distributor_id) $where .= 'distributor_id in ('.$distributor_id.') AND ';
+            $where .= ' nums>=used_nums+refunding_nums+refunded_nums AND `created_at` BETWEEN '.$start_date.' AND '.$end_date;
+            $group_by = ' GROUP BY `distributor_id`';
+            $count = reset(OrderModel::model()->db->selectBySql('SELECT count(*) COUNT FROM (SELECT COUNT(*) COUNT FROM orders WHERE '.$where.$group_by.') a'));
+            $this->count = reset($count);
+            $this->pagenation();
+            $data['data'] = OrderModel::model()->search($where.$group_by,$fields_agency.$fields,null,$this->limit,'distributor_id');
         }
+        $data['amount'] = reset(OrderModel::model()->search($where,$fields,null));
         $data['pagination'] = array(
             'count'=>$this->count,
             'current'=>$this->current,
@@ -159,37 +175,51 @@ class StatController extends Base_Controller_Api
     public function plateform_detailAction()
     {
         $date = trim($this->body['date']);
-        !Validate::isString($date) && Lang_Msg::error('日期不能为空');
-        !in_array($this->body['type'],array('whole','scenic')) && Lang_Msg::error('类型不正确');
-        !in_array($this->body['date_type'],array(1,2,3)) && Lang_Msg::error('日期类型不正确');
-        $start_date = reset(explode(' - ',$date));
-        $start_date = strtotime($start_date);
-        $end_date = end(explode(' - ',$date));
-        $end_date = strtotime($end_date.' 23:59:59');
+//        !Validate::isString($date) && Lang_Msg::error('日期不能为空');
+        !in_array($this->body['type'],array('whole','scenic','agency')) && Lang_Msg::error('类型不正确');
+//        !in_array($this->body['date_type'],array(1,2,3)) && Lang_Msg::error('日期类型不正确');
+        $start_date = isset($this->body['start_date'])?$this->body['start_date']:reset(explode(' - ',$date));
+        $start_date = strtotime($start_date)?strtotime($start_date):0;
+        $end_date = isset($this->body['end_date'])?$this->body['end_date']:end(explode(' - ',$date));
+        $end_date = strtotime($end_date.' 23:59:59')?strtotime($end_date.' 23:59:59'):time();
         $type = $this->body['type'];
+        $fields_day = 'FROM_UNIXTIME(`created_at`,\'%Y-%m-%d\') AS `day`,';
+        $fields = 'COUNT(*) order_num,SUM(nums) person_num,SUM(used_nums) used_person_num,SUM(nums-used_nums-refunded_nums) unused_person_num,SUM(refunded_nums) refunded_person_num,SUM(amount) amount,SUM(amount-refunded) receive_amount,SUM(refunded) refunded';
         if($type == 'whole'){
             // 供应商
             $supplier_id = trim($this->body['supplier_id']);
-            $fields = 'FROM_UNIXTIME(`created_at`,\'%Y-%m-%d\') AS `day`,COUNT(*) order_num,SUM(nums) person_num,SUM(used_nums) used_person_num,SUM(nums-used_nums-refunded_nums) unused_person_num,SUM(refunded_nums) refunded_person_num,SUM(amount) amount,SUM(amount-refunded) receive_amount,SUM(refunded) refunded';
             $where = '`status` IN (\'paid\',\'finish\',\'billed\') AND ';
             if($supplier_id) $where .= 'supplier_id in ('.$supplier_id.') AND ';
-            $where .= ' nums>=used_nums+refunding_nums+refunded_nums AND `created_at` BETWEEN '.$start_date.' AND '.$end_date.' GROUP BY `day`';
-            $count = reset(OrderModel::model()->db->selectBySql('SELECT count(*) COUNT FROM (SELECT FROM_UNIXTIME(`created_at`,\'%Y-%m-%d\') `day` FROM orders WHERE '.$where.') a'));
+            $where .= ' nums>=used_nums+refunding_nums+refunded_nums AND `created_at` BETWEEN '.$start_date.' AND '.$end_date;
+            $group_by = ' GROUP BY `day`';
+            $count = reset(OrderModel::model()->db->selectBySql('SELECT count(*) COUNT FROM (SELECT FROM_UNIXTIME(`created_at`,\'%Y-%m-%d\') `day` FROM orders WHERE '.$where.$group_by.') a'));
             $this->count = reset($count);
             $this->pagenation();
-            $data['data'] = OrderModel::model()->search($where,$fields,null,$this->limit,'day');
+            $data['data'] = OrderModel::model()->search($where.$group_by,$fields_day.$fields,null,$this->limit,'day');
         }elseif($type == 'scenic'){
             // 景区
             $landscape_ids = trim($this->body['landscape_ids']);
-            $fields = 'FROM_UNIXTIME(`created_at`,\'%Y-%m-%d\') `day`,COUNT(*) order_num,SUM(nums) person_num,SUM(used_nums) used_person_num,SUM(nums-used_nums-refunded_nums) unused_person_num,SUM(refunded_nums) refunded_person_num,SUM(amount) amount,SUM(amount-refunded) receive_amount,SUM(refunded) refunded';
             $where = 'kind=1 AND `status` IN (\'paid\',\'finish\',\'billed\') AND ';
             if($landscape_ids) $where .= 'landscape_ids in ('.$landscape_ids.') AND ';
-            $where .= ' nums>=used_nums+refunding_nums+refunded_nums AND `created_at` BETWEEN '.$start_date.' AND '.$end_date.' GROUP BY `day`';
-            $count = reset(OrderModel::model()->db->selectBySql('SELECT count(*) COUNT FROM (SELECT FROM_UNIXTIME(`created_at`,\'%Y-%m-%d\') `day` FROM orders WHERE '.$where.') a'));
+            $where .= ' nums>=used_nums+refunding_nums+refunded_nums AND `created_at` BETWEEN '.$start_date.' AND '.$end_date;
+            $group_by = ' GROUP BY `day`';
+            $count = reset(OrderModel::model()->db->selectBySql('SELECT count(*) COUNT FROM (SELECT FROM_UNIXTIME(`created_at`,\'%Y-%m-%d\') `day` FROM orders WHERE '.$where.$group_by.') a'));
             $this->count = reset($count);
             $this->pagenation();
-            $data['data'] = OrderModel::model()->search($where,$fields,null,$this->limit,'day');
+            $data['data'] = OrderModel::model()->search($where.$group_by,$fields_day.$fields,null,$this->limit,'day');
+        }elseif($type == 'agency'){
+            // 分销商
+            $distributor_id = trim($this->body['distributor_id']);
+            $where = '`status` IN (\'paid\',\'finish\',\'billed\') AND ';
+            if($distributor_id) $where .= 'distributor_id in ('.$distributor_id.') AND ';
+            $where .= ' nums>=used_nums+refunding_nums+refunded_nums AND `created_at` BETWEEN '.$start_date.' AND '.$end_date;
+            $group_by = ' GROUP BY `day`';
+            $count = reset(OrderModel::model()->db->selectBySql('SELECT count(*) COUNT FROM (SELECT FROM_UNIXTIME(`created_at`,\'%Y-%m-%d\') `day` FROM orders WHERE '.$where.$group_by.') a'));
+            $this->count = reset($count);
+            $this->pagenation();
+            $data['data'] = OrderModel::model()->search($where.$group_by,$fields_day.$fields,null,$this->limit,'day');
         }
+        $data['amount'] = reset(OrderModel::model()->search($where,$fields,null));
         $data['pagination'] = array(
             'count'=>$this->count,
             'current'=>$this->current,

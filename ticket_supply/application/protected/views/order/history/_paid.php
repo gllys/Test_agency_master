@@ -55,7 +55,71 @@ use common\huilian\utils\Format;
             </select>
         </div>
         <!--取消状态结束-->
-        
+
+
+        <!--订单查询开始-->
+        <div class="form-group">
+            <div class="input-group input-group-sm" style=" position: relative; top: -2px;">
+                <div class="input-group-btn">
+                    <button id="search_label" type="button" class="btn btn-default" tabindex="-1">
+                        <?php
+                        //左边显示的名称
+                        $_querys = array('id' => '订单号', 'product_name' => '门票名称','scenic_name'=>'景区名称', 'owner_name' => '取票人', 'owner_mobile' => '手机号', 'owner_card' => '身份证');
+
+                        //当前选择的name
+                        $_queryName = 'id';
+                        foreach ($_querys as $key => $val) {
+                            if (isset($get[$key])) {
+                                $_queryName =  $key;
+                                break;
+                            }
+                        }
+
+                        echo $_querys[$_queryName] ;
+                        ?>
+                    </button>
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                            tabindex="-1">
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                        <?php
+                        //下拉列表
+                        foreach ($_querys as $key => $val) :
+                            ?>
+                            <li><a class="sec-btn clearPart" href="javascript:;" data-id="<?php echo $key ?>" id="" aria-labelledby="search_label"><?php echo $val; ?></a></li>
+                        <?php endforeach; ?>
+                    </ul>
+                    <script>
+                        $('.sec-btn').click(function() {
+                            $('#search_label').text($(this).text());
+                            $('#search_field').attr('name', $(this).attr('data-id'));
+                        });
+                    </script>
+                </div>
+                <!-- input-group-btn -->
+                <input id="search_field" name="<?php echo $_queryName ?>" value="<?php echo empty($get[$_queryName])?'':$get[$_queryName] ?>" type="text" class="form-control" style="z-index: 0"/>
+            </div>
+        </div>
+        <!--订单查询结束-->
+
+
+        <!--分销商查询开始-->
+        <div class="form-group">
+            <select name="distributor_id" class="select2" data-placeholder="分销商"  style="width:170px;height:34px;">
+                <option value="">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;分销商&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</option>
+                <?php foreach ($distributors_labels as $distributor => $label) : ?>
+                    <option <?php echo isset($get['distributor_id']) && $distributor == $get['distributor_id'] ? 'selected="selectd"' : '' ?> value="<?php echo $distributor ?>"><?php echo $label ?></option>
+                <?php
+                endforeach;
+                unset($distributor, $label)
+                ?>
+            </select>
+        </div>
+        <!--分销商查询结束-->
+
+
+
         <div class="form-group">
             <input type="hidden" name="is_export" class="is_export" value="0">
             <button class="btn btn-primary btn-sm" type="submit">查询</button>

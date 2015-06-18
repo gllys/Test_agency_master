@@ -10,6 +10,7 @@ class ManagequipController extends Controller {
      */
     public function actionIndex() {
     	ini_set('error_reporting','E_ALL & ~E_NOTICE');
+        $type = array('手持','闸机','小票打印机(蓝牙)','小票打印机(USB)','身份证阅读器','扫码枪','二维码打印机','掌纹录入机');
         $get = $_GET;
 
         //供应商 景区 要求是模糊查询
@@ -54,7 +55,7 @@ class ManagequipController extends Controller {
         $pages->pageSize = 15; #每页显示的数目
 
         //加载视图
-        $this->render('index',compact('list','pages','get','supply','landscape'));
+        $this->render('index',compact('list','pages','get','supply','landscape','type'));
 
     }
      /*
@@ -206,7 +207,7 @@ class ManagequipController extends Controller {
             $param['keyword'] = $get['landscape_name'];
         }
         $param['organization_id'] = $equipment['body']['organization_id'];
-        $param['current'] = isset($get['p']) ? $get['p'] : 1;
+        $param['current'] = isset($get['page']) ? $get['page'] : 1;
         $data = Landscape::api()->lists($param);
         $landscapes = ApiModel::getLists($data);
 

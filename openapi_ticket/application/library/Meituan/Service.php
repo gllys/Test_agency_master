@@ -1,4 +1,4 @@
-    <?php
+<?php
 /**
  * Created by PhpStorm.
  * User: bee
@@ -53,18 +53,33 @@ class Meituan_Service {
 
         Util_Logger::getLogger('meituan')->info(__METHOD__, array('header' => $header, 'data' => $data), '', '通知美团参数');
 
-        $data = json_encode($data);
+        $data = Pack_Json::encode($data);
         $res_json = Tools::curl(self::$url . $uri, 'POST', $data, $header);
-        $res = json_decode($res_json, true);
+        $res = Pack_Json::decode($res_json);
+        if(!$res){
+            Util_Logger::getLogger('meituan')->info(__METHOD__, $res_json, '', '返回数据json解析错误');
+        }
         return $res;
     }
 
-    public function outputError($desc = ''){
-        Lang_Msg::output(array(
-            'code'      => 300,
-            'describe'  => $desc,
-            'partnerId' => self::$partnerId,
-        ));
+    public function outputError($res = '', $method = __METHOD__, $searchKey = '', $logData = NULL){
+        if(is_array($res)){
+            $data = array_merge(array(
+                'code'      => 300,
+                'partnerId' => self::$partnerId,
+            ),$res);
+        }else{
+            $data = array(
+                'code'      => 200,
+                'describe'  => $res,
+                'partnerId' => self::$partnerId,
+            );
+        }
+        if($logData === NULL) {
+            $logData = $res;
+        }
+        Util_Logger::getLogger('meituan')->error($method, $logData, '', '错误输出', $searchKey);
+        Lang_Msg::output($data, 200, JSON_UNESCAPED_UNICODE);
     }
     public function outputSucc($res = array(), $desc = 'success'){
         $data = array_merge(array(
@@ -72,7 +87,7 @@ class Meituan_Service {
             'describe'  => $desc,
             'partnerId' => self::$partnerId,
         ),$res);
-        Lang_Msg::output($data);
+        Lang_Msg::output($data, 200, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 
     private function validSign(){

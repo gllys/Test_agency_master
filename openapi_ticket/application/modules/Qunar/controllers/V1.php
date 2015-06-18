@@ -110,44 +110,46 @@ class V1Controller extends Base_Controller_ApiDispatch {
         $smsTemplet = '感谢您购买“浙风国际旅行社”的旅游产品，稍候将为您发送电子门票，请凭浙风发送的电子门票消费游玩。如长时间未收到电子票，请及时致电15355755871索取。';
         $productInfos = array();
         foreach ($products as $key => $product) {
+            $temp = array();
 
-            $productInfos[$key]['resourceId']   = $product['code'];
-            $productInfos[$key]['productName']  = $product['product_name'];
-            $productInfos[$key]['paymentType']  = 'PREPAY';
-            $productInfos[$key]['remind']       = !empty($product['description']) ? $product['description'] : $remind;
-            $productInfos[$key]['smsTemplet']   = !empty($product['extra']['msg_custom']) ? $product['extra']['msg_custom'] : $smsTemplet;
+            $temp['resourceId']   = $product['code'];
+            $temp['productName']  = $product['product_name'];
+            $temp['paymentType']  = 'PREPAY';
+            $temp['remind']       = !empty($product['description']) ? $product['description'] : $remind;
+            $temp['smsTemplet']   = !empty($product['extra']['msg_custom']) ? $product['extra']['msg_custom'] : $smsTemplet;
 
-            $productInfos[$key]['canRefund'] = $product['refund'] == 1 ? 'TRUE' : 'FALSE';
-            $productInfos[$key]['bookAdvanceDay'] = floor($product['scheduled_time'] / 86400);
-            $productInfos[$key]['bookAdvanceTime'] = gmstrftime('%H:%M', $product['scheduled_time'] % 86400);
-            $productInfos[$key]['autoCancelTime'] = $product['extra']['cancel_time'];
-            $productInfos[$key]['visitPersonRequiredForQuantity'] = $product['extra']['user_per_infos'];
+            $temp['canRefund'] = $product['refund'] == 1 ? 'TRUE' : 'FALSE';
+            $temp['bookAdvanceDay'] = floor($product['scheduled_time'] / 86400);
+            $temp['bookAdvanceTime'] = gmstrftime('%H:%M', $product['scheduled_time'] % 86400);
+            $temp['autoCancelTime'] = $product['extra']['cancel_time'];
+            $temp['visitPersonRequiredForQuantity'] = $product['extra']['user_per_infos'];
 
             $buyer_fileds = explode( ',', $product['extra']['buyer_fileds']);
-            $productInfos[$key]['contactNamePinyinRequired']    = in_array('namePinyinRequired', $buyer_fileds) ? 'TRUE' : 'FALSE';
-            $productInfos[$key]['contactEmailRequired']         =  in_array('emailRequired', $buyer_fileds) ? 'TRUE' : 'FALSE';
-            $productInfos[$key]['contactAddressRequired']       =  in_array('addressRequired', $buyer_fileds) ? 'TRUE' : 'FALSE';
+            $temp['contactNamePinyinRequired']    = in_array('namePinyinRequired', $buyer_fileds) ? 'TRUE' : 'FALSE';
+            $temp['contactEmailRequired']         =  in_array('emailRequired', $buyer_fileds) ? 'TRUE' : 'FALSE';
+            $temp['contactAddressRequired']       =  in_array('addressRequired', $buyer_fileds) ? 'TRUE' : 'FALSE';
 //            $user_fileds = explode($product['extra']['user_fileds'], ',');
-//            $productInfos[$key]['visitNamePinyinRequired'] = in_array('namePinyinRequired', $user_fileds) ? TRUE : FALSE;
-            $productInfos[$key]['perPhoneMaximum'] = $product['extra']['mobile_limit'];
+//            $temp['visitNamePinyinRequired'] = in_array('namePinyinRequired', $user_fileds) ? TRUE : FALSE;
+            $temp['perPhoneMaximum'] = $product['extra']['mobile_limit'];
 
-            $productInfos[$key]['feeInfo']          = $product['consumption_detail'];
-            $productInfos[$key]['cashBackMoney']    = intval($product['extra']['derate']) * 100;
-            $productInfos[$key]['refundApplyTimeBeforeValidEndDay'] = $product['extra']['refund_time'];
+            $temp['feeInfo']          = $product['consumption_detail'];
+            $temp['cashBackMoney']    = intval($product['extra']['derate']) * 100;
+            $temp['refundApplyTimeBeforeValidEndDay'] = $product['extra']['refund_time'];
             $refundChargeType = array(1 => 'QUANTITY', 2 => 'ORDER');
-            $productInfos[$key]['refundChargeType'] = isset($product['extra']['refund_type']) ? $refundChargeType[$product['extra']['refund_type']] : '';
-            $productInfos[$key]['refundCharge']     = intval($product['extra']['refund_fee']) * 100;
-            $productInfos[$key]['refundInfo']       = $product['refund_detail'];
+            $temp['refundChargeType'] = isset($product['extra']['refund_type']) ? $refundChargeType[$product['extra']['refund_type']] : '';
+            $temp['refundCharge']     = intval($product['extra']['refund_fee']) * 100;
+            $temp['refundInfo']       = $product['refund_detail'];
 
 
-            $productInfos[$key]['validType'] = $product['valid_flag'] == 0 ? 'BETWEEN_USE_DATE_AND_N_DAYSAFTER' : 'BETWEEN_USE_DATE_START_AND_END';
-            $date_available = explode(',',$product['date_available']);
-            $start  = isset($date_available[0]) ? date('Y-m-d',$date_available[0]) : '';
-            $end    = isset($date_available[1]) ? date('Y-m-d',$date_available[1]) : '';
+            $temp['validType']  = $product['valid_flag'] == 0 ? 'BETWEEN_USE_DATE_AND_N_DAYSAFTER' : 'BETWEEN_USE_DATE_START_AND_END';
+            $date_available     = explode(',',$product['date_available']);
+            $start              = isset($date_available[0]) ? date('Y-m-d',$date_available[0]) : '';
+            $end                = isset($date_available[1]) ? date('Y-m-d',$date_available[1]) : '';
+            $marketPrice        = $product['listed_price2'] != 0 ? floatval($product['listed_price2']) * 100 : floatval($product['listed_price']) * 100 ;
 
             //日历票模式
-            if($productInfos[$key]['validType'] == 'BETWEEN_USE_DATE_AND_N_DAYSAFTER'){
-                $productInfos[$key]['daysAfterUseDateValid'] = $product['valid'] + 1;
+            if($temp['validType'] == 'BETWEEN_USE_DATE_AND_N_DAYSAFTER'){
+                $temp['daysAfterUseDateValid'] = $product['valid'] + 1;
                 $rule = ApiProductModel::model()->getTicketRule(
                     array(
                         'id' => $product['rule_id'],
@@ -162,43 +164,55 @@ class V1Controller extends Base_Controller_ApiDispatch {
                 //按有效日期，构造日历票数据
                 for($now = date('Y-m-d',time()); strtotime($now) <= strtotime($end); $now = date("Y-m-d",strtotime("$now +1 day"))){
                     $calendarPrice['useDate']       = $now;
-                    $calendarPrice['marketPrice']   = $product['listed_price2'] != 0 ? floatval($product['listed_price2']) * 100 : floatval($product['listed_price']) * 100 ;
+                    $calendarPrice['marketPrice']   = $marketPrice;
                     $calendarPrice['sellPrice']     = floatval($product['price']) * 100;
+                    $calendarPrice['settlePrice']   = floatval($product['extra']['b2b_price']) * 100;
                     $calendarPrice['minimum']       = 1;
                     $calendarPrice['maximum']       = 100;
                     if(isset($rule_items[$now])){
-                        $s = $product['fat_price'] . $rule_items[$now]['fat_price'];
-                        eval("\$a=$s;");
-                        $calendarPrice['settlePrice']   = floatval($a) * 100;
                         $calendarPrice['sellstock']     = $rule_items[$now]['reserve'] - $rule_items[$now]['used_reserve'];
                         //最多购买不能大于整体库存
                         if($calendarPrice['sellstock'] < $calendarPrice['maximum'])
                             $calendarPrice['maximum']   = $calendarPrice['sellstock'];
                     }else{
-                        $calendarPrice['settlePrice']   = floatval($product['fat_price']) * 100;
                         $calendarPrice['sellstock']     = 9999;
+                    }
+                    if($calendarPrice['sellPrice'] == 0){
+                        $calendarPrice['sellPrice'] = $calendarPrice['settlePrice'];
+                    }
+                    if($calendarPrice['settlePrice'] == 0){
+                        $calendarPrice['settlePrice'] = $calendarPrice['sellPrice'];
                     }
                     $calendarPrices[] = $calendarPrice;
                     if(count($calendarPrices) > 60) break;
                 }
-                $productInfos[$key]['calendarPrices'] = $calendarPrices;
+                $temp['calendarPrices'] = $calendarPrices;
             }
 
             //期票模式
-            if($productInfos[$key]['validType'] == 'BETWEEN_USE_DATE_START_AND_END'){
-                $productInfos[$key]['daysAfterBookDateValid'] = $product['valid'] + 1;   //几天内有效，valid==0 表示当天有效，故需要加1
-                $productInfos[$key]['periodStart']  = $start;             //有效期开始日
-                $productInfos[$key]['periodEnd']    = $end;               //有效期结束日
-                $productInfos[$key]['validWeek']    = str_replace('0','7',$product['week_time']);
-                $productInfos[$key]['marketPrice']  = intval($product['listed_price2']) * 100;             //票面价格单位：分
-                $productInfos[$key]['sellPrice']    = floatval($product['price']) * 100;               //Qunar 销售产品单价单位：分
-    //            $productInfos[$key]['minimum']      = $product['mini_buy'];//最小购买量 - 团购时才有购买量限制
-    //            $productInfos[$key]['maximum']      = $product['max_buy'];//最大购买量
-                $productInfos[$key]['settlePrice']  = floatval($product['fat_price']) * 100;
+            if($temp['validType'] == 'BETWEEN_USE_DATE_START_AND_END'){
+                $temp['daysAfterBookDateValid'] = $product['valid'] + 1;   //几天内有效，valid==0 表示当天有效，故需要加1
+                $temp['periodStart']  = $start;             //有效期开始日
+                $temp['periodEnd']    = $end;               //有效期结束日
+                $temp['validWeek']    = str_replace('0','7',$product['week_time']);
+                $temp['marketPrice']  = $marketPrice;             //票面价格单位：分
+                $temp['sellPrice']    = floatval($product['price']) * 100;               //Qunar 销售产品单价单位：分
+    //            $temp['minimum']      = $product['mini_buy'];//最小购买量 - 团购时才有购买量限制
+    //            $temp['maximum']      = $product['max_buy'];//最大购买量
+                $temp['settlePrice']  = floatval($product['extra']['b2b_price']) * 100;
+                $temp['sellstock']    = 9999;
+                if($temp['sellPrice'] == 0){
+                    $temp['sellPrice'] = $temp['settlePrice'];
+                }
+                if($temp['settlePrice'] == 0){
+                    $temp['settlePrice'] = $temp['sellPrice'];
+                }
             }
 
-            $productInfos[$key]['saleType']     = $req->saleType == 'ALL' ? 'B2B' : $req->saleType;
-            $productInfos[$key]['suggestPrice'] = intval($product['sale_price']) * 100;
+            $temp['saleType']       = $req->saleType == 'ALL' ? 'B2C' : $req->saleType;
+            $temp['suggestPrice']   = intval($product['sale_price']) * 100;
+            $temp['saleStartTime']  = $product['sale_start_time'] == 0 ? '' : date('Y-m-d H:i:s',$product['sale_start_time']);  //开始销售时间（上架时间）
+            $temp['saleEndTime']    = $product['sale_end_time'] == 0 ? '' : date('Y-m-d H:i:s',$product['sale_end_time']);    //结束销售时间（下架时间）
 
             //景区信息
             $api_res = ApiScenicModel::model()->lists(array('ids' => $product['scenic_id']));
@@ -206,11 +220,24 @@ class V1Controller extends Base_Controller_ApiDispatch {
             $sights = $api_res['body']['data'];
             if ($sights) {
                 foreach ($sights as $keysight => $sight) {
-                    $productInfos[$key]['sights'][$keysight] = array(
+                    $temp['sights'][$keysight] = array(
                         'sightName' => $sight['name'],
                         'sightAddress' => $sight['address'],
                         'city' => $sight['district'][1],        //城市
                     );
+                }
+            }
+
+            if($req->method == 'SINGLE'){
+                $productInfos[] = $temp;
+            }else if($req->method == 'ALL'){
+                if(floatval($product['price']) > 0){
+                    $temp['saleType']   = 'B2C';
+                    $productInfos[]     = $temp;
+                }
+                if(floatval($product['extra']['b2b_price']) > 0){
+                    $temp['saleType']   = 'B2B';
+                    $productInfos[]     = $temp;
                 }
             }
         }

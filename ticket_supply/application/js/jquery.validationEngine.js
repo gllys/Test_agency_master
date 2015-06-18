@@ -233,6 +233,9 @@
             var field = $(this);
             var form = field.closest('form, .validationEngineContainer');
             var options = form.data('jqv');
+			if(options==undefined){
+				return
+			}
             options.eventTrigger = "field";
             // validate the current field
             window.setTimeout(function () {
@@ -2077,8 +2080,8 @@
             // Ajax form validation callback method: boolean onComplete(form, status, errors, options)
             // retuns false if the form.submit event needs to be canceled.
             onAjaxFormComplete: $.noop,
-            // 增加一个字段用于检测当天的ajax状态
-            // 函数样式fieldStatus(fieldId, status)
+            // 澧炲姞涓€涓瓧娈电敤浜庢娴嬪綋澶╃殑ajax鐘舵€�
+            // 鍑芥暟鏍峰紡fieldStatus(fieldId, status)
             onAjaxFieldsComplete: false,
             // called right before the ajax call, may return false to cancel
             onBeforeAjaxFormValidation: $.noop,

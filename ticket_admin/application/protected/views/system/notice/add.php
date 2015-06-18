@@ -72,18 +72,20 @@
         var editor = KindEditor.create('#remark', {
             resizeType: 1,
             allowPreviewEmoticons: false,
-            allowImageUpload: false,
+            allowImageUpload: true,
             items: [
                 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'underline',
                 'removeformat', '|', 'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist',
-                'insertunorderedlist', 'link']
+                'insertunorderedlist', 'image','link']
         });
 
 		function showMsg(data, type_msg) {
 			if (data.code == 'succ') {
 				var type_msg;
                 alert(type_msg + '成功!', function() {
-                    location.href='/site/switch/#/system/notice/';
+                    setTimeout(function() {
+						location.href='/site/switch/#/system/notice/';
+                    }, 500);
                 });
 			} else {
 				var tmp_errors = '';

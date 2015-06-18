@@ -276,7 +276,36 @@ abstract class Base_Model_Abstract
     }
     
     public function insert($data) {
-        $rt = $this->db->insert($this->getTable(), $data);
+        $rt = false;
+        if(!empty($data)) {
+            $mult = false;
+            foreach ($data as $key => $val) {
+                if (is_numeric($key)) {
+                    $mult = true;
+                }
+                break;
+            }
+            $total = count($data);
+            if($mult===true && $total>301) { //超过300条数据就分页插入
+                $pageRow = 300;
+                $fields = array_shift($data);
+                $totalPage = ceil($total/$pageRow);
+                for($page=1;$page<=$totalPage;$page++) {
+                    $offset = ($page-1)*$pageRow;
+                    $splitData = array_slice($data,$offset,$pageRow);
+                    if(!empty($splitData)) {
+                        array_unshift($splitData,$fields);
+                        $rt = $this->db->insert($this->getTable(), $splitData);
+                        if(!$rt) return false;
+                    }
+                }
+
+            } else {
+                $rt = $this->db->insert($this->getTable(), $data);
+            }
+        }
+
+        //$rt = $this->db->insert($this->getTable(), $data);
         if ($rt) {
             return $this->setCacheNS();
         }

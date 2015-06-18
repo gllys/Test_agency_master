@@ -137,6 +137,102 @@ class OrganizationsController extends Base_Controller_Api
     }
 
     /**
+     * 获取分销商归属列表
+     * @author qiuling
+     */
+    public function getAgencyListAction()
+    {
+        $search_type = 'agency';
+        //搜索类型
+        if(isset($this->body['search_type']) && !empty($this->body['search_type'])){
+            $search_type = $this->body['search_type'];
+        }
+        if($search_type == 'supply'){
+            //根据供应商名称查询分销商id
+            $idarr = SupplyAgencyModel::model()->setCd(0)->search(array('supplier_name|like'=>'%'.$this->body['name'].'%'),'DISTINCT(distributor_id) as id');
+            if(count($idarr) > 0){
+                $idarr = array_keys($idarr);
+            }else{
+                $idarr = array(0);
+            }
+            $where['id|in'] = $idarr;
+        }else{
+            if($this->body['name']) $where['name|like'] = array('%'.$this->body['name'].'%');
+        }
+        // type字段限定为分销商
+        $where['type'] = 'agency';
+        // 创建时间段
+        if($this->body['created_at']) {
+            $created_at = explode(' - ',$this->body['created_at']);
+            $start_at = intval(strtotime(reset($created_at).' 00:00:00'));
+            $end_at = intval(strtotime(end($created_at).'  23:59:59'));
+            ($end_at<$start_at || !Validate::isUnsignedInt($start_at) || !Validate::isUnsignedInt($end_at)) && Lang_Msg::error("ERROR_LIST_1");
+            $where['created_at|between'] = array($start_at,$end_at);
+        }
+        if($this->body['province_id'] && !$this->body['city_id'] && !$this->body['district_id']){
+            // 省份筛选
+            $where['province_id|in'] = explode(',',$this->body['province_id']);
+        }elseif($this->body['city_id'] && !$this->body['district_id']){
+            // 市筛选
+            $where['city_id|in'] = explode(',',$this->body['city_id']);
+        }elseif(isset($this->body['district_id']) && Validate::isUnsignedId($this->body['district_id'])){
+            // 区筛选
+            $where['district_id|in'] = explode(',',$this->body['district_id']);
+        }
+        if(intval($this->body['agency_id'])>0) $where['agency_id'] = intval($this->body['agency_id']);
+        if(intval($this->body['supply_id'])>0) $where['supply_id'] = intval($this->body['supply_id']);
+        if(intval($this->body['landscape_id'])) $where['landscape_id'] = intval($this->body['landscape_id']);
+        if($this->body['status']) $where['status'] = $this->body['status'];
+        //如果指定id则忽略supply name搜索条件
+        if(isset($this->body['id']) && !empty($this->body['id'])) $where['id|in'] = explode(',',$this->body['id']);        
+        if($this->body['verify_status']) $where['verify_status'] = $this->body['verify_status'];
+        if(array_key_exists('agency_type', $this->body)) {
+            $where['agency_type'] = intval($this->body['agency_type']);
+        }
+        if(array_key_exists('supply_type', $this->body)) {
+            $where['supply_type'] = intval($this->body['supply_type']);
+        }
+        if(!empty($this->body['partner_type']) || $this->body['partner_type'] === '0'){
+            $where['partner_type'] = $this->body['partner_type'];
+        }
+        $where['is_del'] = 0;
+        Tools::walkArray($where,'trim');
+        // 分页
+        $show_all = intval($this->body['show_all']);
+        if($show_all>0) {
+            $data['data'] = $this->organizationModel->setCd(0)->search($where,$this->getFields(),$this->getSortRule());
+        } else {
+            $count = reset($this->organizationModel->setCd(0)->search($where,'count(*) as count'));
+            $this->count = $count['count'];
+            $this->pagenation();            
+            $data['data'] = $this->count?$this->organizationModel->setCd(0)->search($where,$this->getFields(),$this->getSortRule(),$this->limit):array();
+        }
+        //根据agency id 获取supply name
+        if(count($data['data'] > 0)){
+            $arr = SupplyAgencyModel::model()->setCd(0)->search(array('distributor_id|in'=>array_keys($data['data'])),
+                    'id,distributor_id,supplier_name');
+            foreach($arr as $one){
+                $data['data'][$one['distributor_id']]['supplier_name'][] = $one['supplier_name'];
+            }
+        }
+
+        if($show_all>0) {
+            $data['pagination'] = array(
+                'count'=> is_array($data['data']) ? count($data['data']):0,
+            );
+        } else {
+            $data['pagination'] = array(
+                'count'=>$this->count,
+                'current'=>$this->current,
+                'items' => $this->items,
+                'total' => $this->total,
+            );
+        }
+        
+        Tools::lsJson(true,'ok',$data);
+    }
+    
+    /**
      * 机构列表筛选
      * author : yinjian
      */
@@ -247,7 +343,7 @@ class OrganizationsController extends Base_Controller_Api
             'email','telephone','address','description','logo','status',
             'business_license','tax_license','certificate_license','agency_type','supply_type',
             'is_distribute_person','is_distribute_group','is_credit','is_balance','is_del','landscape_id',
-            'partner_type','partner_identify'
+            'partner_type','partner_identify','pay_password'
         )));
         // 手机号码
         if(isset($this->body['mobile']) && !Validate::isMobilePhone($this->body['mobile'])){
@@ -326,6 +422,7 @@ class OrganizationsController extends Base_Controller_Api
         }
         $data['updated_at'] = $this->now;
         Tools::walkArray($data,'trim');
+        if(isset($data['pay_password']) && $data['pay_password']) $data['pay_password'] = md5($data['pay_password']);
         $res = $this->organizationModel->modify($this->body['id'],$data);
         !$res && Lang_Msg::error("ERROR_EDIT_18");
         Tools::lsJson(true,'操作成功');
@@ -535,7 +632,7 @@ class OrganizationsController extends Base_Controller_Api
 
     /**
      * 新增渠道机构
-     * author : yinjian
+     * author : cuiqiao
      */
     public function orgAddAction()
     {
@@ -568,11 +665,11 @@ class OrganizationsController extends Base_Controller_Api
 
     /**
      * 渠道机构列表
-     * author : yinjian
+     * author : cuiqiao
      */
     public function orgListAction()
     {
-        empty($this->body['source']) && Lang_Msg::error('来源ID必填');
+        //empty($this->body['source']) && Lang_Msg::error('来源ID必填');
         $where = array('deleted_at'=>0);
         if(isset($this->body['ids']) && $this->body['ids']) $where['id|in'] = explode(',',$this->body['ids']);
         if(isset($this->body['organization_id']) && $this->body['organization_id']) $where['organization_id|in'] = explode(',',$this->body['organization_id']);
@@ -612,7 +709,7 @@ class OrganizationsController extends Base_Controller_Api
 	
     /**
      * 渠道机构详情
-     * author : yinjian
+     * author : cuiqiao
      */
     public function orgDetailAction()
     {
@@ -637,7 +734,7 @@ class OrganizationsController extends Base_Controller_Api
 
     /**
      * 渠道机构修改
-     * author : yinjian
+     * author : cuiqiao
      */
     public function orgUpdateAction()
     {

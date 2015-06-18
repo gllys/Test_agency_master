@@ -15,7 +15,6 @@ class Tools {
             print_r($arg);
             echo $tag;
         }
-        echo $tag == '' ? PHP_EOL : '<br>';
     }
 	/**
 	 * 生成随机密码

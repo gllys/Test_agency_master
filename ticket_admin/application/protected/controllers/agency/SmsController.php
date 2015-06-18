@@ -55,4 +55,31 @@ class SmsController extends Controller {
         $this->render('index', $data);
     }
 
+    //短信预警
+    public function actionSmsWarn(){
+        //邮箱格式
+        $emails = $_POST['emails'];
+        $arr_mail= explode(';',$emails);
+        foreach($arr_mail as $email){
+            $pattern_test = "/^[a-z]([a-z0-9]*[-_]?[a-z0-9]+)*@([a-z0-9]*[-_]?[a-z0-9]+)+[\\.][a-z]{2,3}([\\.][a-z]{2})?$/i";
+            if(!preg_match($pattern_test,$email)){
+                $this->_end('0','邮箱地址出现错误！');die;
+            }
+        }
+
+        $param['sms_warning_send_email'] = $emails ;
+        $param['sms_warning_money'] = $_POST['money'];
+
+        $result =  SendMessage::api()->editWarningMoney($param);
+        if($result['code'] == 'succ'){
+            $this->_end('1','预警短信设置成功！');die;
+        }else{
+            $this->_end('0',$result['message']);die;
+        }
+
+
+    }
+
+
+
 }

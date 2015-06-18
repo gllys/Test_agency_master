@@ -135,7 +135,7 @@
 
 								<div class="col-sm-6">
 									<div class="form-group">
-										<label class="col-sm-2 control-label">营业执照</label>
+										<label class="col-sm-2 control-label"><span class="text-danger">*</span>营业执照</label>
 										<div class="col-sm-6">
 											<div class="dropzone" id="business_license">
 												<div class="fallback nailthumb-container square-thumb">
@@ -231,7 +231,7 @@
 
 								<div class="col-sm-6">
 									<div class="form-group">
-										<label class="col-sm-2 control-label">营业执照</label>
+										<label class="col-sm-2 control-label"><span class="text-danger">*</span>营业执照</label>
 										<div class="col-sm-6">
 											<div class="dropzone" id="business_license">
 												<div class="fallback nailthumb-container square-thumb">

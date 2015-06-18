@@ -186,7 +186,7 @@ class RefundController extends Base_Controller_Api {
         $count = reset(RefundApplyModel::model()->db->selectBySql('select count(*) count from ('.$select .$from . $join . $where . $group_by.') c'));
         $this->count = $count['count'];
         $this->pagenation();
-        $select = 'SELECT b.*,a.allow_status ';
+        $select = 'SELECT b.*,a.allow_status,a.op_id,a.created_name ';
         $order_by = ' ORDER BY b.'.$this->getSortRule();
 //        Tools::dump($select . $from . $join . $where . $group_by .$order_by. ' LIMIT ' .$this->limit);
         $data['data'] = RefundApplyModel::model()->db->selectBySql($select . $from . $join . $where . $group_by .$order_by. ' LIMIT ' .$this->limit);

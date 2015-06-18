@@ -54,6 +54,9 @@ class HistoryController extends Controller {
         
         //获取支付类型配置
         $data['payTypes'] = Pay::types();
+        // 获取机构的信用和储值状态
+        $isCredit = Organizations::api()->show(array('id'=>Yii::app()->user->org_id,'fields'=>"is_credit,is_balance"));
+        $data['isShow'] = ApiModel::getData($isCredit);
         
         //获取所有游玩类型配置
         $data['timeTypes'] = array(
@@ -123,6 +126,8 @@ class HistoryController extends Controller {
         $params['show_verify_items'] = 1;
         if($is_export)
         {
+            set_time_limit(0);
+            ini_set('memory_limit','1024M');
             $this->renderPartial("excelTop",$data);
         }
         

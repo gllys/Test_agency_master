@@ -6,11 +6,12 @@
 namespace common\huilian\models;
 
 use Yii;
+use Organizations;
 
 
 /**
  * 供应商类
- * 本类基于当前供应商封装一些常用的方法
+ * 本类基于供应商封装一些常用的方法
  */
 class Supply 
 {
@@ -25,6 +26,27 @@ class Supply
 		
 	}
 	
+	/**
+	 * 对供应商进行名字模糊查询
+	 * @return array
+	 */
+	public static function searchName($name) {
+		$params = [
+			'type' => 'supply',
+			'name' => $name,
+			'items' => 99999999,
+		];
+		$res = Organizations::api()->list($params);
+		return empty($res['body']['data']) ? [] : $res['body']['data'];
+	}
+	
+	/**
+	 * 对供应商进行名字模糊查询, 返回供应商主键
+	 * @return string 未查到返回空字符串
+	 */
+	public static function searchNameForIds($name) {
+		return implode(',', array_keys(self::searchName($name)));
+	}
 }
 
 ?>

@@ -56,6 +56,20 @@ class ApiOrderModel extends Base_Model_Api
         return $r;
     }
 
+    public function refundDetail($params){
+        $this->url = '/v1/refund/apply_list';
+        $this->params = $params;
+        $r = json_decode($this->request(),true);
+        return $r;
+    }
+
+    public function directRefund($params){
+        $this->url = '/v1/refund/applycheck';
+        $this->params = $params;
+        $r = json_decode($this->request(),true);
+        return $r;
+    }
+
     public function detail($params){
         $this->url = '/v1/order/detail';
         $this->params = $params;
@@ -82,6 +96,13 @@ class ApiOrderModel extends Base_Model_Api
         return $r;
     }
 
+    public function lists($params) {
+        $this->url = '/v1/order/lists';
+        $this->params = $params;
+        $r = json_decode($this->request(),true);
+        return $r;
+    }
+
     public function scenicUsed($params){
         $this->url = '/v1/order/scenicUsed';
         $this->params = $params;
@@ -98,6 +119,13 @@ class ApiOrderModel extends Base_Model_Api
 
     public function sendTicket($params){
         $this->url = '/v1/order/sms';
+        $this->params = $params;
+        $r = json_decode($this->request(),true);
+        return $r;
+    }
+
+    public function consumeInfo($params){
+        $this->url = '/v1/Verification/record';
         $this->params = $params;
         $r = json_decode($this->request(),true);
         return $r;

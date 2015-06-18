@@ -76,8 +76,9 @@ class ProductController extends Controller
             $params['scenic_id'] = rtrim($params['scenic_id'], ', ');
             unset($params['scenic_name']);
         }
-
+		
 		$params['p'] = isset($_GET['page']) ? $_GET['page'] : 1;
+		$params['show_policy_name'] = 1;
 		$datas = Tickettemplate::api()->lists($params);
 		$lists = ApiModel::getLists($datas);
 		$lists = API::simultaneous($lists, 'organization_id', 'Organizations::list', 'id', 'id', 'organization');
@@ -85,7 +86,8 @@ class ProductController extends Controller
 		
 // 		Header::utf8();
 // 		var_dump($params);
- 		//echo "<pre>";print_r($lists) ;exit;
+// 		var_dump($lists) ;
+// 		exit;
 		$pagination = ApiModel::getPagination($datas);
 		$pages = new CPagination($pagination['count']);
 		$pages->pageSize = 15; #每页显示的数目
@@ -104,10 +106,13 @@ class ProductController extends Controller
 		if(empty($product['items'])) {
 			$product['items'] = [];
 		}
+
 // 		Header::utf8();
 // 		var_dump($product);
 // 		exit;
-		$this->render('view', ['product' => $product, ]);
+		$this->render('view', [
+			'product' => $product, 
+		]);
 	}
 	
 	/**
@@ -424,6 +429,19 @@ class ProductController extends Controller
 						$html .='<td><input disabled id="advance_'.$distr_id.'" type="checkbox" value="'.$distr_id.'" name="advance_arr['.$distr_id.']" class="advancegroup" style="margin-left: 17px;"></td>';
 						$html .='</tr>';
 					}
+					
+					$new_blackname = $result['body']['new_blackname_flag']==1?'checked="checked"':'';
+					$new_credit = $result['body']['new_credit_flag']==0?'checked="checked"':'';
+					$new_advance = $result['body']['new_advance_flag']==0?'checked="checked"':'';
+					$newhtml  ='<tr>';
+					$newhtml .='<td style="width:200px;">新合作分销商</td>';
+					$newhtml .='<td style="width:162px;"><input disabled id="p_n" type="checkbox" value="1" name="new_blackname_flag" class="new_blackname_flag" '.$new_blackname.'></td>';
+					$newhtml .='<td style="width:167px;"><input disabled type="text" class="spinner" id="s_price_n" name="new_fat_price" value="'.$result['body']['new_fat_price'].'" ></td>';
+					$newhtml .='<td style="width:148px;"><input disabled type="text" class="spinner" id="g_price_n" name="new_group_price" value="'.$result['body']['new_group_price'].'" ></td>';
+					$newhtml .=' <td style="width:150px;"><input disabled id="credit_n" type="checkbox" value="0" name="new_credit_flag" class="new_credit_flag" '.$new_credit.'></td>';
+					$newhtml .='<td><input disabled id="advance_n" type="checkbox" value="0" name="new_advance_flag" class="new_advance_flag" '.$new_advance.' ></td>';
+					$newhtml .='</tr>';
+					
 					$tmp_blackname = $result['body']['other_blackname_flag']==1?'checked="checked"':'';
 					$tmp_credit = $result['body']['other_credit_flag']==1?'':'checked="checked"';
 					$tmp_advance = $result['body']['other_advance_flag']==1?'':'checked="checked"';
@@ -438,7 +456,7 @@ class ProductController extends Controller
 					$otherhtml .='<td></td>';
 					$otherhtml .='</tr>';
 				}
-				echo json_encode(array('error'=>0,'message'=>"",'data'=>$html,'otherdata'=>$otherhtml,'dist_id'=>$id,'name'=>$name,'note'=>$note));
+				echo json_encode(array('error'=>0,'message'=>"",'data'=>$html,'otherdata'=>$otherhtml, 'newdata'=>$newhtml,'dist_id'=>$id,'name'=>$name,'note'=>$note));
 			}else{
 				echo json_encode(array('error'=>1,
 						'message'=>isset($result['message'])?$result['message']:'数据未返回'));

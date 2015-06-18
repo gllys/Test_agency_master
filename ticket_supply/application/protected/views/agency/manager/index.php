@@ -27,8 +27,8 @@ $this->breadcrumbs = array('分销商', '分销商管理');
                     <div class="form-inline">
 <div class="form-group " style="width: 350px;">
     <label>合作日期：</label>
-    <input style="cursor: pointer;cursor: hand;background-color: #ffffff" name="start_date" id="start_date" class="form-control datepicker" type="text" readonly="readonly" value="<?php echo isset($get['start_date']) ? $get['start_date'] : ""; ?>" placeholder="开始日期"> ~
-    <input style="cursor: pointer;cursor: hand;background-color: #ffffff" name="end_date" id="end_date" class="form-control datepicker"  type="text" readonly="readonly" value="<?php echo isset($get['end_date']) ? $get['end_date'] : date('Y-m-d', time()); ?>" placeholder="结束日期">
+    <input style="cursor: pointer;cursor: hand;background-color: #ffffff" name="start_date" id="start_date" class="form-control datepicker" type="text" readonly="readonly" value="<?php echo isset($get['start_date']) ? $get['start_date'] : ""; ?>" placeholder=""> ~
+    <input style="cursor: pointer;cursor: hand;background-color: #ffffff" name="end_date" id="end_date" class="form-control datepicker"  type="text" readonly="readonly" value="<?php echo isset($get['end_date']) ? $get['end_date'] : ""; ?>" placeholder="">
 </div>
 
                         <!--订单查询开始-->
@@ -105,9 +105,12 @@ $this->breadcrumbs = array('分销商', '分销商管理');
                         <th>联系人</th>
                         <th>手机</th>
                         <th>电话</th>
+                        <?php if($isShow['is_credit'] == 1):?>
                         <th>结算周期</th>
                         <th>信用余额</th>
+                        <?php endif;if($isShow['is_balance'] == 1):?>
                         <th>储值余额</th>
+                        <?php endif;?>
                         <th>合作日期</th>
                         <th>操作</th>
                     </tr>
@@ -133,6 +136,8 @@ $this->breadcrumbs = array('分销商', '分销商管理');
                             <td></td>
                             <td></td>
                         <?php    }   ?>
+                        <?php
+                            if($isShow['is_credit'] == 1):?>
                         <td>
                             <?php
                             if(isset($orgInfo['is_credit'])&&$orgInfo['is_credit']==1):
@@ -153,6 +158,9 @@ $this->breadcrumbs = array('分销商', '分销商管理');
                                 <?php echo $item['credit_infinite']?"无限":$item['credit_money'] ?>
                             <?php endif ;?>
                         </td>
+                        <?php
+                            endif ;
+                        if($isShow['is_balance'] == 1):?>
                         <td>
                             <?php
                             if(isset($orgInfo['is_balance'])&&$orgInfo['is_balance']==1):
@@ -162,6 +170,7 @@ $this->breadcrumbs = array('分销商', '分销商管理');
                                 <?php echo $item['balance_money'] ?>
                             <?php endif ;?>
                         </td>
+                        <?php endif ;?>
                         <td> <?php echo date('Y-m-d',$item['add_time']); ?></td>
                         <!--data-id="<?php echo $item['id'];?>" href="/agency/manager/delcredit?id=<?php echo $item['id'];?>"-->
                         <td data-names="<?php echo $item['distributor_name'] ?>" ><a  data-id="<?php echo $item['id'];?>" href="javascript:;" class="del">解除合作</a></td>

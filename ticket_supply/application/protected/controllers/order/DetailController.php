@@ -1,4 +1,5 @@
 <?php
+use common\huilian\utils\Header;
 
 class DetailController extends Controller {
 
@@ -40,6 +41,7 @@ class DetailController extends Controller {
         
         $infos = Order::api()->infos(array('id' => $_GET['id'], 'type' => 1), 0);
         if($infos['code'] == 'succ') { $data['infos'] = $infos['body']; }
+  
         $this->render('index', $data);
     }
 

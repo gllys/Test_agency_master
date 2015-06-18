@@ -1,7 +1,7 @@
 <?php
-
 use common\huilian\utils\Header;
-
+use common\huilian\utils\GET;
+use common\huilian\models\API;
 class CheckController extends Controller {
 
     public function actionOrderCheck() {
@@ -81,7 +81,7 @@ class CheckController extends Controller {
 // 		var_dump($lists);
 // 		var_dump($landscapes);
 // 		exit;
-        
+        $lists = API::simultaneous($lists, 'poi_id', 'Poi::lists', 'ids', 'id', 'pois');
         $this->render('index', compact('lists', 'pages', 'landscapes', 'pois', 'totalNums', 'orderNums'));
     }
 

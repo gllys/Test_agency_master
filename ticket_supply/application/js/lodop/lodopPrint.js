@@ -25,7 +25,7 @@ lodopPrint.prototype.style = function() {
 	'<div><span style="display: inline-block; *display: inline; zoom: 1; width: 15mm;">景区名称:</span><span style="display: inline-block; *display: inline; zoom: 1; width: 30mm; vertical-align: middle;">{lan_name}</span></div>' +
 	'<div><span style="display: inline-block; *display: inline; zoom: 1; width: 15mm;">产品名称:</span><span style="display: inline-block; *display: inline; zoom: 1; width: 30mm; vertical-align: middle;">{ticket_name}</span></div>' +
 	'<div><span style="display: inline-block; *display: inline; zoom: 1; width: 15mm;">订单号:</span><span>{order_id}</span></div>' +
-	'<div><span style="display: inline-block; *display: inline; zoom: 1; width: 15mm;">验证张数:</span><span>{num}张</span></div>' +
+	'<div><span style="display: inline-block; *display: inline; zoom: 1; width: 15mm;">验证套数:</span><span>{num}套</span></div>' +
 	'<div><span style="display: inline-block; *display: inline; zoom: 1; width: 15mm;">验证时间:</span><span>{date}</span></div>' +
 	'<div><span style="display: inline-block; *display: inline; zoom: 1; width: 15mm;">取票人:</span><span>{owner_name}</span></div>' +
 	'<div><span style="display: inline-block; *display: inline; zoom: 1; width: 15mm;">电话:</span><span>{owner_mobile}</span></div>' +

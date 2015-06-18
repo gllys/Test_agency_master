@@ -346,6 +346,10 @@ class MessageController extends Base_Controller_Api
         }
         $sys_message = MessageModel::model()->search($sys_message_where, '*', 'created_at desc', 100);
         foreach ($sys_message as $k => $v) {
+            if($v['receiver_organization']>0 || $v['check_scenic_id']>0 || $v['reveive_landscape']>0){
+                continue 1;
+            }
+            $v['parent_id'] = $v['id'];
             unset($v['id']);
             unset($v['read_time']);
             $v['receiver_organization'] = $receiver_organization;

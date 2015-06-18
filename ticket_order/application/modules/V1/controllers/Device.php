@@ -134,6 +134,15 @@ class DeviceController extends Base_Controller_Device {
             $log['num'] = $num;
             $log['ticket_type_name'] = $order['name'];
             $log['tickets_code'] = $order['ticket_template_id'];
+
+            $ticket_infos=json_decode($order['ticket_infos'],true);
+            $log['per_num'] = 0;  //每份产品可过人数
+            foreach($ticket_infos as $base) {
+                if($landscape_id>0 && $base['scenic_id']==$landscape_id) {
+                    $log['per_num'] += $base['num'];
+                }
+            }
+
             TicketRecordModel::model()->insert($log);
             $log['id'] = TicketRecordModel::model()->getInsertId();
 
@@ -243,6 +252,7 @@ class DeviceController extends Base_Controller_Device {
                 $this->useTicket($order_id, $ticket_id, $num, $landscape_id, $poi_id);
             }
         } catch (Exception $e) {
+            Log_Base::save('VerificationExcept','['.date('Y-m-d H:i:s').'] OrderId ['.$order_id.'] Params: '.var_export($this->body,true)."\n".$e->getMessage()."\n");
             Lang_Msg::error("ERROR_DEVICE_11");
         }
     }

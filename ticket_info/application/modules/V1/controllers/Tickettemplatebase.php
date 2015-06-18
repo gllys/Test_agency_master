@@ -367,7 +367,7 @@ class TickettemplatebaseController extends Base_Controller_Api
             $tmp['mult_enter'] = (isset($item['mult_enter']) && intval($item['mult_enter']))?1:0; //是否允许多次入园:0否1是
             $tmp['enter_by_card'] = (isset($item['enter_by_card']) && $tmp['mult_enter'] && intval($item['enter_by_card'])) ? 1:0; //是否允许使用身份证入园:0否1是
             $tmp['num_by_card'] = (isset($item['num_by_card']) && $tmp['enter_by_card']) ? intval($item['num_by_card']):0; //使用身份证可购买张数,0不限
-            $tmp['enter_by_qrcode'] = (isset($item['enter_by_qrcode']) && $tmp['mult_enter'] && intval($item['enter_by_qrcode'])) ? 1:0;; //是否允许使用二维码入园:0否1是
+            $tmp['enter_by_qrcode'] = (isset($item['enter_by_qrcode']) && $tmp['mult_enter'] && intval($item['enter_by_qrcode'])) ? 1:0; //是否允许使用二维码入园:0否1是
             $tmp['poi_enter_num'] = (isset($item['poi_enter_num']) && $tmp['mult_enter'] && intval($item['poi_enter_num'])) ? intval($item['poi_enter_num']):1; //每个景点在使用有效期内可使用次数
             isset($item['enter_by_palm']) && $tmp['enter_by_palm'] = intval($item['enter_by_palm']); //是否允许掌纹
 
@@ -376,7 +376,7 @@ class TickettemplatebaseController extends Base_Controller_Api
         array_unshift($data,array_keys(reset($data)));
         $r = TicketTemplateBaseModel::model()->add($data);
         !$r && Lang_Msg::error("ERROR_AddGenerate_24");
-        Tools::lsJson(true,'ok');
+        Tools::lsJson(true,'ok',array('gid'=>$params['gid'],'created_at'=>$now));
     }
 
     /*
@@ -533,7 +533,7 @@ class TickettemplatebaseController extends Base_Controller_Api
             }
         }
         $TicketTemplateBaseModel->commit();
-        Tools::lsJson(true,'ok');
+        Tools::lsJson(true,'ok',array('updated_at'=>$now));
     }
 
     /**

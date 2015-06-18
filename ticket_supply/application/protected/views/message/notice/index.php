@@ -206,8 +206,8 @@
                 <input id="preview" type="submit" class="btn btn-primary" value="预览">
                 <button type="button" class="btn btn-success" id="send_advice">发送</button>
             </div>
+            </form>
         </div>
-        </form>
     </div>
 <!-- 发送公告结束 -->
 </div>
@@ -238,6 +238,7 @@
 <script  charset="utf-8" src="/js/kindeditor-4.1.10/kindeditor.js"></script>
 <script  charset="utf-8" src="/js/kindeditor-4.1.10/lang/zh_CN.js"></script>
 <script  charset="utf-8" src="/js/kindeditor.create.js"></script>
+<script  charset="utf-8" src="/js/check-message.js"></script>
 <script>
 jQuery(document).ready(function() {
 	

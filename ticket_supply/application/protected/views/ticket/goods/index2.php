@@ -72,7 +72,9 @@ $this->breadcrumbs = array('产品', '基础票管理');
                     </select>
                 </div>
 
-
+                <div class="form-group">
+                    <input type="text" name="name" style="width:200px;" value="<?php if(!empty($_GET['name']))echo $_GET['name']; ?>" placeholder="请输入门票名称" class="form-control">
+                </div>
                 <div class="form-group">
                     <button  type="submit" class="btn btn-primary btn-sm pull-left">查询</button>
                 </div>

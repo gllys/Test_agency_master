@@ -12,6 +12,13 @@
                     "alertTextCheckboxe": "* {tag}该选项为必选",
                     "alertTextDateRange": "* 请选择{tag}"
                 },
+                "req": {
+                    "regex": "none",
+                    "alertText": "* {tag}",
+                    "alertTextCheckboxMultiple": "* {tag}",
+                    "alertTextCheckboxe": "* {tag}",
+                    "alertTextDateRange": "* {tag}"
+                },
                 "dateRange": {
                     "regex": "none",
                     "alertText": "* 请输入有效的{tag}",

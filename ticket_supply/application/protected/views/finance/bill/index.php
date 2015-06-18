@@ -24,7 +24,7 @@ $this->breadcrumbs = array('结算管理', '应收账款');
 			</ul>
         </div>
         <div class="panel-body">
-            <form class="form-inline" method="post" action="/finance/bill/">
+            <form class="form-inline" id="form" method="post" action="/finance/bill/">
 				<div class="form-group" style="width: 335px;">
                                     <label>账单时间:</label>
 					<input style="cursor: pointer;cursor: hand;background-color: #ffffff" class="form-control datepicker" placeholder="账单日期" type="text" name="bill_sd" id="bill_sd"
@@ -148,11 +148,13 @@ jQuery(document).ready(function() {
 			$('#bill_ed').PWShowPrompt('请选择账单结束日期');
 			return false;
 		}
-		$('.is_export').attr('value', '1');
-		$('form').addClass('clearPart');
-        $('form').submit();
-		$('form').removeClass('clearPart');
-		$('.is_export').attr('value', '0');
+ 
+		$('.is_export').val(1);
+		$('#form').addClass('clearPart');
+                $('#form').submit();
+		$('#form').removeClass('clearPart');
+		$('.is_export').val(0);
+                return false;
 	});
 
 

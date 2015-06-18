@@ -1,4 +1,6 @@
 <?php
+use common\huilian\utils\Header;
+use common\huilian\utils\GET;
 
 Yii::import('ext.phpPasswordHashingLib.passwordLib', true);
 
@@ -24,13 +26,12 @@ class ScenicController extends Controller {
             if(isset($param['has_bind_org'])){
                if($param['has_bind_org']==='3'){unset($param['has_bind_org']);}
             }
-
-            // 电子票务类型查询条件
-            if(isset($param['partner_type'])) {
-                // 再查询电子票务系统类型
-                $param['partner_type'] = $_GET['partner_type'];
+		
+            if(GET::required('partner_type') === null) {
+            	unset($param['partner_type']);
             }
-
+//             Header::utf8();
+// var_dump($param);exit;
             $data = Landscape::api()->lists($param, 0);
 
             $lists = ApiModel::getLists($data);
@@ -292,10 +293,6 @@ class ScenicController extends Controller {
 
     public function actionSaveScenic() {
         if (Yii::app()->request->isPostRequest) {
-            if ($_POST['province_id'] == '__NULL__') {
-                $this->_end(1, '省市区至少选择一个！');
-                exit;
-            }
 
             //图片处理
             if ($_POST['images']['id'] && $_POST['images']['url']) { #更新图片
@@ -304,9 +301,13 @@ class ScenicController extends Controller {
                 Landscapeimage::api()->add(array('landscape_id' => $_POST['id'], 'url' => $_POST['images']['url']));
             }
 
-
             unset($_POST['images']);
             $param = $_POST;
+            $param['phone'] = implode('-',$_POST['phone']);
+            $param['feature'] = implode(',',$_POST['feature']);
+            $param['biography'] = UbbToHtml::Entry($_POST['biography'], time());
+            $param['user_id'] =Yii::app()->user->uid;
+            $param['user_name'] =Yii::app()->user->display_name;
 
             $param['take_from_poi']=0;
             $param['biography'] = $_POST['description'];
@@ -350,15 +351,16 @@ class ScenicController extends Controller {
 
     //编辑景区
     public function actionEdit() {
+        $data['feature'] = array('温泉','滑雪','乐园','海滨海岛','漂流','古迹','山水','赏花','采摘');
         $id = $_GET['id'];
 
         $lists = Landscape::api()->detail(array('id' => $id,'take_from_poi'=>0));
         if($lists['code'] == 'succ'){
-
             $info = $lists['body'];
         }
 
         $data['info'] = isset($info) ? $info : array();
+
         $this->render('edit', $data);
     }
 
@@ -695,4 +697,33 @@ class ScenicController extends Controller {
 //        }
 //        return $LandList;
 //    }
+
+    public function actionNew(){
+        $feature = array('温泉','滑雪','乐园','海滨海岛','漂流','古迹','山水','赏花','采摘');
+        $this->render('new',compact('feature'));
+    }
+
+    public function actionNewScenic(){
+
+        $param = $_POST;
+        $param['phone'] = implode('-',$_POST['phone']);
+        $param['feature'] = implode(',',$_POST['feature']);
+        $param['biography'] = UbbToHtml::Entry($_POST['biography'], time());
+        $param['user_id'] =Yii::app()->user->uid;
+        $param['user_name'] =Yii::app()->user->display_name;
+
+       $resu = Landscape::api()->add($param);  //新增景区
+        //print_r($param);exit;
+        if($resu['code'] =='succ'){
+            $rst = Landscapeimage::api()->add(array('landscape_id' => $resu['body']['id'], 'url' => $_POST['images']['url']));
+            if($rst['code'] =='succ'){
+                $this->_end(1,'新建景区成功！');
+            }else{
+                $this->_end(0,$rst['message']);
+            }
+        }else{
+            $this->_end(0,$resu['message']);
+        }
+
+    }
 }

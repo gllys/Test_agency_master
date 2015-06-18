@@ -1,4 +1,7 @@
 <?php
+use common\huilian\utils\TwoDimensionalArray;
+?>
+<?php
 $this->breadcrumbs = array(
     '验票',
     '验票记录'
@@ -97,6 +100,7 @@ $this->breadcrumbs = array(
                 <th style="width:12%">订单编号</th>
                 <th style="width:10%">验证时间</th>
                 <th style="width:10%">验证数量</th>
+				<th style="width:10%">验证张（套）数</th>
                  <?php if (!Yii::app()->user->isGuest && Yii::app()->user->lan_id): ?>
                 <?php else: ?>
                     <th style="width:10%">验证景区</th>
@@ -118,6 +122,7 @@ foreach ($lists as $item) :
                     <td  style="width:12%"><?php echo $item['record_code'] ?></td>
                     <td style="width:10%"><?php echo date('Y-m-d H:i:s', $item['created_at']) ?></td>
                     <td style="width:10%"><?php echo $item['num'] ?></td>
+					<td style="width:10%"><?php if($item['per_num'])echo intval($item['num']/$item['per_num']) ?></td>
                     <?php if (!Yii::app()->user->isGuest && Yii::app()->user->lan_id): ?>
                 <?php else: 
                     //得到景区
@@ -128,19 +133,7 @@ foreach ($lists as $item) :
                  ?>
                     <td style="width:10%"><?php echo $_landscapes[$item['landscape_id']]['name'] ?></td>
                 <?php endif;?>
-                    <td style="<?php echo empty($item['poi_id']) ? '' : 'text-align: left;' ?> width: 10%;"><?php
-                        if (empty($item['poi_id'])) {
-                            echo '全部';
-                        } else if (strlen($item['poi_id']) > 0) {
-                            $p_ids = explode(',', $item['poi_id']);
-                            $spans = array();
-                            foreach ($p_ids as $pid) {
-                                $spans[] = sprintf('<span role="async-name" class="poi-%d" data-id="poi_%d"></span>', $pid, $pid);
-                            }
-                            echo implode(',', $spans);
-                        }
-                        ?>
-                    </td>
+                    <td style="<?php echo empty($item['poi_id'])?'':'text-align: left;'?> width: 10%;"><?= $item['pois'] ? implode(',', TwoDimensionalArray::columns($item['pois'], 'name')) : '全部' ?> </td>
                     <td style="width:10%"><span class="text <?php echo $item['status'] ? 'text-success' : 'text-danger' ?>"><?php echo $item['status'] ? '成功' : '失败' ?></span></td>
                     <td style="width:10%"><?= $item['cancel_name'] ? '汇联运营客服' : $item['user_name'] ?></td>
                     <td style="width:7%;"><?php

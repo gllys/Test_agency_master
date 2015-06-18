@@ -61,11 +61,13 @@ class Base_Controller_Api extends Base_Controller_Abstract
      *获取排序参数
      * @author ：zhaqinfeng
      */
-    public function getSortRule($field = 'id'){
+    public function getSortRule($field='id',$dir='desc'){
         $sort_by = trim(Tools::safeOutput($this->body['sort_by']));
-        $sort_by = explode(':',$sort_by);
-        $field = $sort_by[0] ? $sort_by[0] : $field;
-        $dir = $sort_by[1]=='asc'?'asc':'desc';
+        if($sort_by){
+            $sort_by = explode(':',$sort_by);
+            $field = $sort_by[0] ? $sort_by[0] : 'id';
+            $dir = $sort_by[1]=='asc'?'asc':'desc';
+        }
         return $field." ".$dir; //初始值 也可array('updated_at'=>'desc')
     }
 

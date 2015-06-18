@@ -44,7 +44,11 @@ $this->breadcrumbs = array('结算管理', '交易流水');
                             <option value="">支付方式</option>
                             <?php
                             if( isset($mode_type) && !empty($mode_type)):
-                            foreach ($mode_type as $mode => $value) : ?>
+                            foreach ($mode_type as $mode => $value) :
+                                //如果存在隐藏的信用/储值支付 直接跳过
+                                if($isShow['is_credit'] == 0 && $mode == 'credit'){continue;}
+                                if($isShow['is_balance'] == 0 && $mode == 'advance'){continue;}
+                                ?>
                                 <option <?php echo isset($get['mode']) && $mode == $get['mode'] ? 'selected="selectd"' : '' ?> value="<?php echo $mode ?>"><?php echo $value ?></option>
                             <?php
                             endforeach;

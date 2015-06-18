@@ -31,10 +31,6 @@ class Bootstrap extends Yaf_Bootstrap_Abstract{
             $arr['way'] = unserialize($arr['way']);
         }
 
-        if ($arr['openapi_log']) {
-            $arr['openapi_log'] = unserialize($arr['openapi_log']);
-        }
-
         if ($arr['meituan']) {
             $arr['meituan'] = unserialize($arr['meituan']);
         }

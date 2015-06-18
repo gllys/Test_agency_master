@@ -19,12 +19,14 @@ class TicketpolicyController extends Base_Controller_Api
         $params['note']= trim(Tools::safeOutput($this->body['note']));
         $params['other_fat_price']= doubleval($this->body['other_fat_price']); //其他散客价
         $params['other_group_price']= doubleval($this->body['other_group_price']); //其他团客价
-        $params['other_blackname_flag'] = intval($this->body['other_blackname_flag'])?1:0; //不合作分销商黑名单开关：0关闭 1开启
+        $params['other_fat_blackname_flag'] = intval($this->body['other_fat_blackname_flag'])?1:0; //不合作分销商散客黑名单开关：0关闭 1开启
+        $params['other_group_blackname_flag'] = intval($this->body['other_group_blackname_flag'])?1:0; //不合作分销商团客黑名单开关：0关闭 1开启
         $params['other_credit_flag'] = intval($this->body['other_credit_flag'])?1:0; //不合作分销商信用支付开关：0关闭 1开启
         $params['other_advance_flag'] = intval($this->body['other_advance_flag'])?1:0; //不合作分销商储值支付开关：0关闭 1开启
         $params['new_fat_price']= doubleval($this->body['new_fat_price']); //新合作散客价
         $params['new_group_price']= doubleval($this->body['new_group_price']); //新合作团客价
-        $params['new_blackname_flag'] = intval($this->body['new_blackname_flag'])?1:0; //新合作分销商黑名单开关：0关闭 1开启
+        $params['new_fat_blackname_flag'] = intval($this->body['new_fat_blackname_flag'])?1:0; //新合作分销商散客黑名单开关：0关闭 1开启
+        $params['new_group_blackname_flag'] = intval($this->body['new_group_blackname_flag'])?1:0; //新合作分销商团客黑名单开关：0关闭 1开启
         $params['new_credit_flag'] = intval($this->body['new_credit_flag'])?1:0; //新合作分销商信用支付开关：0关闭 1开启
         $params['new_advance_flag'] = intval($this->body['new_advance_flag'])?1:0; //新合作分销商储值支付开关：0关闭 1开启
         $policy_items = json_decode($this->body['policy_items'],true);
@@ -45,7 +47,8 @@ class TicketpolicyController extends Base_Controller_Api
                         'distributor_id'=>$v['distributor_id'],
                         'fat_price'=>doubleval($v['fat_price']),
                         'group_price'=>doubleval($v['group_price']),
-                        'blackname_flag'=>intval($v['blackname_flag'])?1:0, //黑名单开关：0关闭 1开启
+                        'fat_blackname_flag'=>intval($v['fat_blackname_flag'])?1:0, //黑名单开关：0关闭 1开启
+                        'group_blackname_flag'=>intval($v['group_blackname_flag'])?1:0, //黑名单开关：0关闭 1开启
                         'credit_flag'=>intval($v['credit_flag'])?1:0,       //信用支付开关：0关闭 1开启
                         'advance_flag'=>intval($v['advance_flag'])?1:0,     //储值支付开关：0关闭 1开启
                     );
@@ -82,16 +85,17 @@ class TicketpolicyController extends Base_Controller_Api
         $params['note']= trim(Tools::safeOutput($this->body['note']));
         $params['other_fat_price']= doubleval($this->body['other_fat_price']); //其他散客价
         $params['other_group_price']= doubleval($this->body['other_group_price']); //其他团客价
-        $params['other_blackname_flag'] = intval($this->body['other_blackname_flag'])?1:0; //不合作分销商黑名单开关：0关闭 1开启
+        $params['other_fat_blackname_flag'] = intval($this->body['other_fat_blackname_flag'])?1:0; //不合作分销商散客黑名单开关：0关闭 1开启
+        $params['other_group_blackname_flag'] = intval($this->body['other_group_blackname_flag'])?1:0; //不合作分销商团客黑名单开关：0关闭 1开启
         $params['other_credit_flag'] = intval($this->body['other_credit_flag'])?1:0; //不合作分销商信用支付开关：0关闭 1开启
         $params['other_advance_flag'] = intval($this->body['other_advance_flag'])?1:0; //不合作分销商储值支付开关：0关闭 1开启
         $params['new_fat_price']= doubleval($this->body['new_fat_price']); //新合作散客价
         $params['new_group_price']= doubleval($this->body['new_group_price']); //新合作团客价
-        $params['new_blackname_flag'] = intval($this->body['new_blackname_flag'])?1:0; //新合作分销商黑名单开关：0关闭 1开启
+        $params['new_fat_blackname_flag'] = intval($this->body['new_fat_blackname_flag'])?1:0; //新合作分销商散客黑名单开关：0关闭 1开启
+        $params['new_group_blackname_flag'] = intval($this->body['new_group_blackname_flag'])?1:0; //新合作分销商团客黑名单开关：0关闭 1开启
         $params['new_credit_flag'] = intval($this->body['new_credit_flag'])?1:0; //新合作分销商信用支付开关：0关闭 1开启
         $params['new_advance_flag'] = intval($this->body['new_advance_flag'])?1:0; //新合作分销商储值支付开关：0关闭 1开启
         $policy_items = json_decode($this->body['policy_items'],true);
-
         !$policy_items && Lang_Msg::error('ERR_TKT_POLICY_2'); //请设置分销策略明细
 
         $TicketPolicyModel = new TicketPolicyModel();
@@ -103,12 +107,14 @@ class TicketpolicyController extends Base_Controller_Api
         isset($_POST['note']) && $data['note'] = $params['note'];
         isset($_POST['other_fat_price']) && $data['other_fat_price'] = $params['other_fat_price'];
         isset($_POST['other_group_price']) && $data['other_group_price'] = $params['other_group_price'];
-        isset($_POST['other_blackname_flag']) && $data['other_blackname_flag'] = $params['other_blackname_flag'];
+        isset($_POST['other_fat_blackname_flag']) && $data['other_fat_blackname_flag'] = $params['other_fat_blackname_flag'];
+        isset($_POST['other_group_blackname_flag']) && $data['other_group_blackname_flag'] = $params['other_group_blackname_flag'];
         isset($_POST['other_credit_flag']) && $data['other_credit_flag'] = $params['other_credit_flag'];
         isset($_POST['other_advance_flag']) && $data['other_advance_flag'] = $params['other_advance_flag'];
         isset($_POST['new_fat_price']) && $data['new_fat_price'] = $params['new_fat_price'];
         isset($_POST['new_group_price']) && $data['new_group_price'] = $params['new_group_price'];
-        isset($_POST['new_blackname_flag']) && $data['new_blackname_flag'] = $params['new_blackname_flag'];
+        isset($_POST['new_fat_blackname_flag']) && $data['new_fat_blackname_flag'] = $params['new_fat_blackname_flag'];
+        isset($_POST['new_group_blackname_flag']) && $data['new_group_blackname_flag'] = $params['new_group_blackname_flag'];
         isset($_POST['new_credit_flag']) && $data['new_credit_flag'] = $params['new_credit_flag'];
         isset($_POST['new_advance_flag']) && $data['new_advance_flag'] = $params['new_advance_flag'];
 
@@ -130,7 +136,8 @@ class TicketpolicyController extends Base_Controller_Api
                         'distributor_id'=>$v['distributor_id'],
                         'fat_price'=>doubleval($v['fat_price']),
                         'group_price'=>doubleval($v['group_price']),
-                        'blackname_flag'=>intval($v['blackname_flag'])?1:0, //黑名单开关：0关闭 1开启
+                        'fat_blackname_flag'=>intval($v['fat_blackname_flag'])?1:0, //黑名单开关：0关闭 1开启
+                        'group_blackname_flag'=>intval($v['group_blackname_flag'])?1:0, //黑名单开关：0关闭 1开启
                         'credit_flag'=>intval($v['credit_flag'])?1:0,       //信用支付开关：0关闭 1开启
                         'advance_flag'=>intval($v['advance_flag'])?1:0,     //储值支付开关：0关闭 1开启
                     );
@@ -250,6 +257,7 @@ class TicketpolicyController extends Base_Controller_Api
 
 	/**
 	 * 解绑分销商-删除策略绑定数据
+     * (用于供应商解除分销商绑定关系时，同步删除关联的分销策略)
 	 */
     public function unbindDistributorAction(){
         $distributor_id = intval($this->body['distributor_id']);
@@ -259,13 +267,14 @@ class TicketpolicyController extends Base_Controller_Api
 		
 		$list = TicketPolicyModel::model()->search([
 			'supplier_id' => $supply_id
-		]);
+		],"id");
 
-		empty($list) && $list = [0=>0];
-		TicketPolicyItemModel::model()->delete([
-			'distributor_id' => $distributor_id,
-			'policy_id|in'    => array_keys($list)
-		]);
+		if(!empty($list)) {
+            TicketPolicyItemModel::model()->delete([
+                'distributor_id' => $distributor_id,
+                'policy_id|in'    => array_keys($list)
+            ]);
+        }
 		Lang_Msg::output(true);
     }
 }

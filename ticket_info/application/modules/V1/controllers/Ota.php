@@ -24,9 +24,15 @@ class OtaController extends Base_Controller_Api
             $where .= " AND A.source={$source} ";
         }
 
+        $now = time();
+        $where .= " AND T.sale_start_time<=".$now." AND (T.sale_end_time=0 OR T.sale_end_time>=".$now.") "; //过滤过期
+        $where .= " AND A.delete_at=0 AND T.is_del=0 "; //过滤已删除
+        $where .= " AND A.is_sale=1 "; //过滤已下架
+
         $AgencyProduct = AgencyProductModel::model();
         $sql = 'select A.*,T.name,T.fat_price,T.group_price,T.sale_price,T.listed_price,T.rule_id,T.valid,T.max_buy,T.mini_buy,T.scenic_id,' .
-            'T.view_point,T.state,T.fat_scheduled_time scheduled_time,T.week_time,T.refund,T.is_del,T.remark,T.organization_id,T.type,T.date_available,T.policy_id,T.valid_flag,T.sms_template' .
+            'T.view_point,T.state,T.fat_scheduled_time scheduled_time,T.week_time,T.refund,T.is_del,T.remark,'.
+            'T.sale_start_time,T.sale_end_time,T.organization_id,T.type,T.date_available,T.policy_id,T.valid_flag,T.sms_template' .
             ' from ' . $AgencyProduct->getTable() . ' A join ' . TicketTemplateModel::model()->getTable() . ' T on A.product_id=T.id' .
             ' where ' . $where . ' order by A.' . $this->getSortRule('update_at');
 
@@ -59,7 +65,8 @@ class OtaController extends Base_Controller_Api
         $AgencyProduct = AgencyProductModel::model();
         $where = ($product_id > 0 && $agency_id > 0) ? " A.product_id=" . $product_id . " AND A.agency_id=" . $agency_id : "A.code='" . $id . "'";
         $sql = "select A.*,T.name,T.fat_price,T.group_price,T.sale_price,T.listed_price,T.rule_id,T.valid,T.max_buy,T.mini_buy,T.scenic_id," .
-            "T.view_point,T.state,T.fat_scheduled_time scheduled_time,T.week_time,T.refund,T.is_del,T.remark,T.organization_id,T.type,T.date_available,T.policy_id,T.valid_flag,T.sms_template" .
+            "T.view_point,T.state,T.fat_scheduled_time scheduled_time,T.week_time,T.refund,T.is_del,T.remark,".
+            "T.sale_start_time,T.sale_end_time,T.organization_id,T.type,T.date_available,T.policy_id,T.valid_flag,T.sms_template" .
             " from " . $AgencyProduct->getTable() . " A join " . TicketTemplateModel::model()->getTable() . " T on A.product_id=T.id" .
             " where " . $where . " AND T.is_del=0";
 

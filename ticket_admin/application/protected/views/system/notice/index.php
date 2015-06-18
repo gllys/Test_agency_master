@@ -94,8 +94,6 @@
 								<a onclick="modal_jump_view(<?php echo isset($v['id']) ? $v['id'] : '';?>, 2)" data-target=".modal-notice" data-toggle="modal">驳回</a>
 							<?php } else if($v['is_allow'] == 1) { ?>
 								<a class="clearPart" onclick="revocation(<?= $v['id'] ?>)">撤回</a>
-							<?php } else { ?>
-								<a class="btn btn-warning btn-xs" disabled="disabled">驳回</a>
 							<?php } ?>
 						</td>
 					</tr>
@@ -181,17 +179,9 @@
 			}
 
 		}
-        this.pubNotice = function (id) {
-			// 驳回操作
-			PWConfirm("确定要发布这条公告吗", function() {
-				$.post('/system/notice/pub', {id:id, type:1}, function(data){
-					showMsg(data, '发布公告');
-				}, 'json');
-			});
-        }
 		
         this.delNotice = function (id) {
-			// 驳回操作
+			// 
 			PWConfirm("确定要删除这条公告吗", function() {
 				$.post('/system/notice/del/id/'+id, function(data){
 					showMsg(data, '删除公告');

@@ -144,6 +144,7 @@ $this->breadcrumbs = array('订单', '订单详情');
 				<input type="hidden" name="id" value="<?php echo $detail['id'];?>" id="complexid"/>
 				<?php if($detail['status'] == 'paid'){ ?>
 				<button id="complexConfirm" class="btn btn-primary btn-xs ml10" <?php if($detail['message_open']===0): ?>style="display:none;"<?php endif; ?>  type="button">重发短信</button></td>
+				<td style=" font-weight: bold;<?php if($detail['message_open']===0): ?>display:none;<?php endif; ?>">是否发送成功：<?php echo $detail['send_sms_nums']>0?'<font color="green">成功</font>':'<font color="red">失败</font>'?></td>
 			    <!-- onclick="againSms('<?php //echo $detail['id'] ?>', '<?php //echo $detail['owner_mobile'] ?>');"-->
 			  <?php  }  ?>
 			<td>取票人身份证号码：<?php echo $detail['owner_card']?></td>

@@ -96,12 +96,25 @@ $this->breadcrumbs = array('验票', '验票');
                 foreach ($lists as $item):
                     $_rs = Order::api()->detail(array('id' => $item['order_id'],'show_order_items'=>1));
                     $detail = ApiModel::getData($_rs);
+                    $tmk1 = '可用门票张(套)数';
+                    $tmk2 = '';
+                    
+                    $ticketSum = 0;
+                    foreach((array)$detail['ticket_infos'] as $t){
+                        if($_GET['landscape_id']==$t['scenic_id']){
+                        $ticketSum = $ticketSum + $t['num'] ;
+                        }
+                    }
+                    if($ticketSum){
+                        $item['nums'] = intval($item['nums']/$ticketSum);
+                    }
                     ?>
                     <tr>
-                        <th style="width: 220px;">订单号：<?php echo $item['order_id'] ?></th>
-                        <th>取票人：<?php echo $detail['owner_name'] ?></th>
+                    <input type="hidden" name="ticketSum[<?php echo $item['order_id'] ?>]" value="<?php echo $ticketSum ?>" />
+                        <th style="width: 175px;">订单号：<?php echo $item['order_id'] ?></th>
+                        <th style="width:100px;">取票人：<?php echo $detail['owner_name'] ?></th>
                         <th>手机号：<?php echo $detail['owner_mobile'] ?></th>
-                        <th style=" text-align: left;">票名称：<?php
+                        <th style=" text-align: left;">门票名称：<?php
 	                        //todo optimize
                             if (ApiModel::isSucc($_rs)) { #得到景点
                                 $detail = ApiModel::getData($_rs);
@@ -121,8 +134,15 @@ $this->breadcrumbs = array('验票', '验票');
                                 echo '<br/><font style="font-size:12px;font-weight:400;">可用景点:' . join(',', $outs) . '</font>';
                             }
                             ?></th>
-                        <th>可用门票张数：<span id="can_used"><?php echo $item['nums']; ?></span>张</th>
-                        <th>已选择： <input type="text"  name="datas[<?php echo $item['order_id'] ?>]" id="min_spinner-<?php echo $item['order_id'] ?>" value="0" onafterpaste="this.value=this.value.replace(/\D/g,'')" onkeyup="this.value=this.value.replace(/\D/g,'')"/> 张</th>
+                        <th style="width:40px;">内含:</th>
+                        <th style="width:200px;"><?php
+                        foreach((array)$detail['ticket_infos'] as $_v){
+                            $_model = TicketType::model()->findByPk($_v['type']);
+                          echo    ''.(strpos($_v['base_name'],'-')?substr($_v['base_name'],strpos($_v['base_name'],'-')):$_v['base_name']).$_model['name'].'*'.$_v['num'].'张<br/>';
+                        }
+                        ?></th>
+                        <th><?php echo $tmk1; ?>：<span id="can_used"><?php echo $item['nums']; ?></span><?php echo $tmk2; ?></th>
+                        <th>已选择： <input type="text"  name="datas[<?php echo $item['order_id'] ?>]" id="min_spinner-<?php echo $item['order_id'] ?>" value="0" onafterpaste="this.value=this.value.replace(/\D/g,'')" onkeyup="this.value=this.value.replace(/\D/g,'')"/> <?php echo $tmk2; ?></th>
                     </tr>
                 <?php endforeach; ?>
             </table>
@@ -147,7 +167,7 @@ $this->breadcrumbs = array('验票', '验票');
         <div><span style="display:inline-block;*display:inline;zoom:1; width:15mm;">产品名称:</span><span style="display:inline-block;*display:inline;zoom:1; width:30mm; vertical-align:middle;">{ticket_name}</span>
         </div>
         <div><span style="display:inline-block;*display:inline;zoom:1; width:15mm;">订单号:</span><span>{order_id}</span></div>
-        <div><span style="display:inline-block;*display:inline;zoom:1; width:15mm;">验证张数:</span><span>{num}张</span></div>
+        <div><span style="display:inline-block;*display:inline;zoom:1; width:15mm;">验证套数:</span><span>{num}套</span></div>
         <div><span style="display:inline-block;*display:inline;zoom:1; width:15mm;">验证时间:</span><span>{date}</span></div>
         <div><span style="display:inline-block;*display:inline;zoom:1; width:15mm;">取票人:</span><span>{owner_name}</span></div>
         <div><span style="display:inline-block;*display:inline;zoom:1; width:15mm;">电话:</span><span>{owner_mobile}</span></div>
@@ -206,14 +226,20 @@ $this->breadcrumbs = array('验票', '验票');
                                     printLodop(data.params,'正联');
                                     setTimeout(function() {
                                         printLodop(data.params,'副联');
-                                        alert('验证成功',function(){location.partReload();});
+                                        alert('验证成功',function(){
+                                            location.partReload();
+                                        });
                                     }, 1000);
                                 }else{
                                     printLodop(data.params,'正联');
-                                    alert('验证成功',function(){location.partReload();});
+                                    alert('验证成功',function(){
+                                        location.partReload();
+                                    });
                                 }
 	                    } else {
-	                        alert('验证成功',function(){location.partReload();});
+	                        alert('验证成功',function(){
+                                    location.partReload();
+                                });
 	                    }
 	                } else {
 	                    alert(data.msg);
@@ -284,6 +310,15 @@ $this->breadcrumbs = array('验票', '验票');
         // Spinner
 <?php
 foreach ($lists as $item):
+					$ticketSum = 0;
+                    foreach((array)$detail['ticket_infos'] as $t){
+                        if($_GET['landscape_id']==$t['scenic_id']){
+                        $ticketSum = $ticketSum + $t['num'] ;
+                        }
+                    }
+                    if($ticketSum){
+                        $item['nums'] = intval($item['nums']/$ticketSum);
+                    }
     ?>
             jQuery('#min_spinner-<?php echo $item['order_id'] ?>').spinner({'min': 0, 'max':<?php echo $item['nums'] ?>});
 <?php endforeach; ?>
@@ -292,6 +327,15 @@ foreach ($lists as $item):
         $('.num').blur(function(){
 <?php
 foreach ($lists as $item):
+					$ticketSum = 0;
+                    foreach((array)$detail['ticket_infos'] as $t){
+                        if($_GET['landscape_id']==$t['scenic_id']){
+                        $ticketSum = $ticketSum + $t['num'] ;
+                        }
+                    }
+                    if($ticketSum){
+                        $item['nums'] = intval($item['nums']/$ticketSum);
+                    }
     ?>
                 if (parseInt($('#min_spinner-<?php echo $item['order_id'] ?>').val()) > <?php echo $item['nums'] ?>) {
                     $('#min_spinner-<?php echo $item['order_id'] ?>').val(<?php echo $item['nums'] ?>);

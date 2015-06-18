@@ -162,6 +162,7 @@ class OrganizationModel extends Base_Model_Abstract
                     'distributor_name' => $agency['name'],
                     'supplier_name' => $v['name'],
                     'add_time' => $now,
+                    'source' => 2,
                 ));
             }
             $this->commit();

@@ -21,6 +21,7 @@
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label"><span class="text-danger">*</span> 用户名</label>
                                     <div class="col-sm-6">
+                                        <input type="hidden" name="agencyname" disabled>
                                         <input type="text" placeholder="" class="form-control validate[required, minSize[6], maxSize[20], custom[numChinese]]" maxlength="20" tag="用户名" name="agencyname" id="agencyname" />
 									</div>
                                 </div>

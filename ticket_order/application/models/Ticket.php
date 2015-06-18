@@ -46,7 +46,7 @@ class TicketModel extends Base_Model_Abstract {
                 $poi_num = count($view_point);
                 for($i=0;$i<$prodItem['num'];$i++) {
                     $idx++;
-                    $id = '2'.substr("{$orderItem['order_id']}", 1)."$idx";
+                    $id = '2'.substr("{$orderItem['order_id']}", 1)."{$idx}".mt_rand(10,99);
                     $ticket = array();
                     $ticket['id'] = $id;
                     $ticket['status'] = 1; //状态：0：不可使用 1：可使用 2已使用，支付后状态为1   因异步，先支付所以直接为可用
@@ -89,7 +89,7 @@ class TicketModel extends Base_Model_Abstract {
                 $poi_num = count($view_point);
                 for($i=0;$i<$prodItem['num'];$i++) {
                     $idx++;
-                    $id = '2'.substr("{$orderItem['order_id']}", 1)."$idx";
+                    $id = '2'.substr("{$orderItem['order_id']}", 1)."{$idx}".mt_rand(10,99);
                     $ticket = array();
                     $ticket['id'] = $id;
                     $ticket['status'] = 1; //状态：0：不可使用 1：可使用 2已使用，支付后状态为1

@@ -3,7 +3,10 @@
  * @link
  */
 namespace common\huilian\models;
+
 use common\huilian\utils\TwoDimensionalArray;
+use ApiModel;
+use CPagination;
 
 /**
  * API类
@@ -30,7 +33,7 @@ class API {
 	 * @param string $column 列名
 	 * @param string $callback 接口， 一般为  `Organizations::list`
 	 * @param string $param 查询参数，用于接口查询的参数
-	 * @param string $compareColumn 用于比对的列
+	 * @param string $compareColumn 用于比对的列，是接口返回的数组的列名
 	 * @param string $newKey 键名，用于存接口返回的数据
 	 * @return array
 	 */
@@ -63,6 +66,31 @@ class API {
 		return $rows;
 	}
 	
+	/**
+	 * 获取接口列表数据
+	 * 备注：
+	 * - 本方法默认包含分页功能，这是实际中常用的状态。
+	 * - 参数$callback上，采用通用参数格式，如：`Organizations::list`，如果参数的首字符不是`\`，则需要添加`\`，即最外层命名空间。
+	 * @param string $callback 接口， 一般为  `Organizations::list`
+	 * @param array $params 传递给接口的参数
+	 * @param integer $pageSize 分页类型
+	 * @return array ['lists' => '列表数组', 'pages' => '分页对象', ]
+	 */
+	public static function lists($callback, $params, $pageSize = 15) {
+		if(strncasecmp($callback, '\\', 1) !== 0) {
+			$callback = '\\' . $callback;
+		}
+		list($class, $func) = explode('::', $callback);
+		$obj = $class::api();
+		$res = $obj->$func($params);
+		$lists = ApiModel::getLists($res);
+		
+		$pagination = ApiModel::getPagination($res);
+		$pages = new CPagination($pagination['count']);
+		$pages->pageSize = $pageSize; #每页显示的数目
+		
+		return ['lists' => $lists, 'pages' => $pages, ];
+	}
 }
 
 

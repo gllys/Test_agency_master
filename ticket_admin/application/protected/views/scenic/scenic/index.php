@@ -19,9 +19,10 @@
 <div class="contentpanel">
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			<h4 class="panel-title">
-				景区列表
-			</h4>
+            <ul class="list-inline">
+                <li><h4 class="panel-title">景区列表</h4></li>
+                <li class="pull-right"><a href="/scenic/scenic/new" class="btn btn-primary btn-sm">新建景区</a></li>
+            </ul>
 		</div>
 
 		<div class="panel-body">
@@ -44,9 +45,10 @@
                 </div>
                 <div class="form-group">
                     <select class="select2" name="partner_type" style="width: 150px; padding: 0 10px;">
-                        <option value="-1">未使用</option>
-                        <option value="0" <?php echo isset($_GET['partner_type'])&&$_GET['partner_type']==0?'selected':'';?>>票台</option>
-                        <option value="1" <?php echo isset($_GET['partner_type'])&&$_GET['partner_type']==1?'selected':'';?>>大漠</option>
+                        <option value="">全部</option>
+                        <option value="0" <?php echo isset($_GET['partner_type'])&&$_GET['partner_type']==='0'?'selected':'';?>>票台</option>
+                        <option value="1" <?php echo isset($_GET['partner_type'])&&$_GET['partner_type']==='1'?'selected':'';?>>大漠</option>
+						<option value="2" <?php echo isset($_GET['partner_type'])&&$_GET['partner_type']==='2'?'selected':'';?>>计调通</option>
                     </select>
                 </div>
 				<div class="form-group">
@@ -74,8 +76,43 @@
                 </div>
 			</form>
 		</div>
-	</div>
 
+	</div>
+    <style>
+        .rules {
+            position: relative;
+            display: inline-block;
+        }
+        .rules+.rules {
+            margin-left:5px;
+        }
+        .rules > span {
+            cursor: pointer
+        }
+        .rules > div {
+            display: none;
+            position: absolute;
+            top: 15px;
+            left: 10px;
+            z-index: 999;
+            width: 100px;
+            padding: 10px;
+            background-color: #fbf8e9;
+            border: 1px solid #fed202;
+            border-radius: 2px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, .2);
+            word-wrap: break-word;
+        }
+        .rules > div .table {
+            background: none;
+        }
+        .rules > div .table tr > * {
+            border: 1px solid #e0d9b6
+        }
+        .rules:hover > div {
+            display: block;
+        }
+    </style>
 	<div class="table-responsive">
 		<table class="table table-bordered mb30">
 			<thead>
@@ -84,6 +121,7 @@
 				<th>景区名称</th>
 				<th>景区级别</th>
 				<th>所属地区</th>
+                <th>是否已绑定设备</th>
                 <th>是否已绑定供应商</th>
                 <th>电子票务系统</th>
                 <th>验票账号</th>
@@ -91,7 +129,7 @@
 			</tr>
 			</thead>
 			<tbody>
-			<?PHP foreach ($lists as $item): ?>
+			<?PHP foreach ($lists as $item): //print_r($item);?>
 			<tr>
 				<td><?php echo $item['id'] ?></td>
 				<td>
@@ -115,6 +153,18 @@
                                         }
                                 ?>
 				</td>
+                <td>
+                    <?php if(count($item['dev_list'])>0){
+                        $type = array('手持','闸机','小票打印机(蓝牙)','小票打印机(USB)','身份证阅读器','扫码枪','二维码打印机','掌纹录入机');
+                        foreach($item['dev_list'] as $k => $v):
+                        ?>
+                        <div class="rules"><span><img src="/img/equipment/e-<?php echo $v['device_type']+1;?>.png" width="20"></span>
+                            <div><?php
+                                echo $type[$v['device_type']];
+                                echo $v['num'].'台';?></div>
+                        </div>
+                    <?php endforeach; }else{ echo '否';}?>
+                </td>
                                 <td><?php
                                 if(isset($item['has_bind_org'])){
                                     if($item['has_bind_org']==1){
@@ -132,6 +182,8 @@
                         echo "票台";
                     } else if($item['partner_type'] == 1) {
                         echo '大漠';
+                    } else if($item['partner_type'] == 2) {
+                        echo '计调通';
                     }
                     ?>
                 </td>

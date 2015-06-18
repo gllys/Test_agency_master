@@ -103,7 +103,7 @@
 					</tbody>
 				  </table>
 				  <div class="panel-footer">
-					<a  id="bill_finish" <?php if($detail['receipt_status'] == 1 || $detail['pay_status'] == 0){echo "style='display:none'";} ?>><button class="btn btn-primary btn-sm" type="button">确认收款</button></a>
+					<a  class="clearPart" id="bill_finish" <?php if($detail['receipt_status'] == 1 || $detail['pay_status'] == 0){echo "style='display:none'";} ?>><button class="btn btn-primary btn-sm" type="button">确认收款</button></a>
 					<a  href="/finance/bill" class="btn btn-primary btn-sm">返回</a>
 				  </div>
 				</div>
@@ -121,7 +121,8 @@ jQuery(document).ready(function() {
                 }else{
                     alert(data.msg);
                 }
-            },'json')
+            },'json');
+        return false;
 	})
 });	
 </script>

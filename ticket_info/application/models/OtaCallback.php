@@ -18,7 +18,7 @@ class OtaCallbackModel extends Base_Model_Api
     {
 
         $this->url = '/common/notice/productChanged';
-        $this->params = $tmp = array(
+        $this->params = array(
             'product_id' => $params['product_id'], //产品id
             'code' => $params['code'], //产品对接码（agency_product表的code字段）
             'agency_id' => (isset($params['agency_id']) && intval($params['agency_id'])>0) ? intval($params['agency_id']) : 0, //分销商id
@@ -29,8 +29,9 @@ class OtaCallbackModel extends Base_Model_Api
             $this->params['is_sale'] = $tmp['is_sale'] = $params['is_sale'] > 0 ? 1 : 0;
         }
 
+        Log_Base::save('OtaCallback_productChanged', "[" . date('Y-m-d H:i:s') . "] [Require] Url:".$this->getSrvUrl() . $this->url."\nParams: " . var_export($this->params, true));
         $response = $this->request(null, 10);
-        Log_Base::save('OtaCallback_productChanged', "[" . date('Y-m-d H:i:s') . "]Params: " . var_export($tmp, true) . "\nResult: " . $response);
+        Log_Base::save('OtaCallback_productChanged', "[" . date('Y-m-d H:i:s') . "] [Response] " . $response);
         if (!empty($response)) {
             $response = json_decode($response, true);
             if ($response !== false) {

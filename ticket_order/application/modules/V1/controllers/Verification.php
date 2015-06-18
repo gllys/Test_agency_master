@@ -134,6 +134,15 @@ class VerificationController extends  Base_Controller_Api
                 $record[ 'tickets_code' ] = $orderInfo['product_id'];
                 $record[ 'local_source' ] = $orderInfo['local_source'];
                 $record[ 'source' ] = $orderInfo['source'];
+
+                $ticket_infos=json_decode($orderInfo['ticket_infos'],true);
+                $record['per_num'] = 0;  //每份产品可过人数
+                foreach($ticket_infos as $base) {
+                    if($landscape_id>0 && $base['scenic_id']==$landscape_id) {
+                        $record['per_num'] += $base['num'];
+                    }
+                }
+
                 TicketRecordModel::model()->insert( $record );
                 $record['id'] = TicketRecordModel::model()->getInsertId();
 
@@ -165,6 +174,7 @@ class VerificationController extends  Base_Controller_Api
             Lang_Msg::error($e->getMessage());
         } catch ( Exception  $e) {
             $OrderModel->rollback();
+            Log_Base::save('VerificationExcept','['.date('Y-m-d H:i:s').'] OrderId ['.$order_id.'] Params: '.var_export($this->body,true)."\n".$e->getMessage()."\n");
             Lang_Msg::error('操作失败');
         }
 		
@@ -356,32 +366,33 @@ class VerificationController extends  Base_Controller_Api
     public function partnerUseAction() {
         $OrderModel = new OrderModel();
         try {
+            $partner_type = intval($this->body['partner_type']); //合作伙伴类型
             $partner_order_id = trim(Tools::safeOutput($this->body['partner_order_id']));
             $partner_product_code = trim(Tools::safeOutput($this->body['partner_product_code']));
             $nums = intval($this->body['nums']);
 
             if (empty($partner_order_id)) {
-                Lang_Msg::error('外部订单号不能为空');
+                Tools::lsJson(false,'外部订单号不能为空');
+            }  else if ($partner_type<1) {
+                Tools::lsJson(false,'请指定合作伙伴类型');
             } else if(!preg_match("/^\w+$/", $partner_order_id)) {
-                Lang_Msg::error('您输入的订单号有误或者非本系统订单号');
+                Tools::lsJson(false,'您输入的订单号有误或者非本系统订单号');
             } else if (empty($partner_product_code)) {
-                Lang_Msg::error('外部票种编号不能为空');
+                Tools::lsJson(false,'外部票种编号不能为空');
             } else if ($nums<1) {
-                Lang_Msg::error('请指定取票张数');
+                Tools::lsJson(false,'请指定取票张数');
             }
 
-            $orderInfo = $OrderModel->get(array('partner_order_id'=>$partner_order_id));
+            $orderInfo = $OrderModel->get(array('partner_type'=>$partner_type,'partner_order_id'=>$partner_order_id));
+
             if(empty($orderInfo)) {
-                Lang_Msg::error('该订单不存在');
-            }
-            if(!in_array($partner_product_code,explode(',',$orderInfo['partner_product_code']))) {
-                Lang_Msg::error('票种编号有误');
-            }
-            if($orderInfo['nums'] <= $orderInfo['refunding_nums']+$orderInfo['refunded_nums']) {
-                Lang_Msg::error('该订单已退款');
-            }
-            if($orderInfo['status'] == 'cancel') {
-                Lang_Msg::error('该订单已取消');
+                Tools::lsJson(false,'该订单不存在');
+            } else if(!in_array($partner_product_code,explode(',',$orderInfo['partner_product_code']))) {
+                Tools::lsJson(false,'票种编号有误');
+            } else if($orderInfo['nums'] <= $orderInfo['refunding_nums']+$orderInfo['refunded_nums']) {
+                Tools::lsJson(false,'该订单已退款');
+            } else if($orderInfo['status'] == 'cancel') {
+                Tools::lsJson(false,'该订单已取消');
             }
             $OrderModel->begin();
             $landscape_id = intval($orderInfo['landscape_ids']);
@@ -401,7 +412,7 @@ class VerificationController extends  Base_Controller_Api
             TicketRecordModel::model()->insert( $record );
             $record['id'] = TicketRecordModel::model()->getInsertId();
 
-            $OrderModel->useTicket($orderInfo['id'], $landscape_id, 0, $nums);
+            $OrderModel->useTicket($orderInfo,$orderInfo['id'], $landscape_id, 0, $nums);
 
             PvModel::model()->updateStatics($landscape_id, $nums);
             $OrderModel->commit();
@@ -410,7 +421,7 @@ class VerificationController extends  Base_Controller_Api
             Lang_Msg::error($e->getMessage());
         } catch (Exception $e) {
             $OrderModel->rollback();
-            Lang_Msg::error('核销失败');
+            Tools::lsJson(false,'核销失败');
         }
 
         $data = array();

@@ -62,18 +62,18 @@ use common\huilian\utils\Format;
 		<div class="panel-body">
 			<form class="form-inline" method="get" action="/agency/product/">
 				<div class="form-group">
-					<select name="state" class="select2" data-placeholder="Choose One" style="width: 130px; padding-left:6px;height: 32px;">
+					<select name="state" class="select2" data-placeholder="Choose One" style="width: 130px; padding-left: 6px; height: 32px;">
 						<option value="" <?= isset($_GET['state']) && ($_GET['state'] == "") ? ' selected' : '' ?>>产品状态</option>
 						<option value="1" <?= isset($_GET['state']) && ($_GET['state'] == 1) ? ' selected' : '' ?>>已上架</option>
 						<option value="2" <?= isset($_GET['state']) && ($_GET['state'] == 2) ? ' selected' : '' ?>>未上架</option>
 						<option value="3" <?= isset($_GET['state']) && ($_GET['state'] == 3) ? ' selected' : '' ?>>强制下架</option>
 					</select>
 				</div>
-				 <!--景区查询开始-->
-                <div class="form-group">
-                    <div class="input-group input-group-sm" style=" position: relative; top: -2px;">
-                        <div class="input-group-btn">
-                            <button id="search_label" type="button" class="btn btn-default" tabindex="-1">
+				<!--景区查询开始-->
+				<div class="form-group">
+					<div class="input-group input-group-sm" style="position: relative; top: -2px;">
+						<div class="input-group-btn">
+							<button id="search_label" type="button" class="btn btn-default" tabindex="-1">
                                 <?php
 								$get = $_GET;
                                 //左边显示的名称
@@ -91,11 +91,10 @@ use common\huilian\utils\Format;
                                 echo $_querys[$_queryName] ;
                             ?>
                             </button>
-                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
-                                    tabindex="-1">
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu" role="menu">
+							<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" tabindex="-1">
+								<span class="caret"></span>
+							</button>
+							<ul class="dropdown-menu" role="menu">
                                  <?php
                                 //下拉列表
                                  foreach ($_querys as $key => $val) :
@@ -103,21 +102,20 @@ use common\huilian\utils\Format;
                                 <li><a class="sec-btn clearPart" href="javascript:;" data-id="<?php echo $key ?>" id="" aria-labelledby="search_label"><?php echo $val; ?></a></li>
                                 <?php endforeach; ?>
                             </ul>
-                            <script>
+							<script>
                                 $('.sec-btn').click(function() {
                                     $('#search_label').text($(this).text());
                                     $('#search_field').attr('name', $(this).attr('data-id'));
                                 });
                             </script>
-                        </div>
-                        <!-- input-group-btn -->
-                        <input id="search_field" name="<?php echo $_queryName ?>" value="<?php echo empty($get[$_queryName])?'':$get[$_queryName] ?>" type="text" class="form-control" style="z-index: 0"/>
-                    </div>
-                </div>
-                <!--景区查询结束-->
-	
+						</div>
+						<!-- input-group-btn -->
+						<input id="search_field" name="<?php echo $_queryName ?>" value="<?php echo empty($get[$_queryName])?'':$get[$_queryName] ?>" type="text" class="form-control" style="z-index: 0" />
+					</div>
+				</div>
+				<!--景区查询结束-->
 				<div class="form-group">
-                                    <button class="btn btn-primary btn-sm" type="submit">查询</button>
+					<button class="btn btn-primary btn-sm" type="submit">查询</button>
 				</div>
 			</form>
 		</div>
@@ -135,7 +133,7 @@ use common\huilian\utils\Format;
 		<table class="table table-bordered mb30" style="">
 			<thead>
 				<tr>
-                    <th style="width:4%">产品ID</th>
+					<th style="width: 4%">产品ID</th>
 					<th>供应商</th>
 					<th>景区</th>
 					<th>产品名称</th>
@@ -155,7 +153,7 @@ use common\huilian\utils\Format;
 			<tbody id="staff-body">
 				<?php foreach( $lists as $key => $item ) { ?>
 				<tr>
-                    <td  style="width:4%"><?= $item['id'] ?></td>
+					<td style="width: 4%"><?= $item['id'] ?></td>
 					<td><?= empty($item['organization'][0]['name']) ? '' :  $item['organization'][0]['name'] ?></td>
 					<td style="width: 11%;">
 					<?php
@@ -166,7 +164,7 @@ use common\huilian\utils\Format;
 					?>
                     </td>
 					<td>
-						<div class="rules" style="word-break:break-all;">
+						<div class="rules" style="word-break: break-all;">
 							<a href="/agency/product/view?id=<?= $item['id'] ?>" target="_blank"> <span class="pull-left" style="margin-top: 5px"><?= mb_strlen($item['name'],'utf8')>15?mb_substr($item['name'], 0, 15,'utf8').'...':$item['name'] ?></span>
 							</a>
 						</div>
@@ -198,7 +196,7 @@ use common\huilian\utils\Format;
 						<?php if(empty($item['policy_id'])) { ?>
 						未设置
 						<?php } else { ?>
-						<a style="cursor: pointer; cursor: hand;" data-target=".modal-bank" data-toggle="modal" href="javascript:;" onclick="viewPolicy(<?= $item['policy_id'] ?>,<?= $item['organization_id'] ?>);">已设置</a>
+						<a style="cursor: pointer; cursor: hand;" data-target=".modal-bank" data-toggle="modal" href="javascript:;" onclick="viewPolicy(<?= $item['policy_id'] ?>,<?= $item['organization_id'] ?>);"><?= $item['policy_name'] ?></a>
 						<?php }?>
 					</td>
 					<td>
@@ -214,8 +212,7 @@ use common\huilian\utils\Format;
 						 */
 						?>
 						<?php if($item['force_out'] == 0 && $item['state'] == 1) { ?>
-						<a class="clearPart"  style="cursor: pointer; cursor: hand;" data-target=".modal-bank" data-toggle="modal"
-							href="/agency/product/forceOut?id=<?= $item['id'] ?>" onclick="modal_jump(this);">强制下架</a>
+						<a class="clearPart" style="cursor: pointer; cursor: hand;" data-target=".modal-bank" data-toggle="modal" href="/agency/product/forceOut?id=<?= $item['id'] ?>" onclick="modal_jump(this);">强制下架</a>
 						<?php } else if($item['force_out'] == 0 && $item['state'] != 1) { ?>
 						强制下架									
 						<?php } else if($item['force_out'] == 1 && $item['state'] != 1) { // ?>
@@ -276,7 +273,7 @@ use common\huilian\utils\Format;
 		<div class="modal-content">
 			<form class="form-horizontal form-bordered" id="repass-form">
 				<div class="modal-body">
-					<div class="form-group" style="position:relative;top:-20px;">
+					<div class="form-group" style="position: relative; top: -20px;">
 						<button id="close_rule" class="close" aria-hidden="true" data-dismiss="modal" type="button">×</button>
 					</div>
 					<div class="form-group" style="overflow: inherit;">
@@ -318,6 +315,9 @@ use common\huilian\utils\Format;
 						</table>
 					</div>
 					<table class="table table-bordered mb30">
+						<tbody id="newdist">
+
+						</tbody>
 						<tbody id="otherdist">
 							<tr style="background-color: #f7f7f7;">
 								<td style="width: 200px;">未合作分销商</td>
@@ -325,7 +325,7 @@ use common\huilian\utils\Format;
 								<td style="width: 200px;"><input type="text" class="spinner-day"></td>
 								<td><input type="text" class="spinner-day"></td>
 							</tr>
-					
+						</tbody>
 					</table>
 				</div>
 			</form>
@@ -640,6 +640,7 @@ use common\huilian\utils\Format;
         $('#verify-modal').html('');
         $('#distributor').empty();
         $('#otherdist').empty();
+        $('#newdist').empty();
         $('#fatAll').val('');
         $('#groupAll').val('');
         $('.formError').remove();
@@ -650,6 +651,7 @@ use common\huilian\utils\Format;
                 $('#verify-modal').html($("#modal1").parent().html()).modal('show');
                 $('#distributor').append(result.data);
                 $('#otherdist').append(result.otherdata);
+                $('#newdist').append(result.newdata);
                 $('#modal1').show();
                 $('#rule_add').show();
                 $('#distid').val(result.dist_id);

@@ -44,7 +44,8 @@
                                     <div class="col-sm-9">
                                         <div class="row">
                                             <div class="col-sm-4">
-                                                <select class="select2" data-validation-engine="form-control validate[required]" data-placeholder="Choose One" id="province" name="province_id">
+                                                <select class="select2 validate[required]" data-validation-engine="form-control
+                                                validate[required]" data-placeholder="Choose One" id="province" name="province_id">
                                                     <option value="__NULL__">省</option>
                                                     <?php
                                                     $province = Districts::model()->findAllByAttributes(array("parent_id" => 0));
@@ -57,7 +58,8 @@
                                                 </select>
                                             </div>
                                             <div class="col-sm-4">
-                                                <select class="select2" data-placeholder="Choose One" id="city" name="city_id">
+                                                <select class="select2 validate[required]" data-placeholder="Choose One" id="city"
+                                                        name="city_id">
                                                     <option value="__NULL__">市</option>
                                                     <?php
                                                     if(isset($info['province_id']) && !empty($info['province_id'])){
@@ -74,7 +76,8 @@
                                             </div>
 
                                             <div class="col-sm-4">
-                                                <select class="select2 col-sm-4" data-placeholder="Choose One" id="area" name="district_id">
+                                                <select class="select2 col-sm-4 validate[required]" data-placeholder="Choose One"
+                                                        id="area" name="district_id">
                                                     <option value="__NULL__">县</option>
                                                     <?php
                                                     if(isset($info['city_id']) && !empty($info['city_id'])){
@@ -97,18 +100,108 @@
                                 <div class="form-group">
                                     <label class="col-sm-2 control-label"><span class="text-danger">*</span> 详细地址</label>
                                     <div class="col-sm-6">
-                                        <input type="text" placeholder="" tag="详细地址" class="form-control validate[required,minSize[4],maxSize[20]]" name="address" value="<?php echo isset($info['address']) && !empty($info['address']) ? $info['address'] : ''?>"/>
+                                        <input type="text" placeholder="" tag="详细地址" class="form-control
+                                        validate[required,minSize[4],maxSize[20]]" name="address" value="<?php echo isset($info['address']) && !empty($info['address']) ? $info['address'] : ''?>"/>
                                     </div>
                                 </div>
                                 <!-- form-group -->
 
                                 <div class="form-group">
-                                    <label class="col-sm-2 control-label">景区介绍</label>
+                                    <label class="col-sm-2 control-label"><span class="text-danger">*</span>联系电话</label>
                                     <div class="col-sm-6">
-                                        <textarea rows="5" name="description" class="form-control"><?php echo isset($info['biography']) && !empty($info['biography']) ? $info['biography'] : '' ?></textarea>
+                                        <div class="row">
+                                            <?php $phone = explode('-',$info['phone']);?>
+                                            <div class="col-sm-3">
+                                                <input type="text" id="phoneditribute" name="phone[]" tag="请正确输入该景区联系电话区号"
+                                                       class="validate[required,req,custom[integer],minSize[3],
+                                                       maxSize[5]] form-control"
+                                                       placeholder="区号" value="<?php echo $phone['0']?>">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <input type="text" id="phonenum" name="phone[]" tag="请正确输入该景区联系电话"
+                                                       class="validate[required,req,custom[integer],minSize[7],
+                                                       maxSize[8]] form-control"
+                                                       placeholder="电话" value="<?php echo $phone['1']?>">
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <input type="text" id="phoneextension" name="phone[]" tag="请正确输入该景区联系电话分机号"
+                                                       class="validate[req,maxSize[3],custom[integer]] form-control"
+                                                       placeholder="分机" value="<?php echo $phone['2']?>">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- form-group -->
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><span class="text-danger">*</span>开放时间</label>
+                                    <div class="col-sm-7">
+                                        <textarea rows="5" tag="请正确输入该景区开放时间" name="hours" class="form-control
+                                        validate[required,req]"><?php echo isset($info['hours']) && !empty($info['hours']) ?$info['hours']:'';?></textarea>
                                     </div>
                                 </div>
                                 <!-- form-group -->
+
+                                <!-- form-group -->
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label"><span class="text-danger">*</span>景区经纬度</label>
+                                    <div class="col-sm-3">
+                                        <input type="text" placeholder="景区经度" tag="请正确输入该景区经度坐标" class="form-control
+                                        validate[required,req,custom[number]]" name="lat" value="<?php echo isset($info['lat']) && !empty($info['lat']) ?$info['lat']:'';?>"/>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <input type="text" placeholder="景区纬度" tag="请正确输入该景区纬度坐标" class="form-control
+                                        validate[required,req,custom[number]]" name="lng" value="<?php echo isset($info['lng']) && !empty($info['lng']) ?$info['lng']:'';?>"/>
+                                    </div>
+                                </div>
+                                <!-- form-group -->
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">全景ID</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" placeholder="" tag="请正确输入该景区的ID" class="form-control
+                                        validate[req,custom[number],minSize[1],maxSize[9]]" name="panorama_id" value="<?php echo isset($info['panorama_id']) && !empty($info['panorama_id']) ?$info['panorama_id']:'';?>"/>
+                                    </div>
+                                </div>
+                                <!-- form-group -->
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">注意事项</label>
+                                    <div class="col-sm-7">
+                                        <textarea rows="5" name="note" class="form-control"><?php echo isset($info['note']) && !empty($info['note']) ?$info['note']:'';?></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">交通情况</label>
+                                    <div class="col-sm-7">
+                                        <textarea rows="5" name="transit" class="form-control"><?php echo isset($info['transit']) && !empty($info['transit']) ?$info['transit']:'';?></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">景区介绍</label>
+                                    <div class="col-sm-6">
+                                        <textarea id="editor_id" name="biography" style="width:200px;height:100px;
+                                        "><?php echo isset($info['biography']) && !empty($info['biography'])
+                                                ?htmlspecialchars_decode($info['biography']):'';?></textarea>
+                                        <script>
+                                            $(function(){
+                                                window.editor = KindEditor.create('#editor_id', {
+                                                    resizeType: 1,
+                                                    allowPreviewEmoticons: false,
+                                                    afterBlur: function () { this.sync(); },
+                                                    allowImageUpload: true,
+                                                    items: [
+                                                        'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic', 'underline',
+                                                        'removeformat', '|', 'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist',
+                                                        'insertunorderedlist', '|', 'link','image']
+                                                });
+                                            });
+                                        </script>
+                                    </div>
+                                </div>
 
                             </div>
 
@@ -118,13 +211,28 @@
                                     <div class="col-sm-6">
                                         <div class="dropzone" id="image_upload">
                                             <div class="fallback nailthumb-container square-thumb">
-                                                <img id="image"  src="<?php echo isset($info['images']) && !empty($info['images']) ? $info['images'][0]['url'] : '/img/uploadfile.png'?>"
-                                                     style="width:310px;height:180px;position:absolute;left:0px;top:0px">
-                                                <input type="hidden" class="sp_sxming" name="images[id]" value="<?php echo isset($info['images']) && !empty($info['images']) ? $info['images'][0]['id'] : ''?>" />
-                                                <input type="hidden" id="image_upload_img" name="images[url]" value="<?php echo isset($info['images']) && !empty($info['images']) ? $info['images'][0]['url'] : ''?>">
+                                                <img id="image"  src="<?php echo isset($info['images']) && !empty($info['images']) ? $info['images'][0]['url'] : '/img/uploadfile.png'?>" style="width:310px;height:180px;position:absolute;left:0px;top:0px">
+                                                <input type="hidden" class="sp_sxming" name="images[id]" value="" />
+                                                <input type="hidden" id="image_upload_img" name="images[url]" value="">
                                                 <input type="hidden" name="id" value="<?php echo $info['id']?>">
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label" id="getsc"><span class="text-danger">*</span>景区主题：</label>
+                                    <div class="col-sm-6">
+                                        <ul class="list-inline">
+                                            <?php
+                                            if(isset($feature)&&!empty($feature)):
+                                                $f = explode(',',$info['feature']);
+                                                foreach($feature as $_k =>$_v):
+                                                    ?>
+                                                    <li><input type="checkbox" value="<?php echo $_k;?>" name="feature[]"
+                                                               id="checkboxPrimary<?php echo $_k;?>" <?php if(in_array($_k,$f)){ echo "checked=checked";}?>><label
+                                                            for="checkboxPrimary<?php echo $_k;?>"><?php echo $_v;?></label></li>
+                                                <?php   endforeach; endif;?>
+                                        </ul>
                                     </div>
                                 </div>
                             </div>
@@ -150,6 +258,8 @@
     <!-- row -->
 
 </div>
+
+
 <script>
     jQuery(document).ready(function() {
         jQuery('.select2').select2({
@@ -161,6 +271,7 @@
         $('#area').select2("val","<?php echo isset($info['district_id']) && !empty($info['district_id']) ? $info['district_id'] : '__NULL__'?>");
 
         $('#landscape_level_id').select2('val',<?php echo isset($info['landscape_level_id']) ? $info['landscape_level_id'] : 0?>);
+
 
         //jQuery('select option:first-child').text('');
         $('#province option:first-child').html('省').val("__NULL__");
@@ -245,12 +356,32 @@
     $('#save_scenic').click(function() {
         $(this).hide();
         $('#load').show();
-        $('#scenic_form').validationEngine({
-            autoHidePrompt: false,
-            scroll: false,
-            autoHideDelay: 3000,
-            maxErrorsPerField: 1
-        });
+        if($('#province').val() == '__NULL__'){
+            $('#save_scenic').show();
+            $('#load').hide();
+            $('#province').PWShowPrompt('请选择省份');
+            return false;
+        }
+        if($('#city').val() == '__NULL__'){
+            $('#save_scenic').show();
+            $('#load').hide();
+            $('#city').PWShowPrompt('请选择城市');
+            return false;
+        }
+        if($('#area').val() == '__NULL__'){
+            $('#save_scenic').show();
+            $('#load').hide();
+            $('#area').PWShowPrompt('请选择县区');
+            return false;
+        }
+
+        if(!$('input[name="feature[]"]').is(':checked')){
+            $('#save_scenic').show();
+            $('#load').hide();
+            $('#getsc').PWShowPrompt('请选择至少一个主题');
+            return false;
+        }
+
         if ($('#scenic_form').validationEngine('validate') == true) {
             $.post('/scenic/scenic/saveScenic', $('#scenic_form').serialize(), function(data) {
                 if (data.error) {
@@ -261,10 +392,10 @@
                     });
                 } else {
                     window.setTimeout(function(){
-                      alert('更新成功！', function() {
-                        location.href='/site/switch/#/scenic/scenic/';
-                      });
-                    },200);
+                        alert('更新成功！', function() {
+                            location.href='/site/switch/#/scenic/scenic/';
+                        });
+                    },400);
                 }
             }, "json")
         }else{
@@ -276,4 +407,3 @@
     })
 
 </script>
-

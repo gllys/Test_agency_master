@@ -61,7 +61,7 @@
                 <div class="form-group">
                     <label class="col-sm-2 control-label"><div class="pull-right"><span class="text-danger">*</span>产品名称:</div></label>
                     <div class="col-sm-4">
-                        <input type="text" placeholder="请输入产品名称" maxlength="20" tag="产品名称" class="validate[required] form-control" name="name">
+                        <input type="text" placeholder="请输入产品名称" maxlength="30" tag="产品名称" class="validate[required] form-control" name="name">
                     </div>
                 </div><!-- form-group -->
 
@@ -88,6 +88,7 @@
                             <label for="is_fat_once_verificate0">否</label>
                         </div>
                     </div>
+                    <div class="once">
                     <label class="col-sm-1 control-label"><div class="pull-right"><span class="text-danger pull-left">*</span>是否一次取票:</div></label>
                     <div class="col-sm-2">
                         <div class="rdio rdio-default inline-block">
@@ -101,6 +102,7 @@
                         <i style="cursor:pointer" animation="true" class="fa fa-question-circle text-muted popovers" title=""  data-original-title="" data-container="body" data-toggle="popover"  data-trigger="hover" data-placement="top" data-html="true" data-content="一次验票：为了防止倒票，您可以开启此功能，开启后一张包含多个门票的订单第一次验票后，所有未使用的门票都会自动退款而不能被使用。
 <br/>一次取票：对于线下有实体票的联票，为了防止在A景区换实体票后再去B
 景区扫二维码入园，您可以开启此功能，开启后，在A景区验证换实体票后，其他景区不可以再扫二维码。"></i>
+                    </div>
                     </div>
                     <?php  endif ;?>
                 </div><!-- form-group -->
@@ -143,6 +145,7 @@
                             <label for="is_group_once_verificate0">否</label>
                         </div>
                     </div>
+                    <div class="once">
                     <label class="col-sm-1 control-label"><div class="pull-right"><span class="text-danger pull-left">*</span>是否一次取票:</div></label>
                     <div class="col-sm-2">
                         <div class="rdio rdio-default inline-block">
@@ -154,10 +157,11 @@
                             <label for="is_group_once_taken0">否</label>
                         </div>
                     </div>
+                    </div>
                     <?php  endif ;?>
 
                     <div class="col-sm-2">
-                        最少订票 <input type="text" id="spinner-min" tag="最少订票" class="spinner validate[custom[number]]" style="cursor: pointer;cursor: hand;background-color: #ffffff" name="mini_buy"  onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"> 张
+                        最少订票 <input type="text" id="spinner-min" tag="最少订票" class="spinner validate[custom[number]]" style="cursor: pointer;cursor: hand;background-color: #ffffff" name="mini_buy" value="10"  onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"> 张
                     </div>
                 </div><!-- form-group -->
 
@@ -790,7 +794,7 @@
                 $('input[name="group_scheduledtime"]').val("");
                 $('#group_des').val("");
                 $('input[name="group_price"]').attr("readonly", "readonly").removeClass('validate[required]');
-                 $('#spinner-min').attr("readonly", "readonly").val(1).css('background-color','#eeeeee');
+                 $('#spinner-min').attr("readonly", "readonly").val(10).css('background-color','#eeeeee');
                 $('[name=is_full]').parents('.form-group').find('[type=radio]').attr('disabled', 'disabled');
             }
             
@@ -807,6 +811,20 @@
                $('input[name="sale_start_time"]').removeAttr("readonly").addClass('validate[required]').css('background-color','#ffffff');
                $('input[name="sale_end_time"]').removeAttr("readonly").addClass('validate[required]').css('background-color','#ffffff');
             }
+            
+            //一次性取票是否显示
+            var _lanCount = [];
+            $('select.lan').each(function(){
+                if($(this).val()){
+                    _lanCount.push($(this).val());
+                }
+            });
+           _lanCount = unique(_lanCount);
+           if(_lanCount.length>1){
+               $('.once').show();
+           }else{
+               $('.once').hide();
+           }
             
         }, 200);
         
@@ -900,7 +918,9 @@
                         alert(data.msg);
                         $('#form-button').attr('disabled', false);
                     } else {
-                        alert('新增产品成功',function(){window.location.partReload();});
+                        alert('新增产品成功',function(){
+                           setTimeout(function(){location.partReload();},1000);
+                        });
                     }
                 }, 'json');
             }
@@ -1023,6 +1043,17 @@
             return false;
         });
     });
-
     
+function unique(arr){
+        var tmp = new Array();
+        for(var m in arr){
+            tmp[arr[m]]=1;
+        }
+        //再把键和值的位置再次调换
+        var tmparr = new Array();
+       for(var n in tmp){
+         tmparr.push(n);
+       }
+     return tmparr;
+}
 </script>

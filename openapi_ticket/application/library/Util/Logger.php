@@ -10,6 +10,8 @@ if (!function_exists('fastcgi_finish_request')) {
  * @author wfdx1_000
  */
 class Util_Logger {
+    
+    const REDIS_LOG_KEY = 'openapi_log_Util_Logger';
 
     /**
      *
@@ -30,7 +32,12 @@ class Util_Logger {
     public static function getLogger($module = 'common') {
         if (empty(self::$supportModules)) {
             $config = Yaf_Registry::get('config');
-            $config = $config['openapi_log'];
+            
+            if (!isset($config['openapi_log'])) {
+                throw new Exception('缺少 openapi_log的配置');
+            }
+            
+            $config = unserialize($config['openapi_log']);
             
             self::$supportModules = $config['module'];
         }
@@ -62,7 +69,8 @@ class Util_Logger {
         $data = array(array_merge($params, array(
             'module' => $this->module
         )));
-        Process_Async::send(array('LoggerModel', 'write2Db'), $data);
+        
+        Util_Queue::send(self::REDIS_LOG_KEY, json_encode($data));
     }
     
     /**
@@ -98,7 +106,7 @@ class Util_Logger {
             'category' => $category,
             'method' => $method,
             'params' => var_export($params, true),
-            'comment' => is_string($comment) ? $comment : var_export($params, false),
+            'comment' => is_string($comment) ? $comment : var_export($comment, false),
             'search_val' => $searchVal,
             'created_date' => time(),
             'level' => $level,

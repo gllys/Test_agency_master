@@ -43,16 +43,6 @@ class ConsumeAction extends Yaf_Action_Abstract {
                 'code_msg' => '核销成功',
                 'way_msg' => json_encode($resp),
             ));
-<<<<<<< HEAD
-        } catch (Exception $ex) {
-            Lang_Msg::error($ex->getMessage());
-<<<<<<< HEAD
-
-=======
-            
->>>>>>> 90f42504b60bff00f11952fbd557ac17a2520d2a
-=======
->>>>>>> 81dcc72e90aae190d036164819d74ccaa19fd891
         }
     }
 

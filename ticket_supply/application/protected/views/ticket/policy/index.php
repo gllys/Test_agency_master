@@ -78,8 +78,11 @@ $this->breadcrumbs = array('产品', '分销策略');
                         <td><?= $rule['name']; ?></td>
                         <td><?= $rule['note']; ?></td>
                         <td>
-                            <a title="编辑" style="margin-left: 5px; border-width: 1px" href="javascript:;" onclick="edit_rule('<?= $rule['id'] ?>')" data-target=".bs-example-modal-static" data-toggle="modal" class="btn btn-success btn-bordered btn-xs clearPart" >编辑</a>
-                            <a class="btn btn-bordered btn-xs btn-danger del  clearPart" title="删除" style="margin-left: 5px;border-width: 1px"  onclick="del('<?= $rule['id'] ?>')" data-target="" data-toggle="modal"  >删除</a>
+                            <a title="编辑" style="margin-left: 5px; border-width: 1px" href="javascript:;" onclick="edit_rule('<?= $rule['id'] ?>')"
+                               data-target=".bs-example-modal-static" data-toggle="modal"
+                               class="btn btn-success btn-bordered btn-xs clearPart" >编辑</a>
+                            <a class="btn btn-bordered btn-xs btn-danger del  clearPart" title="删除" style="margin-left: 5px;border-width: 1px"
+                               onclick="del('<?= $rule['id'] ?>')" data-target="" data-toggle="modal"  >删除</a>
                         </td>
                     </tr>
                 <?php endforeach;
@@ -89,7 +92,7 @@ $this->breadcrumbs = array('产品', '分销策略');
 
 
     <div class="panel-footer">
-        <div class="pull-right">
+        <div class="">
             <div class="pagenumQu">
                 <?php
                 if (isset($lists['data'])) {
@@ -159,14 +162,20 @@ $this->breadcrumbs = array('产品', '分销策略');
                         <tbody>
                             <tr style="background-color:#f7f7f7;">
                                 <td style="width:200px;"><label>分销商名称</label></td>
-                                <td style="width:100px;"><input id="blacknameAll" type="checkbox" value=""
-                                                                name="">&nbsp;<label for="blacknameAll">不允许购买</label></td>
+                                <td style="width:100px;word-wrap: break-word; "><input id="blacknameFat" type="checkbox" value="" name="">&nbsp;
+                                    <label for="blacknameFat">不许散购</label></td>
+                                <td style="width:100px;word-wrap: break-word; "><input id="blacknameGroup" type="checkbox" value="" name="">&nbsp;
+                                    <label for="blacknameGroup">不许团购</label></td>
                                 <td style=""><label style="margin-right: 4px;">散客结算价</label><input type="text" id="fatAll" name="daystorage" class="spinner form-control"></td>
                                 <td style=""><label style="margin-right: 4px;">团购价</label><input type="text" id="groupAll" name="daystorage" class="spinner form-control">
-                                </td><td style="width:150px;"><input id="creditAll" type="checkbox" value=""
+                                </td>
+                                <?php if($isShow['is_credit'] == 1):?>
+                                <td style="width:150px;"><input id="creditAll" type="checkbox" value=""
                                                                     name="">&nbsp;<label for="creditAll">不允许信用支付</label></td>
+                                <?php endif;if($isShow['is_balance'] == 1):?>
                                 <td style="width:150px;"><input id="advanceAll" type="checkbox" value=""
                                                                name="">&nbsp;<label for="advanceAll">不允许储存支付</label></td>
+                                <?php endif;?>
                             </tr>
                         </tbody>
                     </table>
@@ -175,31 +184,24 @@ $this->breadcrumbs = array('产品', '分销策略');
                             <tbody id="distributor">
                                 <tr>
                                     <td style="width:200px;">eweq</td>
-                                    <td style="width:162px;"><input id="p_176" type="checkbox" value="176" name="blackname_arr[176]" class="blackgroup"></td>
-                                    <td style="width:167px;"><input type="text" class="spinner-day"></td>
+                                    <td style="width:100px;"><input id="p_176" type="checkbox" value="176"
+                                                                  name="blackname_arr[176]" class="blackgroup"></td>
+                                    <td style=""><input type="text" class="spinner-day"></td>
                                     <td><input type="text" class="spinner-day"></td>
-                                    <td style="width:148px;"><input id="p_176" type="checkbox" value="176" name="blackname_arr[176]" class="blackgroup"></td>
-                                    <td style="width:130px;"><input id="p_176" type="checkbox" value="176" name="blackname_arr[176]" class="blackgroup"></td>
+                                    <td style="width:150px;"><input id="p_176" type="checkbox" value="176"
+                                                                   name="blackname_arr[176]" class="blackgroup"></td>
+                                    <td style="width:150px;"><input id="p_176" type="checkbox" value="176"
+                                                                   name="blackname_arr[176]" class="blackgroup"></td>
                                 </tr>
                         </table>
                     </div>
                     <table class="table table-bordered mb30" style="width:975px;">
                         <tbody id="newdist">
-<!--                        <tr>-->
-<!--                            <td style="width:200px;">新合作分销商</td>-->
-<!--                            <td style="width:162px;"><input id="p_n" type="checkbox" value="1" name="new_blackname_flag" class="new_blackname_flag"></td>-->
-<!--                            <td style="width:167px;"><input type="text" class="spinner" id="s_price_n" name="new_fat_price"></td>-->
-<!--                            <td style="width:148px;"><input type="text" class="spinner" id="g_price_n" name="new_group_price"></td>-->
-<!--                            <td style="width:150px;"><input id="credit_n" type="checkbox" value="1" name="new_credit_flag" class="new_credit_flag"></td>-->
-<!--                            <td><input id="advance_n" type="checkbox" value="1" name="new_advance_flag" class="new_advance_flag"></td>-->
-<!--                        </tr>-->
+                            <!--新合作分销商-->
                         </tbody>
                         <tbody id="otherdist">
                             <tr style="background-color:#f7f7f7;">
-                                <td style="width:200px;">未合作分销商</td><td style="width:116px;">
-                                    <input id="p_0" type="checkbox" value="0" name="blackname_arr[0]"></td>
-                                <td style="width:200px;"><input type="text" class="spinner-day"></td>
-                                <td><input type="text" class="spinner-day"></td>
+                                <!--未合作分销商-->
                             </tr>
                         </tbody>
                     </table>
@@ -265,7 +267,8 @@ $this->breadcrumbs = array('产品', '分销策略');
                 $('#modal1').show();
                 $('#rule_add').show();
                 $('#distid').val('');
-                $("#blacknameAll").prop('checked', false);
+                $("#blacknameFat").prop('checked', false);
+                $("#blacknameGroup").prop('checked', false);
                 $("#fatAll").prop('checked', false);
                 $("#groupAll").prop('checked', false);
                 jQuery('.spinner').spinner({
@@ -347,7 +350,8 @@ $this->breadcrumbs = array('产品', '分销策略');
                 $('#distid').val(result.dist_id);
                 $('#pname').val(result.name);
                 $('#note').val(result.note);
-                $("#blacknameAll").prop('checked', false);
+                $("#blacknameFat").prop('checked', false);
+                $("#blacknameGroup").prop('checked', false);
                 $("#fatAll").prop('checked', false);
                 $("#groupAll").prop('checked', false);
                 jQuery('.spinner').spinner({
@@ -365,7 +369,7 @@ $this->breadcrumbs = array('产品', '分销策略');
                             return false
                         }
                     }
-                });
+                }); 
                 //spin事件统一控制散客价
                 jQuery('#fatAll').spinner({
                     spin: function(event, ui) {
@@ -418,13 +422,14 @@ $this->breadcrumbs = array('产品', '分销策略');
 
         if (obj.validationEngine('validate') == true) {
             $.post('/ticket/policy/save', obj.serialize(), function(data) {
+               // console.log(data);
                 if (data.error) {
                     alert(data.msg);
                     $('#rule_add').show();
                     $('#loader').hide();
                 } else {
 					alert('保存成功',function(){
-						 location.partReload();
+						 setTimeout(function(){location.partReload();},2000);
 					});
                 }
             }, 'json');
@@ -472,11 +477,20 @@ $this->breadcrumbs = array('产品', '分销策略');
     }
     ;
     //黑名单全选
-    $(document).on('click', '#blacknameAll', function() {
-        if ($("#blacknameAll").prop('checked') == true) {
-            $(".blackgroup").prop('checked', true);
+    $(document).on('click', '#blacknameFat', function() {
+        if ($("#blacknameFat").prop('checked') == true) {
+            $(".fblackgroup").prop('checked', true);
         } else {
-            $(".blackgroup").prop('checked', false);
+            $(".fblackgroup").prop('checked', false);
+        }
+        ;
+    });
+    //黑名单全选
+    $(document).on('click', '#blacknameGroup', function() {
+        if ($("#blacknameGroup").prop('checked') == true) {
+            $(".gblackgroup").prop('checked', true);
+        } else {
+            $(".gblackgroup").prop('checked', false);
         }
         ;
     });
